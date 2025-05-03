@@ -1,6 +1,9 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import { createMDX } from 'fumadocs-mdx/next';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
+
+const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -10,6 +13,12 @@ const nextConfig = {
   // typescript: {
   //   ignoreBuildErrors: true,
   // },
+  // mdx需要的配置
+  reactStrictMode: true,
+
+  // 手动添加 turbopack 配置
+  turbopack: true,
+
   images: {
     unoptimized: true,
     // 允许加载图片的host
@@ -30,8 +39,8 @@ const nextConfig = {
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
+    parallelServerCompiles: true
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(withMDX(nextConfig));

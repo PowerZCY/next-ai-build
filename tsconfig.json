@@ -22,10 +22,11 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": [ "./src/*" ],
+      // 配置Fumadocs的source, 强制使用别名路径
+      ".source/*": ["./.source/*"]
     }
   },
   "include": [

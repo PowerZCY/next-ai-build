@@ -1,6 +1,12 @@
 import { getRequestConfig } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { appConfig } from "./lib/appConfig";
+import { appConfig } from "@/lib/appConfig";
+import type { I18nConfig } from 'fumadocs-core/i18n';
+ 
+export const i18n: I18nConfig = {
+  defaultLanguage: appConfig.i18n.defaultLocale,
+  languages: appConfig.i18n.locales as unknown as string[],
+}
 
 // Can be imported from a shared config
 const locales = appConfig.i18n.locales;

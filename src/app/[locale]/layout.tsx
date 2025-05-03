@@ -2,7 +2,16 @@ import { appConfig } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, unstable_setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
+// Fumadocs 数学公式样式
+import 'katex/dist/katex.css';
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
+import { RootProvider } from 'fumadocs-ui/provider';
+import type { Translations } from 'fumadocs-ui/i18n';
+
+const cn: Partial<Translations> = {
+  search: 'Translated Content',
+  // other translations
+};
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +55,6 @@ export async function generateMetadata({
   }
 }
 
-
 export default async function RootLayout({
   children,
   params: paramsPromise  // 重命名参数
@@ -57,10 +65,34 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   unstable_setRequestLocale(locale);
   const messages = await getMessages();
+  const generatedLocales = appConfig.i18n.locales.map((loc) => ({
+    name: appConfig.i18n.localeLabels[loc as keyof typeof appConfig.i18n.localeLabels],
+    locale: loc,
+  }));
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body>{children}</body>
+        <body
+          // // you can use Tailwind CSS too
+          // style={{
+          //   display: 'flex',
+          //   flexDirection: 'column',
+          //   minHeight: '100vh',
+          // }}
+        >
+          <RootProvider
+            i18n={{
+              locale: locale,
+              // available languages
+              locales: generatedLocales,
+              // translations for UI
+              translations: { cn }[locale],
+            }}
+          >
+            {children}
+          </RootProvider>
+        </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>
     </html>
