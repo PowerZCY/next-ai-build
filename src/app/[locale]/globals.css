@@ -1,5 +1,16 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
+
+/* 
+ * 文档主题皮肤, 参考https://fumadocs.dev/docs/ui/theme
+ * neutral
+ * black
+ * vitepress
+ * dusk
+ * catppuccin
+ * ocean
+ * purple
+ */
+@import 'fumadocs-ui/css/vitepress.css';
 @import 'fumadocs-ui/css/preset.css';
 
 @custom-variant dark (&:is(.dark *));

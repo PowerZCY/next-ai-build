@@ -7,7 +7,7 @@ import {
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
- 
+import { EditOnGitHub, LLMCopyButton } from './page.client';
 export default async function Page({
   params,
 }: {
@@ -20,10 +20,23 @@ export default async function Page({
   const MDX = page.data.body;
  
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage 
+      tableOfContent={{ style: 'clerk', single: false }}
+      toc={page.data.toc}
+      full={page.data.full}
+      article={{
+        className: 'max-sm:pb-16',
+      }}
+    >
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
-      <DocsBody>
+      <DocsDescription className="mb-2">{page.data.description}</DocsDescription>
+      <DocsBody className="text-fd-foreground/80">
+        <div className="flex flex-row gap-x-2 items-center mb-4">
+          <LLMCopyButton />
+          <EditOnGitHub
+            url={`https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/${page.file.path}`}
+          />
+        </div>
         <MDX components={getMDXComponents()} />
       </DocsBody>
     </DocsPage>

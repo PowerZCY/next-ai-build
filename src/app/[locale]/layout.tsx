@@ -89,6 +89,9 @@ export default async function RootLayout({
               // translations for UI
               translations: { cn }[locale],
             }}
+            search={{
+              enabled: false,
+            }}
           >
             {children}
           </RootProvider>
