@@ -74,12 +74,12 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
         <body
-          // // you can use Tailwind CSS too
-          // style={{
-          //   display: 'flex',
-          //   flexDirection: 'column',
-          //   minHeight: '100vh',
-          // }}
+          // you can use Tailwind CSS too
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh',
+          }}
         >
           <RootProvider
             i18n={{

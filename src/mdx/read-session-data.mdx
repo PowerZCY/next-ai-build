@@ -1,143 +1,257 @@
 ---
-title: Read session and user data in your Next.js app with Clerk
-description: Learn how to use Clerk's hooks and helpers to access the active session and user data in your Next.js application.
+title: FumaDocs Quickstart
+description: build a beauty.
+icon: HousePlus
 ---
 
-Clerk provides a set of [hooks and helpers](/docs/references/nextjs/overview#client-side-helpers) that you can use to access the active session and user data in your Next.js application. Here are examples of how to use these helpers in both the client and server-side to get you started.
+# Quick Start
 
-## Server-side
+Getting Started with Fumadocs
+        
+## Introduction
 
-### App Router
+Fumadocs <span className="text-fd-muted-foreground text-sm">(Foo-ma docs)</span> is a **documentation framework** based on Next.js, designed to be fast, flexible,
+and composes seamlessly into Next.js App Router.
 
-[`auth()`](/docs/references/nextjs/auth) and [`currentUser()`](/docs/references/nextjs/current-user) are App Router-specific helpers that you can use inside of your Route Handlers, Middleware, Server Components, and Server Actions.
+Fumadocs has different parts:
 
-- The `auth()` helper will return the [`Auth`](/docs/references/backend/types/auth-object) object of the currently active user.
-- The `currentUser()` helper will return the [`Backend User`](/docs/references/backend/types/backend-user) object of the currently active user. This is helpful if you want to render information, like their first and last name, directly from the server. Under the hood, `currentUser()` uses the [`clerkClient`](/docs/references/backend/overview) wrapper to make a call to the Backend API. **This does count towards the [Backend API request rate limit](/docs/backend-requests/resources/rate-limits)**. This also uses `fetch()` so it is automatically deduped per request.
+<Cards>
+  <Card icon={<Cpu className="text-purple-300" />} title="Fumadocs Core">
+    Handles most of the logic, including document search, content source adapters, and Markdown extensions.
+  </Card>
 
-The following example uses the [`auth()`](/docs/references/nextjs/auth) helper to validate an authenticated user and the `currentUser()` helper to access the `Backend User` object for the authenticated user.
+  <Card icon={<PanelsTopLeft className="text-blue-300" />} title="Fumadocs UI">
+    The default theme of Fumadocs offers a beautiful look for documentation sites and interactive components.
+  </Card>
 
-> [!NOTE]
-> Any requests from a Client Component to a Route Handler will read the session from cookies and will not need the token sent as a Bearer token.
+  <Card icon={<DatabaseZap />} title="Content Source">
+    The source of your content, can be a CMS or local data layers like [Fumadocs MDX](/docs/clerk-quick-start) (the official content source).
+  </Card>
 
-<Tabs items={["Server components and actions", "Route Handler"]}>
-  <Tab>
-    ```tsx {{ filename: 'app/page.tsx' }}
-    import { auth, currentUser } from '@clerk/nextjs/server'
+  <Card icon={<SquareTerminal />} title="Fumadocs CLI">
+    A command line tool to install UI components and automate things, useful for customizing layouts.
+  </Card>
+</Cards>
 
-    export default async function Page() {
-      // Get the userId from auth() -- if null, the user is not signed in
-      const { userId } = await auth()
+<Callout title="Want to learn more?">
+  Read our in-depth [What is Fumadocs](/docs/clerk-setup) introduction.
+</Callout>
 
-      // Protect the route by checking if the user is signed in
-      if (!userId) {
-        return <div>Sign in to view this page</div>
-      }
+### Terminology
 
-      // Get the Backend API User object when you need access to the user's information
-      const user = await currentUser()
+**Markdown/MDX:** Markdown is a markup language for creating formatted text. Fumadocs supports Markdown and MDX (superset of Markdown) out-of-the-box.
 
-      // Use `user` to render user details or create UI elements
-      return <div>Welcome, {user.firstName}!</div>
-    }
+Although not required, some basic knowledge of Next.js App Router would be useful for further customisations.
+
+## Automatic Installation
+
+A minimum version of Node.js 18 required, note that Node.js 23.1 might have problems with Next.js production build.
+
+<Tabs groupId="package-manager" persist items={['npm', 'pnpm', 'yarn', 'bun']}>
+  ```bash tab="npm"
+  npm create fumadocs-app
+  ```
+
+  ```bash tab="pnpm"
+  pnpm create fumadocs-app
+  ```
+
+  ```bash tab="yarn"
+  yarn create fumadocs-app
+  ```
+
+  ```bash tab="bun"
+  bun create fumadocs-app
+  ```
+</Tabs>
+
+It will ask you:
+
+* the React.js framework to use (the docs is only written for Next.js).
+* the content source to use.
+
+A new fumadocs app should be initialized. Now you can start hacking!
+
+<Callout title="From Existing Codebase?">
+  You can follow the [Manual Installation](/docs/clerk-setup) guide to get started.
+</Callout>
+
+### Enjoy
+
+Create your first MDX file in the docs folder. 
+
+Run the app in development mode and see [http://localhost:3000/docs](http://localhost:3000/docs).
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash
+    npm run dev
     ```
   </Tab>
 
-  <Tab>
-    ```tsx {{ filename: 'app/api/user/route.ts' }}
-    import { NextResponse } from 'next/server'
-    import { currentUser, auth } from '@clerk/nextjs/server'
+  <Tab value="pnpm">
+    ```bash
+    pnpm run dev
+    ```
+  </Tab>
 
-    export async function GET() {
-      // Use `auth()` to get the user's ID
-      const { userId } = await auth()
+  <Tab value="yarn">
+    ```bash
+    yarn dev
+    ```
+  </Tab>
 
-      // Protect the route by checking if the user is signed in
-      if (!userId) {
-        return new NextResponse('Unauthorized', { status: 401 })
-      }
-
-      // Use `currentUser()` to get the Backend API User object
-      const user = await currentUser()
-
-      // Add your Route Handler's logic with the returned `user` object
-
-      return NextResponse.json({ user: user }, { status: 200 })
-    }
+  <Tab value="bun">
+    ```bash
+    bun run dev
     ```
   </Tab>
 </Tabs>
 
-### Pages Router
+## Explore
 
-For Next.js applications using the Pages Router, the [`getAuth()`](/docs/references/nextjs/get-auth) helper will return the [`Auth`](/docs/references/backend/types/auth-object) object of the currently active user, which contains important information like the current user's session ID, user ID, and organization ID. The `userId` can be used to protect your API routes.
+In the project, you can see:
 
-In some cases, you may need the full [`Backend User`](/docs/references/backend/types/backend-user) object of the currently active user. This is helpful if you want to render information, like their first and last name, directly from the server.
+* `lib/source.ts`: Code for content source adapter, [`loader()`](/docs/clerk-setup) provides the interface to access your content.
+* `app/layout.config.tsx`: Shared options for layouts, optional but preferred to keep.
 
-The `clerkClient()` helper returns an instance of the [JavaScript Backend SDK](/docs/references/backend/overview), which exposes Clerk's Backend API resources through methods such as the [`getUser()`](/docs/references/backend/user/get-user){{ target: '_blank' }} method. This method returns the full `Backend User` object.
+| Route                     | Description                                            |
+| ------------------------- | ------------------------------------------------------ |
+| `app/(home)`              | The route group for your landing page and other pages. |
+| `app/docs`                | The documentation layout and pages.                    |
+| `app/api/search/route.ts` | The Route Handler for search.                          |
 
-In the following example, the `userId` is passed to the Backend SDK's `getUser()` method to get the user's full `Backend User` object.
+### Writing Content
 
-<Tabs items={["API Route", "getServerSideProps"]}>
-  <Tab>
-    ```tsx {{ filename: 'pages/api/auth.ts' }}
-    import { getAuth, clerkClient } from '@clerk/nextjs/server'
-    import type { NextApiRequest, NextApiResponse } from 'next'
+For authoring docs, make sure to read:
 
-    export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-      // Use `getAuth()` to get the user's ID
-      const { userId } = getAuth(req)
+<Cards>
+  <Card href="/docs/ui/markdown" title="Markdown">
+    Fumadocs has some additional features for authoring content.
+  </Card>
 
-      // Protect the route by checking if the user is signed in
-      if (!userId) {
-        return res.status(401).json({ error: 'Unauthorized' })
-      }
+  <Card href="/docs/ui/navigation" title="Navigation">
+    Learn how to customise navigation links and sidebar items.
+  </Card>
 
-      // Initialize the Backend SDK
-      const client = await clerkClient()
+  <Card href="/docs/ui/page-conventions" title="Routing">
+    Learn how to organise content.
+  </Card>
+</Cards>
 
-      // Get the user's full `Backend User` object
-      const user = await client.users.getUser(userId)
+### Content Source
 
-      return res.status(200).json({ user })
-    }
-    ```
+Content source handles all your content, like compiling Markdown files and validating frontmatter.
+
+<Tabs items={['Fumadocs MDX', 'Custom Source']}>
+  <Tab value="Fumadocs MDX">
+    A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+
+    Read the [Introduction](/docs/mdx) for further details.
   </Tab>
 
-  <Tab>
-    > [!NOTE]
-    > `buildClerkProps` informs client-side features, like `useAuth()`, `<SignedIn>`, and `<SignedOut>`, of the authentication state during server-side rendering.
-
-    ```tsx {{ filename: 'pages/example.tsx' }}
-    import { getAuth, buildClerkProps } from '@clerk/nextjs/server'
-    import { GetServerSideProps } from 'next'
-
-    export const getServerSideProps: GetServerSideProps = async (ctx) => {
-      // Use `getAuth()` to get the user's ID
-      const { userId } = getAuth(ctx.req)
-
-      // Protect the route by checking if the user is signed in
-      if (!userId) {
-        // Handle when the user is not signed in
-      }
-
-      // Initialize the Backend SDK
-      const client = await clerkClient()
-
-      // Get the user's full `Backend User` object
-      const user = userId ? await client.users.getUser(userId) : undefined
-
-      return { props: { ...buildClerkProps(ctx.req, { user }) } }
-    }
-    ```
+  <Tab value="Custom Source">
+    Fumadocs is not Markdown-exclusive. For other sources like Sanity, you can build a [custom content source](/docs/headless/custom-source).
   </Tab>
 </Tabs>
 
-## Client-side
+### Customise UI
 
-### `useAuth()`
+See [Customisation Guide](/docs/ui/customisation).
 
-<Include src="_partials/hooks/use-auth" />
+## FAQ
 
-### `useUser()`
+Some common questions you may encounter.
 
-<Include src="_partials/hooks/use-user" />
+<Accordions>
+  <Accordion id="change-base-url" title="How to change the base route of /docs?">
+    You can change the base route of docs (e.g. from `/docs/page` to `/info/page`).
+    Since Fumadocs uses Next.js App Router, you can simply rename the route:
+
+    <Files>
+      <Folder name="app/docs" defaultOpen className="opacity-50" disabled>
+        <File name="layout.tsx" />
+      </Folder>
+
+      <Folder name="app/info" defaultOpen>
+        <File name="layout.tsx" />
+      </Folder>
+    </Files>
+
+    And tell Fumadocs to use the new route in `source.ts`:
+
+    ```ts title="lib/source.ts"
+    import { loader } from 'fumadocs-core/source';
+
+    export const source = loader({
+      baseUrl: '/info',
+      // other options
+    });
+    ```
+  </Accordion>
+
+  <Accordion id="dynamic-route" title="It uses Dynamic Route, will it be poor in performance?">
+    Next.js turns dynamic route into static routes when `generateStaticParams` is configured.
+    Hence, it is as fast as static pages.
+
+    You can enable Static Exports on Next.js to get a static build output. (Notice that Route Handler doesn't work with static export, you have to configure static search)
+  </Accordion>
+
+  <Accordion id="custom-layout-docs-page" title="How to create a page in /docs without docs layout?">
+    Same as managing layouts in Next.js App Router, remove the original MDX file from content directory (`/content/docs`).
+    This ensures duplicated pages will not cause errors.
+
+    Now, You can add the page to another route group, which isn't a descendant of docs layout.
+
+    For example, to replace `/docs/test`:
+
+    <Files>
+      <File name="(home)/docs/test/page.tsx" />
+
+      <Folder name="docs">
+        <File name="layout.tsx" />
+
+        <File name="[[...slug]]/page.tsx" />
+      </Folder>
+    </Files>
+
+    For `/docs`, you need to change the catch-all route to be non-optional:
+
+    <Files>
+      <File name="(home)/docs/page.tsx" />
+
+      <Folder name="docs" defaultOpen>
+        <File name="layout.tsx" />
+
+        <File name="[...slug]/page.tsx" />
+      </Folder>
+    </Files>
+  </Accordion>
+
+  <Accordion id="multi-versions" title="How to implement docs with multi-version?">
+    Use a separate deployment for each version.
+
+    On Vercel, this can be done by creating another branch for a specific version on your GitHub repository.
+    To link to the sites of other versions, use the Links API or a custom navigation component.
+  </Accordion>
+
+  <Accordion id="multi-docs" title="How to implement multi-docs?">
+    We recommend to use [Sidebar Tabs](/docs/ui/navigation/sidebar#sidebar-tabs).
+  </Accordion>
+</Accordions>
+
+## Learn More
+
+New to here? Don't worry, we are welcome for your questions.
+
+If you find anything confusing, please give your feedback on [Github Discussion](https://github.com/fuma-nama/fumadocs/discussions)!
+
+<Cards>
+  <Card href="/docs/ui/static-export" title="Configure Static Export" description="Learn how to enable static export on your docs" />
+
+  <Card href="/docs/ui/search" title="Customise Search" description="Learn how to customise document search" />
+
+  <Card href="/docs/ui/theme" title="Theming" description="Add themes to Fumadocs UI" />
+
+  <Card href="/docs/ui/components" title="Components" description="See all available components to enhance your docs" />
+</Cards>
