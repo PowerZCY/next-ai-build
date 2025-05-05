@@ -69,11 +69,15 @@
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "rehype-katex": "^7.0.1",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
+    "remark-mdx": "^3.1.0",
     "shiki": "^3.3.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "ts-morph": "^25.0.1",
     "vaul": "^0.9.9",
     "zod": "^3.24.1"
   },
@@ -87,9 +91,11 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "fast-glob": "^3.3.3",
     "postcss": "^8",
+    "remark-frontmatter": "^5.0.0",
     "tailwindcss": "^4.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "unist-util-visit": "^5.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

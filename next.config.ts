@@ -1,23 +1,22 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import { createMDX } from 'fumadocs-mdx/next';
+import { NextConfig } from 'next';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   // eslint: {
   //   ignoreDuringBuilds: true,
   // },
   // typescript: {
   //   ignoreBuildErrors: true,
   // },
+  
   // mdx需要的配置
   reactStrictMode: true,
-
-  // 手动添加 turbopack 配置
-  turbopack: true,
 
   images: {
     unoptimized: true,
@@ -36,6 +35,7 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,

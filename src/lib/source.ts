@@ -1,7 +1,7 @@
 import { createMDXSource } from 'fumadocs-mdx';
 import { docs, blog as blogPosts } from '.source';
 import { i18n } from '@/i18n';
-import { loader } from 'fumadocs-core/source';
+import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';
 import { Bitcoin, Bug, icons } from 'lucide-react';
 import { createElement } from 'react';
  
@@ -28,3 +28,6 @@ export const blogSource = loader({
   baseUrl: '/blog',
   source: createMDXSource(blogPosts),   
 });
+
+export type Page = InferPageType<typeof docsSource>;
+export type Meta = InferMetaType<typeof docsSource>;

@@ -1,8 +1,6 @@
 'use client';
 import { useState } from 'react';
-// import { Check, Copy } from 'lucide-react';
-// import { cn } from '@/lib/utils';
-// import { buttonVariants } from '@/components/ui/button';
+import { useParams } from 'next/navigation';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
 import { Check } from 'lucide-react';
@@ -11,15 +9,30 @@ const cache = new Map<string, string>();
 
 export function LLMCopyButton() {
   const [isLoading, setLoading] = useState(false);
+  const params = useParams();
+  const locale = params.locale as string;
+  const slug = params.slug as string[];
+
   const [checked, onClick] = useCopyButton(async () => {
     setLoading(true);
-    const url = window.location.pathname + '.mdx';
+
+    const path = slug.join('/');
+    const apiUrl = `/api/llm-content?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
+    console.log('Fetching LLM content from:', apiUrl);
+
     try {
       const content: string =
-        cache.get(url) ?? (await fetch(url).then((res) => res.text()));
+        cache.get(apiUrl) ?? (await fetch(apiUrl).then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch LLM content: ${res.status} ${res.statusText}`);
+          }
+          return res.text();
+        }));
 
-      cache.set(url, content);
+      cache.set(apiUrl, content);
       await navigator.clipboard.writeText(content);
+    } catch (error) {
+      console.error("Error fetching or copying LLM content:", error);
     } finally {
       setLoading(false);
     }

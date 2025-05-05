@@ -1,5 +1,5 @@
 // source.config.ts
-import { defineDocs, defineConfig, defineCollections, frontmatterSchema } from "fumadocs-mdx/config";
+import { defineDocs, defineConfig, defineCollections, frontmatterSchema, metaSchema } from "fumadocs-mdx/config";
 import { fileGenerator, remarkDocGen, remarkInstall } from "fumadocs-docgen";
 import { remarkTypeScriptToJavaScript } from "fumadocs-docgen/remark-ts2js";
 import { rehypeCodeDefaultOptions, remarkSteps } from "fumadocs-core/mdx-plugins";
@@ -8,24 +8,24 @@ import remarkMath from "remark-math";
 import { remarkAutoTypeTable } from "fumadocs-typescript";
 import { z } from "zod";
 var docs = defineDocs({
-  dir: "src/mdx/docs"
-  // docs: {
-  //   async: true,
-  //   // @ts-ignore - Temporarily suppress deep instantiation error
-  //   schema: frontmatterSchema.extend({
-  //     preview: z.string().optional(),
-  //     index: z.boolean().default(false),
-  //     /**
-  //      * API routes only
-  //      */
-  //     method: z.string().optional(),
-  //   }),
-  // },
-  // meta: {
-  //   schema: metaSchema.extend({
-  //     description: z.string().optional(),
-  //   }),
-  // },
+  dir: "src/mdx/docs",
+  docs: {
+    async: false,
+    // @ts-ignore - Temporarily suppress deep instantiation error
+    schema: frontmatterSchema.extend({
+      preview: z.string().optional(),
+      index: z.boolean().default(false),
+      /**
+       * API routes only
+       */
+      method: z.string().optional()
+    })
+  },
+  meta: {
+    schema: metaSchema.extend({
+      description: z.string().optional()
+    })
+  }
 });
 var blog = defineCollections({
   dir: "src/mdx/blog",
