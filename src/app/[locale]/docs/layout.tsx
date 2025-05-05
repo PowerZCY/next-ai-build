@@ -50,10 +50,10 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { locale } = await params;
-  const options = await docsOptions(locale);
+  const customeOptions = await docsOptions(locale);
  
   return (
-    <DocsLayout {...options} >
+    <DocsLayout {...customeOptions} >
       {children}
     </DocsLayout>
   );

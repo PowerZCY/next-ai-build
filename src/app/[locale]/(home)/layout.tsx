@@ -1,6 +1,17 @@
 import type { ReactNode } from 'react';
-import { HomeLayout } from 'fumadocs-ui/layouts/home';
-import { baseOptions } from '@/app/[locale]/layout.config';
+import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
+
+async function homeOptions(locale: string): Promise<HomeLayoutProps> {
+  const options = await baseOptions(locale);
+  return {
+    ...options,
+    links: [
+      ...levelNavLinks,
+      ...homeNavLinks,
+      ]
+  };
+}
 
 export default async function Layout({
   params,
@@ -10,11 +21,14 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { locale } = await params;
-  const options = await baseOptions(locale);
+  const customeOptions = await homeOptions(locale);
 
   return (
     <HomeLayout
-      {...options}
+      {...customeOptions}
+      searchToggle={{
+        enabled: false,
+      }}
       className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)]"
     >
       {children}
