@@ -1,10 +1,43 @@
-import { defineDocs, defineConfig } from 'fumadocs-mdx/config';
+import { defineDocs, defineConfig} from 'fumadocs-mdx/config';
 import { fileGenerator, remarkDocGen, remarkInstall } from 'fumadocs-docgen';
 import { remarkTypeScriptToJavaScript } from 'fumadocs-docgen/remark-ts2js';
-import { remarkSteps, } from 'fumadocs-core/mdx-plugins';
+import { rehypeCodeDefaultOptions, remarkSteps} from 'fumadocs-core/mdx-plugins';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
+// import { z } from 'zod';
+
+export const docs = defineDocs({
+  dir: 'src/mdx/docs',
+  // docs: {
+  //   async: true,
+  //   // @ts-ignore - Temporarily suppress deep instantiation error
+  //   schema: frontmatterSchema.extend({
+  //     preview: z.string().optional(),
+  //     index: z.boolean().default(false),
+  //     /**
+  //      * API routes only
+  //      */
+  //     method: z.string().optional(),
+  //   }),
+  // },
+  // meta: {
+  //   schema: metaSchema.extend({
+  //     description: z.string().optional(),
+  //   }),
+  // },
+});
+
+// export const blog = defineCollections({
+//   dir: 'src/mdx/blog',
+//   type: 'doc',
+//   async: true,
+//   // @ts-ignore - Temporarily suppress deep instantiation error
+//   schema: frontmatterSchema.extend({
+//     author: z.string(),
+//     date: z.string().date().or(z.date()).optional(),
+//   }),
+// });
 
 
 const remarkInstallOptions = {
@@ -12,13 +45,39 @@ const remarkInstallOptions = {
     id: 'package-manager',
   },
 };
- 
-export const docs = defineDocs({
-  dir: 'src/mdx',
-});
 
 export default defineConfig({
   mdxOptions: {
+    rehypeCodeOptions: {
+      lazy: true,
+      experimentalJSEngine: true,
+      langs: ['ts', 'js', 'html', 'tsx', 'mdx'],
+      inline: 'tailing-curly-colon',
+      themes: {
+        light: 'catppuccin-latte',
+        dark: 'catppuccin-mocha',
+      },
+      transformers: [
+        ...(rehypeCodeDefaultOptions.transformers ?? []),
+        {
+          name: 'transformers:remove-notation-escape',
+          code(hast) {
+            for (const line of hast.children) {
+              if (line.type !== 'element') continue;
+
+              const lastSpan = line.children.findLast(
+                (v) => v.type === 'element',
+              );
+
+              const head = lastSpan?.children[0];
+              if (head?.type !== 'text') continue;
+
+              head.value = head.value.replace(/\[\\!code/g, '[!code');
+            }
+          },
+        },
+      ],
+    },
     remarkPlugins: [
       remarkSteps,
       remarkMath, 

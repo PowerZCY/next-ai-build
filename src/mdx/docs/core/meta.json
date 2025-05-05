@@ -1,0 +1,13 @@
+{
+    "title": "Re8ger's Core",
+    "description": "What is Re8ger's Core?",
+    "icon": "Zap",
+    "root": true,
+    "pages": [
+        "---Guide---",
+        "index",
+        "---Configuration---",
+        "clerk-quick-start",
+        "---Features---"
+    ]
+}

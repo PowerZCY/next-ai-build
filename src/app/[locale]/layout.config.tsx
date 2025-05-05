@@ -20,13 +20,13 @@ export const homeNavLinks: LinkItemType[] = [
   {
     icon: <AlbumIcon />,
     text: 'Blog',
-    url: '/d8ger',
+    url: '/blog',
     active: 'nested-url',
   },
   {
     icon: <LayoutTemplate />,
     text: 'Showcase',
-    url: '/showcase',
+    url: '/docs',
     active: 'url',
   },
 ];
@@ -36,7 +36,7 @@ export const levelNavLinks: LinkItemType[] = [
   {
     type: 'menu',
     text: 'Documentation',
-    url: '/docs/read-session-data',
+    url: '/docs',
     items: [
       {
         menu: {
@@ -57,13 +57,13 @@ export const levelNavLinks: LinkItemType[] = [
         },
         text: 'Getting Started',
         description: 'Learn to use Fumadocs on your docs site.',
-        url: '/docs/ui',
+        url: '/docs/framework',
       },
       {
         icon: <ComponentIcon />,
         text: 'Components',
         description: 'Add interactive experience to your docs.',
-        url: '/docs/ui/components',
+        url: '/docs/framework/clerk-quick-start',
         menu: {
           className: 'lg:col-start-2',
         },
@@ -73,7 +73,7 @@ export const levelNavLinks: LinkItemType[] = [
         text: 'OpenAPI',
         description:
           'Generate interactive playgrounds and docs for your OpenAPI schema.',
-        url: '/docs/ui/openapi',
+        url: '/docs/framework/clerk-setup',
         menu: {
           className: 'lg:col-start-2',
         },
@@ -82,7 +82,7 @@ export const levelNavLinks: LinkItemType[] = [
         icon: <Pencil />,
         text: 'Markdown',
         description: 'Learn the writing format/syntax of Fumadocs.',
-        url: '/docs/ui/markdown',
+        url: '/docs/framework/(showcase)',
         menu: {
           className: 'lg:col-start-3 lg:row-start-1',
         },
@@ -91,7 +91,7 @@ export const levelNavLinks: LinkItemType[] = [
         icon: <Layout />,
         text: 'Layouts',
         description: 'See the available layouts of Fumadocs UI.',
-        url: '/docs/ui/layouts/docs',
+        url: '/docs/framework/fumadocs',
         menu: {
           className: 'lg:col-start-3',
         },

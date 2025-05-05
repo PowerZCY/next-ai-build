@@ -1,3 +1,4 @@
+// import { createMDXSource } from 'fumadocs-mdx';
 import { docs } from '.source';
 import { i18n } from '@/i18n';
 import { loader } from 'fumadocs-core/source';
@@ -21,3 +22,8 @@ export const source = loader({
     return createElement(Bug)
   },
 });
+
+// export const blog = loader({
+//   baseUrl: '/blog',
+//   source: createMDXSource(blogPosts),   
+// });
