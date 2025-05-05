@@ -1,6 +1,17 @@
+export { withArticle as default } from 'fumadocs-ui/page';
 
+## Hello World
 
-```mermaid
+Create a `page.mdx` file, put the page under a non-docs layout.
+
+Apply typography styles with:
+
+```java title="mdx as page css"
+export { withArticle as default } from 'fumadocs-ui/page';
+```
+
+<Mermaid
+  chart="
 graph LR
     classDef startend fill:#F5EBFF,stroke:#BE8FED,stroke-width:2px;
     classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
@@ -21,10 +32,11 @@ graph LR
     G --> H(Closed):::process
     H -.->|开发者最终放弃| U2
     H --> I([结束]):::startend       
-``` 
+"/>
 
 
-```mermaid
+<Mermaid
+  chart="
 flowchart TB
     classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
     
@@ -105,4 +117,5 @@ flowchart TB
     linkStyle 22 stroke:red,stroke-width:2px
     linkStyle 23 stroke:red,stroke-width:2px
 
-```
+"/>
+

@@ -29,6 +29,8 @@ export default async function Page({
     </div>
 	);
  
+  // Markdown content requires await if you config 'async: true' in source.config.ts
+  // const { body: MdxContent, toc } = await page.data.load();
   const MDX = page.data.body;
  
   return (
