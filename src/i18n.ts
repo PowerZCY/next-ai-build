@@ -1,5 +1,4 @@
 import { getRequestConfig } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 import { appConfig } from "@/lib/appConfig";
 import type { I18nConfig } from 'fumadocs-core/i18n';
  
@@ -29,9 +28,12 @@ const locales = appConfig.i18n.locales;
 - 内容安全策略
  */
 
-export default getRequestConfig(async ({ locale }) => {
-  // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as (typeof locales)[number])) notFound();
+export default getRequestConfig(async ({ requestLocale }) => {
+  let locale = await requestLocale;
+  // Ensure that the incoming locale is valid
+  if ( !locale || !locales.includes(locale as (typeof locales)[number])) {
+    locale = appConfig.i18n.defaultLocale;
+  }
 
   return {
     locale, // 明确返回 locale 参数
