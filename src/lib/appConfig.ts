@@ -1,45 +1,3 @@
-// 菜单项类型定义
-export type MenuItem = {
-  key: string;        // 唯一标识，也用作国际化翻译键
-  href: string;       // 链接地址
-  children?: MenuItem[]; // 子菜单项
-  external?: boolean; // 是否为外部链接
-};
-
-// 开发环境菜单配置
-const devMenu: MenuItem[] = [
-  {
-    key: 'journey',
-    href: '/blog',
-  },
-  // {
-  //   key: 'docs',
-  //   href: '/docs',
-  //   children: [
-  //     {
-  //       key: 'gettingStarted',
-  //       href: '/docs/getting-started',
-  //     },
-  //     {
-  //       key: 'guides',
-  //       href: '/docs/guides',
-  //     },
-  //     {
-  //       key: 'apiReference',
-  //       href: '/docs/api',
-  //     },
-  //   ],
-  // }
-];
-
-// 生产环境菜单配置
-const prodMenu: MenuItem[] = [
-  // {
-  //   key: 'journey',
-  //   href: '/blog',
-  // }
-];
-
 export const appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://reveimage.directory',
@@ -80,8 +38,6 @@ export const appConfig = {
     messageRoot: 'messages',
   },
 
-  // 菜单配置
-  menu: process.env.NODE_ENV !== 'production' ? devMenu : prodMenu,
 };
 
 // 辅助函数：检查是否为支持的语言

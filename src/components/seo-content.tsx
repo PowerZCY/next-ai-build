@@ -16,7 +16,7 @@ export function SeoContent() {
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>
-      <div className="prose prose-lg prose-invert max-w-4xl mx-auto">
+      <div className="prose prose-lg dark:prose-invert max-w-4xl mx-auto">
         <p>{t('intro')}</p>
 
         {t.raw('sections').map((section: Section, index: number) => (

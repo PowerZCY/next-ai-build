@@ -1,6 +1,5 @@
 import { i18n } from '@/i18n';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { appConfig } from '@/lib/appConfig';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
 import {
   AlbumIcon,
@@ -11,9 +10,12 @@ import {
   LayoutTemplate,
   Pencil,
   Server,
+  Zap
 } from 'lucide-react';
 import Image from 'next/image';
 import Preview from '@/../public/banner.png';
+import { getTranslations } from 'next-intl/server';
+import { appConfig } from '@/lib/appConfig';
 
 // 页面导航菜单
 export const linkItems: LinkItemType[] = [
@@ -42,29 +44,28 @@ export const logo = (
   </>
 );
 
- 
-export function baseOptions(locale: string): BaseLayoutProps {
+export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
+  const t = await getTranslations({ locale : locale, namespace: 'home' });
   return {
     i18n,
-    // 该导航栏为移动端特有的
     nav: {
-      url: "https://d8ger.com",
+      url: appConfig.baseUrl,
       title: (
         <>
-          {logo}
+          <Zap className="h-6 w-6 text-purple-500" />
           <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
-          {locale === appConfig.i18n.defaultLocale ? "D8ger's SpaceX" : "帝八哥太空科技"}
+            {t('title')}
           </span>
         </>
       ),
-      transparentMode: 'top',
+      transparentMode: 'none',
     },
     // 页面导航菜单
     links: [
       {
         type: 'menu',
         text: 'Documentation',
-        url: '/docs/xx',
+        url: '/docs/read-session-data',
         items: [
           {
             menu: {

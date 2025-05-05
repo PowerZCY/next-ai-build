@@ -90,7 +90,7 @@ export default async function RootLayout({
               translations: { cn }[locale],
             }}
             search={{
-              enabled: false,
+              enabled: true,
             }}
           >
             {children}

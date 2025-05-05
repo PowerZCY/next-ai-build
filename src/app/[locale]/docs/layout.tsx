@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react';
 import { source } from '@/lib/source';
-import { baseOptions, linkItems } from '@/app/layout.config';
+import { baseOptions } from '@/app/[locale]/layout.config';
 // https://fumadocs.dev/docs/ui/layouts/notebook
-import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/notebook';
+import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
  
 import 'katex/dist/katex.min.css';
 
-function docsOptions(locale: string): DocsLayoutProps {
+async function docsOptions(locale: string): Promise<DocsLayoutProps> {
+  const options = await baseOptions(locale);
   return {
-    ...baseOptions(locale),
+    ...options,
     tree: source.pageTree[locale],
-    links: linkItems,
     sidebar: {
       tabs: {
         transform(option, node) {
@@ -50,9 +50,10 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { locale } = await params;
+  const options = await docsOptions(locale);
  
   return (
-    <DocsLayout {...docsOptions(locale)} >
+    <DocsLayout {...options} >
       {children}
     </DocsLayout>
   );

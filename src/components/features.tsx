@@ -21,11 +21,11 @@ export function Features() {
         {featureItems.map((feature, index) => (
           <div
             key={index}
-            className="bg-gray-800/50 p-8 rounded-xl border border-gray-700 hover:border-purple-500/50 transition"
+            className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-500/50 transition"
           >
             <div className="text-4xl mb-4">{feature.icon}</div>
             <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-            <p className="text-gray-400">{feature.description}</p>
+            <p className="">{feature.description}</p>
           </div>
         ))}
       </div>

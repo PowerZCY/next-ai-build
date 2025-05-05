@@ -33,7 +33,7 @@ export function Gallery() {
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
         {t('titleL')} <span className="text-purple-500">{t('eyesOn')}</span> {t('titleR')}
       </h2>
-      <p className="text-center text-gray-400 max-w-2xl mx-auto mb-16">
+      <p className="text-center max-w-2xl mx-auto mb-16">
         {t('description')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -61,7 +61,7 @@ export function Gallery() {
         <Button
           asChild
           size="lg"
-          className="bg-linear-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
+          className="bg-linear-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-black dark:text-white"
         >
           <Link href="https://preview.reve.art/" target="_blank" rel="noopener noreferrer">
             {t('button')} <ArrowRight className="ml-2 h-4 w-4" />

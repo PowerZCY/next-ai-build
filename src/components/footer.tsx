@@ -1,16 +1,30 @@
+'use client'
+
 import { Zap } from "lucide-react"
+import { useTranslations } from 'next-intl'
 
 export function Footer() {
+  const t = useTranslations('home');
+  
   return (
-    <footer className="container mx-auto px-4 py-12 border-t border-gray-800">
-      <div className="flex flex-col md:flex-row justify-between items-center">
-        <div className="flex items-center gap-2 mb-6 md:mb-0">
+    <footer className="mt-auto border-t bg-fd-card py-12 text-fd-secondary-foreground">
+      <div className="container flex flex-col gap-4">
+        <div className="flex flex-row items-center gap-2">
           <Zap className="h-6 w-6 text-purple-500" />
-          <span className="text-xl font-bold">Reve Image</span>
+          <span className="mb-1 text-sm font-semibold">{t('title')}</span>
         </div>
-        <div className="text-gray-400 text-sm">© {new Date().getFullYear()} Reve Image. All rights reserved.</div>
+        <div className="flex flex-row items-start gap-x-2">
+         <span className="text-xs">Thanks to ❤️</span>
+          <span className="text-xs">
+            <a href="https://fumadocs.dev/" rel="noreferrer noopener" target="_blank" className="font-medium hover:underline">Fuma</a>
+          </span>
+          <span className="text-xs">|</span>
+          <span className="text-xs">
+            <a href="https://reveimage.directory/" rel="noreferrer noopener" target="_blank" className="font-medium hover:underline">Reveimage</a>
+          </span>
+        </div>
       </div>
     </footer>
-  )
+  );
 }
 

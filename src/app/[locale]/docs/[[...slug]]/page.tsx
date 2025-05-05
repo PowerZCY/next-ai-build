@@ -6,7 +6,7 @@ import {
   DocsTitle,
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/mdx-components';
+import { getMDXComponents } from '@/lib/mdx-components';
 import { EditOnGitHub, LLMCopyButton } from './page.client';
 export default async function Page({
   params,
@@ -16,12 +16,23 @@ export default async function Page({
   const { slug, locale } = await params;
   const page = source.getPage(slug, locale);
   if (!page) notFound();
+
+  const path = `src/app/mdx/${page.file.path}`;
+	const tocFooter = (
+    <div className="flex flex-col gap-y-2 items-start m-4">
+      <LLMCopyButton />
+      <EditOnGitHub
+        url={`https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/${path}`}
+      />
+    </div>
+	);
  
   const MDX = page.data.body;
  
   return (
     <DocsPage 
-      tableOfContent={{ style: 'clerk', single: false }}
+      tableOfContent={{ style: 'clerk', single: false, footer: tocFooter }}
+      tableOfContentPopover={{ footer: tocFooter }}
       toc={page.data.toc}
       full={page.data.full}
       article={{
@@ -31,12 +42,6 @@ export default async function Page({
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-2">{page.data.description}</DocsDescription>
       <DocsBody className="text-fd-foreground/80">
-        <div className="flex flex-row gap-x-2 items-center mb-4">
-          <LLMCopyButton />
-          <EditOnGitHub
-            url={`https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/${page.file.path}`}
-          />
-        </div>
         <MDX components={getMDXComponents()} />
       </DocsBody>
     </DocsPage>

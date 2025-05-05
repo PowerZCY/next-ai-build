@@ -28,6 +28,10 @@ const fumadocsUiComponents = {
   Mermaid
 };
 
+const customUiComponents = {
+  
+}
+
 // Object containing globally available Lucide icon components
 // 所有的图标都要从这里导入, 并且图标会占据项目包的体积, 因此最好提前设计规划好
 const globalLucideIcons = {
@@ -48,6 +52,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
       </CodeBlock>
     ),
     ...fumadocsUiComponents,
+    ...customUiComponents,
     ...globalLucideIcons,
     ...components,
   };
