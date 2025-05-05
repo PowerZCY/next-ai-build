@@ -7,10 +7,11 @@ import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-import { HousePlus, Cpu, PanelsTopLeft,
-   DatabaseZap, SquareTerminal,
-   Bitcoin,
-   Bug
+import { AlbumIcon, Bitcoin, Bug, Cpu, ComponentIcon,
+  DatabaseZap, 
+  HousePlus, Layout, LayoutTemplate,
+  Pencil, PanelsTopLeft, SquareTerminal, Server,
+  Zap
   } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 
@@ -41,11 +42,18 @@ const customUiComponents = {
 export const globalLucideIcons = {
   HousePlus,
   Cpu,
+  AlbumIcon,
   PanelsTopLeft,
   DatabaseZap,
   SquareTerminal,
   Bitcoin, 
-  Bug
+  Bug,
+  ComponentIcon,
+  Layout,
+  LayoutTemplate,
+  Pencil,
+  Server,
+  Zap
 };
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {

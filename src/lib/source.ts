@@ -3,7 +3,7 @@ import { docs, blog as blogPosts } from '.source';
 import { i18n } from '@/i18n';
 import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';
 import { createElement } from 'react';
-import { globalLucideIcons as icons } from './mdx-components';
+import { globalLucideIcons as icons } from '@/lib/mdx-components';
 
 export const docsSource = loader({
   i18n,

@@ -7,8 +7,8 @@ async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   return {
     ...options,
     links: [
-      ...levelNavLinks,
-      ...homeNavLinks,
+      ...levelNavLinks(locale),
+      ...homeNavLinks(locale),
       ]
   };
 }
