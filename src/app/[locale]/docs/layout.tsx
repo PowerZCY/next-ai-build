@@ -3,7 +3,7 @@ import { docsSource } from '@/lib/source';
 import { baseOptions } from '@/app/[locale]/layout.config';
 // https://fumadocs.dev/docs/ui/layouts/notebook
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
- 
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
 import 'katex/dist/katex.min.css';
 
 async function docsOptions(locale: string): Promise<DocsLayoutProps> {
@@ -11,7 +11,17 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
   return {
     ...options,
     tree: docsSource.pageTree[locale],
+    links: [
+      {
+        type: 'custom',
+        children: (
+          <GithubInfo owner="caofanCPU" repo="D8gerAutoCode" className="lg:-mx-2" />
+        ),
+      },
+    ],
     sidebar: {
+      // 禁用侧边栏Link组件预加载, 降低服务端负荷, 并尽可能降低触发云平台限流规则的概率
+      prefetch: false,
       tabs: {
         transform(option, node) {
           const meta = docsSource.getNodeMeta(node);

@@ -65,6 +65,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
         <Pre>{props.children}</Pre>
       </CodeBlock>
     ),
+    // 全局处理图片放大
+    img: (props) => <ImageZoom {...(props as any)} />,
     ...fumadocsUiComponents,
     ...customUiComponents,
     ...globalLucideIcons,
