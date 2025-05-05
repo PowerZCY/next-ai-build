@@ -17,7 +17,7 @@ export default async function Page({
   const page = docsSource.getPage(slug, locale);
   if (!page) notFound();
 
-  const path = `src/app/mdx/${page.file.path}`;
+  const path = `src/mdx/docs/${page.file.path}`;
 	const tocFooter = (
     <div className="flex flex-col gap-y-2 items-start m-4">
       <LLMCopyButton />

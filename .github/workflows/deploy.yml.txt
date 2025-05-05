@@ -1,0 +1,24 @@
+# name: Deploy to Vercel
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+      
+#       - name: Deploy to Vercel
+#         env:
+#           # Vercel平台配置秘钥Token
+#           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+#           # Vercel平台上找到项目ID
+#           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+#           # Vercel平台点开用户账号设置, 浏览器调试接口信息, 关键请求teams就能找到orgId或者teamId
+#           # Vercel官方说明 https://vercel.com/docs/accounts#default-team
+#           # Vercel后门快速获取链接 https://vercel.com/teams/your_team_name_here/settings#team-id
+#           # your_team_name_here替换为你的团队名称id
+#           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+#         run: |
+#           npx vercel --token ${VERCEL_TOKEN} --prod --yes
