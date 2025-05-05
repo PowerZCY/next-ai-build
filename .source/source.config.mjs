@@ -43,6 +43,7 @@ var remarkInstallOptions = {
   }
 };
 var source_config_default = defineConfig({
+  lastModifiedTime: "git",
   mdxOptions: {
     rehypeCodeOptions: {
       lazy: true,

@@ -7,7 +7,8 @@ import {
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/lib/mdx-components';
-import { EditOnGitHub, LLMCopyButton } from './page.client';
+import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from './page.client';
+
 export default async function Page({
   params,
 }: {
@@ -20,6 +21,7 @@ export default async function Page({
   const path = `src/mdx/docs/${page.file.path}`;
 	const tocFooter = (
     <div className="flex flex-col gap-y-2 items-start m-4">
+      <LastUpdatedDate gitTimestamp={page.data.lastModified} />
       <LLMCopyButton />
       <EditOnGitHub
         url={`https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/${path}`}
@@ -38,6 +40,7 @@ export default async function Page({
       article={{
         className: 'max-sm:pb-16',
       }}
+      // lastUpdate={page.data.lastModified}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-2">{page.data.description}</DocsDescription>
