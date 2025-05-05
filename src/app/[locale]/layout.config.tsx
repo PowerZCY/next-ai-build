@@ -14,7 +14,6 @@ import {
 import Image from 'next/image';
 import Preview from '@/../public/banner.png';
 import { getTranslations } from 'next-intl/server';
-import { appConfig } from '@/lib/appConfig';
 
 // 首页普通菜单
 export const homeNavLinks: LinkItemType[] = [
@@ -112,7 +111,7 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
   return {
     // 导航Header配置
     nav: {
-      url: appConfig.baseUrl,
+      url: '/',
       title: (
         <>
           <Zap className="h-6 w-6 text-purple-500" />

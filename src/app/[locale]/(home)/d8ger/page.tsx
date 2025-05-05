@@ -5,7 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Spot from '@/../public/zap-icon.png';
 
-export default function DocsPage(): React.ReactElement {
+export default function D8gerPage(): React.ReactElement {
   return (
     <main className="container flex flex-col items-center py-16 text-center z-[2]">
       <div className="absolute inset-0 z-[-1] overflow-hidden duration-1000 animate-in fade-in [perspective:2000px]">

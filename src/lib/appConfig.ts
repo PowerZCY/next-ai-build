@@ -1,6 +1,6 @@
 export const appConfig = {
   // 基础配置
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://reveimage.directory',
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
 
   // 国际化配置
   // - 英语 (en)
