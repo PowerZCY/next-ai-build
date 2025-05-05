@@ -26,7 +26,7 @@ export const homeNavLinks: LinkItemType[] = [
   {
     icon: <LayoutTemplate />,
     text: 'Showcase',
-    url: '/docs',
+    url: '/docs/framework/step',
     active: 'url',
   },
 ];

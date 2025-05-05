@@ -1,11 +1,11 @@
-// import { createMDXSource } from 'fumadocs-mdx';
-import { docs } from '.source';
+import { createMDXSource } from 'fumadocs-mdx';
+import { docs, blog as blogPosts } from '.source';
 import { i18n } from '@/i18n';
 import { loader } from 'fumadocs-core/source';
 import { Bitcoin, Bug, icons } from 'lucide-react';
 import { createElement } from 'react';
  
-export const source = loader({
+export const docsSource = loader({
   i18n,
   baseUrl: '/docs',
   source: docs.toFumadocsSource(),
@@ -23,7 +23,8 @@ export const source = loader({
   },
 });
 
-// export const blog = loader({
-//   baseUrl: '/blog',
-//   source: createMDXSource(blogPosts),   
-// });
+export const blogSource = loader({
+  i18n,
+  baseUrl: '/blog',
+  source: createMDXSource(blogPosts),   
+});

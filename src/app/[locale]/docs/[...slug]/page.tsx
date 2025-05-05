@@ -1,4 +1,4 @@
-import { source } from '@/lib/source';
+import { docsSource } from '@/lib/source';
 import {
   DocsBody,
   DocsDescription,
@@ -14,7 +14,7 @@ export default async function Page({
   params: Promise<{ locale: string; slug?: string[] }>;
 }) {
   const { slug, locale } = await params;
-  const page = source.getPage(slug, locale);
+  const page = docsSource.getPage(slug, locale);
   if (!page) notFound();
 
   const path = `src/app/mdx/${page.file.path}`;
@@ -50,14 +50,14 @@ export default async function Page({
  
 
 export function generateStaticParams() {
-  return source.generateParams('slug', 'locale');
+  return docsSource.generateParams('slug', 'locale');
 }
  
 export async function generateMetadata(props: {
   params: Promise<{ slug?: string[] }>;
 }) {
   const params = await props.params;
-  const page = source.getPage(params.slug);
+  const page = docsSource.getPage(params.slug);
   if (!page) notFound();
  
   return {

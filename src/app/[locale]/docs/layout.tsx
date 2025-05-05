@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { source } from '@/lib/source';
+import { docsSource } from '@/lib/source';
 import { baseOptions } from '@/app/[locale]/layout.config';
 // https://fumadocs.dev/docs/ui/layouts/notebook
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
@@ -10,11 +10,11 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
   const options = await baseOptions(locale);
   return {
     ...options,
-    tree: source.pageTree[locale],
+    tree: docsSource.pageTree[locale],
     sidebar: {
       tabs: {
         transform(option, node) {
-          const meta = source.getNodeMeta(node);
+          const meta = docsSource.getNodeMeta(node);
           if (!meta || !node.icon) return option;
 
           const color = `var(--${meta.file.dirname}-color, var(--color-fd-foreground))`;

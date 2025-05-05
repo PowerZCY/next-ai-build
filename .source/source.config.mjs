@@ -1,11 +1,12 @@
 // source.config.ts
-import { defineDocs, defineConfig } from "fumadocs-mdx/config";
+import { defineDocs, defineConfig, defineCollections, frontmatterSchema } from "fumadocs-mdx/config";
 import { fileGenerator, remarkDocGen, remarkInstall } from "fumadocs-docgen";
 import { remarkTypeScriptToJavaScript } from "fumadocs-docgen/remark-ts2js";
 import { rehypeCodeDefaultOptions, remarkSteps } from "fumadocs-core/mdx-plugins";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import { remarkAutoTypeTable } from "fumadocs-typescript";
+import { z } from "zod";
 var docs = defineDocs({
   dir: "src/mdx/docs"
   // docs: {
@@ -25,6 +26,16 @@ var docs = defineDocs({
   //     description: z.string().optional(),
   //   }),
   // },
+});
+var blog = defineCollections({
+  dir: "src/mdx/blog",
+  type: "doc",
+  async: false,
+  // @ts-ignore - Temporarily suppress deep instantiation error
+  schema: frontmatterSchema.extend({
+    author: z.string(),
+    date: z.string().date().or(z.date()).optional()
+  })
 });
 var remarkInstallOptions = {
   persist: {
@@ -73,6 +84,7 @@ var source_config_default = defineConfig({
   }
 });
 export {
+  blog,
   source_config_default as default,
   docs
 };

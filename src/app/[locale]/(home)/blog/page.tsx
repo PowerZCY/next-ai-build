@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { blog } from '@/lib/source';
+import { blogSource } from '@/lib/source';
 
 export default function Page(): React.ReactElement {
-  const posts = [...blog.getPages()].sort(
+  const posts = [...blogSource.getPages()].sort(
     (a, b) =>
       new Date(b.data.date ?? b.file.name).getTime() -
       new Date(a.data.date ?? a.file.name).getTime(),

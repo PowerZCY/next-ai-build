@@ -1,10 +1,10 @@
-import { source } from '@/lib/source';
+import { docsSource } from '@/lib/source';
 import { createI18nSearchAPI } from 'fumadocs-core/search/server';
 import { i18n } from '@/i18n';
  
 export const { GET } = createI18nSearchAPI('advanced', {
   i18n,
-  indexes: source.getLanguages().flatMap(({ language, pages }) =>
+  indexes: docsSource.getLanguages().flatMap(({ language, pages }) =>
     pages.map((page) => ({
       title: page.data.title,
       description: page.data.description,

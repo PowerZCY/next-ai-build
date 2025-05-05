@@ -1,19 +1,23 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
-import { blog } from '@/lib/source';
+import { blogSource } from '@/lib/source';
 import { buttonVariants } from '@/components/ui/button';
 import { Control } from './page.client';
 import { getMDXComponents } from '@/lib/mdx-components';
 
-export default async function Page(props: {
-  params: Promise<{ slug: string }>;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; slug?: string[] }>;
 }) {
-  const params = await props.params;
-  const page = blog.getPage([params.slug]);
+  const { slug, locale } = await params;
+  const page = blogSource.getPage(slug, locale);
 
   if (!page) notFound();
-  const { body: Mdx, toc } = await page.data.load();
+
+  const MDX = page.data.body;
+  const toc = page.data.toc;
 
   return (
     <>
@@ -43,7 +47,7 @@ export default async function Page(props: {
       <article className="container flex flex-col px-0 py-8 lg:flex-row lg:px-4">
         <div className="prose min-w-0 flex-1 p-4">
           <InlineTOC items={toc} />
-          <Mdx components={getMDXComponents()} />
+          <MDX components={getMDXComponents()} />
         </div>
         <div className="flex flex-col gap-4 border-l p-4 text-sm lg:w-[250px]">
           <div>
