@@ -66,6 +66,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
       </CodeBlock>
     ),
     // 全局处理图片放大
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     img: (props) => <ImageZoom {...(props as any)} />,
     ...fumadocsUiComponents,
     ...customUiComponents,
