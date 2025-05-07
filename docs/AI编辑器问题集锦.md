@@ -241,4 +241,3 @@ psql -d <database-name>
 \q          # 退出
 ```
 
-woca 
