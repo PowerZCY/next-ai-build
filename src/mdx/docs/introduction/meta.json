@@ -1,19 +1,15 @@
 {
-    "title": "Re8ger's Framework",
-    "description": "What is Re8ger's Framework?",
+    "title": "Re8ger's Introduction",
+    "description": "What is Re8ger?",
     "icon": "Pencil",
     "root": true,
     "pages": [
         "---Guide---",
         "index",
-        "fumadocs",
         "clerk-quick-start",
         "---Configuration---",
         "clerk-setup",
         "---Features---",
-        "code-block",
-        "(showcase)",
-        "---Rest---",
         "..."
     ]
 }

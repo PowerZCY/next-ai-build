@@ -1,9 +1,6 @@
 import { i18n } from '@/i18n';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
-import {
-  
-} from 'lucide-react';
 import { globalLucideIcons as icons } from '@/lib/mdx-components';
 import Image from 'next/image';
 import Preview from '@/../public/banner.png';
@@ -21,7 +18,7 @@ export function homeNavLinks(locale: string): LinkItemType[] {
     {
       icon: <icons.LayoutTemplate />,
       text: 'Showcase',
-      url: `/${locale}/docs/framework/step`,
+      url: `/${locale}/docs/introduction/clerk-quick-start`,
       active: 'url',
     },
   ];
@@ -33,6 +30,7 @@ export function levelNavLinks(locale: string): LinkItemType[] {
     {
       type: 'menu',
       text: 'Documentation',
+      // 文档落地页
       url: `/${locale}/docs`,
       items: [
         {
@@ -52,15 +50,15 @@ export function levelNavLinks(locale: string): LinkItemType[] {
             ),
             className: 'md:row-span-2',
           },
-          text: 'Getting Started',
+          text: 'FumaDocs',
           description: 'Learn to use Fumadocs on your docs site.',
-          url: `/${locale}/docs/framework`,
+          url: `/${locale}/docs/introduction`,
         },
         {
           icon: <icons.ComponentIcon />,
           text: 'Components',
-          description: 'Add interactive experience to your docs.',
-          url: `/${locale}/docs/framework/clerk-quick-start`,
+          description: 'Mermaid showcase.',
+          url: `/${locale}/docs/tool-manuals/mermaid`,
           menu: {
             className: 'lg:col-start-2',
           },
@@ -68,9 +66,8 @@ export function levelNavLinks(locale: string): LinkItemType[] {
         {
           icon: <icons.Server />,
           text: 'OpenAPI',
-          description:
-            'Generate interactive playgrounds and docs for your OpenAPI schema.',
-          url: `/${locale}/docs/framework/clerk-setup`,
+          description: 'Suitable',
+          url: `/${locale}/docs/restrictions`,
           menu: {
             className: 'lg:col-start-2',
           },
@@ -78,8 +75,8 @@ export function levelNavLinks(locale: string): LinkItemType[] {
         {
           icon: <icons.Pencil />,
           text: 'Markdown',
-          description: 'Learn the writing format/syntax of Fumadocs.',
-          url: `/${locale}/docs/framework/(showcase)`,
+          description: 'Term Service',
+          url: `/${locale}/docs/legislations/terms`,
           menu: {
             className: 'lg:col-start-3 lg:row-start-1',
           },
@@ -87,8 +84,8 @@ export function levelNavLinks(locale: string): LinkItemType[] {
         {
           icon: <icons.Layout />,
           text: 'Layouts',
-          description: 'See the available layouts of Fumadocs UI.',
-          url: `/${locale}/docs/framework/fumadocs`,
+          description: 'Privacy',
+          url: `/${locale}/docs/legislations/privacy`,
           menu: {
             className: 'lg:col-start-3',
           },

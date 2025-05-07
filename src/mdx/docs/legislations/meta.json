@@ -1,0 +1,15 @@
+{
+    "title": "Re8ger's Legislations",
+    "description": "What is Re8ger's legislations?",
+    "icon": "Zap",
+    "root": true,
+    "pages": [
+        "---Guide---",
+        "index",
+        "---Important---",
+        "terms",
+        "privacy",
+        "dpa",
+        "..."
+    ]
+}

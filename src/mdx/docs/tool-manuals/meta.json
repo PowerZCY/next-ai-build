@@ -1,5 +1,5 @@
 {
-    "title": "Re8ger's Core",
+    "title": "Re8ger's Tool Manuals",
     "description": "What is Re8ger's Core?",
     "icon": "Zap",
     "root": true,
@@ -7,8 +7,8 @@
         "---Guide---",
         "index",
         "---Configuration---",
-        "clerk-quick-start",
+        "mermaid",
         "---Features---",
-        "mermaid"
+        "..."
     ]
 }

@@ -1,0 +1,9 @@
+{
+    "title": "Re8ger's Restrictions",
+    "description": "What is Re8ger's restrictions?",
+    "icon": "Zap",
+    "root": true,
+    "pages": [
+        "index"
+    ]
+}

@@ -8,7 +8,7 @@ import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { AlbumIcon, Bitcoin, Bug, Cpu, ComponentIcon,
-  DatabaseZap, 
+  DatabaseZap, FileLock2,
   HousePlus, Layout, LayoutTemplate,
   Pencil, PanelsTopLeft, SquareTerminal, Server,
   Zap
@@ -48,6 +48,7 @@ export const globalLucideIcons = {
   SquareTerminal,
   Bitcoin, 
   Bug,
+  FileLock2,
   ComponentIcon,
   Layout,
   LayoutTemplate,

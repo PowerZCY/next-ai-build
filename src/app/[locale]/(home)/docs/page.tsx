@@ -3,7 +3,7 @@ import Link, { type LinkProps } from 'next/link';
 import Image from 'next/image';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import Spot from '@/../public/zap-icon.png';
+import Spot from '@/../public/banner.png';
 
 export default function D8gerPage(): React.ReactElement {
   return (
@@ -18,12 +18,12 @@ export default function D8gerPage(): React.ReactElement {
           }}
         />
       </div>
-      <div className="absolute inset-0 z-[-1] select-none overflow-hidden opacity-30">
+      <div className="absolute inset-0 z-[-1] select-none overflow-hidden opacity-50">
         <Image
           alt="spot"
           src={Spot}
-          sizes="100vw"
-          className="size-full min-w-[800px] max-w-fd-container"
+          sizes="50vw"
+          className=""
           priority
         />
       </div>
