@@ -4,40 +4,12 @@ import { useParams } from 'next/navigation';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
 import { Check } from 'lucide-react';
-import { format, isValid } from 'date-fns';
+import {formatTimestamp} from '@/lib/utils'
 import Image from 'next/image';
 
 const cache = new Map<string, string>();
 
-function formatGitTimestamp(gitTimestamp: string) {
-  const fail = "Ages ago";
-  if (!gitTimestamp) {
-    return fail;
-  }
 
-  // 假设 gitTimestamp 是毫秒时间戳字符串
-  const timestampMs = parseInt(gitTimestamp, 10);
-  if (isNaN(timestampMs)) {
-     return fail;
-  }
-
-  const date = new Date(timestampMs); // 或者如果确定是秒级用 fromUnixTime(timestampSeconds)
-
-  // 检查日期是否有效
-  if (!isValid(date)) {
-    return fail;
-  }
-
-  // 格式化日期
-  try {
-     // 'yyyy-MM-dd HH:mm:ss' 是 date-fns 的格式化模式
-     return format(date, 'yyyy-MM-dd');
-  } catch (error) {
-     // format也可能因无效日期抛错（虽然isValid应该已经捕获）
-     console.error("Error formatting date:", error);
-     return fail;
-  }
-}
 
 export function LLMCopyButton() {
   const [isLoading, setLoading] = useState(false);
@@ -127,7 +99,7 @@ export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: string }) {
         width={18}
         height={18}
       />
-      Lastest on {formatGitTimestamp(gitTimestamp)}
+      Lastest on {formatTimestamp(gitTimestamp, "YYYY-mm-dd")}
     </div>
   );
 }
