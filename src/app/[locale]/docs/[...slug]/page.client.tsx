@@ -89,7 +89,7 @@ export function EditOnGitHub({ url }: { url: string }) {
 }
 
 // New component for displaying the last updated date with an icon
-export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: string }) {
+export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: Date | undefined }) {
   return (
     <div className="flex items-center gap-x-2 text-stone-600 dark:text-stone-400 text-sm">
       <Image
@@ -99,7 +99,7 @@ export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: string }) {
         width={18}
         height={18}
       />
-      Lastest on {formatTimestamp(gitTimestamp, "YYYY-mm-dd")}
+      Lastest on {gitTimestamp ? formatTimestamp(gitTimestamp.toString(), "yyyy-MM-dd") : "Ages ago"}
     </div>
   );
 }

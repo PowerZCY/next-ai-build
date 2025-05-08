@@ -12,7 +12,7 @@ export const { GET } = createI18nSearchAPI('advanced', {
         title: page.data.title as string,
         description: page.data.description,
         url: page.url,
-        keywords: page.data.keywords,
+        keywords: (page.data.keywords || []).join(' '),
         structuredData: page.data.structuredData,
         id: page.url,
       })),

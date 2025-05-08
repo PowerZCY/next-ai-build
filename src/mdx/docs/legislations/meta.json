@@ -1,7 +1,7 @@
 {
     "title": "Re8ger's Legislations",
     "description": "What is Re8ger's legislations?",
-    "icon": "Zap",
+    "icon": "GlobeLock",
     "root": true,
     "pages": [
         "---Guide---",

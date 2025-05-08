@@ -15,9 +15,9 @@ var docs = defineDocs({
     schema: frontmatterSchema.extend({
       preview: z.string().optional(),
       index: z.boolean().default(false),
-      /**
-       * API routes only
-       */
+      keywords: z.array(z.string()).optional(),
+      // 添加 keywords 字段，类型为可选的字符串数组
+      // API routes only
       method: z.string().optional()
     })
   },
@@ -34,7 +34,9 @@ var blog = defineCollections({
   // @ts-ignore - Temporarily suppress deep instantiation error
   schema: frontmatterSchema.extend({
     author: z.string(),
-    date: z.string().date().or(z.date()).optional()
+    date: z.string().date().or(z.date()).optional(),
+    keywords: z.array(z.string()).optional()
+    // 添加 keywords 字段，类型为可选的字符串数组
   })
 });
 var remarkInstallOptions = {
@@ -45,7 +47,7 @@ var remarkInstallOptions = {
 var source_config_default = defineConfig({
   lastModifiedTime: "git",
   mdxOptions: {
-    providerImportSource: "@/lib/mdx-components",
+    providerImportSource: "@/components/mdx-components",
     rehypeCodeOptions: {
       lazy: true,
       experimentalJSEngine: true,

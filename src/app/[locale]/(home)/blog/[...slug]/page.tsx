@@ -4,7 +4,7 @@ import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 import { blogSource } from '@/lib/source';
 import { buttonVariants } from '@/components/ui/button';
 import { Control } from './page.client';
-import { getMDXComponents } from '@/lib/mdx-components';
+import { getMDXComponents } from '@/components/mdx-components';
 
 export default async function Page({
   params,

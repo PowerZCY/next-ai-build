@@ -7,8 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export function formatTimestamp(timestamp: string, formatter: string): String {
-  const fail = "Ages ago";
+export function formatTimestamp(timestamp: string, formatter: string) {
+  const fail = "";
   if (!timestamp) {
     return fail;
   }

@@ -6,7 +6,7 @@ import {
   DocsTitle,
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/lib/mdx-components';
+import { getMDXComponents } from '@/components/mdx-components';
 import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from './page.client';
 
 export default async function Page({

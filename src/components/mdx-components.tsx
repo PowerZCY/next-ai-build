@@ -7,12 +7,7 @@ import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-import { AlbumIcon, Bitcoin, Bug, Cpu, ComponentIcon,
-  DatabaseZap, FileLock2,
-  HousePlus, Layout, LayoutTemplate,
-  Pencil, PanelsTopLeft, SquareTerminal, Server,
-  Zap
-  } from 'lucide-react';
+import { globalLucideIcons } from '@/components/global-icon';
 import type { MDXComponents } from 'mdx/types';
 
 // Object containing globally available Fumadocs UI components
@@ -37,26 +32,6 @@ const customUiComponents = {
   
 }
 
-// Object containing globally available Lucide icon components
-// 所有的图标都要从这里导入, 并且图标会占据项目包的体积, 因此最好提前设计规划好
-export const globalLucideIcons = {
-  HousePlus,
-  Cpu,
-  AlbumIcon,
-  PanelsTopLeft,
-  DatabaseZap,
-  SquareTerminal,
-  Bitcoin, 
-  Bug,
-  FileLock2,
-  ComponentIcon,
-  Layout,
-  LayoutTemplate,
-  Pencil,
-  Server,
-  Zap
-};
-
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
@@ -71,6 +46,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     img: (props) => <ImageZoom {...(props as any)} />,
     ...fumadocsUiComponents,
     ...customUiComponents,
+    // 从项目统一icon库中使用
     ...globalLucideIcons,
     ...components,
   };

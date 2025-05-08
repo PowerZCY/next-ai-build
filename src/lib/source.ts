@@ -3,7 +3,7 @@ import { docs, blog as blogPosts } from '.source';
 import { i18n } from '@/i18n';
 import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';
 import { createElement } from 'react';
-import { globalLucideIcons as icons } from '@/lib/mdx-components';
+import { globalLucideIcons as icons } from '@/components/global-icon';
 
 export const docsSource = loader({
   i18n,
@@ -20,6 +20,7 @@ export const docsSource = loader({
       return createElement(icons.Bitcoin);
     }
     // 如果图标为空，则为空
+    return;
   },
 });
 

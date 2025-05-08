@@ -15,9 +15,8 @@ export const docs = defineDocs({
     schema: frontmatterSchema.extend({
       preview: z.string().optional(),
       index: z.boolean().default(false),
-      /**
-       * API routes only
-       */
+      keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
+      // API routes only
       method: z.string().optional(),
     }),
   },
@@ -36,6 +35,7 @@ export const blog = defineCollections({
   schema: frontmatterSchema.extend({
     author: z.string(),
     date: z.string().date().or(z.date()).optional(),
+    keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
   }),
 });
 
@@ -49,7 +49,7 @@ const remarkInstallOptions = {
 export default defineConfig({
   lastModifiedTime: 'git',
   mdxOptions: {
-    providerImportSource: '@/lib/mdx-components',
+    providerImportSource: '@/components/mdx-components',
     rehypeCodeOptions: {
       lazy: true,
       experimentalJSEngine: true,

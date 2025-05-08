@@ -1,7 +1,7 @@
 {
     "title": "Re8ger's Restrictions",
     "description": "What is Re8ger's restrictions?",
-    "icon": "Zap",
+    "icon": "Tablets",
     "root": true,
     "pages": [
         "index"

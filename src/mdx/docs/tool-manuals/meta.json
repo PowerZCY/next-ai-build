@@ -1,7 +1,7 @@
 {
     "title": "Re8ger's Tool Manuals",
     "description": "What is Re8ger's Core?",
-    "icon": "Zap",
+    "icon": "SplinePointer",
     "root": true,
     "pages": [
         "---Guide---",
