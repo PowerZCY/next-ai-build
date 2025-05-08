@@ -33,12 +33,10 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
             ...option,
             icon: (
               <div
-                className="rounded-md p-1 shadow-lg ring-2 [&_svg]:size-5"
+                className="rounded-md p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 [&_svg]:size-5"
                 style={
                   {
                     color,
-                    border: `1px solid color-mix(in oklab, ${color} 50%, transparent)`,
-                    '--tw-ring-color': `color-mix(in oklab, ${color} 20%, transparent)`,
                   } as object
                 }
               >

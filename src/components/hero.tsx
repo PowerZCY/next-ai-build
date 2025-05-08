@@ -32,7 +32,7 @@ export function Hero() {
           </Button>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          <icons.Zap className="h-4 w-4 text-purple-500" />
+          <icons.Zap className="h-6 w-6 rounded-full p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 text-purple-500" />
           <span>{t('about')}</span>
         </div>
       </div>

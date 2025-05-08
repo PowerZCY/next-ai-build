@@ -87,6 +87,6 @@ export const globalLucideIcons = {
 
 // Define the site icon as a functional component
 export const SiteIcon = () => (
-  <globalLucideIcons.Zap className={`h-6 w-6 ${iconColor}`} />
+  <globalLucideIcons.Zap className={`h-8 w-8 rounded-full p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 ${iconColor}`} />
 );
 
