@@ -69,13 +69,13 @@ export default function Loading() {
               height: DOT_SIZE,
               backgroundColor: dot.color,
               borderRadius: '50%',
-              animationName: 'dotPulseAnimation',
+              animationName: 'loading-dot-pulse',
               animationDuration: `${ANIMATION_DURATION}s`,
-              animationTimingFunction: 'cubic-bezier(0.45, 0, 0.55, 1)', // Smoother easing
+              animationTimingFunction: 'cubic-bezier(0.45, 0, 0.55, 1)',
               animationIterationCount: 'infinite',
               animationDelay: `${dot.delay}s`,
-              opacity: 0, // Start fully transparent, animation will fade it in
-              transform: 'scale(0)', // Start scaled down
+              opacity: 0,
+              transform: 'scale(0)',
             }}
           />
         ))}
@@ -89,30 +89,6 @@ export default function Loading() {
           </p>
         </div>
       </div>
-      {/* 
-        The <style jsx global> tag allows for defining global CSS, including @keyframes.
-        These styles will apply to this component and its children.
-      */}
-      <style jsx global>{`
-        @keyframes dotPulseAnimation {
-          0% {
-            transform: scale(0.2);
-            opacity: 0;
-          }
-          25% { /* Peak of the pulse, more prominent */
-            transform: scale(1.2);
-            opacity: 1;
-          }
-          50% { /* Start to fade and shrink */
-             transform: scale(0.8);
-             opacity: 0.7;
-          }
-          100% { /* Fully faded and shrunk back */
-            transform: scale(0.2);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 }

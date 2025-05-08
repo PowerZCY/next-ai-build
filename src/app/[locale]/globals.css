@@ -14,7 +14,8 @@
 @import 'fumadocs-ui/css/preset.css';
 
 @layer utilities {
-  @keyframes gradient-wave {
+  /* Renamed Keyframes for CTA component */
+  @keyframes cta-gradient-wave {
     0%, 100% {
       background-position: 0% 50%;
     }
@@ -23,8 +24,29 @@
     }
   }
 
-  .animate-gradient-wave {
-    animation: gradient-wave 6s ease infinite;
+  /* Renamed Utility Class for CTA component */
+  .animate-cta-gradient-wave {
+    animation: cta-gradient-wave 6s ease infinite; /* Use renamed keyframes */
+  }
+  
+  /* Loading Animation Keyframes */
+  @keyframes loading-dot-pulse {
+    0% {
+      transform: scale(0.2);
+      opacity: 0;
+    }
+    25% { /* Peak of the pulse, more prominent */
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    50% { /* Start to fade and shrink */
+        transform: scale(0.8);
+        opacity: 0.7;
+    }
+    100% { /* Fully faded and shrunk back */
+      transform: scale(0.2);
+      opacity: 0;
+    }
   }
 }
 
