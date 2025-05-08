@@ -1,8 +1,8 @@
 'use client'
 
-import { Zap } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import Link from "next/link";
+import { SiteIcon } from '@/components/global-icon';
 
 export function Footer() {
   const t = useTranslations('home');
@@ -12,7 +12,7 @@ export function Footer() {
       <div className="container flex flex-col gap-4">
         <div className="mb-4 flex items-center space-x-2">
           <Link href="/" className="flex items-center space-x-2">
-            <Zap className="h-6 w-6 text-purple-500" />
+            <SiteIcon/>
             <span className="mb-1 text-sm font-semibold">{t('title')}</span>
           </Link>
         </div>

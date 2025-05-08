@@ -1,4 +1,4 @@
-import { Building2, LibraryIcon } from 'lucide-react';
+import { globalLucideIcons as icons } from "@/components/global-icon"
 import Link, { type LinkProps } from 'next/link';
 import Image from 'next/image';
 import { buttonVariants } from '@/components/ui/button';
@@ -51,7 +51,7 @@ export default function D8gerPage(): React.ReactElement {
       <div className="mt-16 grid grid-cols-1 gap-4 text-left md:grid-cols-2">
         <Item href="/docs/ui">
           <Icon>
-            <Building2 className="size-full" />
+            <icons.Building2 className="size-full" />
           </Icon>
           <h2 className="mb-2 text-lg font-semibold">Fumadocs</h2>
           <p className="text-sm text-fd-muted-foreground">
@@ -60,7 +60,7 @@ export default function D8gerPage(): React.ReactElement {
         </Item>
         <Item href="/docs/headless">
           <Icon>
-            <LibraryIcon className="size-full" />
+            <icons.LibraryIcon className="size-full" />
           </Icon>
           <h2 className="mb-2 text-lg font-semibold">Fumadocs Core</h2>
           <p className="text-sm text-fd-muted-foreground">

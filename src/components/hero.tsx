@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Zap } from "lucide-react"
+import { globalLucideIcons as icons } from "@/components/global-icon"
 import Image from "next/image"
 import { useTranslations } from 'next-intl'
 
@@ -27,12 +27,12 @@ export function Hero() {
             className="bg-linear-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-black dark:text-white"
           >
             <Link href="https://preview.reve.art/" target="_blank" rel="noopener noreferrer">
-              {t('button')} <ArrowRight className="ml-2 h-4 w-4" />
+              {t('button')} <icons.ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          <Zap className="h-4 w-4 text-purple-500" />
+          <icons.Zap className="h-4 w-4 text-purple-500" />
           <span>{t('about')}</span>
         </div>
       </div>

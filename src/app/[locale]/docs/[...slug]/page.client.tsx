@@ -3,13 +3,10 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
-import { Check } from 'lucide-react';
+import { globalLucideIcons as icons } from '@/components/global-icon'
 import {formatTimestamp} from '@/lib/utils'
-import Image from 'next/image';
 
 const cache = new Map<string, string>();
-
-
 
 export function LLMCopyButton() {
   const [isLoading, setLoading] = useState(false);
@@ -51,18 +48,12 @@ export function LLMCopyButton() {
       {checked ?
         (
           <>
-            <Check className="size-3.5" color="#ec4899" />
+            <icons.Check className="size-3.5" color="#ec4899" />
             Copied!
           </>
         ) : (
           <>
-            <Image
-              src="/icons/markdown.svg"
-              alt="Copy"
-              className="size-4.5"
-              width={18}
-              height={18}
-            />
+            <icons.MarkdownX className="size-3.5" color="#ec4899" />
             Copy page as Markdown
           </>
         )} 
@@ -76,13 +67,7 @@ export function EditOnGitHub({ url }: { url: string }) {
       className="flex items-center gap-x-2 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300 text-sm"
       href={url}
     >
-      <Image
-        src="/icons/github.svg"
-        alt="GitHub"
-        className="size-4.5"
-        width={18}
-        height={18}
-      />
+      <icons.GitHub className="size-3.5" color="#ec4899"/>
       Edit this page on GitHub
     </Link>
   );
@@ -92,13 +77,7 @@ export function EditOnGitHub({ url }: { url: string }) {
 export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: Date | undefined }) {
   return (
     <div className="flex items-center gap-x-2 text-stone-600 dark:text-stone-400 text-sm">
-      <Image
-        src="/icons/latest.svg"
-        alt="Last updated"
-        className="size-4.5"
-        width={18}
-        height={18}
-      />
+      <icons.LastUpdated className="size-3.5" color="#ec4899"/>
       Lastest on {gitTimestamp ? formatTimestamp(gitTimestamp.toString(), "yyyy-MM-dd") : "Ages ago"}
     </div>
   );

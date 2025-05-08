@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
-import { globalLucideIcons as icons } from '@/components/global-icon';
+import { globalLucideIcons as icons, SiteIcon } from '@/components/global-icon';
 import Image from 'next/image';
 import Preview from '@/../public/banner.png';
 import { getTranslations } from 'next-intl/server';
@@ -103,7 +103,7 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
       url: `/${locale}`,
       title: (
         <>
-          <icons.Zap className="h-6 w-6 text-purple-500" />
+          <SiteIcon/>
           <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
             {t('title')}
           </span>

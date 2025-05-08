@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { globalLucideIcons as icons } from "@/components/global-icon"
 import { useTranslations } from 'next-intl'
 
 export function CTA() {
@@ -20,7 +20,7 @@ export function CTA() {
         </p>
         <Button asChild size="lg" className="bg-white text-purple-900 hover:bg-gray-100">
           <Link href="https://preview.reve.art/" target="_blank" rel="noopener noreferrer">
-            {t('button')} <ArrowRight className="ml-2 h-4 w-4" />
+            {t('button')} <icons.ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       </div>

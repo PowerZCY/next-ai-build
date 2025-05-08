@@ -8,54 +8,48 @@
 import React from 'react';
 import { type LucideProps } from 'lucide-react';
 import Image from 'next/image';
-
-// Revert to wildcard import for lucide icons
 import * as limitedIconsModule from '@/lib/limited-lucide-icons';
+import { iconColor } from '@/lib/appConfig';
 
-// Props for the SVG-derived icon components. 
-// Making it compatible with LucideProps for easier unification, focusing on className.
-interface SvgIconProps {
-  className?: string;
-  // Add other props if your SVG icons need to be more configurable
-}
+// Define all custom image-based icons in this object
+const customImageIcons = {
+  GitHub: iconFromSVG("/icons/github.svg", "GitHub"),
+  LastUpdated: iconFromSVG("/icons/latest.svg", "Last updated"),
+  MarkdownX: iconFromSVG("/icons/markdown.svg", "MarkdownX"),
+  // Future custom SVG icons can be added here directly
+};
 
-// Helper function to create SVG-based icon components
-function iconFromSVG(src: string, alt: string): (props: SvgIconProps) => React.ReactElement {
-  const SvgIconComponent = (props: SvgIconProps): React.ReactElement => {
-    // Base className for these SVG icons, combined with any passed className
+// Helper function to create SVG-based icon components, now accepting LucideProps
+function iconFromSVG(src: string, alt: string): (props: LucideProps) => React.ReactElement {
+  const SvgIconComponent = (props: LucideProps): React.ReactElement => {
+    // We primarily use className from LucideProps. Other props like size, color specific to SVG paths
+    // won't directly affect the <Image /> unless explicitly handled.
     const combinedClassName = `size-4.5 ${props.className || ''}`.trim();
     return (
       <Image
         src={src}
         alt={alt}
         className={combinedClassName}
-        width={18} // These could also be made configurable via props
-        height={18}
+        width={18} // Fixed width for image-based icons
+        height={18} // Fixed height for image-based icons
       />
     );
   };
-  // Set a displayName for better debugging in React DevTools
   SvgIconComponent.displayName = `SvgIcon(${alt.replace(/\s+/g, '_')})`;
   return SvgIconComponent;
 }
 
-// 项目内SVG图标 (now these are function components)
-const GitHub = iconFromSVG("/icons/github.svg", "GitHub");
-const LastUpdated = iconFromSVG("/icons/latest.svg", "Last updated");
-const MarkdownX = iconFromSVG("/icons/markdown.svg", "MarkdownX");
-
+// Type for styled Lucide icon components (accepts LucideProps)
 type StyledLucideIconComponent = (props: LucideProps) => React.ReactElement;
-type CustomSvgIconComponent = (props: SvgIconProps) => React.ReactElement;
 
-// Create styled versions of the lucide icons from the module
 const tempStyledLimitedIcons: Partial<Record<keyof typeof limitedIconsModule, StyledLucideIconComponent>> = {};
 
 for (const iconNameKey in limitedIconsModule) {
   if (Object.prototype.hasOwnProperty.call(limitedIconsModule, iconNameKey)) {
     const iconName = iconNameKey as keyof typeof limitedIconsModule;
-    const OriginalIconComponent = limitedIconsModule[iconName] as any; // Treat as any for the check
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const OriginalIconComponent = limitedIconsModule[iconName] as any; 
 
-    // Check if it's a function or a React forwardRef component (Corrected Check)
     if (typeof OriginalIconComponent === 'function' || 
         (typeof OriginalIconComponent === 'object' && 
          OriginalIconComponent !== null && 
@@ -64,7 +58,7 @@ for (const iconNameKey in limitedIconsModule) {
       
       const StyledIcon = (props: LucideProps): React.ReactElement => {
         const originalClassName = props.className || '';
-        const newClassName = `text-purple-500 ${originalClassName}`.trim();
+        const newClassName = `${iconColor} ${originalClassName}`.trim(); // User changed to 500
         return <ComponentToRender {...props} className={newClassName} />;
       };
       StyledIcon.displayName = `Styled(${iconName})`;
@@ -79,23 +73,20 @@ const styledLimitedIconsPart = tempStyledLimitedIcons as {
   [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent;
 };
 
-// More precise type for globalLucideIcons based on the module exports
-type GlobalIconsType = {
-  [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent;
-} & {
-  GitHub: CustomSvgIconComponent;
-  LastUpdated: CustomSvgIconComponent;
-  MarkdownX: CustomSvgIconComponent;
-};
+// GlobalIconsType now dynamically combines types from Lucide module and custom image icons
+type GlobalIconsType = 
+  { [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent } &
+  { [K in keyof typeof customImageIcons]: StyledLucideIconComponent };
 
 // Object containing globally available icon components
 // 所有的图标都要从这里导入, 并且图标会占据项目包的体积, 因此最好提前设计规划好
 export const globalLucideIcons = {
   ...styledLimitedIconsPart,
-  GitHub,
-  LastUpdated,
-  MarkdownX
+  ...customImageIcons, // Spread all custom image icons
 } satisfies GlobalIconsType; // Use satisfies for better type checking without up-casting
 
-
+// Define the site icon as a functional component
+export const SiteIcon = () => (
+  <globalLucideIcons.Zap className={`h-6 w-6 ${iconColor}`} />
+);
 

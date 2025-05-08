@@ -1,5 +1,5 @@
 'use client';
-import { Check, Share } from 'lucide-react';
+import { globalLucideIcons as icons } from "@/components/global-icon"
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
@@ -17,7 +17,7 @@ export function Control({ url }: { url: string }): React.ReactElement {
       )}
       onClick={onCopy}
     >
-      {isChecked ? <Check className="size-4" /> : <Share className="size-4" />}
+      {isChecked ? <icons.Check className="size-4" /> : <icons.Share className="size-4" />}
       {isChecked ? 'Copied URL' : 'Share Post'}
     </button>
   );

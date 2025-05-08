@@ -37,8 +37,16 @@ export const appConfig = {
     },
     messageRoot: 'messages',
   },
+  style: {
+    icon: {
+      // 所有图标默认颜色
+      uniformColor: "text-purple-500"
+    }
+  }
 
 };
+
+export const iconColor = appConfig.style.icon.uniformColor
 
 // 辅助函数：检查是否为支持的语言
 function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.locales[number] {
