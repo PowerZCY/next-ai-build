@@ -48,12 +48,12 @@ export function LLMCopyButton() {
       {checked ?
         (
           <>
-            <icons.Check className="size-3.5" color="#ec4899" />
+            <icons.Check className="size-3.5"/>
             Copied!
           </>
         ) : (
           <>
-            <icons.MarkdownX className="size-3.5" color="#ec4899" />
+            <icons.MarkdownX className="size-3.5"/>
             Copy page as Markdown
           </>
         )} 
@@ -67,7 +67,7 @@ export function EditOnGitHub({ url }: { url: string }) {
       className="flex items-center gap-x-2 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300 text-sm"
       href={url}
     >
-      <icons.GitHub className="size-3.5" color="#ec4899"/>
+      <icons.GitHub className="size-3.5"/>
       Edit this page on GitHub
     </Link>
   );
@@ -77,7 +77,7 @@ export function EditOnGitHub({ url }: { url: string }) {
 export function LastUpdatedDate({ gitTimestamp }: { gitTimestamp: Date | undefined }) {
   return (
     <div className="flex items-center gap-x-2 text-stone-600 dark:text-stone-400 text-sm">
-      <icons.LastUpdated className="size-3.5" color="#ec4899"/>
+      <icons.LastUpdated className="size-3.5"/>
       Lastest on {gitTimestamp ? formatTimestamp(gitTimestamp.toString(), "yyyy-MM-dd") : "Ages ago"}
     </div>
   );
