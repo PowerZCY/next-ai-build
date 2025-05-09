@@ -64,14 +64,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body
-          // you can use Tailwind CSS too
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100vh',
-          }}
-        >
+        <body >
           {children}
         </body>
         <GoogleAnalyticsScript />

@@ -44,9 +44,6 @@ export default async function Layout({
         // translations for UI
         translations: { cn }[locale],
       }}
-      search={{
-        enabled: true,
-      }}
     >
       {showBanner ? 
       (<Banner variant="rainbow" changeLayout={false}>
@@ -63,10 +60,10 @@ export default async function Layout({
         className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)]"
       >
         {children}
-        <Footer />
         <GoToTop />
+        <Footer />
       </HomeLayout>
     </RootProvider>
-  );
+	);
 }
 
