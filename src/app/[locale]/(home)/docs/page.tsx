@@ -7,23 +7,13 @@ import Spot from '@/../public/banner.png';
 
 export default function D8gerPage(): React.ReactElement {
   return (
-    <main className="container flex flex-col items-center py-16 text-center z-[2]">
-      <div className="absolute inset-0 z-[-1] overflow-hidden duration-1000 animate-in fade-in [perspective:2000px]">
-        <div
-          className="absolute bottom-[20%] left-1/2 size-[1200px] origin-bottom bg-fd-primary/30 opacity-30"
-          style={{
-            transform: 'rotateX(75deg) translate(-50%, 400px)',
-            backgroundImage:
-              'radial-gradient(50% 50% at center,transparent,var(--color-fd-background)), repeating-linear-gradient(to right,var(--color-fd-primary),var(--color-fd-primary) 1px,transparent 2px,transparent 100px), repeating-linear-gradient(to bottom,var(--color-fd-primary),var(--color-fd-primary) 2px,transparent 3px,transparent 100px)',
-          }}
-        />
-      </div>
-      <div className="absolute inset-0 z-[-1] select-none overflow-hidden opacity-50">
+    <main className="container relative flex flex-col items-center py-16 text-center z-[2]">
+      <div className="absolute inset-0 z-[-1] select-none overflow-hidden opacity-50 flex justify-center items-center">
         <Image
           alt="spot"
           src={Spot}
-          sizes="50vw"
-          className=""
+          sizes="100vw"
+          className="w-full h-full object-contain"
           priority
         />
       </div>
