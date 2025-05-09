@@ -1,6 +1,6 @@
 import { appConfig } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, unstable_setRequestLocale, getTranslations } from 'next-intl/server';
+import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
 // Fumadocs 数学公式样式
 import 'katex/dist/katex.css';
@@ -64,7 +64,7 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await paramsPromise;  // 使用新名称
-  unstable_setRequestLocale(locale);
+  setRequestLocale(locale);
   const messages = await getMessages();
   const generatedLocales = appConfig.i18n.locales.map((loc) => ({
     name: appConfig.i18n.localeLabels[loc as keyof typeof appConfig.i18n.localeLabels],
