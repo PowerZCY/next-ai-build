@@ -35,13 +35,13 @@ export function Footer() {
         <div className="flex flex-col items-center text-center m-2 space-y-5">
           {/* Row 2.1: Legal Links */}
           <div className="flex items-center space-x-4 text-xs">
-            <Link href="/terms" className="flex items-center space-x-1 hover:underline">
+            <Link href="/legal/terms" className="flex items-center space-x-1 hover:underline">
               <icons.ReceiptText className="h-3.5 w-3.5"/>
               <span>{tFooter('terms', { defaultValue: 'Terms of Service' })}</span>
             </Link>
-            <Link href="/privacy" className="flex items-center space-x-1 hover:underline">
+            <Link href="/legal/privacy" className="flex items-center space-x-1 hover:underline">
               <icons.ShieldUser className="h-3.5 w-3.5"/>
-              <span>{tFooter('privacy', { defaultValue: '隐私政策' })}</span>
+              <span>{tFooter('privacy', { defaultValue: 'Privacy Policy' })}</span>
             </Link>
           </div>
           {/* Row 2.2: Copyright */}
@@ -56,12 +56,12 @@ export function Footer() {
         <div className="flex justify-end m-2">
           <div className="flex flex-col space-y-5">
             {/* Link 1 */}
-            <Link href="#" className="text-xs flex items-center space-x-1 hover:underline text-left">
+            <Link href="/legal/dpa" className="text-xs flex items-center space-x-1 hover:underline text-left">
               <icons.Fingerprint className="h-3.5 w-3.5"/>
               <span>{tFooter('contact', { defaultValue: 'Contact Us' })}</span>
             </Link>
             {/* Link 2 */}
-            <Link href="#" className="text-xs flex items-center space-x-1 hover:underline text-left">
+            <Link href="/legal/subprocessors" className="text-xs flex items-center space-x-1 hover:underline text-left">
               <icons.Handshake className="h-3.5 w-3.5"/>
               <span>{tFooter('sitemap', { defaultValue: 'Sitemap' })}</span>
             </Link>

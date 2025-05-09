@@ -6,6 +6,8 @@ icon: ReceiptText
 
 # Example
 
+## Cards
+
 <Cards>
   <Card icon={<HousePlus className="text-purple-300" />} title="How">
     hahaha
@@ -16,13 +18,15 @@ icon: ReceiptText
   console.log("jj")
 ```
 
+## Accordions
+
 <Accordions>
   <Accordion id="faq" title="Why docs">
     Cause you're DaShaBi
   </Accordion>
 </Accordions>
 
-
+## Files
 <File name="jj" />
 
 <Files>
@@ -41,11 +45,7 @@ icon: ReceiptText
 
 
 
-
-
-
-
-
+### Tabs
 <Tabs groupId="package-manager" persist items={["npm", "pnpm", "yarn", "bun"]}>
   ```bash tab="npm"
   npm install fumadocs-ui fumadocs-core
@@ -64,7 +64,7 @@ icon: ReceiptText
   ```
 </Tabs>
 
-
+### Mermaid
 ```math
   e^A=\sum_{n = 0}^{\infty}\frac{1}{n!}A^n
 ```
@@ -94,6 +94,7 @@ graph LR
 
 "/>
 
+## Callout
 <Callout title="提示框" type="error">
   提示框类型info|warning|error, 默认为info
 </Callout>
@@ -110,42 +111,9 @@ graph LR
   </div>
 </div>
 
+### Normal Tabs
 <Tabs groupId="haha" persist items={["ts", "js", "java"]}>
   <Tab value="ts">hh</Tab>
   <Tab value="js">jj</Tab>
   <Tab value="java">kk</Tab>
 </Tabs>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
