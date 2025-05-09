@@ -119,5 +119,12 @@
         "description": "Would you like to switch to",
         "close": "No, thanks",
         "changeAction": "Yes, switch"
+    },
+    "footer": {
+        "copyright": "Copyright © {year} {name} All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "sitemap": "Sitemap",
+        "contact": "Contact Us"
     }
 }

@@ -119,5 +119,12 @@
         "description": "是否切换到",
         "close": "不，谢谢",
         "changeAction": "是的，切换"
+    },
+    "footer": {
+        "copyright": "版权所有 © {year} {name} 保留所有权利。",
+        "privacy": "隐私政策",
+        "terms": "服务条款",
+        "sitemap": "网站地图",
+        "contact": "联系我们"
     }
 }
