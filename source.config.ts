@@ -39,6 +39,26 @@ export const blog = defineCollections({
   }),
 });
 
+export const legal = defineDocs({
+  dir: 'src/mdx/legal',
+  docs: {
+    async: false,
+    // @ts-ignore - Temporarily suppress deep instantiation error
+    schema: frontmatterSchema.extend({
+      preview: z.string().optional(),
+      index: z.boolean().default(false),
+      keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
+      // API routes only
+      method: z.string().optional(),
+    }),
+  },
+  meta: {
+    schema: metaSchema.extend({
+      description: z.string().optional(),
+    }),
+  },
+});
+
 
 const remarkInstallOptions = {
   persist: {
