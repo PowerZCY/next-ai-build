@@ -5,14 +5,7 @@ import './globals.css'
 // Fumadocs 数学公式样式
 import 'katex/dist/katex.css';
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
-import { RootProvider } from 'fumadocs-ui/provider';
-import type { Translations } from 'fumadocs-ui/i18n';
-import { Banner } from 'fumadocs-ui/components/banner';
 
-const cn: Partial<Translations> = {
-  search: 'Translated Content',
-  // other translations
-};
 
 export const dynamic = 'force-dynamic'
 
@@ -66,10 +59,7 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
-  const generatedLocales = appConfig.i18n.locales.map((loc) => ({
-    name: appConfig.i18n.localeLabels[loc as keyof typeof appConfig.i18n.localeLabels],
-    locale: loc,
-  }));
+  
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -82,21 +72,7 @@ export default async function RootLayout({
             minHeight: '100vh',
           }}
         >
-          <RootProvider
-            i18n={{
-              locale: locale,
-              // available languages
-              locales: generatedLocales,
-              // translations for UI
-              translations: { cn }[locale],
-            }}
-            search={{
-              enabled: true,
-            }}
-          >
-            <Banner variant="rainbow" changeLayout={false}/>
-            {children}
-          </RootProvider>
+          {children}
         </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>

@@ -4,7 +4,9 @@ import { baseOptions } from '@/app/[locale]/layout.config';
 // https://fumadocs.dev/docs/ui/layouts/notebook
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
 import { GithubInfo } from 'fumadocs-ui/components/github-info';
-import 'katex/dist/katex.min.css';
+import { RootProvider } from 'fumadocs-ui/provider';
+import { generatedLocales } from '@/lib/appConfig';
+import { cn } from '@/lib/fuma-search-util';
 
 async function docsOptions(locale: string): Promise<DocsLayoutProps> {
   const options = await baseOptions(locale);
@@ -59,15 +61,28 @@ export default async function Layout({
 }) {
   const { locale } = await params;
   const customeOptions = await docsOptions(locale);
-
+  
   // // 在这里添加人工延迟
   // console.log('Starting 5-second delay for testing loading animation...');
   // await new Promise(resolve => setTimeout(resolve, 5000)); // 5秒延迟
   // console.log('Delay finished. Rendering page.');
  
   return (
-    <DocsLayout {...customeOptions} >
-      {children}
-    </DocsLayout>
+    <RootProvider
+      i18n={{
+        locale: locale,
+        // available languages
+        locales: generatedLocales,
+        // translations for UI
+        translations: { cn }[locale],
+      }}
+      search={{
+        enabled: true,
+      }}
+    >
+      <DocsLayout {...customeOptions} >
+        {children}
+      </DocsLayout>
+    </RootProvider>
   );
 }

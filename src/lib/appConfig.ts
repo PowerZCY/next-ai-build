@@ -59,3 +59,8 @@ function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.loca
 export function getValidLocale(locale: string): typeof appConfig.i18n.locales[number] {
   return isSupportedLocale(locale) ? locale : appConfig.i18n.defaultLocale;
 }
+
+export const generatedLocales = appConfig.i18n.locales.map((loc) => ({
+  name: appConfig.i18n.localeLabels[loc as keyof typeof appConfig.i18n.localeLabels],
+  locale: loc,
+}));
