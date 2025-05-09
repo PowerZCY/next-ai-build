@@ -7,6 +7,7 @@ import 'katex/dist/katex.css';
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
 import { RootProvider } from 'fumadocs-ui/provider';
 import type { Translations } from 'fumadocs-ui/i18n';
+import { Banner } from 'fumadocs-ui/components/banner';
 
 const cn: Partial<Translations> = {
   search: 'Translated Content',
@@ -93,6 +94,7 @@ export default async function RootLayout({
               enabled: true,
             }}
           >
+            <Banner variant="rainbow" changeLayout={false}/>
             {children}
           </RootProvider>
         </body>
