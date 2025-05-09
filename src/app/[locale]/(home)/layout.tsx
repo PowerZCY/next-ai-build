@@ -6,6 +6,8 @@ import { RootProvider } from 'fumadocs-ui/provider';
 import { generatedLocales } from '@/lib/appConfig';
 import { Banner } from 'fumadocs-ui/components/banner';
 import { cn } from '@/lib/fuma-search-util';
+import GoToTop from '@/components/go-to-top';
+
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   const options = await baseOptions(locale);
@@ -58,6 +60,7 @@ export default async function Layout({
       >
         {children}
         <Footer />
+        <GoToTop />
       </HomeLayout>
     </RootProvider>
   );

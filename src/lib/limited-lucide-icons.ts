@@ -8,6 +8,7 @@ export {
     AlbumIcon,
     ArrowLeft,
     ArrowRight,
+    ArrowUp,
     Bitcoin,
     Binary,
     Building2,
