@@ -1,6 +1,7 @@
 export const appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
+  githubBaseUrl: 'https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/',
 
   // 国际化配置
   // - 英语 (en)
@@ -42,12 +43,19 @@ export const appConfig = {
     icon: {
       // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
       uniformColor: "text-purple-500"
-    }
+    },
+    showBanner: false
+  },
+  mdxSourceDir: {
+    docs: "src/mdx/docs",
+    blog: "src/mdx/blog",
+    legal: "src/mdx/legal"
   }
 
 };
 
 export const iconColor = appConfig.style.icon.uniformColor
+export const showBanner = appConfig.style.showBanner
 
 // 辅助函数：检查是否为支持的语言
 function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.locales[number] {

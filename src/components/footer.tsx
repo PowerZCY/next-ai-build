@@ -4,10 +4,17 @@ import { useTranslations } from 'next-intl'
 import Link from "next/link";
 import { SiteIcon } from '@/components/global-icon';
 import { globalLucideIcons as icons } from '@/components/global-icon';
+import { useEffect } from 'react';
+import { showBanner } from '@/lib/appConfig';
 
 export function Footer() {
   const t = useTranslations('home');
   const tFooter = useTranslations('footer');
+
+  useEffect(() => {
+    // 如果设置了banner, 就需要调节header的高度
+    document.documentElement.style.setProperty('--fd-banner-height', showBanner ? '2.5rem' : '-0.5rem');
+  }, []);
 
   return (
     <footer className="mt-auto bg-fd-card text-fd-secondary-foreground max-w-full border-2 border-fd-foreground/10 transition-colors lg:mx-2 lg:my-1 rounded-2xl lg:border-0 lg:bg-fd-background/80 lg:backdrop-blur-lg supports-[backdrop-filter]:bg-fd-background/80 supports-[backdrop-filter]:backdrop-blur-lg">

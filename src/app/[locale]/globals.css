@@ -16,9 +16,6 @@
 /* 
  * 强制FumaDocs生成的导航栏在页面顶部
  */
-:root {
-  --fd-banner-height: 2.5rem; /* 确保这个值与你的 Banner 高度一致 */
-}
 header#fd-nav {
   top: var(--fd-banner-height) !important;
 }

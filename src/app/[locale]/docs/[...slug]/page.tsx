@@ -7,7 +7,8 @@ import {
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/components/mdx-components';
-import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from './page.client';
+import { TocFooter } from '@/components/toc';
+import { appConfig } from '@/lib/appConfig';
 
 export default async function Page({
   params,
@@ -18,16 +19,8 @@ export default async function Page({
   const page = docsSource.getPage(slug, locale);
   if (!page) notFound();
 
-  const path = `src/mdx/docs/${page.file.path}`;
-	const tocFooter = (
-    <div className="flex flex-col gap-y-2 items-start m-4">
-      <LastUpdatedDate gitTimestamp={page.data.lastModified} />
-      <LLMCopyButton />
-      <EditOnGitHub
-        url={`https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/${path}`}
-      />
-    </div>
-	);
+  const path = `${appConfig.mdxSourceDir.docs}/${page.file.path}`;
+  const tocFooterElement = <TocFooter lastModified={page.data.lastModified} editPath={path} />;
  
   // Markdown content requires await if you config 'async: true' in source.config.ts
   // const { body: MdxContent, toc } = await page.data.load();
@@ -35,8 +28,8 @@ export default async function Page({
  
   return (
     <DocsPage 
-      tableOfContent={{ style: 'clerk', single: false, footer: tocFooter }}
-      tableOfContentPopover={{ footer: tocFooter }}
+      tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement }}
+      tableOfContentPopover={{ footer: tocFooterElement }}
       toc={page.data.toc}
       full={page.data.full}
       article={{
@@ -52,7 +45,6 @@ export default async function Page({
     </DocsPage>
   );
 }
- 
 
 export function generateStaticParams() {
   return docsSource.generateParams('slug', 'locale');

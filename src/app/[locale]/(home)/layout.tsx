@@ -4,10 +4,10 @@ import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.
 import { Footer } from '@/components/footer';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { generatedLocales } from '@/lib/appConfig';
-import { Banner } from 'fumadocs-ui/components/banner';
 import { cn } from '@/lib/fuma-search-util';
 import GoToTop from '@/components/go-to-top';
-
+import { Banner } from 'fumadocs-ui/components/banner';
+import { showBanner } from '@/lib/appConfig';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   const options = await baseOptions(locale);
@@ -48,9 +48,13 @@ export default async function Layout({
         enabled: true,
       }}
     >
-      <Banner variant="rainbow" id="Re8ger" changeLayout={false}>
-          <p className="text-xl">A modern, responsive, and accessible documentation theme for Fumadocs.</p>
-      </Banner>
+      {showBanner ? 
+      (<Banner variant="rainbow" changeLayout={false}>
+        <p className="text-xl">A modern, responsive, and accessible documentation theme for Fumadocs.</p>
+      </Banner>)
+      : (<></>)
+      }
+
       <HomeLayout
         {...customeOptions}
         searchToggle={{

@@ -6,9 +6,12 @@ import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
 import { z } from 'zod';
+import { appConfig } from '@/lib/appConfig';
+
+const mdxSourceDir = appConfig.mdxSourceDir
 
 export const docs = defineDocs({
-  dir: 'src/mdx/docs',
+  dir: mdxSourceDir.docs,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
@@ -28,7 +31,7 @@ export const docs = defineDocs({
 });
 
 export const blog = defineCollections({
-  dir: 'src/mdx/blog',
+  dir: mdxSourceDir.blog,
   type: 'doc',
   async: false,
   // @ts-ignore - Temporarily suppress deep instantiation error
@@ -40,7 +43,7 @@ export const blog = defineCollections({
 });
 
 export const legal = defineDocs({
-  dir: 'src/mdx/legal',
+  dir: mdxSourceDir.legal,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error

@@ -7,8 +7,72 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import { remarkAutoTypeTable } from "fumadocs-typescript";
 import { z } from "zod";
+
+// src/lib/appConfig.ts
+var appConfig = {
+  // 基础配置
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://re8ger.com",
+  githubBaseUrl: "https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/",
+  // 国际化配置
+  // - 英语 (en)
+  // - 简体中文 (zh)
+  // - 日语 (ja)
+  // - 韩语 (ko)
+  // - 法语 (fr)
+  // - 德语 (de)
+  // - 西班牙语 (es)
+  // - 意大利语 (it)
+  // - 土耳其语 (tr)
+  // - 波兰语 (pl)
+  i18n: {
+    // locales: ["en", "zh", "ja", "ko", "fr", "de", "es", "it", "pt", "tr", "pl"] as const,
+    locales: ["en", "zh"],
+    defaultLocale: "en",
+    localeLabels: {
+      en: "English",
+      zh: "\u7B80\u4F53\u4E2D\u6587"
+      // ja: "日本語",
+      // ko: "한국어",
+      // fr: "Français",
+      // de: "Deutsch",
+      // es: "Español",
+      // it: "Italiano",
+      // pt: "Português",
+      // tr: "Türkçe",
+      // pl: "Polski",
+    },
+    detector: {
+      storageKey: "language-preference-status",
+      autoCloseTimeout: 1e4,
+      expirationDays: 30,
+      storagePrefix: "REVE-IMAGE"
+    },
+    messageRoot: "messages"
+  },
+  style: {
+    icon: {
+      // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
+      uniformColor: "text-purple-500"
+    },
+    showBanner: true
+  },
+  mdxSourceDir: {
+    docs: "src/mdx/docs",
+    blog: "src/mdx/blog",
+    legal: "src/mdx/legal"
+  }
+};
+var iconColor = appConfig.style.icon.uniformColor;
+var showBanner = appConfig.style.showBanner;
+var generatedLocales = appConfig.i18n.locales.map((loc) => ({
+  name: appConfig.i18n.localeLabels[loc],
+  locale: loc
+}));
+
+// source.config.ts
+var mdxSourceDir = appConfig.mdxSourceDir;
 var docs = defineDocs({
-  dir: "src/mdx/docs",
+  dir: mdxSourceDir.docs,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
@@ -28,7 +92,7 @@ var docs = defineDocs({
   }
 });
 var blog = defineCollections({
-  dir: "src/mdx/blog",
+  dir: mdxSourceDir.blog,
   type: "doc",
   async: false,
   // @ts-ignore - Temporarily suppress deep instantiation error
@@ -40,7 +104,7 @@ var blog = defineCollections({
   })
 });
 var legal = defineDocs({
-  dir: "src/mdx/legal",
+  dir: mdxSourceDir.legal,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
