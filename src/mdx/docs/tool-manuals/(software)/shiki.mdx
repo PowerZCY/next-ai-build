@@ -14,14 +14,15 @@ icon: Highlighter
 | log✅ | md | mdx✅ | prisma |
 | py | ruby | rust | scheme✅ |
 | shell | ts | tsx | xml✅ |
-| yaml✅ | zsh |  |  |
+| yaml✅ | zsh | regex✅ | http✅ |
+| sql✅ | diff✅ |  |  |
 
 ## Shiki基础语法
 <Callout title="注意" type="warn">
   使用`title`属性来指定代码块的标题, 只有指定了title, 才会显示图标。
 </Callout>
 
-<Tabs groupId="language" persist items={["带图标", "不带图标"]}>
+<Tabs groupId="icon" items={["带图标", "不带图标"]}>
   <Tab value="带图标">
     ```bash title="shiki"
     echo "Hello Re8ger"
@@ -36,11 +37,25 @@ icon: Highlighter
 
 ## Shiki默认图标
 
-### bash
+### Terminal
 
-```bash title="shiki"
-echo "Hello Re8ger"
-```
+<Tabs groupId="terminal" items={["bash", "shell", "zsh"]}>
+  <Tab value="bash">
+    ```bash title="shiki"
+    echo "Hello Re8ger"
+    ```
+  </Tab>
+  <Tab value="shell">
+    ```shell title="shiki.shell"
+    echo "Hello Re8ger"
+    ```
+  </Tab>
+  <Tab value="zsh">
+    ```zsh title="shiki.zsh"
+    echo "Hello Re8ger"
+    ```
+  </Tab>
+</Tabs>
 
 ### c
 
@@ -72,6 +87,64 @@ int main() {{
     return 0;
 }}
 ```
+
+### diff
+<Tabs groupId="diff" items={["base", "easy", "special", "high"]}>
+```diff title="base用法" tab="base"
+// 这里是代码
+- 这是被删除的行
++ 这是新增的行
+  这是未修改的行
+! 这是被修改的行（用 ! 标记）
+```
+
+```diff title="easy用法" tab="easy"
+function calculateTotal(prices) {
+-   let total = 0;
++   const total = 0;
+    for (const price of prices) {
+-       total += price * 1.05; // 旧逻辑：包含税
++       total += price; // 新逻辑：不含税
+    }
+!   return total.toFixed(2); // 修改了返回值格式
+}
+```
+```diff title="special用法" tab="special"
+{
+  "name": "my-project",
+-  "version": "1.0.0",
++  "version": "1.1.0",
+  "scripts": {
+    "start": "node server.js",
+-    "test": "jest",
++    "test": "jest --coverage",
++    "lint": "eslint src"
+  },
+-  "dependencies": {
++  "dependencies": {
+     "react": "^17.0.2",
+-    "axios": "^0.21.1"
++    "axios": "^1.4.0",
++    "lodash": "^4.17.21"
+  }
+}
+```
+
+```diff title="high用法" tab="high"
+@@ -1,7 +1,8 @@
+ function greeting(name) {
+-  return `Hello, ${name}!`;
++  if (!name) {
++    return 'Hello, Re8ger!';
++  }
++  return `Hello, ${name}!`;
+ }
+
+-console.log(greeting());
++console.log(greeting('Alice'));
+```
+
+</Tabs>
 
 ### go
 
@@ -144,10 +217,8 @@ fn main() {{
 }}
 ```
 
-### shell
-
-```shell title="shiki"
-echo "Hello Re8ger"
+```sql title="shiki.sql"
+SELECT * FROM users;
 ```
 
 ### ts
@@ -164,12 +235,6 @@ console.log(message);
 interface GreeterProps {{ name: string; }}
 const Greeter: React.FC<GreeterProps> = ({{ name }}) => <h1>Hello {{name}}</h1>;
 // const App = () => <Greeter name="Re8ger" />;
-```
-
-### zsh
-
-```zsh title="shiki"
-echo "Hello Re8ger"
 ```
 
 ## 需要自定义图标
@@ -214,22 +279,20 @@ Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件�
     mdxOptions: {
       rehypeCodeOptions: {
         // ...,
+        // [!code word:transformers]
         transformers: [
           // 1. 自定义 Transformer，用于从 this.options.lang 添加 data-language
           {
             name: 'transformer:parse-code-language', 
-            pre(this: TransformerContext | any, preNode: Element) { 
-              // 为了调试，暂时取消下面这行的注释，以便查看 this.options 的完整结构:
-              // console.log('[Transformer] this.options:', JSON.stringify(this.options, null, 2));
-              
-              const languageFromOptions = this.options?.lang as string | undefined;
+            pre(this: TransformerContext | any, preNode: Element) { // [!code highlight]
+              const languageFromOptions = this.options?.lang as string | undefined;  // [!code highlight]
 
               if (languageFromOptions && typeof languageFromOptions === 'string' && languageFromOptions.trim() !== '') {
                 if (!preNode.properties) {
                   preNode.properties = {};
                 }
                 const langLower = languageFromOptions.toLowerCase();
-                preNode.properties['data-language'] = langLower;
+                preNode.properties['data-language'] = langLower;  // [!code highlight]
               }
               return preNode; // 确保返回处理后的节点
             }
@@ -268,13 +331,14 @@ Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件�
 
   // source.config.ts 中自定义transformer:parse-code-language中调用, 搭配使用
   function tryToMatchIcon(
-    props: Readonly<MDXProps & { 'data-language'?: string; title?: string }>, // 明确 props 的类型
+    // 明确 props 的类型
+    props: Readonly<MDXProps & { 'data-language'?: string; title?: string }>, 
     iconMap: Record<string, React.ReactNode>
   ): React.ReactNode | undefined {
     let lang: string | undefined;
 
     // 1. 优先从 props['data-language'] 获取
-    const dataLanguage = props['data-language'] as string | undefined;
+    const dataLanguage = props['data-language'] as string | undefined;  // [!code highlight]
 
     if (dataLanguage && dataLanguage.trim() !== '') {
       lang = dataLanguage.trim().toLowerCase();
@@ -293,8 +357,8 @@ Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件�
       } 
     }
     let customIcon: React.ReactNode | undefined;
-    if (lang && iconMap[lang]) {
-      customIcon = iconMap[lang];
+    if (lang && iconMap[lang]) {   // [!code highlight]
+      customIcon = iconMap[lang];  // [!code highlight]
     }
     return customIcon;
   }
@@ -307,8 +371,10 @@ Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件�
         return (
           <CodeBlock
             keepBackground
-            {...props} // 扩展原始 props (包含 Shiki 的 props.icon)
-            {...(customIcon && { icon: customIcon })} // 条件性覆盖 icon
+            // 扩展原始 props (包含 Shiki 的 props.icon)
+            {...props} 
+            // 条件性覆盖 icon
+            {...(customIcon && { icon: customIcon })}   // [!code highlight]
           >
             <Pre>{props.children}</Pre>
           </CodeBlock>
@@ -320,11 +386,128 @@ Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件�
   ```
 </Tabs>
 
+核心原理是利用shiki的transformer扩展口自定义处理代码块。
+
+<Tabs groupId="jsonc" items={["jsonc", "json"]}>
+  ```jsonc title="<CodeToHastOptionsCommon>:this.options结构" tab="jsonc"
+    {
+      // 主题配置
+      "themes": {
+        "light": "catppuccin-latte",
+        "dark": "catppuccin-mocha"
+      },
+      // 默认颜色
+      "defaultColor": false,
+      // 实验性JS引擎
+      "experimentalJSEngine": true,
+      // 转换器
+      "transformers": [
+        {
+          // 预处理
+          "name": "rehype-code:pre-process"
+        },
+        {
+          // 添加语言标识符
+          "name": "transformer:add-data-language-from-options-lang",  // [!code --]
+          "name": "transformer:add-data-language-from-options-lang"   // [!code ++]
+        },
+        {
+          // 高亮
+          "name": "@shikijs/transformers:notation-highlight"
+        },
+        {
+          // 高亮单词
+          "name": "@shikijs/transformers:notation-highlight-word"
+        },
+        {
+          // 差异
+          "name": "@shikijs/transformers:notation-diff"
+        },
+        {
+          // 转义
+          "name": "transformers:remove-notation-escape"
+        },
+        {
+          // 图标
+          "name": "rehype-code:icon"
+        },
+        {
+          // 标签
+          "name": "rehype-code:tab"
+        }
+      ],  
+      // 语言
+      "lang": "yaml",    // [!code highlight]
+      // 元数据
+      "meta": {
+        "title": "shiki.yaml",
+        "__raw": ""
+      },
+      // 前景色
+      "fg": "--shiki-light:#4c4f69;--shiki-dark:#cdd6f4",
+      // 背景色
+      "bg": "--shiki-light-bg:#eff1f5;--shiki-dark-bg:#1e1e2e",
+      // 主题名称
+      "themeName": "shiki-themes catppuccin-latte catppuccin-mocha",
+      // 根样式
+      "rootStyle": "--shiki-light:#4c4f69;--shiki-dark:#cdd6f4;--shiki-light-bg:#eff1f5;--shiki-dark-bg:#1e1e2e"
+    }
+  ```
+
+  ```json title="<CodeToHastOptionsCommon>:this.options结构" tab="json"
+    {
+      "themes": {
+        "light": "catppuccin-latte",
+        "dark": "catppuccin-mocha"
+      },
+      "defaultColor": false,
+      "experimentalJSEngine": true,
+      "transformers": [
+        {
+          "name": "rehype-code:pre-process"
+        },
+        {
+          "name": "transformer:add-data-language-from-options-lang",  // [!code --]
+          "name": "transformer:add-data-language-from-options-lang"   // [!code ++]
+        },
+        {
+          "name": "@shikijs/transformers:notation-highlight"
+        },
+        {
+          "name": "@shikijs/transformers:notation-highlight-word"
+        },
+        {
+          "name": "@shikijs/transformers:notation-diff"
+        },
+        {
+          "name": "transformers:remove-notation-escape"
+        },
+        {
+          "name": "rehype-code:icon"
+        },
+        {
+          "name": "rehype-code:tab"
+        }
+      ],  
+      "lang": "yaml",    // [!code highlight]
+      "meta": {
+        "title": "shiki.yaml",
+        "__raw": ""
+      },
+      "fg": "--shiki-light:#4c4f69;--shiki-dark:#cdd6f4",
+      "bg": "--shiki-light-bg:#eff1f5;--shiki-dark-bg:#1e1e2e",
+      "themeName": "shiki-themes catppuccin-latte catppuccin-mocha",
+      "rootStyle": "--shiki-light:#4c4f69;--shiki-dark:#cdd6f4;--shiki-light-bg:#eff1f5;--shiki-dark-bg:#1e1e2e"
+    }
+  ```
+</Tabs>
+
+
 完成以上配置后, 就可以在代码块中使用自定义图标了, 参见下面的样例
 
 ### css
 
-```css title="shiki"
+```css title="tailwind.css"
 /* Hello Re8ger */
 body::before {
   content: "Hello Re8ger";
@@ -357,6 +540,46 @@ id,message
 </html>
 ```
 
+### http
+
+<Tabs groupId="http" persist items={["restful", "request", "response"]}>
+  ```http title="restful" tab="restful"
+  # 获取用户列表
+  GET /api/users
+  # 创建用户
+  POST /api/users?id=1
+  # 更新用户
+  PUT /api/users?id=1
+  # 删除用户
+  DELETE /api/users?id=1
+  ```
+
+  ```http title="request" tab="request"
+  POST /upload HTTP/1.1
+  Host: example.com
+  Content-Type: multipart/form-data; boundary=---------------------------1234567890
+
+  -----------------------------1234567890
+  Content-Disposition: form-data; name="text"
+
+  Hello, World!
+  -----------------------------1234567890
+  Content-Disposition: form-data; name="file"; filename="example.txt"
+  Content-Type: text/plain
+
+  This is a test file.
+  -----------------------------1234567890--
+  ```
+
+  ```http title="response" tab="response"
+  HTTP/1.1 401 Unauthorized
+  WWW-Authenticate: Bearer realm="Access to the staging site"
+  Content-Type: text/plain
+
+  Authentication credentials missing or invalid.
+  ```
+</Tabs>
+
 ### java
 
 ```java title="shiki"
@@ -369,11 +592,20 @@ public class HelloWorld {
 
 ### json
 
-```json title="shiki"
-{
-    "message": "Hello Re8ger"
-}
-```
+<Tabs groupId="json" items={["json", "jsonc"]}>
+  ```json title="shiki.json" tab="json"
+  {
+      "message": "Hello Re8ger"
+  }
+  ```
+
+  ```jsonc title="shiki.jsonc" tab="jsonc"
+  {
+      // 带注释的JSON数据
+      "message": "Hello Re8ger"
+  }
+  ```
+</Tabs>
 
 ### log
 
@@ -393,6 +625,12 @@ export const Greeter = () => <p>Hello Re8ger from component!</p>;
 <Greeter />
 ```
 
+### regex
+
+```regex title="regex"
+^(https?|ftp):\/\/[^\s/$.?#].[^\s]*:(80|8[1-9]|[9]\d|[1-9]\d{2,3}|5\d{3}|6000)(\/[^\s]*)?$
+```
+
 ### schema
 
 ```scheme title="shiki"
@@ -405,6 +643,32 @@ type User {
 }
 ```
 
+### text
+<Tabs groupId="text" items={["text", "txt", "plaintext"]}>
+  <Tab value="text">
+    ```text title="shiki.text"
+    ✓ Compiled /[locale]/docs/[...slug] in 20ms
+    GET /en/docs/tool-manuals/shiki 200 in 299ms
+    [MDX] updated map file in 4.207417000085115ms
+    ```
+  </Tab>
+  <Tab value="txt">
+    ```txt title="shiki.txt"
+    ✓ Compiled /[locale]/docs/[...slug] in 20ms
+    GET /en/docs/tool-manuals/shiki 200 in 299ms
+    [MDX] updated map file in 4.207417000085115ms
+    ```
+  </Tab>
+  <Tab value="plaintext">
+    ```plaintext title="shiki.plaintext"
+    ✓ Compiled /[locale]/docs/[...slug] in 20ms
+    GET /en/docs/tool-manuals/shiki 200 in 299ms
+    [MDX] updated map file in 4.207417000085115ms
+    ```
+  </Tab>
+</Tabs>
+
+
 ### xml
 
 ```xml title="shiki"
@@ -414,11 +678,21 @@ type User {
 </greeting>
 ```
 
-### yaml
 
-```yaml title="shiki"
-message: Hello Re8ger
-details:
-  recipient: Re8ger
-  date: 2024-01-01
-```
+### yml
+
+<Tabs groupId="yml" items={["yml", "yaml"]}>
+  ```yml title="yml" tab="yml"
+  message: Hello Re8ger
+  details:
+    recipient: Re8ger
+    date: 2024-01-01
+  ```
+
+  ```yaml title="yaml" tab="yaml"
+  message: Hello Re8ger
+  details:
+    recipient: Re8ger
+    date: 2024-01-01
+  ```
+</Tabs>

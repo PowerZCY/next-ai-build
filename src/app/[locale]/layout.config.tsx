@@ -18,7 +18,7 @@ export function homeNavLinks(locale: string): LinkItemType[] {
     {
       icon: <icons.LayoutTemplate />,
       text: 'Showcase',
-      url: `/${locale}/docs/introduction/clerk-quick-start`,
+      url: `/${locale}/docs/tool-manuals/test`,
       active: 'url',
     },
   ];

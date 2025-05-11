@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" fill="#AC62FD">
+  <!-- Braces: font-size 22px, baseline y=20. Approximate vertical span y=2.4 to y=24.4 -->
+  <text x="3" y="20" font-size="22px">{</text>
+  <text x="29" y="20" font-size="22px" text-anchor="end">}</text>
+
+  <!-- "//" symbol: font-size 9px, baseline y=15. Approximate vertical span y=7.8 to y=16.8 -->
+  <!-- Horizontally centered within the braces. Calculated content area width approx 12.8px; "//" (9px) fits. -->
+  <text x="16" y="15" font-size="9px" text-anchor="middle">//</text>
+
+  <!-- "jsonc" text: font-size 9px bold, baseline y=28. Approximate vertical span y=20.8 to y=29.8 -->
+  <!-- Positioned below the braces and centered horizontally. -->
+  <text x="16" y="28" font-size="9px" font-weight="bold" text-anchor="middle">jsonc</text>
+</svg> 

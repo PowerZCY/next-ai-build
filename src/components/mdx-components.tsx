@@ -17,13 +17,21 @@ const languageToIconMap: Record<string, React.ReactNode> = {
   css: <icons.CSS />,
   csv: <icons.CSV />,
   html: <icons.Html />,
+  http: <icons.Http />,
   java: <icons.Java />,
   json: <icons.Json />,
+  jsonc: <icons.Jsonc />,
   log: <icons.Log />,
   mdx: <icons.MarkdownX />,
+  regex: <icons.Regex />,
+  sql: <icons.SQL />,
+  text: <icons.FileText />,
+  txt: <icons.FileText />,
+  plaintext: <icons.FileText />,
   scheme: <icons.Scheme />,
   xml: <icons.XML />,
   yaml: <icons.Yaml />,
+  yml: <icons.Yaml />,
 };
 
 // source.config.ts 中自定义transformer:parse-code-language中调用, 搭配使用
