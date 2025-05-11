@@ -26,29 +26,36 @@ const languageToIconMap: Record<string, React.ReactNode> = {
   yaml: <icons.Yaml />,
 };
 
-
-function getLanguageAndIconFromProps(
-  props: Readonly<MDXProps>, // 使用 MDXProps 或更具体的类型
+// source.config.ts 中自定义transformer:parse-code-language中调用, 搭配使用
+function tryToMatchIcon(
+  props: Readonly<MDXProps & { 'data-language'?: string; title?: string }>, // 明确 props 的类型
   iconMap: Record<string, React.ReactNode>
 ): React.ReactNode | undefined {
   let lang: string | undefined;
-  const title = props.title as string | undefined;
 
-  if (title) {
-    const titleParts = title.split('.');
-    if (titleParts.length > 1 && titleParts[0] !== "") {
-      const extension = titleParts.pop()?.toLowerCase();
-      if (extension) {
-        lang = extension;
+  // 1. 优先从 props['data-language'] 获取
+  const dataLanguage = props['data-language'] as string | undefined;
+
+  if (dataLanguage && dataLanguage.trim() !== '') {
+    lang = dataLanguage.trim().toLowerCase();
+  } else {
+    // 2. 如果 data-language 不可用，则回退到从 title 解析
+    const title = props.title as string | undefined;
+    if (title) {
+      const titleParts = title.split('.');
+      // 确保文件名部分不是空的 (例如 ".css" 这种标题是不合法的)
+      if (titleParts.length > 1 && titleParts[0] !== "") {
+        const extension = titleParts.pop()?.toLowerCase();
+        if (extension) {
+          lang = extension;
+        }
       }
-    }
+    } 
   }
-
   let customIcon: React.ReactNode | undefined;
   if (lang && iconMap[lang]) {
     customIcon = iconMap[lang];
   }
-
   return customIcon;
 }
 
@@ -78,7 +85,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     pre: (props) => {
-      const customIcon = getLanguageAndIconFromProps(props, languageToIconMap);
+      const customIcon = tryToMatchIcon(props, languageToIconMap);
       return (
         <CodeBlock
           keepBackground

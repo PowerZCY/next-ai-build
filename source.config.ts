@@ -7,6 +7,8 @@ import remarkMath from 'remark-math';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
 import { z } from 'zod';
 import { appConfig } from '@/lib/appConfig';
+import type { Element } from 'hast';
+import type { ShikiTransformerContext as TransformerContext } from 'shiki'; 
 
 const mdxSourceDir = appConfig.mdxSourceDir
 
@@ -82,7 +84,28 @@ export default defineConfig({
         dark: 'catppuccin-mocha',
       },
       transformers: [
+        // 1. 自定义 Transformer，用于从 this.options.lang 添加 data-language
+        {
+          name: 'transformer:parse-code-language', 
+          pre(this: TransformerContext | any, preNode: Element) { 
+            // 为了调试，暂时取消下面这行的注释，以便查看 this.options 的完整结构:
+            // console.log('[Transformer] this.options:', JSON.stringify(this.options, null, 2));
+            
+            const languageFromOptions = this.options?.lang as string | undefined;
+
+            if (languageFromOptions && typeof languageFromOptions === 'string' && languageFromOptions.trim() !== '') {
+              if (!preNode.properties) {
+                preNode.properties = {};
+              }
+              const langLower = languageFromOptions.toLowerCase();
+              preNode.properties['data-language'] = langLower;
+            }
+            return preNode; // 确保返回处理后的节点
+          }
+        },
+        // 2. Fumadocs 的默认 Transformers
         ...(rehypeCodeDefaultOptions.transformers ?? []),
+        // 3. 您现有的 transformer
         {
           name: 'transformers:remove-notation-escape',
           code(hast) {
@@ -110,7 +133,6 @@ export default defineConfig({
       [remarkDocGen, { generators: [fileGenerator()] }],
       remarkTypeScriptToJavaScript,
     ],
-    // Place it at first, it should be executed before the syntax highlighter
     rehypePlugins: (v) => [rehypeKatex, ...v],
   },
 });
