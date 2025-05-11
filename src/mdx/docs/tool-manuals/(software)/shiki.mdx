@@ -1,0 +1,251 @@
+---
+title: Shiki语言支持
+description: Shiki支持的常用语言符号示例
+icon: Highlighter
+---
+
+# 支持的语言列表
+
+## Shiki默认图标
+
+### bash
+
+```bash title="shiki.bash"
+echo "Hello Re8ger"
+```
+
+### c
+
+```c title="shiki.c"
+#include <stdio.h>
+int main() {{
+   printf("Hello Re8ger\n");
+   return 0;
+}}
+```
+
+### c#
+
+```c# title="shiki.cs"
+using System;
+public class Hello {{
+    public static void Main(string[] args) {{
+        Console.WriteLine("Hello Re8ger");
+    }}
+}}
+```
+
+### c++
+
+```c++ title="shiki.cpp"
+#include <iostream>
+int main() {{
+    std::cout << "Hello Re8ger" << std::endl;
+    return 0;
+}}
+```
+
+### go
+
+```go title="shiki.go"
+package main
+import "fmt"
+func main() {{
+    fmt.Println("Hello Re8ger")
+}}
+```
+
+### graphql
+
+```graphql title="shiki.graphql"
+# Query to greet Re8ger
+query GreetRe8ger {{
+  greeting(name: "Re8ger")
+}}
+```
+
+### js
+
+```js title="shiki.js"
+console.log("Hello Re8ger");
+```
+
+### md
+
+```md title="shiki.md"
+# Hello Re8ger
+
+This is a greeting to Re8ger in Markdown.
+```
+
+### prisma
+
+```prisma title="shiki.prisma"
+// Prisma schema example
+// model Post {{
+//   id      Int      @id @default(autoincrement())
+//   title   String
+//   content String?  // Hello Re8ger
+// }}
+
+datasource db {{
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}}
+
+// Just a comment: Hello Re8ger
+```
+
+### py
+
+```py title="shiki.py"
+print(f"Hello Re8ger")
+```
+
+### ruby
+
+```ruby title="shiki.rb"
+puts "Hello Re8ger"
+```
+
+### rust
+
+```rust title="shiki.rs"
+fn main() {{
+    println!("Hello Re8ger");
+}}
+```
+
+### shell
+
+```shell title="shiki.sh"
+echo "Hello Re8ger"
+```
+
+### ts
+
+```ts title="shiki.ts"
+const message: string = "Hello Re8ger";
+console.log(message);
+```
+
+### tsx
+
+```tsx title="shiki.tsx"
+// TSX example
+interface GreeterProps {{ name: string; }}
+const Greeter: React.FC<GreeterProps> = ({{ name }}) => <h1>Hello {{name}}</h1>;
+// const App = () => <Greeter name="Re8ger" />;
+```
+
+### zsh
+
+```zsh title="shiki.zsh"
+echo "Hello Re8ger"
+```
+
+## 需要自定义图标
+
+### css
+
+```css title="shiki.css"
+/* Hello Re8ger */
+body::before {
+  content: "Hello Re8ger";
+  display: block;
+  text-align: center;
+  font-size: 2em;
+  padding: 1em;
+}
+```
+
+### csv
+
+```csv title="shiki.csv"
+id,message
+1,"Hello Re8ger"
+```
+
+
+### html
+
+```html title="shiki.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+</head>
+<body>
+    <h1>Hello Re8ger</h1>
+</body>
+</html>
+```
+
+### java
+
+```java title="shiki.java"
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello Re8ger");
+    }
+}
+```
+
+### json
+
+```json title="shiki.json"
+{
+    "message": "Hello Re8ger"
+}
+```
+
+### log
+
+```log title="shiki.log"
+2024-01-01 12:00:00 [INFO] Hello Re8ger
+```
+
+
+
+### mdx
+
+```mdx title="shiki.mdx"
+# Hello Re8ger
+
+This is a greeting to Re8ger in Markdown.
+
+export const Greeter = () => <p>Hello Re8ger from component!</p>;
+
+<Greeter />
+```
+
+### schema
+
+```scheme title="shiki.scheme"
+// Schema definition for a User
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int
+}
+```
+
+### xml
+
+```xml title="shiki.xml"
+<greeting>
+  <to>Re8ger</to>
+  <message>Hello Re8ger</message>
+</greeting>
+```
+
+### yaml
+
+```yaml title="shiki.yaml"
+message: Hello Re8ger
+details:
+  recipient: Re8ger
+  date: 2024-01-01
+```

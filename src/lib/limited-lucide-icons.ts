@@ -31,6 +31,7 @@ export {
     GripVertical,
     HandHeart,
     Handshake,
+    Highlighter,
     HousePlus,
     LibraryIcon,
     Layout,

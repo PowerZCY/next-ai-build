@@ -76,15 +76,6 @@ export default defineConfig({
     rehypeCodeOptions: {
       lazy: true,
       experimentalJSEngine: true,
-      langs: [
-        'ts', 'tsx', 'js', 'css',
-        'html', 'xml', 'csv',
-        'mdx', 'md',
-        'json', 'jsonc', 'yaml',  
-        'zsh', 'sh', 'bash',
-        'sql', 
-        'java', 'python', 'go', 'rust',
-      ],
       inline: 'tailing-curly-colon',
       themes: {
         light: 'catppuccin-latte',

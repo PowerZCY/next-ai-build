@@ -16,7 +16,16 @@ const customImageIcons = {
   GitHub: iconFromSVG("/icons/github.svg", "GitHub"),
   LastUpdated: iconFromSVG("/icons/latest.svg", "Last updated"),
   MarkdownX: iconFromSVG("/icons/markdown.svg", "MarkdownX"),
-  // Future custom SVG icons can be added here directly
+  Diff: iconFromSVG("/icons/diff.svg", "Diff"),
+  Html: iconFromSVG("/icons/html.svg", "Html"),
+  Java: iconFromSVG("/icons/java.svg", "Java"),
+  Json: iconFromSVG("/icons/json.svg", "Json"),
+  Log: iconFromSVG("/icons/log.svg", "Log"),
+  Scheme: iconFromSVG("/icons/scheme.svg", "Scheme"),
+  CSS: iconFromSVG("/icons/tailwindcss.svg", "CSS"),
+  XML: iconFromSVG("/icons/xml.svg", "XML"),
+  Yaml: iconFromSVG("/icons/yaml.svg", "Yaml"),
+  CSV: iconFromSVG("/icons/csv.svg", "CSV"),
 };
 
 // Helper function to create SVG-based icon components, now accepting LucideProps
