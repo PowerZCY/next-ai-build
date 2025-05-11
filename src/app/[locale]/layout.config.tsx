@@ -18,7 +18,7 @@ export function homeNavLinks(locale: string): LinkItemType[] {
     {
       icon: <icons.LayoutTemplate />,
       text: 'Showcase',
-      url: `/${locale}/docs/tool-manuals/test`,
+      url: `/${locale}/docs/tool-manuals/shiki`,
       active: 'url',
     },
   ];
