@@ -1,22 +1,50 @@
 ---
-title: Shiki语言支持
-description: Shiki支持的常用语言符号示例
+title: Shiki代码块语法高亮支持
+description: Shiki常用编程语言代码块示例
 icon: Highlighter
 ---
 
-# 支持的语言列表
+# 常用代码块语言列表
+
+| 语言ID | 语言ID | 语言ID | 语言ID |
+| :---: | :---: | :---: | :---: |
+| bash | c | c# | c++ |
+| css✅ | csv✅ | go | graphql |
+| html✅ | java✅ | js | json✅ |
+| log✅ | md | mdx✅ | prisma |
+| py | ruby | rust | scheme✅ |
+| shell | ts | tsx | xml✅ |
+| yaml✅ | zsh |  |  |
+
+## Shiki基础语法
+<Callout title="注意" type="warn">
+  使用`title`属性来指定代码块的标题, 只有指定了title, 才会显示图标。
+</Callout>
+
+<Tabs groupId="language" persist items={["带图标", "不带图标"]}>
+  <Tab value="带图标">
+    ```bash title="shiki"
+    echo "Hello Re8ger"
+    ```
+  </Tab>
+  <Tab value="不带图标">
+    ```bash
+    echo "Hello Re8ger"
+    ```
+  </Tab>
+</Tabs>
 
 ## Shiki默认图标
 
 ### bash
 
-```bash title="shiki.bash"
+```bash title="shiki"
 echo "Hello Re8ger"
 ```
 
 ### c
 
-```c title="shiki.c"
+```c title="shiki"
 #include <stdio.h>
 int main() {{
    printf("Hello Re8ger\n");
@@ -26,7 +54,7 @@ int main() {{
 
 ### c#
 
-```c# title="shiki.cs"
+```c# title="shiki"
 using System;
 public class Hello {{
     public static void Main(string[] args) {{
@@ -37,7 +65,7 @@ public class Hello {{
 
 ### c++
 
-```c++ title="shiki.cpp"
+```c++ title="shiki"
 #include <iostream>
 int main() {{
     std::cout << "Hello Re8ger" << std::endl;
@@ -47,7 +75,7 @@ int main() {{
 
 ### go
 
-```go title="shiki.go"
+```go title="shiki"
 package main
 import "fmt"
 func main() {{
@@ -57,7 +85,7 @@ func main() {{
 
 ### graphql
 
-```graphql title="shiki.graphql"
+```graphql title="shiki"
 # Query to greet Re8ger
 query GreetRe8ger {{
   greeting(name: "Re8ger")
@@ -66,13 +94,13 @@ query GreetRe8ger {{
 
 ### js
 
-```js title="shiki.js"
+```js title="shiki"
 console.log("Hello Re8ger");
 ```
 
 ### md
 
-```md title="shiki.md"
+```md title="shiki"
 # Hello Re8ger
 
 This is a greeting to Re8ger in Markdown.
@@ -80,7 +108,7 @@ This is a greeting to Re8ger in Markdown.
 
 ### prisma
 
-```prisma title="shiki.prisma"
+```prisma title="shiki"
 // Prisma schema example
 // model Post {{
 //   id      Int      @id @default(autoincrement())
@@ -98,19 +126,19 @@ datasource db {{
 
 ### py
 
-```py title="shiki.py"
+```py title="shiki"
 print(f"Hello Re8ger")
 ```
 
 ### ruby
 
-```ruby title="shiki.rb"
+```ruby title="shiki"
 puts "Hello Re8ger"
 ```
 
 ### rust
 
-```rust title="shiki.rs"
+```rust title="shiki"
 fn main() {{
     println!("Hello Re8ger");
 }}
@@ -118,20 +146,20 @@ fn main() {{
 
 ### shell
 
-```shell title="shiki.sh"
+```shell title="shiki"
 echo "Hello Re8ger"
 ```
 
 ### ts
 
-```ts title="shiki.ts"
+```ts title="shiki"
 const message: string = "Hello Re8ger";
 console.log(message);
 ```
 
 ### tsx
 
-```tsx title="shiki.tsx"
+```tsx title="shiki"
 // TSX example
 interface GreeterProps {{ name: string; }}
 const Greeter: React.FC<GreeterProps> = ({{ name }}) => <h1>Hello {{name}}</h1>;
@@ -140,15 +168,163 @@ const Greeter: React.FC<GreeterProps> = ({{ name }}) => <h1>Hello {{name}}</h1>;
 
 ### zsh
 
-```zsh title="shiki.zsh"
+```zsh title="shiki"
 echo "Hello Re8ger"
 ```
 
 ## 需要自定义图标
+<Callout title="版本提醒" type="warn">
+依赖版本, 最新版本可能已解决该问题。<br/>
+  "shiki": "^3.3.0"<br/>
+  "fumadocs-core": "^15.2.13"<br/>
+</Callout>
+
+Shiki对于很多语言的图标支持都是使用的默认, 类似文本文件的图标。因而某些常用的编程语言, 如css, html, yaml等, 默认的图标和语言并不匹配。
+我们可以通过shiki预留的`transformers`自定义图标来解决这个问题。
+
+首先需要安装`types/hast`依赖, 因为shiki的`transformers`需要使用`hast`的类型。
+
+<Tabs groupId="package-manager" persist items={["npm", "pnpm", "yarn", "bun"]}>
+  ```bash tab="npm"
+  npm install types/hast
+  ```
+
+  ```bash tab="pnpm"
+  pnpm add types/hast
+  ```
+
+  ```bash tab="yarn"
+  yarn add types/hast
+  ```
+
+  ```bash tab="bun"
+  bun add types/hast
+  ```
+</Tabs>
+
+然后需要修改`source.config.ts`和`mdx-components.ts`文件, 添加自定义图标的代码解析。
+
+<Tabs groupId="custom-icon" items={["source.config.ts", "mdx-components.ts"]}>
+  ```tsx title="source.config.ts" tab="source.config.ts"
+  import type { Element } from 'hast';
+  import type { ShikiTransformerContext as TransformerContext } from 'shiki'; 
+
+  export default defineConfig({
+    // ...,
+    mdxOptions: {
+      rehypeCodeOptions: {
+        // ...,
+        transformers: [
+          // 1. 自定义 Transformer，用于从 this.options.lang 添加 data-language
+          {
+            name: 'transformer:parse-code-language', 
+            pre(this: TransformerContext | any, preNode: Element) { 
+              // 为了调试，暂时取消下面这行的注释，以便查看 this.options 的完整结构:
+              // console.log('[Transformer] this.options:', JSON.stringify(this.options, null, 2));
+              
+              const languageFromOptions = this.options?.lang as string | undefined;
+
+              if (languageFromOptions && typeof languageFromOptions === 'string' && languageFromOptions.trim() !== '') {
+                if (!preNode.properties) {
+                  preNode.properties = {};
+                }
+                const langLower = languageFromOptions.toLowerCase();
+                preNode.properties['data-language'] = langLower;
+              }
+              return preNode; // 确保返回处理后的节点
+            }
+          },
+          // 2. Fumadocs 的默认 Transformers
+          ...(rehypeCodeDefaultOptions.transformers ?? []),
+          // 3. 其他自定义的 Transformer
+          // ...
+        ],
+      },
+      // ...,
+      rehypePlugins: (v) => [rehypeKatex, ...v],
+    },
+  });
+  ```
+
+  ```tsx title="mdx-components.ts" tab="mdx-components.ts"
+  import type { MDXComponents, MDXProps } from 'mdx/types';
+  // 引入你的自定义图标组件
+  import { globalLucideIcons as icons } from '@/components/global-icon';
+
+  // 创建一个语言标识符到图标组件的映射
+  const languageToIconMap: Record<string, React.ReactNode> = {
+    // 配置你希望的语言自定义图标
+    css: <icons.CSS />,
+    csv: <icons.CSV />,
+    html: <icons.Html />,
+    java: <icons.Java />,
+    json: <icons.Json />,
+    log: <icons.Log />,
+    mdx: <icons.MarkdownX />,
+    scheme: <icons.Scheme />,
+    xml: <icons.XML />,
+    yaml: <icons.Yaml />,
+  };
+
+  // source.config.ts 中自定义transformer:parse-code-language中调用, 搭配使用
+  function tryToMatchIcon(
+    props: Readonly<MDXProps & { 'data-language'?: string; title?: string }>, // 明确 props 的类型
+    iconMap: Record<string, React.ReactNode>
+  ): React.ReactNode | undefined {
+    let lang: string | undefined;
+
+    // 1. 优先从 props['data-language'] 获取
+    const dataLanguage = props['data-language'] as string | undefined;
+
+    if (dataLanguage && dataLanguage.trim() !== '') {
+      lang = dataLanguage.trim().toLowerCase();
+    } else {
+      // 2. 如果 data-language 不可用，则回退到从 title 解析
+      const title = props.title as string | undefined;
+      if (title) {
+        const titleParts = title.split('.');
+        // 确保文件名部分不是空的 (例如 ".css" 这种标题是不合法的)
+        if (titleParts.length > 1 && titleParts[0] !== "") {
+          const extension = titleParts.pop()?.toLowerCase();
+          if (extension) {
+            lang = extension;
+          }
+        }
+      } 
+    }
+    let customIcon: React.ReactNode | undefined;
+    if (lang && iconMap[lang]) {
+      customIcon = iconMap[lang];
+    }
+    return customIcon;
+  }
+
+  export function getMDXComponents(components?: MDXComponents): MDXComponents {
+    return {
+      ...defaultMdxComponents,
+      pre: (props) => {
+        const customIcon = tryToMatchIcon(props, languageToIconMap);
+        return (
+          <CodeBlock
+            keepBackground
+            {...props} // 扩展原始 props (包含 Shiki 的 props.icon)
+            {...(customIcon && { icon: customIcon })} // 条件性覆盖 icon
+          >
+            <Pre>{props.children}</Pre>
+          </CodeBlock>
+        );
+      },
+      // ...其他组件代码
+    };
+  }
+  ```
+</Tabs>
+
+完成以上配置后, 就可以在代码块中使用自定义图标了, 参见下面的样例
 
 ### css
 
-```css title="shiki.css"
+```css title="shiki"
 /* Hello Re8ger */
 body::before {
   content: "Hello Re8ger";
@@ -161,15 +337,14 @@ body::before {
 
 ### csv
 
-```csv title="shiki.csv"
+```csv title="shiki"
 id,message
 1,"Hello Re8ger"
 ```
 
-
 ### html
 
-```html title="shiki.html"
+```html title="shiki"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -184,7 +359,7 @@ id,message
 
 ### java
 
-```java title="shiki.java"
+```java title="shiki"
 public class HelloWorld {
     public static void main(String[] args) {
         System.out.println("Hello Re8ger");
@@ -194,7 +369,7 @@ public class HelloWorld {
 
 ### json
 
-```json title="shiki.json"
+```json title="shiki"
 {
     "message": "Hello Re8ger"
 }
@@ -202,15 +377,13 @@ public class HelloWorld {
 
 ### log
 
-```log title="shiki.log"
+```log title="shiki"
 2024-01-01 12:00:00 [INFO] Hello Re8ger
 ```
 
-
-
 ### mdx
 
-```mdx title="shiki.mdx"
+```mdx title="shiki"
 # Hello Re8ger
 
 This is a greeting to Re8ger in Markdown.
@@ -222,7 +395,7 @@ export const Greeter = () => <p>Hello Re8ger from component!</p>;
 
 ### schema
 
-```scheme title="shiki.scheme"
+```scheme title="shiki"
 // Schema definition for a User
 type User {
   id: ID!
@@ -234,7 +407,7 @@ type User {
 
 ### xml
 
-```xml title="shiki.xml"
+```xml title="shiki"
 <greeting>
   <to>Re8ger</to>
   <message>Hello Re8ger</message>
@@ -243,7 +416,7 @@ type User {
 
 ### yaml
 
-```yaml title="shiki.yaml"
+```yaml title="shiki"
 message: Hello Re8ger
 details:
   recipient: Re8ger

@@ -141,7 +141,24 @@ var source_config_default = defineConfig({
         dark: "catppuccin-mocha"
       },
       transformers: [
+        // 1. 自定义 Transformer，用于从 this.options.lang 添加 data-language
+        {
+          name: "transformer:parse-code-language",
+          pre(preNode) {
+            const languageFromOptions = this.options?.lang;
+            if (languageFromOptions && typeof languageFromOptions === "string" && languageFromOptions.trim() !== "") {
+              if (!preNode.properties) {
+                preNode.properties = {};
+              }
+              const langLower = languageFromOptions.toLowerCase();
+              preNode.properties["data-language"] = langLower;
+            }
+            return preNode;
+          }
+        },
+        // 2. Fumadocs 的默认 Transformers
         ...rehypeCodeDefaultOptions.transformers ?? [],
+        // 3. 您现有的 transformer
         {
           name: "transformers:remove-notation-escape",
           code(hast) {
@@ -166,7 +183,6 @@ var source_config_default = defineConfig({
       [remarkDocGen, { generators: [fileGenerator()] }],
       remarkTypeScriptToJavaScript
     ],
-    // Place it at first, it should be executed before the syntax highlighter
     rehypePlugins: (v) => [rehypeKatex, ...v]
   }
 });

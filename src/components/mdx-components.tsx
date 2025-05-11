@@ -88,7 +88,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
       const customIcon = tryToMatchIcon(props, languageToIconMap);
       return (
         <CodeBlock
-          keepBackground
           {...props} // 扩展原始 props (包含 Shiki 的 props.icon)
           {...(customIcon && { icon: customIcon })} // 条件性覆盖 icon
         >
