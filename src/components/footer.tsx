@@ -52,7 +52,7 @@ export function Footer() {
                 <span>{tFooter('privacy', { defaultValue: 'Privacy Policy' })}</span>
               </Link>
               <Link href="/legal/dpa" className="flex items-center space-x-1 hover:underline">
-                <icons.ReceiptText className="h-3.5 w-3.5"/>
+                <icons.Fingerprint className="h-3.5 w-3.5"/>
                 <span>{tFooter('dpa', { defaultValue: 'Data Protection Agreement' })}</span>
               </Link>
             </div>
