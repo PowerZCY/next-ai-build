@@ -51,9 +51,9 @@ export function Footer() {
                 <icons.ShieldUser className="h-3.5 w-3.5"/>
                 <span>{tFooter('privacy', { defaultValue: 'Privacy Policy' })}</span>
               </Link>
-              <Link href="/legal/terms" className="flex items-center space-x-1 hover:underline">
+              <Link href="/legal/dpa" className="flex items-center space-x-1 hover:underline">
                 <icons.ReceiptText className="h-3.5 w-3.5"/>
-                <span>{tFooter('terms', { defaultValue: 'Terms of Service' })}</span>
+                <span>{tFooter('dpa', { defaultValue: 'Data Protection Agreement' })}</span>
               </Link>
             </div>
             {/* Row 2.2: Copyright */}
@@ -68,50 +68,50 @@ export function Footer() {
           <div className="flex justify-end m-2 space-x-4">
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
-              <Link href="/legal/dpa" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/introduction/mdx-shiki" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Fingerprint className="h-3.5 w-3.5"/>
-                <span>{tFooter('contact', { defaultValue: 'Contact Us' })}</span>
+                <span>Shiki</span>
               </Link>
               {/* Link 2 */}
-              <Link href="/legal/subprocessors" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/introduction/mdx-snippets" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Handshake className="h-3.5 w-3.5"/>
-                <span>{tFooter('sitemap', { defaultValue: 'Sitemap' })}</span>
+                <span>Snippets</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
-              <Link href="/legal/dpa" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/introduction/mdx-mermaid" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Fingerprint className="h-3.5 w-3.5"/>
-                <span>{tFooter('contact', { defaultValue: 'Contact Us' })}</span>
+                <span>Mermaid</span>
               </Link>
               {/* Link 2 */}
-              <Link href="/legal/subprocessors" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/tool-manuals/d8ger-auto-code" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Handshake className="h-3.5 w-3.5"/>
-                <span>{tFooter('sitemap', { defaultValue: 'Sitemap' })}</span>
+                <span>D8gerAutoCode</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
-              <Link href="/legal/dpa" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/tool-manuals/macos-software" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Fingerprint className="h-3.5 w-3.5"/>
-                <span>{tFooter('contact', { defaultValue: 'Contact Us' })}</span>
+                <span>Software</span>
               </Link>
               {/* Link 2 */}
-              <Link href="/legal/subprocessors" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/tool-manuals/easy-http" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Handshake className="h-3.5 w-3.5"/>
-                <span>{tFooter('sitemap', { defaultValue: 'Sitemap' })}</span>
+                <span>EasyHttp</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
-              <Link href="/legal/dpa" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/tool-manuals/git" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Fingerprint className="h-3.5 w-3.5"/>
-                <span>{tFooter('contact', { defaultValue: 'Contact Us' })}</span>
+                <span>Git</span>
               </Link>
               {/* Link 2 */}
-              <Link href="/legal/subprocessors" className="text-xs flex items-center space-x-1 hover:underline text-left">
+              <Link href="/docs/tool-manuals/httpie" className="text-xs flex items-center space-x-1 hover:underline text-left">
                 <icons.Handshake className="h-3.5 w-3.5"/>
-                <span>{tFooter('sitemap', { defaultValue: 'Sitemap' })}</span>
+                <span>HTTPie</span>
               </Link>
             </div>
           </div>

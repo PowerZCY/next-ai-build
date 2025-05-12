@@ -18,7 +18,7 @@ export function homeNavLinks(locale: string): LinkItemType[] {
     {
       icon: <icons.LayoutTemplate />,
       text: 'Showcase',
-      url: `/${locale}/docs/tool-manuals/shiki`,
+      url: `/${locale}/docs/introduction/mdx-quickstart`,
       active: 'url',
     },
     {
@@ -61,36 +61,36 @@ export function levelNavLinks(locale: string): LinkItemType[] {
           url: `/${locale}/docs/introduction`,
         },
         {
-          icon: <icons.ComponentIcon />,
-          text: 'Components',
+          icon: <icons.Mmd />,
+          text: 'Graph',
           description: 'Mermaid showcase.',
-          url: `/${locale}/docs/tool-manuals/mermaid`,
+          url: `/${locale}/docs/introduction/mermaid`,
           menu: {
             className: 'lg:col-start-2',
           },
         },
         {
-          icon: <icons.Server />,
-          text: 'OpenAPI',
-          description: 'Suitable',
-          url: `/${locale}/docs/restrictions`,
+          icon: <icons.Snippets />,
+          text: 'Quick generation',
+          description: 'MDX Snippets',
+          url: `/${locale}/docs/introduction/mdx-snippets`,
           menu: {
             className: 'lg:col-start-2',
           },
         },
         {
-          icon: <icons.Pencil />,
-          text: 'Markdown',
-          description: 'Term Service',
-          url: `/${locale}/docs/legislations/terms`,
+          icon: <icons.Highlighter />,
+          text: 'Codeblock',
+          description: 'Codeblock full case',
+          url: `/${locale}/docs/introduction/mdx-shiki`,
           menu: {
             className: 'lg:col-start-3 lg:row-start-1',
           },
         },
         {
-          icon: <icons.Layout />,
-          text: 'Layouts',
-          description: 'Privacy',
+          icon: <icons.ShieldUser/>,
+          text: 'Privacy Policy',
+          description: 'Privacy Policy',
           url: `/${locale}/docs/legislations/privacy`,
           menu: {
             className: 'lg:col-start-3',
