@@ -1,19 +1,21 @@
 ---
 title: 代码模板快捷操作
 description: 充分利用现代IDE的代码模板注入功能, 省去大量重复编码操作, 提高开发效率
+icon: Snippets
 ---
 
 ## 代码模板
 
-在**VSCode**\(**Cursor**|**Trae**\)中, 使用`cmd+shift+p`打开命令面板, 输入`snippet`即可配置代码模板
+在**VSCode**\(`Cursor`|`Trae`\)中, 使用`cmd+shift+p`打开命令面板, 输入`snippet`即可配置代码模板
 
 <Callout title="VSCode" type="info">
     请务必注意VSCode的版本, VSCode Version: 1.96.2+ 是肯定可以用的, Cursor或Trae都已支持该版本
 </Callout>
 
 
+
 ### 快捷操作
-```bash
+```txt title="mdx-snippets"
 # 生成mdx帮助信息
 @mdxhelp
 
@@ -81,8 +83,9 @@ description: 充分利用现代IDE的代码模板注入功能, 省去大量重�
 @mdxmath
 ```
 
-### 示例mdx.json
-```json
+### 配置模板
+
+```json title="mdx.json"
 {
 	"mdx-help": {
 		"prefix": "@mdxhelp",

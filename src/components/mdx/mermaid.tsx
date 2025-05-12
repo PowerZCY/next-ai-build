@@ -3,8 +3,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
+import { watermark as watermarkConfig } from '@/lib/appConfig';
  
-export function Mermaid({ chart }: { chart: string }) {
+export function Mermaid({ chart, title }: { chart: string; title?: string }) {
   const id = useId();
   const [svg, setSvg] = useState('');
   const containerRef = useRef<HTMLDivElement>(null!);
@@ -32,12 +33,47 @@ export function Mermaid({ chart }: { chart: string }) {
           chart.replaceAll('\\n', '\n'),
           containerRef.current,
         );
-        setSvg(svg);
+        let svgWithWatermark = svg;
+        if (watermarkConfig.enabled && watermarkConfig.text) {
+          svgWithWatermark = addWatermarkToSvg(svg, watermarkConfig.text);
+        }
+        setSvg(svgWithWatermark);
       } catch (error) {
         console.error('Error while rendering mermaid', error);
       }
     }
   }, [chart, id, resolvedTheme]);
  
-  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: svg }} />;
+  return (
+    <div>
+      <div ref={containerRef} dangerouslySetInnerHTML={{ __html: svg }} />
+      {title && (
+        <div
+          style={{
+            color: '#AC62FD',
+            textAlign: 'center',
+            fontSize: '13px',
+            fontStyle: 'italic',
+            marginTop: '0.5em',
+          }}
+        >
+          {title}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function addWatermarkToSvg(svg: string, watermark: string) {
+  const watermarkText = `\n    <text
+      x="99%"
+      y="98%"
+      text-anchor="end"
+      font-size="12"
+      font-style="italic"
+      fill="#AC62FD"
+      opacity="0.40"
+      pointer-events="none"
+    >${watermark}</text>\n  `;
+  return svg.replace('</svg>', `${watermarkText}</svg>`);
 }

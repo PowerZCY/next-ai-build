@@ -1,6 +1,7 @@
 ---
 title: Mermaid Graph
 description: How to use mermaid
+icon: Mmd
 ---
 
 ## Hello World
@@ -14,9 +15,10 @@ export { withArticle as default } from 'fumadocs-ui/page';
 ```
 
 <Mermaid
+  title="任务管理流程图"
   chart="
 flowchart TB
-    classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
+    classDef process fill:#AC62FD,stroke:#AC62FD,stroke-width:2px;
     
     R([需求]):::process
     P([优先级]):::process
@@ -96,6 +98,3 @@ flowchart TB
     linkStyle 23 stroke:red,stroke-width:2px
 
 "/>
-
-
-

@@ -44,7 +44,11 @@ export const appConfig = {
       // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
       uniformColor: "text-purple-500"
     },
-    showBanner: false
+    showBanner: false,
+    watermark: {
+      enabled: true,
+      text: "巽川·怀因"
+    }
   },
   mdxSourceDir: {
     docs: "src/mdx/docs",
@@ -55,6 +59,7 @@ export const appConfig = {
 };
 
 export const iconColor = appConfig.style.icon.uniformColor
+export const watermark = appConfig.style.watermark
 export const showBanner = appConfig.style.showBanner
 
 // 辅助函数：检查是否为支持的语言

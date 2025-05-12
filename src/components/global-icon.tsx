@@ -16,6 +16,8 @@ const customImageIcons = {
   GitHub: iconFromSVG("/icons/github.svg", "GitHub"),
   LastUpdated: iconFromSVG("/icons/latest.svg", "Last updated"),
   MarkdownX: iconFromSVG("/icons/markdown.svg", "MarkdownX"),
+  Snippets: iconFromSVG("/icons/snippets.svg", "Snippets"),
+  Mmd: iconFromSVG("/icons/mermaid.svg", "Mermaid"),
   Test: iconFromSVG("/icons/test.svg", "Test"),
   Diff: iconFromSVG("/icons/diff.svg", "Diff"),
   Html: iconFromSVG("/icons/html.svg", "Html"),
