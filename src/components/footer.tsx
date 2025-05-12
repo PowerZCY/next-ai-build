@@ -69,48 +69,48 @@ export function Footer() {
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
               <Link href="/docs/introduction/mdx-shiki" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Fingerprint className="h-3.5 w-3.5"/>
+                <icons.Highlighter className="h-3.5 w-3.5"/>
                 <span>Shiki</span>
               </Link>
               {/* Link 2 */}
               <Link href="/docs/introduction/mdx-snippets" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Handshake className="h-3.5 w-3.5"/>
+                <icons.Snippets className="h-3.5 w-3.5"/>
                 <span>Snippets</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
               <Link href="/docs/introduction/mdx-mermaid" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Fingerprint className="h-3.5 w-3.5"/>
+                <icons.Mmd className="h-3.5 w-3.5"/>
                 <span>Mermaid</span>
               </Link>
               {/* Link 2 */}
               <Link href="/docs/tool-manuals/d8ger-auto-code" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Handshake className="h-3.5 w-3.5"/>
+                <icons.D8 className="h-3.5 w-3.5"/>
                 <span>D8gerAutoCode</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
               <Link href="/docs/tool-manuals/macos-software" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Fingerprint className="h-3.5 w-3.5"/>
+                <icons.Cpu className="h-3.5 w-3.5"/>
                 <span>Software</span>
               </Link>
               {/* Link 2 */}
               <Link href="/docs/tool-manuals/easy-http" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Handshake className="h-3.5 w-3.5"/>
+                <icons.Terminal className="h-3.5 w-3.5"/>
                 <span>EasyHttp</span>
               </Link>
             </div>
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
               <Link href="/docs/tool-manuals/git" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Fingerprint className="h-3.5 w-3.5"/>
+                <icons.GitPullRequestArrow className="h-3.5 w-3.5"/>
                 <span>Git</span>
               </Link>
               {/* Link 2 */}
               <Link href="/docs/tool-manuals/httpie" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Handshake className="h-3.5 w-3.5"/>
+                <icons.Terminal className="h-3.5 w-3.5"/>
                 <span>HTTPie</span>
               </Link>
             </div>

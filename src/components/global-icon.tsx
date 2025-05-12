@@ -17,6 +17,7 @@ const customImageIcons = {
   LastUpdated: iconFromSVG("/icons/latest.svg", "Last updated"),
   MarkdownX: iconFromSVG("/icons/markdown.svg", "MarkdownX"),
   Snippets: iconFromSVG("/icons/snippets.svg", "Snippets"),
+  D8: iconFromSVG("/icons/D8.svg", "D8"),
   Mmd: iconFromSVG("/icons/mermaid.svg", "Mermaid"),
   Test: iconFromSVG("/icons/test.svg", "Test"),
   Diff: iconFromSVG("/icons/diff.svg", "Diff"),

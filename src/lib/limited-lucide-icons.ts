@@ -27,6 +27,7 @@ export {
     FileLock2,
     Fingerprint,
     FileText,
+    GitPullRequestArrow,
     Globe,
     GlobeLock,
     GripVertical,
@@ -52,6 +53,7 @@ export {
     Scale,
     ShieldUser,
     Tablets,
+    Terminal,
     X,
     Zap
 } from 'lucide-react'; 
