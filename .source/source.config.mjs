@@ -12,7 +12,7 @@ import { z } from "zod";
 var appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://re8ger.com",
-  githubBaseUrl: "https://github.com/caofanCPU/next-ai-build/blob/fumadocs-base/",
+  githubBaseUrl: "https://github.com/PowerZCY/next-ai-build/blob/main/",
   // 国际化配置
   // - 英语 (en)
   // - 简体中文 (zh)

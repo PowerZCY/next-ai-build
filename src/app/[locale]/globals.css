@@ -20,6 +20,14 @@ header#fd-nav {
   top: var(--fd-banner-height) !important;
 }
 
+/* 
+ * 强制NProgress进度条颜色为紫色
+ */
+#nprogress .bar {
+  background: #AC62FD !important; /* 紫色 */
+  height: 1px !important;
+}
+
 @layer utilities {
   /* Renamed Keyframes for CTA component */
   @keyframes cta-gradient-wave {

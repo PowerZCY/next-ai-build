@@ -4,8 +4,9 @@ import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server
 import './globals.css'
 // Fumadocs 数学公式样式
 import 'katex/dist/katex.css';
+import 'nprogress/nprogress.css'
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
-
+import NProgressBar from '@/app/[locale]/nProgressBar'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,7 +65,8 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body >
+        <body>
+          <NProgressBar />
           {children}
         </body>
         <GoogleAnalyticsScript />
