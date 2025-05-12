@@ -1,15 +1,10 @@
 {
     "title": "Re8ger's Legislations",
-    "description": "What is Re8ger's legislations?",
+    "description": "Focus on privacy-compliance andmethodological-principles",
     "icon": "GlobeLock",
     "root": true,
     "pages": [
-        "---Guide---",
-        "index",
-        "---Important---",
-        "terms",
-        "privacy",
-        "dpa",
-        "..."
+        "(pricinple)",
+        "(legal)"
     ]
 }

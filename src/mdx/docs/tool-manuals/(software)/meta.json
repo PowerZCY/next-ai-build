@@ -1,16 +1,5 @@
 {
     "pages": [
-        "---Guide---",
-        "fuma-mdx",
-        "shiki",
-        "test",
-        "mdx-snippets",
-        "---Shortcuts---",
-        "git",
-        "macos-software",
-        "httpie",
-        "easy-http",
-        "---Other---",
-        "..."
+        "macos-software"
     ]
 }

@@ -21,6 +21,12 @@ export function homeNavLinks(locale: string): LinkItemType[] {
       url: `/${locale}/docs/tool-manuals/shiki`,
       active: 'url',
     },
+    {
+      icon: <icons.GlobeLock />,
+      text: 'Legal',
+      url: `/${locale}/legal`,
+      active: 'url',
+    },
   ];
 }
 

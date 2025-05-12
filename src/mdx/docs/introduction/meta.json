@@ -4,12 +4,9 @@
     "icon": "Binary",
     "root": true,
     "pages": [
-        "---Guide---",
+        "---Important---",
         "index",
-        "clerk-quick-start",
-        "---Configuration---",
-        "clerk-setup",
-        "---Features---",
-        "..."
+        "(mdx)",
+        "(3p-integration)"
     ]
 }

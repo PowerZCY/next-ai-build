@@ -1,16 +1,16 @@
 {
     "title": "Re8ger's Tool Manuals",
-    "description": "What is Re8ger's Core?",
+    "description": "Focus on system-integrity and efficiency-first",
     "icon": "SplinePointer",
     "root": true,
     "pages": [
         "---Guide---",
         "index",
-        "---Configuration---",
-        "mermaid",
-        "---Software Operation---",
+        "---Software---",
         "(software)",
-        "---Other---",
-        "..."
+        "---Terminal---",
+        "(terminal)",
+        "---Plugin---",
+        "(plugin)"
     ]
 }
