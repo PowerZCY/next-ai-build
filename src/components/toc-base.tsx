@@ -5,6 +5,7 @@ import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
 import { globalLucideIcons as icons } from '@/components/global-icon'
 import {formatTimestamp} from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 const cache = new Map<string, string>();
 
@@ -40,24 +41,26 @@ export function LLMCopyButton() {
   });
 
   return (
-    <button
-      disabled={isLoading}
-      className="flex items-center gap-x-2 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300 text-sm"
+    <Button
+      variant="ghost"
+      size="sm"
+      loading={isLoading}
+      // 强制按钮左对齐
+      className="justify-start px-0 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300"
       onClick={onClick}
     >
-      {checked ?
-        (
-          <>
-            <icons.Check className="size-3.5"/>
-            Copied!
-          </>
-        ) : (
-          <>
-            <icons.MarkdownX className="size-3.5"/>
-            Copy page as Markdown
-          </>
-        )} 
-    </button>
+      {checked ? (
+        <>
+          <icons.Check className="size-3.5"/>
+          Copied!
+        </>
+      ) : (
+        <>
+          <icons.MarkdownX className="size-3.5"/>
+          Copy page as Markdown
+        </>
+      )}
+    </Button>
   );
 }
 

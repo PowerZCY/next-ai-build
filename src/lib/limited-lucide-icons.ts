@@ -37,6 +37,7 @@ export {
     LibraryIcon,
     Layout,
     LayoutTemplate,
+    Loader2,
     MoreHorizontal,
     Pencil,
     PanelLeft,
