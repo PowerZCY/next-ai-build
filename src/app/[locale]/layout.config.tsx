@@ -5,6 +5,8 @@ import { globalLucideIcons as icons, SiteIcon } from '@/components/global-icon';
 import Image from 'next/image';
 import Preview from '@/../public/banner.png';
 import { getTranslations } from 'next-intl/server';
+// import ClerkOrganization from '@/components/ClerkOrganization';
+import ClerkUser from '@/components/ClerkUser';
 
 // 首页普通菜单
 export function homeNavLinks(locale: string): LinkItemType[] {
@@ -27,6 +29,18 @@ export function homeNavLinks(locale: string): LinkItemType[] {
       url: `/${locale}/legal`,
       active: 'url',
     },
+    {
+      type: 'custom',
+      // false就先排左边的菜单, true就先排右边的按钮
+      secondary: true,
+      // NicknameFilter 假设在其内部也使用了 useNickname
+      children: <ClerkUser locale={locale} />
+    },
+    // {
+    //   type: 'custom',
+    //   secondary: true,
+    //   children: <ClerkOrganization locale={locale} />
+    // }
   ];
 }
 

@@ -44,6 +44,7 @@ header#fd-nav {
     animation: cta-gradient-wave 6s ease infinite; /* Use renamed keyframes */
   }
   
+  /* 页面加载时的炫彩波浪球形动画样式 */
   /* Loading Animation Keyframes */
   @keyframes loading-dot-pulse {
     0% {
@@ -63,5 +64,14 @@ header#fd-nav {
       opacity: 0;
     }
   }
+}
+
+/* Icon stroke colors for light/dark themes */
+:root {
+  --clerk-icon-stroke-color: #616161; /* Light theme */
+}
+
+.dark {
+  --clerk-icon-stroke-color: #AAAAAA; /* Dark theme */
 }
 

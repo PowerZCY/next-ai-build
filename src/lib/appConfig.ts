@@ -1,3 +1,4 @@
+
 export const appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
@@ -54,8 +55,11 @@ export const appConfig = {
     docs: "src/mdx/docs",
     blog: "src/mdx/blog",
     legal: "src/mdx/legal"
+  },
+  clerk: {
+    waitlistUrl: "/waitlist",
+    debug: false
   }
-
 };
 
 export const iconColor = appConfig.style.icon.uniformColor

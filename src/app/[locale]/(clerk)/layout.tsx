@@ -1,25 +1,28 @@
-import type { ReactNode } from 'react';
+/**
+ * @license
+ * MIT License
+ * Copyright (c) 2025 D8ger
+ * 
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+import { baseOptions } from '@/app/[locale]/layout.config';
+import { Footer } from "@/components/footer";
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
-import { Footer } from '@/components/footer';
 import { RootProvider } from 'fumadocs-ui/provider';
+import { ReactNode } from 'react';
+import { ClerkProviderClient } from '@/components/ClerkProviderClient';
 import { generatedLocales } from '@/lib/appConfig';
 import { cn } from '@/lib/fuma-search-util';
-import GoToTop from '@/components/go-to-top';
-import { ClerkProviderClient } from '@/components/ClerkProviderClient';
-
-async function homeOptions(locale: string): Promise<HomeLayoutProps> {
-  const options = await baseOptions(locale);
+async function homeOptions(locale: string): Promise<HomeLayoutProps>{
+  const resolvedBaseOptions = await baseOptions(locale);
   return {
-    ...options,
-    links: [
-      ...levelNavLinks(locale),
-      ...homeNavLinks(locale),
-      ]
+    ...resolvedBaseOptions,
   };
 }
 
-export default async function Layout({
+export default async function RootLayout({
   params,
   children,
 }: {
@@ -29,12 +32,8 @@ export default async function Layout({
   const { locale } = await params;
   const customeOptions = await homeOptions(locale);
 
-  // 在这里添加人工延迟
-  // console.log('Starting 5-second delay for testing loading animation...');
-  // await new Promise(resolve => setTimeout(resolve, 5000)); // 5秒延迟
-  // console.log('Delay finished. Rendering page.');
-
   return (
+    
     <RootProvider
       i18n={{
         locale: locale,
@@ -43,7 +42,7 @@ export default async function Layout({
         // translations for UI
         translations: { cn }[locale],
       }}
-    >
+    > 
       <ClerkProviderClient>
         <HomeLayout
           {...customeOptions}
@@ -54,10 +53,8 @@ export default async function Layout({
         >
           {children}
           <Footer />
-          <GoToTop />
         </HomeLayout>
       </ClerkProviderClient>
     </RootProvider>
-	);
+  );
 }
-

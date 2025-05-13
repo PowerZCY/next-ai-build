@@ -64,6 +64,10 @@ var appConfig = {
     docs: "src/mdx/docs",
     blog: "src/mdx/blog",
     legal: "src/mdx/legal"
+  },
+  clerk: {
+    waitlistUrl: "/waitlist",
+    debug: false
   }
 };
 var iconColor = appConfig.style.icon.uniformColor;
