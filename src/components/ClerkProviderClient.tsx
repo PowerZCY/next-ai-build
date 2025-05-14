@@ -1,15 +1,9 @@
-'use client';
-
 import { ClerkProvider } from '@clerk/nextjs';
-// import { dark } from '@clerk/themes';
-import { useTheme } from 'next-themes';
+import { dark, shadesOfPurple } from '@clerk/themes';
 import React from 'react';
 import { zhCN, enUS } from '@clerk/localizations';
 import { appConfig, showBanner } from '@/lib/appConfig';
 import { Banner } from 'fumadocs-ui/components/banner';
-
-// Use React.ComponentProps to get the props type for ClerkProvider
-// type ActualClerkProviderProps = React.ComponentProps<typeof ClerkProvider>;
 
 // https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492
 // https://clerk.com/docs/customization/localization
@@ -48,23 +42,6 @@ const clerkIntl = {
   zh: customZH,
 }
 
-// const clerkVariables = { 
-//   colorPrimary: "#6366F1",
-// };
-
-// const clerkElements = {
-//   formButtonPrimary:
-//     "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
-//   socialButtonsBlockButton:
-//     "bg-white border-gray-200 hover:bg-transparent hover:border-black text-gray-600 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
-//   socialButtonsBlockButtonText: "font-semibold",
-//   formButtonReset:
-//     "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
-//   membersPageInviteButton:
-//     "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
-//   // card styling is now handled by baseTheme (light/dark)
-// }
-
 export function ClerkProviderClient({
   children,
   locale,
@@ -72,7 +49,6 @@ export function ClerkProviderClient({
   children: React.ReactNode;
   locale: string;
 }) {
-  const { resolvedTheme } = useTheme();
 
   const signInUrlWithLocale = `/${locale}${appConfig.clerk.signInUrl}`;
   const signUpUrlWithLocale = `/${locale}${appConfig.clerk.signUpUrl}`;
@@ -81,17 +57,7 @@ export function ClerkProviderClient({
   const waitlistUrlWithLocale = `/${locale}${appConfig.clerk.waitlistUrl}`;
   const currentLocalization = clerkIntl[locale as keyof typeof clerkIntl];
 
-  console.log(`ClerkProviderClient rendering - locale: ${locale}, resolvedTheme: ${resolvedTheme}`);
   console.log(`ClerkProviderClient - signInUrl for ClerkProvider: ${signInUrlWithLocale}`);
-  // console.log(`ClerkProviderClient - current localization title: ${currentLocalization?.signIn?.start?.title}`); // Optional: for deeper debugging
-
-  // const appearance: ActualClerkProviderProps['appearance'] = {
-  //   // TEST: Force baseTheme to undefined even in dark mode to isolate the issue
-  //   baseTheme: undefined, 
-  //   // baseTheme: resolvedTheme === 'dark' ? dark : undefined, // Restore original line
-  //   // variables: clerkVariables,
-  //   // elements: clerkElements,
-  // };
 
   return (
     <ClerkProvider
@@ -101,7 +67,10 @@ export function ClerkProviderClient({
       signUpFallbackRedirectUrl={signUpFallbackRedirectUrlWithLocale}
       waitlistUrl={waitlistUrlWithLocale}
       localization={currentLocalization}
-      // appearance={appearance}
+      appearance={{
+        signIn: { baseTheme: shadesOfPurple },
+        signUp: { baseTheme: dark },
+      }}
     >
       {showBanner ? 
         (<Banner variant="rainbow" changeLayout={false}>

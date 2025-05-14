@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { type JSX } from 'react';
 import { globalLucideIcons as icons } from '@/components/global-icon';
 
@@ -10,15 +10,10 @@ export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
     <div className="ms-1.5 flex items-center gap-2 h-10 me-3">
       <SignedOut>
         <SignInButton>
-          <button className="w-20 h-9 px-2 py-1 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center">
-            SIGNIN
+          <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
+            Sign In
           </button>
         </SignInButton>
-        <SignUpButton>
-          <button className="w-20 h-9 px-2 py-1 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center">
-            SIGNUP
-          </button>
-        </SignUpButton>
       </SignedOut>
       <SignedIn>
         <UserButton
