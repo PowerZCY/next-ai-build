@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { watermark as watermarkConfig } from '@/lib/appConfig';
+import { globalLucideIcons as icons } from '@/components/global-icon';
  
 export function Mermaid({ chart, title }: { chart: string; title?: string }) {
   const id = useId();
@@ -49,15 +50,10 @@ export function Mermaid({ chart, title }: { chart: string; title?: string }) {
       <div ref={containerRef} dangerouslySetInnerHTML={{ __html: svg }} />
       {title && (
         <div
-          style={{
-            color: '#AC62FD',
-            textAlign: 'center',
-            fontSize: '13px',
-            fontStyle: 'italic',
-            marginTop: '0.5em',
-          }}
+          className="mt-2 flex items-center justify-center text-center text-[13px] font-italic text-[#AC62FD]"
         >
-          {title}
+          <icons.Mmd className='mr-1 h-4 w-4' />
+          <span>{title}</span>
         </div>
       )}
     </div>
@@ -73,7 +69,7 @@ function addWatermarkToSvg(svg: string, watermark: string) {
       font-style="italic"
       fill="#AC62FD"
       opacity="0.40"
-      pointer-events="none"
+      class="pointer-events-none"
     >${watermark}</text>\n  `;
   return svg.replace('</svg>', `${watermarkText}</svg>`);
 }

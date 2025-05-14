@@ -26,7 +26,7 @@ const customImageIcons = {
   T3P: iconFromSVG("/icons/3rdP.svg", "T3P"),
   Clerk: iconFromSVG("/icons/clerk.svg", "Clerk"),
   MDX: iconFromSVG("/icons/mdx.svg", "MDX"),
-  Mmd: iconFromSVG("/icons/mermaid.svg", "Mermaid"),
+  Mmd: iconFromSVG("/icons/mermaid.svg", "Mermaid", 16, 16),
   Test: iconFromSVG("/icons/test.svg", "Test"),
   Diff: iconFromSVG("/icons/diff.svg", "Diff"),
   Html: iconFromSVG("/icons/html.svg", "Html"),
@@ -44,18 +44,43 @@ const customImageIcons = {
 };
 
 // Helper function to create SVG-based icon components, now accepting LucideProps
-function iconFromSVG(src: string, alt: string): (props: LucideProps) => React.ReactElement {
+function iconFromSVG(
+  src: string,
+  alt: string,
+  defaultIconWidth?: number, // Optional: default width for this specific icon type
+  defaultIconHeight?: number // Optional: default height for this specific icon type
+): (props: LucideProps) => React.ReactElement {
   const SvgIconComponent = (props: LucideProps): React.ReactElement => {
-    // We primarily use className from LucideProps. Other props like size, color specific to SVG paths
-    // won't directly affect the <Image /> unless explicitly handled.
-    const combinedClassName = `size-4.5 ${props.className || ''}`.trim();
+    // Fallback dimensions if no defaults are provided to iconFromSVG
+    const fallbackWidth = 18;
+    const fallbackHeight = 18;
+
+    let width: number;
+    let height: number;
+
+    // Priority:
+    // 1. props.size (if number)
+    // 2. defaultIconWidth/Height from iconFromSVG call
+    // 3. Fallback (18x18)
+    if (typeof props.size === 'number') {
+      width = props.size;
+      height = props.size;
+    } else {
+      width = defaultIconWidth ?? fallbackWidth;
+      // If defaultIconHeight is not given, use defaultIconWidth if available, otherwise fallbackHeight
+      height = defaultIconHeight ?? defaultIconWidth ?? fallbackHeight;
+    }
+    
+    // className is purely from props. No default "size-4.5" anymore from here.
+    const imageClassName = props.className || ''; 
+
     return (
       <Image
         src={src}
         alt={alt}
-        className={combinedClassName}
-        width={18} // Fixed width for image-based icons
-        height={18} // Fixed height for image-based icons
+        className={imageClassName}
+        width={width}  // Use the determined width
+        height={height} // Use the determined height
       />
     );
   };
