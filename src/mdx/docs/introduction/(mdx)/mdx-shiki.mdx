@@ -15,7 +15,7 @@ icon: Highlighter
 | py | ruby | rust | scheme✅ |
 | shell | ts | tsx | xml✅ |
 | yaml✅ | zsh | regex✅ | http✅ |
-| sql✅ | diff✅ |  |  |
+| sql✅ | diff✅ | sql✅ |  |
 
 ## Shiki基础语法
 <Callout title="注意" type="warn">
@@ -87,64 +87,6 @@ int main() {{
     return 0;
 }}
 ```
-
-### diff
-<Tabs groupId="diff" items={["base", "easy", "special", "high"]}>
-```diff title="base用法" tab="base"
-// 这里是代码
-- 这是被删除的行
-+ 这是新增的行
-  这是未修改的行
-! 这是被修改的行（用 ! 标记）
-```
-
-```diff title="easy用法" tab="easy"
-function calculateTotal(prices) {
--   let total = 0;
-+   const total = 0;
-    for (const price of prices) {
--       total += price * 1.05; // 旧逻辑：包含税
-+       total += price; // 新逻辑：不含税
-    }
-!   return total.toFixed(2); // 修改了返回值格式
-}
-```
-```diff title="special用法" tab="special"
-{
-  "name": "my-project",
--  "version": "1.0.0",
-+  "version": "1.1.0",
-  "scripts": {
-    "start": "node server.js",
--    "test": "jest",
-+    "test": "jest --coverage",
-+    "lint": "eslint src"
-  },
--  "dependencies": {
-+  "dependencies": {
-     "react": "^17.0.2",
--    "axios": "^0.21.1"
-+    "axios": "^1.4.0",
-+    "lodash": "^4.17.21"
-  }
-}
-```
-
-```diff title="high用法" tab="high"
-@@ -1,7 +1,8 @@
- function greeting(name) {
--  return `Hello, ${name}!`;
-+  if (!name) {
-+    return 'Hello, Re8ger!';
-+  }
-+  return `Hello, ${name}!`;
- }
-
--console.log(greeting());
-+console.log(greeting('Alice'));
-```
-
-</Tabs>
 
 ### go
 
@@ -525,6 +467,64 @@ id,message
 1,"Hello Re8ger"
 ```
 
+### diff
+<Tabs groupId="diff" items={["base", "easy", "special", "high"]}>
+```diff title="base用法" tab="base"
+// 这里是代码
+- 这是被删除的行
++ 这是新增的行
+  这是未修改的行
+! 这是被修改的行（用 ! 标记）
+```
+
+```diff title="easy用法" tab="easy"
+function calculateTotal(prices) {
+-   let total = 0;
++   const total = 0;
+    for (const price of prices) {
+-       total += price * 1.05; // 旧逻辑：包含税
++       total += price; // 新逻辑：不含税
+    }
+!   return total.toFixed(2); // 修改了返回值格式
+}
+```
+```diff title="special用法" tab="special"
+{
+  "name": "my-project",
+-  "version": "1.0.0",
++  "version": "1.1.0",
+  "scripts": {
+    "start": "node server.js",
+-    "test": "jest",
++    "test": "jest --coverage",
++    "lint": "eslint src"
+  },
+-  "dependencies": {
++  "dependencies": {
+     "react": "^17.0.2",
+-    "axios": "^0.21.1"
++    "axios": "^1.4.0",
++    "lodash": "^4.17.21"
+  }
+}
+```
+
+```diff title="high用法" tab="high"
+@@ -1,7 +1,8 @@
+ function greeting(name) {
+-  return `Hello, ${name}!`;
++  if (!name) {
++    return 'Hello, Re8ger!';
++  }
++  return `Hello, ${name}!`;
+ }
+
+-console.log(greeting());
++console.log(greeting('Alice'));
+```
+
+</Tabs>
+
 ### html
 
 ```html title="shiki.html"
@@ -641,6 +641,12 @@ type User {
   email: String!
   age: Int
 }
+```
+
+### sql
+
+```sql title="shiki.sql"
+SELECT * FROM users;
 ```
 
 ### text

@@ -6,11 +6,8 @@
     "pages": [
         "---Guide---",
         "index",
-        "---Software---",
         "(software)",
-        "---Terminal---",
         "(terminal)",
-        "---Plugin---",
         "(plugin)"
     ]
 }

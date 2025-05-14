@@ -1,4 +1,7 @@
 {
+    "title": "Terminal",
+    "icon": "Iterm",
+    "root": false,
     "pages": [
         "git",
         "httpie",

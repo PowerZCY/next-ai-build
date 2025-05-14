@@ -1,4 +1,7 @@
 {
+    "title": "Third Party Integration",
+    "icon": "T3P",
+    "root": false,
     "pages": [
         "clerk-quick-start",
         "clerk-setup",
