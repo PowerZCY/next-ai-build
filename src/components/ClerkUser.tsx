@@ -26,12 +26,12 @@ export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
           <UserButton.MenuItems>
             <UserButton.Action label="manageAccount" />
             {<UserButton.Link
-              labelIcon={<icons.ReceiptText width={16} height={16} fill='none' stroke='var(--clerk-icon-stroke-color)' />}
+              labelIcon={<icons.ReceiptText className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
               label="服务条款"
               href={`/${locale}/legal/terms`}>
             </UserButton.Link>}
             {<UserButton.Link
-              labelIcon={<icons.ShieldUser width={16} height={16} fill='none' stroke='var(--clerk-icon-stroke-color)' />}
+              labelIcon={<icons.ShieldUser className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
               label="隐私政策"
               href={`/${locale}/legal/privacy`}>
             </UserButton.Link>}
