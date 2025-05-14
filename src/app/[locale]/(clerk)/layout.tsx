@@ -11,6 +11,7 @@ import { baseOptions } from '@/app/[locale]/layout.config';
 import { Footer } from "@/components/footer";
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import { ReactNode } from 'react';
+
 async function homeOptions(locale: string): Promise<HomeLayoutProps>{
   const resolvedBaseOptions = await baseOptions(locale);
   return {

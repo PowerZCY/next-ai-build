@@ -69,7 +69,10 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
-          <RootProvider
+          
+          <ClerkProviderClient locale={locale}>
+              
+              <RootProvider
             i18n={{
               locale: locale,
               // available languages
@@ -78,10 +81,9 @@ export default async function RootLayout({
               translations: { cn }[locale],
             }}
           >
-            <ClerkProviderClient locale={locale}>
-              {children}
-            </ClerkProviderClient>
+            {children}
           </RootProvider>
+            </ClerkProviderClient>
         </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>

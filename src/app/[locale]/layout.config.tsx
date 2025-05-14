@@ -1,12 +1,12 @@
-import { i18n } from '@/i18n';
-import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
-import { globalLucideIcons as icons, SiteIcon } from '@/components/global-icon';
-import Image from 'next/image';
 import Preview from '@/../public/banner.png';
+import { globalLucideIcons as icons, SiteIcon } from '@/components/global-icon';
+import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
+import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 // import ClerkOrganization from '@/components/ClerkOrganization';
 import ClerkUser from '@/components/ClerkUser';
+import { i18n } from '@/i18n';
 
 // 首页普通菜单
 export function homeNavLinks(locale: string): LinkItemType[] {
@@ -102,7 +102,7 @@ export function levelNavLinks(locale: string): LinkItemType[] {
           },
         },
         {
-          icon: <icons.ShieldUser/>,
+          icon: <icons.ShieldUser />,
           text: 'Privacy Policy',
           description: 'Privacy Policy',
           url: `/${locale}/docs/legislations/privacy`,
@@ -116,14 +116,14 @@ export function levelNavLinks(locale: string): LinkItemType[] {
 }
 
 export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
-  const t = await getTranslations({ locale : locale, namespace: 'home' });
+  const t = await getTranslations({ locale: locale, namespace: 'home' });
   return {
     // 导航Header配置
     nav: {
       url: `/${locale}`,
       title: (
         <>
-          <SiteIcon/>
+          <SiteIcon />
           <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
             {t('title')}
           </span>

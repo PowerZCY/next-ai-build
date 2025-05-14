@@ -1,7 +1,7 @@
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
+// import { dark } from '@clerk/themes';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import { zhCN, enUS } from '@clerk/localizations';
@@ -9,7 +9,7 @@ import { appConfig, showBanner } from '@/lib/appConfig';
 import { Banner } from 'fumadocs-ui/components/banner';
 
 // Use React.ComponentProps to get the props type for ClerkProvider
-type ActualClerkProviderProps = React.ComponentProps<typeof ClerkProvider>;
+// type ActualClerkProviderProps = React.ComponentProps<typeof ClerkProvider>;
 
 // https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492
 // https://clerk.com/docs/customization/localization
@@ -48,22 +48,22 @@ const clerkIntl = {
   zh: customZH,
 }
 
-const clerkVariables = { 
-  colorPrimary: "#6366F1",
-};
+// const clerkVariables = { 
+//   colorPrimary: "#6366F1",
+// };
 
-const clerkElements = {
-  formButtonPrimary:
-    "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
-  socialButtonsBlockButton:
-    "bg-white border-gray-200 hover:bg-transparent hover:border-black text-gray-600 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
-  socialButtonsBlockButtonText: "font-semibold",
-  formButtonReset:
-    "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
-  membersPageInviteButton:
-    "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
-  // card styling is now handled by baseTheme (light/dark)
-}
+// const clerkElements = {
+//   formButtonPrimary:
+//     "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
+//   socialButtonsBlockButton:
+//     "bg-white border-gray-200 hover:bg-transparent hover:border-black text-gray-600 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
+//   socialButtonsBlockButtonText: "font-semibold",
+//   formButtonReset:
+//     "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700",
+//   membersPageInviteButton:
+//     "bg-linear-to-r from-indigo-500 to-purple-600 text-white border-none hover:opacity-90 transition-opacity",
+//   // card styling is now handled by baseTheme (light/dark)
+// }
 
 export function ClerkProviderClient({
   children,
@@ -74,23 +74,34 @@ export function ClerkProviderClient({
 }) {
   const { resolvedTheme } = useTheme();
 
-  // The 'appearance' object passed to ClerkProvider can have optional 'variables' and 'elements',
-  // but here 'variables' and 'elements' are the props passed to ClerkProviderClient, which are defined.
-  const appearance: ActualClerkProviderProps['appearance'] = {
-    baseTheme: resolvedTheme === 'dark' ? dark : undefined,
-    variables: clerkVariables, // This 'variables' is from props, typed as Exclude<..., undefined>
-    elements: clerkElements,  // This 'elements' is from props, typed as Exclude<..., undefined>
-  };
-  console.log(`choosed ClerkProviderClient locale: ${locale}`);
+  const signInUrlWithLocale = `/${locale}${appConfig.clerk.signInUrl}`;
+  const signUpUrlWithLocale = `/${locale}${appConfig.clerk.signUpUrl}`;
+  const signInFallbackRedirectUrlWithLocale = `/${locale}${appConfig.clerk.fallbackSignInUrl}`;
+  const signUpFallbackRedirectUrlWithLocale = `/${locale}${appConfig.clerk.fallbackSignUpUrl}`;
+  const waitlistUrlWithLocale = `/${locale}${appConfig.clerk.waitlistUrl}`;
+  const currentLocalization = clerkIntl[locale as keyof typeof clerkIntl];
+
+  console.log(`ClerkProviderClient rendering - locale: ${locale}, resolvedTheme: ${resolvedTheme}`);
+  console.log(`ClerkProviderClient - signInUrl for ClerkProvider: ${signInUrlWithLocale}`);
+  // console.log(`ClerkProviderClient - current localization title: ${currentLocalization?.signIn?.start?.title}`); // Optional: for deeper debugging
+
+  // const appearance: ActualClerkProviderProps['appearance'] = {
+  //   // TEST: Force baseTheme to undefined even in dark mode to isolate the issue
+  //   baseTheme: undefined, 
+  //   // baseTheme: resolvedTheme === 'dark' ? dark : undefined, // Restore original line
+  //   // variables: clerkVariables,
+  //   // elements: clerkElements,
+  // };
+
   return (
     <ClerkProvider
-      localization={clerkIntl[locale as keyof typeof clerkIntl]}
-      // signInUrl={`/${locale}${appConfig.clerk.signInUrl}`}
-      // signUpUrl={`/${locale}${appConfig.clerk.signUpUrl}`}
-      // signInFallbackRedirectUrl={`/${locale}${appConfig.clerk.fallbackSignInUrl}`}
-      // signUpFallbackRedirectUrl={`/${locale}${appConfig.clerk.fallbackSignUpUrl}`}
-      waitlistUrl={`/${locale}${appConfig.clerk.waitlistUrl}`}
-      appearance={appearance}
+      signInUrl={signInUrlWithLocale}
+      signUpUrl={signUpUrlWithLocale}
+      signInFallbackRedirectUrl={signInFallbackRedirectUrlWithLocale}
+      signUpFallbackRedirectUrl={signUpFallbackRedirectUrlWithLocale}
+      waitlistUrl={waitlistUrlWithLocale}
+      localization={currentLocalization}
+      // appearance={appearance}
     >
       {showBanner ? 
         (<Banner variant="rainbow" changeLayout={false}>
