@@ -30,7 +30,7 @@ export function Footer() {
             {/* Row 1.2: Thanks */}
             <div className="flex flex-col items-start text-xs">
               <div className="flex items-center pl-2">
-                <icons.Bitcoin className="h-3.5 w-3.5"/>
+                <icons.BTC className="h-3.5 w-3.5"/>
                 <span className="ml-5">Thanks to </span>
                 <Link href="https://fumadocs.dev/" rel="noreferrer noopener" target="_blank" className="font-medium hover:underline ml-1">Fumadocs</Link>
                 <span className="ml-1">|</span>
@@ -52,7 +52,7 @@ export function Footer() {
                 <span>{tFooter('privacy', { defaultValue: 'Privacy Policy' })}</span>
               </Link>
               <Link href="/legal/dpa" className="flex items-center space-x-1 hover:underline">
-                <icons.Fingerprint className="h-3.5 w-3.5"/>
+                <icons.DPA className="h-3.5 w-3.5"/>
                 <span>{tFooter('dpa', { defaultValue: 'Data Protection Agreement' })}</span>
               </Link>
             </div>
@@ -93,12 +93,12 @@ export function Footer() {
             <div className="flex flex-col space-y-5">
               {/* Link 1 */}
               <Link href="/docs/tool-manuals/macos-software" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Cpu className="h-3.5 w-3.5"/>
+                <icons.MAC className="h-3.5 w-3.5"/>
                 <span>Software</span>
               </Link>
               {/* Link 2 */}
               <Link href="/docs/tool-manuals/easy-http" className="text-xs flex items-center space-x-1 hover:underline text-left">
-                <icons.Terminal className="h-3.5 w-3.5"/>
+                <icons.Iterm className="h-3.5 w-3.5"/>
                 <span>EasyHttp</span>
               </Link>
             </div>
