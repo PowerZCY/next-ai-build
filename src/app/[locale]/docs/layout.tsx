@@ -69,6 +69,10 @@ export default async function Layout({
       searchToggle={{
         enabled: true,
       }}
+      themeSwitch={{
+        enabled: true,
+        mode: 'light-dark-system',
+      }}
     >
       {children}
     </DocsLayout>

@@ -35,6 +35,10 @@ export default async function RootLayout({
       searchToggle={{
         enabled: false,
       }}
+      themeSwitch={{
+        enabled: true,
+        mode: 'light-dark-system',
+      }}
     className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25"
     >
       {children}

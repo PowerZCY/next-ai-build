@@ -69,21 +69,19 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
-          
           <ClerkProviderClient locale={locale}>
-              
-              <RootProvider
-            i18n={{
-              locale: locale,
-              // available languages
-              locales: generatedLocales,
-              // translations for UI
-              translations: { cn }[locale],
-            }}
-          >
-            {children}
-          </RootProvider>
-            </ClerkProviderClient>
+            <RootProvider
+              i18n={{
+                locale: locale,
+                // available languages
+                locales: generatedLocales,
+                // translations for UI
+                translations: { cn }[locale],
+              }}
+            >
+              {children}
+            </RootProvider>
+          </ClerkProviderClient>
         </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>
