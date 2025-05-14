@@ -10,6 +10,7 @@ import NProgressBar from '@/app/[locale]/nProgressBar'
 import { ClerkProviderClient } from "@/components/ClerkProviderClient";
 import { RootProvider } from "fumadocs-ui/provider";
 import { cn } from '@/lib/fuma-search-util';
+import { FumaBannerSuit } from "@/components/fuma-banner-suit";
 
 export const dynamic = 'force-dynamic'
 
@@ -69,6 +70,7 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
+          <FumaBannerSuit />
           <ClerkProviderClient locale={locale}>
             <RootProvider
               i18n={{
