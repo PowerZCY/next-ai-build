@@ -12,16 +12,46 @@ import type { ShikiTransformerContext as TransformerContext } from 'shiki';
 
 const mdxSourceDir = appConfig.mdxSourceDir
 
+// Reusable schema for title
+const createTitleSchema = () =>
+  z.string({
+    required_error: "Title is required",
+    invalid_type_error: "Title must be a string and cannot be null",
+  })
+  .trim()
+  .min(1, { message: "Title cannot be empty or consist only of whitespace" });
+
+// Reusable schema for description
+const createDescriptionSchema = () =>
+  z.preprocess(
+    (val) => {
+      if (typeof val === 'string') {
+        return val.trim() === "" || val === null ? undefined : val.trim();
+      }
+      return val === null ? undefined : val;
+    },
+    z.string().optional()
+  );
+
+// Reusable schema for icon
+const createIconSchema = () =>
+  z.preprocess(
+    (val) => (val === "" || val === null ? undefined : val),
+    z.string().optional()
+  );
+
 export const docs = defineDocs({
   dir: mdxSourceDir.docs,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
     schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      icon: createIconSchema(),
       preview: z.string().optional(),
       index: z.boolean().default(false),
-      keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
-      // API routes only
+      keywords: z.array(z.string()).optional(),
       method: z.string().optional(),
     }),
   },
@@ -38,9 +68,11 @@ export const blog = defineCollections({
   async: false,
   // @ts-ignore - Temporarily suppress deep instantiation error
   schema: frontmatterSchema.extend({
+    title: createTitleSchema(),
+    description: createDescriptionSchema(),
     author: z.string(),
     date: z.string().date().or(z.date()).optional(),
-    keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
+    keywords: z.array(z.string()).optional(),
   }),
 });
 
@@ -50,10 +82,12 @@ export const legal = defineDocs({
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
     schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      icon: createIconSchema(),
       preview: z.string().optional(),
       index: z.boolean().default(false),
-      keywords: z.array(z.string()).optional(), // 添加 keywords 字段，类型为可选的字符串数组
-      // API routes only
+      keywords: z.array(z.string()).optional(),
       method: z.string().optional(),
     }),
   },

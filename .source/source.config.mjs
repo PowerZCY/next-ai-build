@@ -80,17 +80,35 @@ var generatedLocales = appConfig.i18n.locales.map((loc) => ({
 
 // source.config.ts
 var mdxSourceDir = appConfig.mdxSourceDir;
+var createTitleSchema = () => z.string({
+  required_error: "Title is required",
+  invalid_type_error: "Title must be a string and cannot be null"
+}).trim().min(1, { message: "Title cannot be empty or consist only of whitespace" });
+var createDescriptionSchema = () => z.preprocess(
+  (val) => {
+    if (typeof val === "string") {
+      return val.trim() === "" || val === null ? void 0 : val.trim();
+    }
+    return val === null ? void 0 : val;
+  },
+  z.string().optional()
+);
+var createIconSchema = () => z.preprocess(
+  (val) => val === "" || val === null ? void 0 : val,
+  z.string().optional()
+);
 var docs = defineDocs({
   dir: mdxSourceDir.docs,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
     schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      icon: createIconSchema(),
       preview: z.string().optional(),
       index: z.boolean().default(false),
       keywords: z.array(z.string()).optional(),
-      // 添加 keywords 字段，类型为可选的字符串数组
-      // API routes only
       method: z.string().optional()
     })
   },
@@ -106,10 +124,11 @@ var blog = defineCollections({
   async: false,
   // @ts-ignore - Temporarily suppress deep instantiation error
   schema: frontmatterSchema.extend({
+    title: createTitleSchema(),
+    description: createDescriptionSchema(),
     author: z.string(),
     date: z.string().date().or(z.date()).optional(),
     keywords: z.array(z.string()).optional()
-    // 添加 keywords 字段，类型为可选的字符串数组
   })
 });
 var legal = defineDocs({
@@ -118,11 +137,12 @@ var legal = defineDocs({
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
     schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      icon: createIconSchema(),
       preview: z.string().optional(),
       index: z.boolean().default(false),
       keywords: z.array(z.string()).optional(),
-      // 添加 keywords 字段，类型为可选的字符串数组
-      // API routes only
       method: z.string().optional()
     })
   },
