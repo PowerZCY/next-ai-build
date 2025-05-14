@@ -15,7 +15,8 @@ import { iconColor } from '@/lib/appConfig';
 const customImageIcons = {
   GitHub: iconFromSVG("/icons/github.svg", "GitHub"),
   LastUpdated: iconFromSVG("/icons/latest.svg", "Last updated"),
-  MarkdownX: iconFromSVG("/icons/markdown.svg", "MarkdownX"),
+  Markdown: iconFromSVG("/icons/markdown.svg", "Markdown"),
+  MDX: iconFromSVG("/icons/mdx.svg", "MDX"),
   Snippets: iconFromSVG("/icons/snippets.svg", "Snippets"),
   D8: iconFromSVG("/icons/D8.svg", "D8"),
   MAC: iconFromSVG("/icons/apple.svg", "Mac"),
@@ -25,7 +26,6 @@ const customImageIcons = {
   SubP: iconFromSVG("/icons/subp.svg", "SubP"),
   T3P: iconFromSVG("/icons/3rdP.svg", "T3P"),
   Clerk: iconFromSVG("/icons/clerk.svg", "Clerk"),
-  MDX: iconFromSVG("/icons/mdx.svg", "MDX"),
   Mmd: iconFromSVG("/icons/mermaid.svg", "Mermaid", 16, 16),
   Test: iconFromSVG("/icons/test.svg", "Test"),
   Diff: iconFromSVG("/icons/diff.svg", "Diff"),
@@ -41,6 +41,7 @@ const customImageIcons = {
   XML: iconFromSVG("/icons/xml.svg", "XML"),
   Yaml: iconFromSVG("/icons/yaml.svg", "Yaml"),
   CSV: iconFromSVG("/icons/csv.svg", "CSV"),
+  Txt: iconFromSVG("/icons/txt.svg", "Txt"),
 };
 
 // Helper function to create SVG-based icon components, now accepting LucideProps

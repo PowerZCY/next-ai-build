@@ -28,7 +28,7 @@ export default function ClerkOrganization({
             labelIcon={<icons.D8 />}
           />
           <OrganizationSwitcher.OrganizationProfilePage 
-            labelIcon={<icons.FileText />}
+            labelIcon={<icons.ReceiptText />}
             label="服务"
             url={`/${locale}/legal/terms`}
           >

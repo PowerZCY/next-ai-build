@@ -56,7 +56,7 @@ export function LLMCopyButton() {
         </>
       ) : (
         <>
-          <icons.MarkdownX/>
+          <icons.Markdown/>
           Copy page as Markdown
         </>
       )}

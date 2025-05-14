@@ -26,7 +26,6 @@ export {
     Download,
     FileLock2,
     Fingerprint,
-    FileText,
     GitPullRequestArrow,
     Globe,
     GlobeLock,
