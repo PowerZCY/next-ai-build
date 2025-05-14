@@ -14,10 +14,8 @@ import { Waitlist } from '@clerk/nextjs';
 export default function SignUpPage() {
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-4">
-        <Waitlist />
-      </div>
+    <div className="flex-1 flex items-center justify-center p-4">
+      <Waitlist />
     </div>
   );
 }
