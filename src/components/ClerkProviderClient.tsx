@@ -4,7 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { useTheme } from 'next-themes';
 import React from 'react';
-import { zhCN } from '@clerk/localizations';
+import { zhCN, enUS } from '@clerk/localizations';
 import { appConfig, showBanner } from '@/lib/appConfig';
 import { Banner } from 'fumadocs-ui/components/banner';
 
@@ -13,7 +13,7 @@ type ActualClerkProviderProps = React.ComponentProps<typeof ClerkProvider>;
 
 // https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492
 // https://clerk.com/docs/customization/localization
-export const customLocalization = {
+const customZH = {
   // Use the default zhCN localization
   ...zhCN,
   // Override specific fields here
@@ -43,6 +43,11 @@ export const customLocalization = {
   }
 };
 
+const clerkIntl = {
+  en: enUS,
+  zh: customZH,
+}
+
 const clerkVariables = { 
   colorPrimary: "#6366F1",
 };
@@ -62,8 +67,10 @@ const clerkElements = {
 
 export function ClerkProviderClient({
   children,
+  locale,
 }: {
   children: React.ReactNode;
+  locale: string;
 }) {
   const { resolvedTheme } = useTheme();
 
@@ -74,11 +81,15 @@ export function ClerkProviderClient({
     variables: clerkVariables, // This 'variables' is from props, typed as Exclude<..., undefined>
     elements: clerkElements,  // This 'elements' is from props, typed as Exclude<..., undefined>
   };
-
+  console.log(`choosed ClerkProviderClient locale: ${locale}`);
   return (
     <ClerkProvider
-      localization={customLocalization}
-      waitlistUrl={appConfig.clerk.waitlistUrl}
+      localization={clerkIntl[locale as keyof typeof clerkIntl]}
+      // signInUrl={`/${locale}${appConfig.clerk.signInUrl}`}
+      // signUpUrl={`/${locale}${appConfig.clerk.signUpUrl}`}
+      // signInFallbackRedirectUrl={`/${locale}${appConfig.clerk.fallbackSignInUrl}`}
+      // signUpFallbackRedirectUrl={`/${locale}${appConfig.clerk.fallbackSignUpUrl}`}
+      waitlistUrl={`/${locale}${appConfig.clerk.waitlistUrl}`}
       appearance={appearance}
     >
       {showBanner ? 

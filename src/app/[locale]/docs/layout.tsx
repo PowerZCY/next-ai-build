@@ -1,12 +1,9 @@
-import type { ReactNode } from 'react';
-import { docsSource } from '@/lib/source';
 import { baseOptions } from '@/app/[locale]/layout.config';
+import { docsSource } from '@/lib/source';
+import type { ReactNode } from 'react';
 // https://fumadocs.dev/docs/ui/layouts/notebook
-import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
 import { GithubInfo } from 'fumadocs-ui/components/github-info';
-import { RootProvider } from 'fumadocs-ui/provider';
-import { generatedLocales } from '@/lib/appConfig';
-import { cn } from '@/lib/fuma-search-util';
+import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
 
 async function docsOptions(locale: string): Promise<DocsLayoutProps> {
   const options = await baseOptions(locale);
@@ -68,21 +65,12 @@ export default async function Layout({
   // console.log('Delay finished. Rendering page.');
  
   return (
-    <RootProvider
-      i18n={{
-        locale: locale,
-        // available languages
-        locales: generatedLocales,
-        // translations for UI
-        translations: { cn }[locale],
-      }}
-      search={{
+    <DocsLayout {...customeOptions} 
+      searchToggle={{
         enabled: true,
       }}
     >
-      <DocsLayout {...customeOptions} >
-        {children}
-      </DocsLayout>
-    </RootProvider>
+      {children}
+    </DocsLayout>
   );
 }

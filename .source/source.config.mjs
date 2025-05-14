@@ -66,8 +66,12 @@ var appConfig = {
     legal: "src/mdx/legal"
   },
   clerk: {
-    waitlistUrl: "/waitlist",
-    debug: false
+    // signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || "/sign-in",
+    // fallbackSignInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || "/",
+    // signUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || "/sign-up",
+    // fallbackSignUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL || "/",
+    waitlistUrl: process.env.NEXT_PUBLIC_CLERK_WAITLIST_URL || "/waitlist",
+    debug: process.env.CLERK_DEBUG === "true"
   }
 };
 var iconColor = appConfig.style.icon.uniformColor;

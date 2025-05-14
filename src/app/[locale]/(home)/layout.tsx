@@ -1,12 +1,8 @@
-import type { ReactNode } from 'react';
-import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
 import { Footer } from '@/components/footer';
-import { RootProvider } from 'fumadocs-ui/provider';
-import { generatedLocales } from '@/lib/appConfig';
-import { cn } from '@/lib/fuma-search-util';
 import GoToTop from '@/components/go-to-top';
-import { ClerkProviderClient } from '@/components/ClerkProviderClient';
+import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import type { ReactNode } from 'react';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   const options = await baseOptions(locale);
@@ -15,7 +11,7 @@ async function homeOptions(locale: string): Promise<HomeLayoutProps> {
     links: [
       ...levelNavLinks(locale),
       ...homeNavLinks(locale),
-      ]
+    ]
   };
 }
 
@@ -33,31 +29,19 @@ export default async function Layout({
   // console.log('Starting 5-second delay for testing loading animation...');
   // await new Promise(resolve => setTimeout(resolve, 5000)); // 5秒延迟
   // console.log('Delay finished. Rendering page.');
-
+  
   return (
-    <RootProvider
-      i18n={{
-        locale: locale,
-        // available languages
-        locales: generatedLocales,
-        // translations for UI
-        translations: { cn }[locale],
+    <HomeLayout
+      {...customeOptions}
+      searchToggle={{
+        enabled: false,
       }}
+      className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25"
     >
-      <ClerkProviderClient>
-        <HomeLayout
-          {...customeOptions}
-          searchToggle={{
-            enabled: false,
-          }}
-        className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25"
-        >
-          {children}
-          <Footer />
-          <GoToTop />
-        </HomeLayout>
-      </ClerkProviderClient>
-    </RootProvider>
-	);
+      {children}
+      <Footer />
+      <GoToTop />
+    </HomeLayout>
+  );
 }
 
