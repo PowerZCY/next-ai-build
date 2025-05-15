@@ -1,131 +1,145 @@
 {
-    "home": {
-        "title": "Re8ger",
-        "webTitle": "Reve Image Directory - 展示优美图片和生图技巧",
-        "webDescription": "探索精美的AI图片，学习使用Reve Image强大的文生图算法创建优美的图片。",
-        "keywords": "AI 图像生成, 文本转图像, Reve Image, 免费图像生成"
-    },
-    "hero": {
-        "mainTitle": "使用",
-        "mainEyesOn": "Reve Image",
-        "description": "通过 Reve Image 的 AI 驱动的图像生成，将您的想法转化为令人惊叹的视觉效果。释放您的创造力，体验尖端技术。",
-        "button": "立即开始",
-        "about": "使用 Reve Image 每天享受 20 张免费图片",
-        "heroImageAlt": "Reve Image AI 生成的艺术作品展示平台的强大功能"
-    },
-    "features": {
-        "title": "为什么选择",
-        "eyesOn": "Reve Image",
-        "items": [
-            {
-                "title": "高质量输出",
-                "description": "Reve Image 生成令人惊叹的、细节丰富的图像，可与专业艺术作品媲美。",
-                "icon": "✨"
-            },
-            {
-                "title": "每日20张免费图片",
-                "description": "使用您的 Reve Image 账户，享受每天慷慨的20张免费图片配额。",
-                "icon": "🎁"
-            },
-            {
-                "title": "直观的提示系统",
-                "description": "先进的 AI 能理解自然语言，让您轻松描述您的愿景。",
-                "icon": "💬"
-            }
-        ]
-    },
-    "gallery": {
-        "titleL": "Reve Image",
-        "eyesOn": "画廊",
-        "titleR": "作品展示",
-        "description": "探索 Reve Image 带来的无限可能。以下每张图片都是使用 AI 技术根据相应提示生成。",
-        "button": "创建您自己的图片",
-        "prompts": [
-            "A futuristic cityscape with flying vehicles and neon lights",
-            "A serene mountain landscape at sunset with a lake reflection",
-            "A magical forest with glowing plants and mystical creatures",
-            "An underwater scene with colorful coral reefs and exotic fish",
-            "A steampunk-inspired mechanical dragon with brass gears",
-            "A cosmic scene with planets, nebulae, and a spaceship"
-        ]
-    },
-    "tips": {
-        "title": "获得最佳效果的技巧 - ",
-        "eyesOn": "Reve Image",
-        "sections": [
-            {
-                "title": "提示要具体",
-                "description": "使用 Reve Image 时，提示越具体，效果越好。包含风格、光线、情绪和构图的细节，引导 AI 实现您的愿景。"
-            },
-            {
-                "title": "尝试不同风格",
-                "description": "Reve Image 可以生成各种艺术风格的图像。尝试在提示中添加风格描述符，如\"油画\"、\"数字艺术\"、\"写实\"或\"水彩\"。"
-            },
-            {
-                "title": "参考艺术家风格",
-                "description": "在 Reve Image 提示中提到特定艺术家可以帮助实现特定的美学效果。例如，\"梵高风格\"或\"像韦斯·安德森电影\"。"
-            },
-            {
-                "title": "迭代和改进",
-                "description": "不要害怕使用 Reve Image 生成多张图像并根据结果改进您的提示。每次迭代都会让您更接近完美的图像。"
-            },
-            {
-                "title": "考虑构图元素",
-                "description": "在 Reve Image 提示中包含构图细节，如\"特写\"、\"广角\"、\"俯视\"或\"对称构图\"来控制画面构图。"
-            },
-            {
-                "title": "充分利用每日配额",
-                "description": "有了 Reve Image 每天慷慨的20张免费图片，规划您的创作会话以充分利用这个配额。保存您最好的作品来建立个人灵感库。"
-            }
-        ]
-    },
-    "seoContent": {
-        "title": "掌握 AI 图像生成 - ",
-        "eyesOn": "Reve Image",
-        "intro": "Reve Image 代表着 AI 图像生成技术的前沿，为用户提供将文本描述转换为令人惊叹的视觉内容的能力。无论您是寻求灵感的设计师、创作内容的营销人员，还是探索新媒介的艺术家，Reve Image 都能为您提供将想象力变为现实的工具。",
-        "sections": [
-            {
-                "title": "了解 Reve Image 的工作原理",
-                "content": "当您输入提示时，Reve Image 会分析语义含义并生成与您描述相匹配的图像。这个过程在几秒钟内完成，允许快速迭代和实验。"
-            },
-            {
-                "title": "制作有效的 Reve Image 提示",
-                "content": "从 Reve Image 获得卓越结果的关键在于如何构建您的提示。从清晰的主题开始，然后添加风格、情绪、光线和构图的修饰语。例如，不要简单地写\"一座山\"，而是尝试\"一座雄伟的雪峰在黄金时段，配有戏剧性的云彩，写实风格。\" Reve Image AI 对描述性形容词和具体的视觉参考特别敏感。"
-            },
-            {
-                "title": "利用 Reve Image 满足不同创意需求",
-                "content": "Reve Image 在各种用例中表现出色。对于营销专业人员，它可以生成引人注目的社交媒体图片或概念产品可视化。设计师可以使用 Reve Image 快速制作原型或创建情绪板。作家和故事讲述者可能会使用 Reve Image 来可视化角色和场景。Reve Image 的多功能性使其成为跨创意领域的宝贵工具。"
-            },
-            {
-                "title": "最大化利用 Reve Image 的免费每日图片",
-                "content": "随着 Reve Image 每天提供20次免费图像生成，制定战略性的创作过程变得重要。考虑从更广泛的概念开始，然后根据结果逐步完善您的提示。保存有前途的图像并记录提示中的有效元素。这种系统方法帮助您充分利用 Reve Image 的慷慨免费额度，同时不断改进您的结果。"
-            },
-            {
-                "title": "将 Reve Image 与其他创意工具结合",
-                "content": "虽然 Reve Image 产生令人印象深刻的独立图像，但其输出也可以作为进一步改进的起点。许多创作者使用 Reve Image 生成初始概念，然后将这些图像导入编辑软件进行额外的自定义。这种混合工作流程将 Reve Image AI 的想象力与人工引导编辑的精确性相结合。"
-            }
-        ],
-        "conclusion": "随着 AI 图像生成的不断发展，Reve Image 始终保持在前沿，不断改进其功能，为用户提供表达创造力的新方式。通过了解如何通过精心制作的提示与 Reve Image AI 进行有效沟通，您可以解锁非凡的视觉可能性，改变您处理创意项目的方式。"
-    },
-    "cta": {
-        "title": "准备好使用",
-        "eyesOn": "Reve Image",
-        "description1": "今天就开始生成美丽的图像，享受每日20次免费创作。",
-        "description2": "无需信用卡。",
-        "button": "立即开始"
-    },
-    "languageDetection": {
-        "title": "语言检测",
-        "description": "是否切换到",
-        "close": "不，谢谢",
-        "changeAction": "是的，切换"
-    },
-    "footer": {
-        "copyright": "版权所有 © {year} {name} 保留所有权利。",
-        "privacy": "隐私政策",
-        "terms": "服务条款",
-        "dpa": "数据保护协议",
-        "sitemap": "网站地图",
-        "contact": "联系我们"
-    }
+  "home": {
+    "title": "Re8ger",
+    "slug": "再思·再议·再构",
+    "banner": "一个现代、响应式且易于访问的文档主题, 基于Fumadocs",
+    "webTitle": "Reve Image Directory - 展示优美图片和生图技巧",
+    "webDescription": "探索精美的AI图片, 学习使用Reve Image强大的文生图算法创建优美的图片。",
+    "keywords": "AI 图像生成, 文本转图像, Reve Image, 免费图像生成"
+  },
+  "hero": {
+    "mainTitle": "使用",
+    "mainEyesOn": "Reve Image",
+    "description": "通过 Reve Image 的 AI 驱动的图像生成, 将您的想法转化为令人惊叹的视觉效果。释放您的创造力, 体验尖端技术。",
+    "button": "立即开始",
+    "about": "使用 Reve Image 每天享受 20 张免费图片",
+    "heroImageAlt": "Reve Image AI 生成的艺术作品展示平台的强大功能"
+  },
+  "features": {
+    "title": "为什么选择",
+    "eyesOn": "Reve Image",
+    "items": [
+      {
+        "title": "高质量输出",
+        "description": "Reve Image 生成令人惊叹的、细节丰富的图像, 可与专业艺术作品媲美。",
+        "icon": "✨"
+      },
+      {
+        "title": "每日20张免费图片",
+        "description": "使用您的 Reve Image 账户, 享受每天慷慨的20张免费图片配额。",
+        "icon": "🎁"
+      },
+      {
+        "title": "直观的提示系统",
+        "description": "先进的 AI 能理解自然语言, 让您轻松描述您的愿景。",
+        "icon": "💬"
+      }
+    ]
+  },
+  "gallery": {
+    "titleL": "Reve Image",
+    "eyesOn": "画廊",
+    "titleR": "作品展示",
+    "description": "探索 Reve Image 带来的无限可能。以下每张图片都是使用 AI 技术根据相应提示生成。",
+    "button": "创建您自己的图片",
+    "prompts": [
+      "A futuristic cityscape with flying vehicles and neon lights",
+      "A serene mountain landscape at sunset with a lake reflection",
+      "A magical forest with glowing plants and mystical creatures",
+      "An underwater scene with colorful coral reefs and exotic fish",
+      "A steampunk-inspired mechanical dragon with brass gears",
+      "A cosmic scene with planets, nebulae, and a spaceship"
+    ]
+  },
+  "tips": {
+    "title": "获得最佳效果的技巧 - ",
+    "eyesOn": "Reve Image",
+    "sections": [
+      {
+        "title": "提示要具体",
+        "description": "使用 Reve Image 时, 提示越具体, 效果越好。包含风格、光线、情绪和构图的细节, 引导 AI 实现您的愿景。"
+      },
+      {
+        "title": "尝试不同风格",
+        "description": "Reve Image 可以生成各种艺术风格的图像。尝试在提示中添加风格描述符, 如\"油画\"、\"数字艺术\"、\"写实\"或\"水彩\"。"
+      },
+      {
+        "title": "参考艺术家风格",
+        "description": "在 Reve Image 提示中提到特定艺术家可以帮助实现特定的美学效果。例如, \"梵高风格\"或\"像韦斯·安德森电影\"。"
+      },
+      {
+        "title": "迭代和改进",
+        "description": "不要害怕使用 Reve Image 生成多张图像并根据结果改进您的提示。每次迭代都会让您更接近完美的图像。"
+      },
+      {
+        "title": "考虑构图元素",
+        "description": "在 Reve Image 提示中包含构图细节, 如\"特写\"、\"广角\"、\"俯视\"或\"对称构图\"来控制画面构图。"
+      },
+      {
+        "title": "充分利用每日配额",
+        "description": "有了 Reve Image 每天慷慨的20张免费图片, 规划您的创作会话以充分利用这个配额。保存您最好的作品来建立个人灵感库。"
+      }
+    ]
+  },
+  "seoContent": {
+    "title": "掌握 AI 图像生成 - ",
+    "eyesOn": "Reve Image",
+    "intro": "Reve Image 代表着 AI 图像生成技术的前沿, 为用户提供将文本描述转换为令人惊叹的视觉内容的能力。无论您是寻求灵感的设计师、创作内容的营销人员, 还是探索新媒介的艺术家, Reve Image 都能为您提供将想象力变为现实的工具。",
+    "sections": [
+      {
+        "title": "了解 Reve Image 的工作原理",
+        "content": "当您输入提示时, Reve Image 会分析语义含义并生成与您描述相匹配的图像。这个过程在几秒钟内完成, 允许快速迭代和实验。"
+      },
+      {
+        "title": "制作有效的 Reve Image 提示",
+        "content": "从 Reve Image 获得卓越结果的关键在于如何构建您的提示。从清晰的主题开始, 然后添加风格、情绪、光线和构图的修饰语。例如, 不要简单地写\"一座山\", 而是尝试\"一座雄伟的雪峰在黄金时段, 配有戏剧性的云彩, 写实风格。\" Reve Image AI 对描述性形容词和具体的视觉参考特别敏感。"
+      },
+      {
+        "title": "利用 Reve Image 满足不同创意需求",
+        "content": "Reve Image 在各种用例中表现出色。对于营销专业人员, 它可以生成引人注目的社交媒体图片或概念产品可视化。设计师可以使用 Reve Image 快速制作原型或创建情绪板。作家和故事讲述者可能会使用 Reve Image 来可视化角色和场景。Reve Image 的多功能性使其成为跨创意领域的宝贵工具。"
+      },
+      {
+        "title": "最大化利用 Reve Image 的免费每日图片",
+        "content": "随着 Reve Image 每天提供20次免费图像生成, 制定战略性的创作过程变得重要。考虑从更广泛的概念开始, 然后根据结果逐步完善您的提示。保存有前途的图像并记录提示中的有效元素。这种系统方法帮助您充分利用 Reve Image 的慷慨免费额度, 同时不断改进您的结果。"
+      },
+      {
+        "title": "将 Reve Image 与其他创意工具结合",
+        "content": "虽然 Reve Image 产生令人印象深刻的独立图像, 但其输出也可以作为进一步改进的起点。许多创作者使用 Reve Image 生成初始概念, 然后将这些图像导入编辑软件进行额外的自定义。这种混合工作流程将 Reve Image AI 的想象力与人工引导编辑的精确性相结合。"
+      }
+    ],
+    "conclusion": "随着 AI 图像生成的不断发展, Reve Image 始终保持在前沿, 不断改进其功能, 为用户提供表达创造力的新方式。通过了解如何通过精心制作的提示与 Reve Image AI 进行有效沟通, 您可以解锁非凡的视觉可能性, 改变您处理创意项目的方式。"
+  },
+  "cta": {
+    "title": "准备好使用",
+    "eyesOn": "Reve Image",
+    "description1": "今天就开始生成美丽的图像, 享受每日20次免费创作。",
+    "description2": "无需信用卡。",
+    "button": "立即开始"
+  },
+  "languageDetection": {
+    "title": "语言检测",
+    "description": "是否切换到",
+    "close": "不, 谢谢",
+    "changeAction": "是的, 切换"
+  },
+  "footer": {
+    "company": "巽川·怀因",
+    "copyright": "版权所有 © {year} {name} 保留所有权利。",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "dpa": "数据保护协议",
+    "sitemap": "网站地图",
+    "contact": "联系我们",
+    "thanks": "感谢"
+  },
+  "clerk": {
+    "signIn": "登录",
+    "signUp": "注册"
+  },
+  "linkPreview": {
+    "blog": "真知见闻",
+    "showcase": "客户案例",
+    "legal": "法务声明",
+    "docs": "产品说明"
+  }
 }

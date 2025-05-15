@@ -26,13 +26,13 @@ export function Footer() {
             {/* Row 1.1: Site Icon and Title */}
             <Link href="/" className="flex items-center space-x-2">
               <SiteIcon/>
-              <span className="text-sm font-semibold">{t('title', { defaultValue: 'Re8ger' })}: Rethink | Redefine | Rebuild</span>
+              <span className="text-sm font-semibold">{t('title', { defaultValue: 'Re8ger' })}: {t('slug', { defaultValue: 'Rethink | Redefine | Rebuild' })}</span>
             </Link>
             {/* Row 1.2: Thanks */}
             <div className="flex flex-col items-start text-xs">
               <div className="flex items-center pl-2">
                 <icons.BTC className="h-3.5 w-3.5"/>
-                <span className="ml-5">Thanks to </span>
+                <span className="ml-5">{tFooter('thanks', { defaultValue: 'Thanks to' })}</span>
                 <Link href="https://fumadocs.dev/" rel="noreferrer noopener" target="_blank" className="font-medium hover:underline ml-1">Fumadocs</Link>
                 <span className="ml-1">|</span>
                 <Link href="https://reveimage.directory/" rel="noreferrer noopener" target="_blank" className="font-medium hover:underline ml-1">Reveimage</Link>
@@ -60,7 +60,7 @@ export function Footer() {
             {/* Row 2.2: Copyright */}
             <div className="text-xs">
               <span>
-                {tFooter('copyright', { year: new Date().getFullYear(), name: "巽川・怀因" })}
+                {tFooter('copyright', { year: new Date().getFullYear(), name: tFooter('company') })}
               </span>
             </div>
           </div>

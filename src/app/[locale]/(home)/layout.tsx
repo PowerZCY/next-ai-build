@@ -5,12 +5,11 @@ import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import type { ReactNode } from 'react';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
-  const options = await baseOptions(locale);
   return {
-    ...options,
+    ...(await baseOptions(locale)),
     links: [
-      ...levelNavLinks(locale),
-      ...homeNavLinks(locale),
+      ...(await levelNavLinks(locale)),
+      ...(await homeNavLinks(locale)),
     ]
   };
 }

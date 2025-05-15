@@ -9,23 +9,24 @@ import ClerkUser from '@/components/ClerkUser';
 import { i18n } from '@/i18n';
 
 // 首页普通菜单
-export function homeNavLinks(locale: string): LinkItemType[] {
+export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
+  const t = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
       icon: <icons.AlbumIcon />,
-      text: 'Blog',
+      text: t('blog'),
       url: `/${locale}/blog`,
       active: 'nested-url',
     },
     {
       icon: <icons.LayoutTemplate />,
-      text: 'Showcase',
+      text: t('showcase'),
       url: `/${locale}/docs/introduction/mdx-quickstart`,
       active: 'url',
     },
     {
       icon: <icons.GlobeLock />,
-      text: 'Legal',
+      text: t('legal'),
       url: `/${locale}/legal`,
       active: 'url',
     },
@@ -45,11 +46,12 @@ export function homeNavLinks(locale: string): LinkItemType[] {
 }
 
 // 层级特殊菜单
-export function levelNavLinks(locale: string): LinkItemType[] {
+export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
+  const t = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
       type: 'menu',
-      text: 'Documentation',
+      text: t('docs'),
       // 文档落地页
       url: `/${locale}/docs`,
       items: [

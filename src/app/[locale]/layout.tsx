@@ -64,7 +64,7 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
-
+  const t = await getTranslations({ locale, namespace: 'home' });
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
@@ -81,7 +81,7 @@ export default async function RootLayout({
           >
             {showBanner ? 
               (<Banner variant="rainbow" changeLayout={false}>
-                <p className="text-xl">A modern, responsive, and accessible documentation theme for Fumadocs.</p>
+                <p className="text-xl">{t('banner')}</p>
               </Banner>)
                 : (<></>)
             }
