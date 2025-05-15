@@ -10,23 +10,23 @@ import { i18n } from '@/i18n';
 
 // 首页普通菜单
 export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
-  const t = await getTranslations({ locale: locale, namespace: 'linkPreview' });
+  const t1 = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
       icon: <icons.AlbumIcon />,
-      text: t('blog'),
+      text: t1('blog'),
       url: `/${locale}/blog`,
       active: 'nested-url',
     },
     {
       icon: <icons.LayoutTemplate />,
-      text: t('showcase'),
+      text: t1('showcase'),
       url: `/${locale}/docs/introduction/mdx-quickstart`,
       active: 'url',
     },
     {
       icon: <icons.GlobeLock />,
-      text: t('legal'),
+      text: t1('legal'),
       url: `/${locale}/legal`,
       active: 'url',
     },
@@ -47,11 +47,11 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
 
 // 层级特殊菜单
 export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
-  const t = await getTranslations({ locale: locale, namespace: 'linkPreview' });
+  const t1 = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
       type: 'menu',
-      text: t('docs'),
+      text: t1('docs'),
       // 文档落地页
       url: `/${locale}/docs`,
       items: [

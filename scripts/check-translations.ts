@@ -307,6 +307,7 @@ async function checkTranslations(): Promise<number> {
   fs.writeFileSync(logFilePath, logMessages.join('\n'), 'utf8')
 
   log(`检查完成，日志已保存到 ${logFilePath}`)
+  log("⚠️⚠️⚠️脚本依赖正则匹配, 针对单文件存在多个翻译命名空间, 通过命名区分解决: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
 
   // 如果有任何问题，返回非零状态码
   return Object.values(report).some(keys => keys.length > 0) ? 1 : 0
@@ -324,3 +325,5 @@ checkTranslations().then(exitCode => {
   console.error('检查翻译时发生错误:', error)
   process.exit(1)
 })
+
+console.log("⚠️⚠️⚠️脚本依赖正则匹配, 针对单文件存在翻译键, 代码上要用命名区分解决: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
