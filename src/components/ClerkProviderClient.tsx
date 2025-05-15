@@ -1,9 +1,9 @@
+'use client';
+
+import { appConfig } from '@/lib/appConfig';
+import { enUS, zhCN } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
-import { dark, shadesOfPurple } from '@clerk/themes';
 import React from 'react';
-import { zhCN, enUS } from '@clerk/localizations';
-import { appConfig, showBanner } from '@/lib/appConfig';
-import { Banner } from 'fumadocs-ui/components/banner';
 
 // https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492
 // https://clerk.com/docs/customization/localization
@@ -67,17 +67,7 @@ export function ClerkProviderClient({
       signUpFallbackRedirectUrl={signUpFallbackRedirectUrlWithLocale}
       waitlistUrl={waitlistUrlWithLocale}
       localization={currentLocalization}
-      appearance={{
-        signIn: { baseTheme: shadesOfPurple },
-        signUp: { baseTheme: dark },
-      }}
     >
-      {showBanner ? 
-        (<Banner variant="rainbow" changeLayout={false}>
-          <p className="text-xl">A modern, responsive, and accessible documentation theme for Fumadocs.</p>
-        </Banner>)
-        : (<></>)
-      }
       {children}
     </ClerkProvider>
   );
