@@ -1,4 +1,4 @@
-import { appConfig, generatedLocales } from "@/lib/appConfig";
+import { appConfig, generatedLocales, showBanner } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
@@ -10,7 +10,7 @@ import NProgressBar from '@/app/[locale]/nProgressBar'
 import { ClerkProviderClient } from "@/components/ClerkProviderClient";
 import { RootProvider } from "fumadocs-ui/provider";
 import { cn } from '@/lib/fuma-search-util';
-import { FumaBannerSuit } from "@/components/fuma-banner-suit";
+import { Banner } from "fumadocs-ui/components/banner";
 
 export const dynamic = 'force-dynamic'
 
@@ -70,20 +70,25 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
-          <FumaBannerSuit />
-          <ClerkProviderClient locale={locale}>
-            <RootProvider
-              i18n={{
-                locale: locale,
-                // available languages
-                locales: generatedLocales,
-                // translations for UI
-                translations: { cn }[locale],
-              }}
-            >
+          <RootProvider
+            i18n={{
+              locale: locale,
+              // available languages
+              locales: generatedLocales,
+              // translations for UI
+              translations: { cn }[locale],
+            }}
+          >
+            {showBanner ? 
+              (<Banner variant="rainbow" changeLayout={false}>
+                <p className="text-xl">A modern, responsive, and accessible documentation theme for Fumadocs.</p>
+              </Banner>)
+                : (<></>)
+            }
+            <ClerkProviderClient locale={locale}>
               {children}
-            </RootProvider>
-          </ClerkProviderClient>
+            </ClerkProviderClient>
+          </RootProvider>
         </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>
