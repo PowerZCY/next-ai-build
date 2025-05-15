@@ -4,8 +4,11 @@ import React from 'react';
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { type JSX } from 'react';
 import { globalLucideIcons as icons } from '@/components/global-icon';
+import { useTranslations } from 'next-intl';
 
 export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
+  const t = useTranslations('clerk');
+  const t2 = useTranslations('footer');
   return (
     <div className="ms-1.5 flex items-center gap-2 h-10 me-3">
       <ClerkLoading>
@@ -13,9 +16,9 @@ export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
       </ClerkLoading>
       <ClerkLoaded>
         <SignedOut>
-          <SignInButton>
+          <SignInButton mode="modal">
             <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
-              Sign In
+              {t('signIn')}
             </button>
           </SignInButton>
         </SignedOut>
@@ -31,12 +34,12 @@ export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
               <UserButton.Action label="manageAccount" />
               {<UserButton.Link
                 labelIcon={<icons.ReceiptText className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
-                label="服务条款"
+                label={t2('terms')}
                 href={`/${locale}/legal/terms`}>
               </UserButton.Link>}
               {<UserButton.Link
                 labelIcon={<icons.ShieldUser className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
-                label="隐私政策"
+                label={t2('privacy')}
                 href={`/${locale}/legal/privacy`}>
               </UserButton.Link>}
               <UserButton.Action label="signOut" />
