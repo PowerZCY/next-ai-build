@@ -133,8 +133,8 @@
     "thanks": "Thanks to"
   },
   "clerk": {
-    "signIn": "SIGN IN",
-    "signUp": "SIGN UP"
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
   },
   "linkPreview": {
     "blog": "Blog",
