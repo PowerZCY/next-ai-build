@@ -54,7 +54,7 @@ var appConfig = {
       // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
       uniformColor: "text-purple-500"
     },
-    showBanner: false,
+    showBanner: true,
     watermark: {
       enabled: true,
       text: "\u5DFD\u5DDD\xB7\u6000\u56E0"

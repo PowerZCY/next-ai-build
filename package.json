@@ -107,7 +107,8 @@
     "onlyBuiltDependencies": [
       "@clerk/shared",
       "esbuild",
-      "sharp"
+      "sharp",
+      "unrs-resolver"
     ],
     "overrides": {
       "@types/react": "19.1.2",
