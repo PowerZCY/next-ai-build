@@ -1,46 +1,9 @@
 'use client';
 
 import { appConfig } from '@/lib/appConfig';
-import { enUS, zhCN } from '@clerk/localizations';
+import { clerkIntl } from '@/lib/clerk-intl';
 import { ClerkProvider } from '@clerk/nextjs';
 import React from 'react';
-
-// https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492
-// https://clerk.com/docs/customization/localization
-const customZH = {
-  // Use the default zhCN localization
-  ...zhCN,
-  // Override specific fields here
-  formFieldInputPlaceholder__emailAddress: '请输入邮箱地址',
-  formFieldInputPlaceholder__emailAddress_username: '请输入邮箱或用户名',
-  signIn: {
-    start: {
-      actionLink__join_waitlist: '加入候选列表',
-      actionText__join_waitlist: '想要提前接入？',
-      subtitle: '欢迎回来！请登录',
-      title: '登录·{{applicationName}}·',
-    }
-  },
-  waitlist: {
-    start: {
-      actionLink: '登录',
-      actionText: '已经注册？',
-      formButton: '加入候选列表',
-      subtitle: '输入你的邮箱地址，我们会尽快通知你',
-      title: '加入候选列表',
-    },
-    success: {
-      message: '你将被重定向...',
-      subtitle: '我们会尽快通知你',
-      title: '感谢加入候选列表！',
-    },
-  }
-};
-
-const clerkIntl = {
-  en: enUS,
-  zh: customZH,
-}
 
 export function ClerkProviderClient({
   children,
