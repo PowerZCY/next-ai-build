@@ -21,7 +21,7 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
     {
       icon: <icons.LayoutTemplate />,
       text: t1('showcase'),
-      url: `/${locale}/docs/introduction/mdx-quickstart`,
+      url: `/${locale}/docs/introduction`,
       active: 'url',
     },
     {

@@ -14,3 +14,30 @@ details:
   recipient: Re8ger
   date: 2024-01-01
 ```
+
+### 引入多个组文件
+<Tabs groupId="fuma-include-file" items={["tsx", "ts", "jsonc"]}>
+  <Tab value="tsx">
+    <include cwd lang="tsx" meta='title="ClerkUser.tsx"'>
+      src/components/ClerkUser.tsx
+    </include>
+  </Tab>
+
+  <Tab value="ts">
+    <include cwd lang="ts" meta='title="appConfig.ts"'>
+      src/lib/appConfig.ts
+    </include>
+  </Tab>
+
+  <Tab value="jsonc">
+    <include cwd lang="jsonc" meta='title="mdx.jsonc"'>
+      docs/mdx.jsonc
+    </include>
+  </Tab>
+</Tabs>
+
+## 单独引入某个文件
+<include cwd lang="mdx" meta='title="clerk-customization.mdx"'>
+  src/mdx/docs/introduction/(3p-integration)/clerk-customization.mdx
+</include>
+

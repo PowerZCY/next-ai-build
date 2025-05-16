@@ -6,7 +6,10 @@
     "pages": [
         "---Important---",
         "index",
+        "ddaas",
+        "keybindings",
         "(mdx)",
-        "(3p-integration)"
+        "(3p-integration)",
+        "..."
     ]
 }

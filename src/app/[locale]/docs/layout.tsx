@@ -67,7 +67,7 @@ export default async function Layout({
   return (
     <DocsLayout {...customeOptions} 
       searchToggle={{
-        enabled: true,
+        enabled: true
       }}
       themeSwitch={{
         enabled: true,

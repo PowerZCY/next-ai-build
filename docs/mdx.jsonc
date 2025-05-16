@@ -1,0 +1,345 @@
+{
+	"mdx-help": {
+		"prefix": "@mdxhelp",
+		"body": [
+			"```text",
+			"  ###### mdx代码生成关键词速览 ######",
+			"",
+			"  @mdxfm: 生成mdx文件头信息",
+			"  @mdxmsg: 生成mdx提示信息",
+			"  @mdxinstalltab: 生成mdx安装命令Tab",
+			"  @mdxcg: 生成mdx卡片组",
+			"  @mdxscard: 生成mdx单张卡片",
+			"  @mdxtabs: 生成mdx标签Tab组",
+			"  @mdxstab: 生成mdx单个标签Tab组子项",
+			"  @mdxitabs: 生成mdx引入文件Tab组",
+			"  @mdxistab: 生成mdx单个引入文件Tab组子项",
+			"  @mdxif: 生成mdx单独引入文件",
+			"  @mdxfaq: 生成mdx问答组",
+			"  @mdxsfaq: 生成mdx问答组子项",
+			"  @mdxfiles: 生成mdx文件系统示意图",
+			"  @mdxfile: 生成mdx单个文件",
+			"  @mdxlfile: 生成mdx🔐锁定文件",
+			"  @mdxfolder: 生成mdx文件夹",
+			"  @mdxifolder: 生成mdx置灰文件夹",
+			"  @mdxefolder: 生成mdx空文件夹",
+			"  @mdxsteps: 生成mdx步骤组",
+			"  @mdxsstep: 生成mdx步骤组子项",
+			"  @mdxcode: 生成mdx代码块, 支持语言为ts|js|bash|python|go|rust|javaruby|swift|kotlin",
+			"  @mdxmermaid: 生成mdx图标Mermaid",
+			"  @mdxspage: 生成mdx单页面",
+			"  @mdxmath: 生成mdx数学公式",
+			"",
+			"```",
+			"${0}"
+		],
+		"description": "MDX Help Msg",
+		"isFileTemplate": false
+	},
+	"mdx-front-matter": {
+		"prefix": "@mdxfm",
+		"body": [
+			"---",
+			"title: ${1}",
+			"description: ${2}",
+			"---",
+			"",
+			"${0}"
+		],
+		"description": "MDX Front Matter",
+		"isFileTemplate": true
+	},
+	"mdx-callout-msg": {
+		"prefix": "@mdxmsg",
+		"body": [
+			"<Callout title=\"${1}\" type=\"${2}\">",
+			  "${3}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout",
+		"isFileTemplate": false
+	},
+	"mdx-cards-grop": {
+		"prefix": "@mdxcg",
+		"body": [
+			"<Cards>",
+			"  <Card icon={<${1} />} title=\"${2}\" href=\"${3}\" >",
+			"    ${4}",
+			"  </Card>",
+			"</Cards>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Cards Group",
+		"isFileTemplate": false
+	},
+	"mdx-card": {
+		"prefix": "@mdxscard",
+		"body": [
+			"<Card icon={<${1} />} title=\"${2}\" href=\"${3}\" >",
+			"  ${4}",
+			"</Card>",
+			"${0}"
+		],
+		"description": "MDX Single Card",
+		"isFileTemplate": false
+	},
+	"mdx-install-tab": {
+		"prefix": "@mdxinstalltab",
+		"body": [
+			"<Tabs groupId=\"package-manager\" persist items={[\"npm\", \"pnpm\", \"yarn\", \"bun\"]}>",
+			"  ```bash tab=\"npm\"",
+			"  npm install ${1}",
+			"  ```",
+			"",
+			"  ```bash tab=\"pnpm\"",
+			"  pnpm add ${1}",
+			"  ```",
+			"",
+			"  ```bash tab=\"yarn\"",
+			"  yarn add ${1}",
+			"  ```",
+			"",
+			"  ```bash tab=\"bun\"",
+			"  bun add ${1}",
+			"  ```",
+			"</Tabs>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Install Tab",
+		"isFileTemplate": false
+	},
+  "mdx-tabs": {
+		"prefix": "@mdxtabs",
+		"body": [
+			"<Tabs groupId=\"${2}\" persist items={[\"${1}\"]}>",
+			"  ```${3} title=\"${1}\" tab=\"${1}\" ",
+			"  ${4}",
+			"  ```",
+			"</Tabs>",
+			"${0}"
+		],
+		"description": "MDX Tabs",
+		"isFileTemplate": false
+	},
+  "mdx-tabs-item": {
+		"prefix": "@mdxstab",
+		"body": [
+			"```${2} title=\"${1}\" tab=\"${1}\" ",
+			"  ${3}",
+			"```",
+			"${0}"
+		],
+		"description": "MDX Tabs Item",
+		"isFileTemplate": false
+	},
+  "mdx-include-tabs": {
+		"prefix": "@mdxitabs",
+		"body": [
+			"<Tabs groupId=\"${2}\" items={[\"${1}\"]}>",
+			"  <Tab value=\"${1}\">",
+      "    <include cwd lang=\"${1}\" meta='title=\"${3}.${1}\"'>",
+      "      ${4}/${3}.${1}",
+      "    </include>",
+      "  </Tab>",
+      "</Tabs>",
+			"${0}"
+		],
+		"description": "MDX Tabs",
+		"isFileTemplate": false
+	},
+  "mdx-include-tab-item": {
+		"prefix": "@mdxistab",
+		"body": [
+			"<Tab value=\"${1}\">",
+      "  <include cwd lang=\"${1}\" meta='title=\"${2}.${1}\"'>",
+      "    ${3}/${2}.${1}",
+      "  </include>",
+      "</Tab>",
+			"${0}"
+		],
+		"description": "MDX Tabs",
+		"isFileTemplate": false
+	},
+  "mdx-include-file": {
+		"prefix": "@mdxif",
+		"body": [
+      "<include cwd lang=\"${1}\" meta='title=\"${2}.${1}\"'>",
+      "  ${3}/${2}.${1}",
+      "</include>",
+			"${0}"
+		],
+		"description": "MDX Tabs",
+		"isFileTemplate": false
+	},
+	"mdx-accordion-faq": {
+		"prefix": "@mdxfaq",
+		"body": [
+			"<Accordions>",
+			"  <Accordion id=\"${1}\" title=\"${2}\">",
+			"    ${3}",
+			"  </Accordion>",
+			"  ",
+			"</Accordions>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Accordion FAQ",
+		"isFileTemplate": false
+	},
+	"mdx-accordion-faq-item": {
+		"prefix": "@mdxsfaq",
+		"body": [
+			"<Accordion id=\"${1}\" title=\"${2}\">",
+			"  ${3}",
+			"</Accordion>",
+			"${0}"
+		],
+		"description": "MDX Accordion FAQ Item",
+		"isFileTemplate": false
+	},
+	"mdx-file-system": {
+		"prefix": "@mdxfiles",
+		"body": [
+			"<Files>",
+			"  <File name=\"${1}\" />",
+			"  <Folder name=\"${2}\" defaultOpen>",
+			"    <File name=\"${3}\" />",
+			"  </Folder>",
+			"  ",
+			"</Files>",
+			"",
+			"${0}"
+		],
+		"description": "MDX File System",
+		"isFileTemplate": false
+	},
+	"mdx-file-system-file": {
+		"prefix": "@mdxfile",
+		"body": [
+			"<File name=\"${1}\" />",
+			"${0}"
+		],
+		"description": "MDX File System File",
+		"isFileTemplate": false
+	},
+	"mdx-file-system-file-lock": {
+		"prefix": "@mdxlfile",
+		"body": [
+			"<File icon={<FileLock2 />} name=\"${1}\" className=\"opacity-50\"/>",
+			"${0}"
+		],
+		"description": "MDX File System File",
+		"isFileTemplate": false
+	},
+	"mdx-file-system-folder": {
+		"prefix": "@mdxfolder",
+		"body": [
+			"<Folder name=\"${1}\"> defaultOpen",
+			"  <File name=\"${2}\" />",
+			"  ",
+			"</Folder>",
+			"${0}"
+		],
+		"description": "MDX File System Folder",
+		"isFileTemplate": false
+	},
+	"mdx-file-system-folder-ignore": {
+		"prefix": "@mdxifolde",
+		"body": [
+			"<Folder name=\"${1}\"> defaultOpen className=\"opacity-50\" disabled",
+			"  <File name=\"${2}\" />",
+			"  ",
+			"</Folder>",
+			"${0}"
+		],
+		"description": "MDX File System Folder",
+		"isFileTemplate": false
+	},
+	"mdx-file-system-empty-folder": {
+		"prefix": "@mdxefolder",
+		"body": [
+			"<Folder name=\"${1}\" className=\"opacity-50\" disabled/>",
+			"${0}"
+		],
+		"description": "MDX File System Folder",
+		"isFileTemplate": false
+	},
+	"mdx-steps": {
+		"prefix": "@mdxsteps",
+		"body": [
+			"<div className=\"fd-steps\">",
+			"  <div className=\"[&_h2]:fd-step\">",
+			"    ${1}",
+			"  </div>",
+			"  ",
+			"</div>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Steps",
+		"isFileTemplate": false
+	},
+	"mdx-steps-item": {
+		"prefix": "@mdxsstep",
+		"body": [
+			"<div className=\"[&_h2]:fd-step\">",
+			"  ${1}",
+			"</div>",
+			"${0}"
+		],
+		"description": "MDX Steps Item",
+		"isFileTemplate": false
+	},
+	"mdx-code-block": {
+		"prefix": "@mdxcode",
+		"body": [
+			"```${1} title=\"${2}\"",
+			"  ${3}",
+			"```",
+			"",
+			"${0}"
+		],
+		"description": "MDX Fast Code Block",
+		"isFileTemplate": false
+	},
+	"mdx-mermaid": {
+		"prefix": "@mdxmermaid",
+		"body": [
+			"<Mermaid",
+			"  chart=\"",
+			"${1}",
+			"",
+			"\"/>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Mermaid",
+		"isFileTemplate": false
+	},
+	"mdx-sigle-page": {
+		"prefix": "@mdxspage",
+		"body": [
+			"export { withArticle as default } from 'fumadocs-ui/page';",
+			"",
+			"${1}"
+		],
+		"description": "MDX Single Page",
+		"isFileTemplate": false
+	},
+	"mdx-math-block": {
+		"prefix": "@mdxmath",
+		"body": [
+			"```math",
+			"  ${1}",
+			"```",
+			"",
+			"${0}"
+		],
+		"description": "MDX Math Block",
+		"isFileTemplate": false
+	}
+}

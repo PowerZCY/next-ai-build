@@ -9,7 +9,7 @@ icon: ReceiptText
 ## Cards
 
 <Cards>
-  <Card icon={<HousePlus className="text-purple-300" />} title="How">
+  <Card icon={<HousePlus />} title="How">
     hahaha
   </Card>
 </Cards>
@@ -30,7 +30,7 @@ icon: ReceiptText
 <File name="jj" />
 
 <Files>
-  <File icon={<HousePlus className="text-purple-300" />} name="1" />
+  <File icon={<HousePlus />} name="1" />
   <Folder name="22" defaultOpen disabled>
     <File name="33" />
   </Folder>
@@ -117,3 +117,14 @@ graph LR
   <Tab value="js">jj</Tab>
   <Tab value="java">kk</Tab>
 </Tabs>
+
+
+<Tabs groupId="language" persist items={["tsx"]}>
+  ```tsx title="tsx" tab="tsx" 
+    console.log('Hello world')
+  ```
+  ```js title="js" tab="js" 
+    console.log('Hello world')
+  ```
+</Tabs>
+

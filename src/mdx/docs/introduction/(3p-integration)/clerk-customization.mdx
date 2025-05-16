@@ -1,0 +1,79 @@
+---
+title: 整合Cleck用户系统
+description: 小白开箱即用的用户管理系统, 涵盖登录、权限、组织管理, 提供了丰富的前后端组件
+---
+
+
+## 核心要点
+<Callout title="阅读官网说明书" type="warn">
+  Clerk的官网已经很详细地介绍了如何接入, 目前对于国际化的支持还不够, 但官网正在跟进中
+</Callout>
+
+- 登录、注册全家桶, 第三方账号登录|邮件|手机号|密码
+- `邀请式注册`
+- 用户角色权限系统管理
+- 组织管理
+- Dashboard后台管理
+- 订阅计划托管`Beta`
+
+## CLerk自定义处理
+
+### ClerkProvider
+
+`ClerkProvider`本质上是为后续所有用到的Clerk组件提供全局一致的Context信息, 因而我们可以按照需要来放置`ClerkProvider`的布局层次。
+例如, 有一个更重要的**YourRootProvider**, 它在更外层提供更基础的Context信息, 那么就可以如下代码来处理
+<Tabs groupId="clerk-root-layout" items={["Root", "Config"]}>
+  <Tab value="Root">
+    <include cwd lang="tsx" meta='title="layout.tsx"'>
+      src/app/[locale]/layout.tsx
+    </include>
+  </Tab>
+  <Tab value="Config">
+    <include cwd lang="ts" meta='title="appConfig.ts"'>
+      src/lib/appConfig.ts
+    </include>
+  </Tab>
+</Tabs>
+
+### Config URL
+`ClerkProvider`支持url参数配置, 配置方式也有如下3种, 官方推荐使用环境变量, 其次是代码级配置, 不建议使用Clerk Dashboard的远程配置
+
+<Tabs groupId="clerk-config" items={["env", "props", "dashboard"]}>
+  ```txt title=".env.local" tab="env"
+    # 配置登录url
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+    NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+    # 配置注册url
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+    NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+  ```
+  ```tsx title="ClerkProvider.props" tab="props"
+    <ClerkProvider
+      signInUrl="XXX"
+      signUpUrl="XXX"
+      signInFallbackRedirectUrl="XXX"
+      signUpFallbackRedirectUrl="XXX"
+      waitlistUrl="XXX"
+      localization="XXXLocalization"
+    >
+      {children}
+    </ClerkProvider>
+  ```
+  <Tab value="dashboard">
+    Clerk Dashboard -> Configure -> Paths
+  </Tab>
+</Tabs>
+
+### 登录注册
+建议使用一个登录按钮, 点击登录按钮后, 弹框或者跳转到登录页面, 出现的Clerk `SignIn`卡片组件能自动携带未登录就去注册的指引
+
+如下是一个简单包装过的Clerk用户组件:
+
+<include lang="tsx" meta='title="cf.tsx"'>
+  ../../../../components/ClerkUser.tsx
+</include>
+
+
+### 国际化
+目前经过官方和用户的共同努力, Clerk目前支持40+种语言, 例如中文简体、中文繁体、英法德日韩, 参考[Clerk官网说明](https://clerk.com/docs/customization/localization)
+如果某些字段未处理, 参考[英语标准字段](https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts#L492)自行覆盖, 但推荐给官方提pr融合你的贡献!
