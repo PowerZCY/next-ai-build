@@ -1,0 +1,8 @@
+{
+    "title": "Software",
+    "icon": "MAC",
+    "root": false,
+    "pages": [
+        "macos-software"
+    ]
+}

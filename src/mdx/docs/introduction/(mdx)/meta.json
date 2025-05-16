@@ -1,0 +1,11 @@
+{
+    "title": "MDX",
+    "icon": "MDX",
+    "root": false,
+    "pages": [
+        "mdx-quickstart",
+        "mdx-snippets",
+        "mdx-shiki",
+        "..."
+    ]
+}

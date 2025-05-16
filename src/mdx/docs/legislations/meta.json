@@ -1,0 +1,10 @@
+{
+    "title": "Re8ger's Legislations",
+    "description": "Focus on privacy-compliance andmethodological-principles",
+    "icon": "GlobeLock",
+    "root": true,
+    "pages": [
+        "(pricinple)",
+        "(legal)"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "title": "Plugin",
+    "icon": "Blocks",
+    "root": false,
+    "pages": [
+        "d8ger-auto-code"
+    ]
+}

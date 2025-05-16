@@ -1,48 +1,8 @@
-// 菜单项类型定义
-export type MenuItem = {
-  key: string;        // 唯一标识，也用作国际化翻译键
-  href: string;       // 链接地址
-  children?: MenuItem[]; // 子菜单项
-  external?: boolean; // 是否为外部链接
-};
-
-// 开发环境菜单配置
-const devMenu: MenuItem[] = [
-  {
-    key: 'journey',
-    href: '/blog',
-  },
-  // {
-  //   key: 'docs',
-  //   href: '/docs',
-  //   children: [
-  //     {
-  //       key: 'gettingStarted',
-  //       href: '/docs/getting-started',
-  //     },
-  //     {
-  //       key: 'guides',
-  //       href: '/docs/guides',
-  //     },
-  //     {
-  //       key: 'apiReference',
-  //       href: '/docs/api',
-  //     },
-  //   ],
-  // }
-];
-
-// 生产环境菜单配置
-const prodMenu: MenuItem[] = [
-  // {
-  //   key: 'journey',
-  //   href: '/blog',
-  // }
-];
 
 export const appConfig = {
   // 基础配置
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://reveimage.directory',
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
+  githubBaseUrl: 'https://github.com/PowerZCY/next-ai-build/blob/main/',
 
   // 国际化配置
   // - 英语 (en)
@@ -56,20 +16,21 @@ export const appConfig = {
   // - 土耳其语 (tr)
   // - 波兰语 (pl)
   i18n: {
-    locales: ["en", "zh", "ja", "ko", "fr", "de", "es", "it", "pt", "tr", "pl"] as const,
+    // locales: ["en", "zh", "ja", "ko", "fr", "de", "es", "it", "pt", "tr", "pl"] as const,
+    locales: ["en", "zh"] as const,
     defaultLocale: "en" as const,
     localeLabels: {
       en: "English",
       zh: "简体中文",
-      ja: "日本語",
-      ko: "한국어",
-      fr: "Français",
-      de: "Deutsch",
-      es: "Español",
-      it: "Italiano",
-      pt: "Português",
-      tr: "Türkçe",
-      pl: "Polski",
+      // ja: "日本語",
+      // ko: "한국어",
+      // fr: "Français",
+      // de: "Deutsch",
+      // es: "Español",
+      // it: "Italiano",
+      // pt: "Português",
+      // tr: "Türkçe",
+      // pl: "Polski",
     },
     detector: {
       storageKey: 'language-preference-status',
@@ -79,10 +40,35 @@ export const appConfig = {
     },
     messageRoot: 'messages',
   },
-
-  // 菜单配置
-  menu: process.env.NODE_ENV !== 'production' ? devMenu : prodMenu,
+  style: {
+    icon: {
+      // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
+      uniformColor: "text-purple-500"
+    },
+    showBanner: true,
+    watermark: {
+      enabled: true,
+      text: "巽川·怀因"
+    }
+  },
+  mdxSourceDir: {
+    docs: "src/mdx/docs",
+    blog: "src/mdx/blog",
+    legal: "src/mdx/legal"
+  },
+  clerk: {
+    signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || "/sign-in",
+    fallbackSignInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || "/",
+    signUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || "/sign-up",
+    fallbackSignUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL || "/",
+    waitlistUrl: process.env.NEXT_PUBLIC_CLERK_WAITLIST_URL || "/waitlist",
+    debug: process.env.CLERK_DEBUG === 'true',
+  }
 };
+
+export const iconColor = appConfig.style.icon.uniformColor
+export const watermark = appConfig.style.watermark
+export const showBanner = appConfig.style.showBanner
 
 // 辅助函数：检查是否为支持的语言
 function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.locales[number] {
@@ -94,3 +80,8 @@ function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.loca
 export function getValidLocale(locale: string): typeof appConfig.i18n.locales[number] {
   return isSupportedLocale(locale) ? locale : appConfig.i18n.defaultLocale;
 }
+
+export const generatedLocales = appConfig.i18n.locales.map((loc) => ({
+  name: appConfig.i18n.localeLabels[loc as keyof typeof appConfig.i18n.localeLabels],
+  locale: loc,
+}));

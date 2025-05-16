@@ -9,7 +9,7 @@
 'use client'
 
 import { appConfig } from '@/lib/appConfig'
-import { X } from 'lucide-react'
+import { globalLucideIcons as icons } from "@/components/global-icon"
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -136,7 +136,7 @@ export default function LanguageDetector() {
                 onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <X className="h-5 w-5" />
+                <icons.X className="h-5 w-5" />
               </button>
             </div>
             <div className="flex items-center gap-3">

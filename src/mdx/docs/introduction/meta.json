@@ -1,0 +1,12 @@
+{
+    "title": "Re8ger's Introduction",
+    "description": "What is Re8ger?",
+    "icon": "Binary",
+    "root": true,
+    "pages": [
+        "---Important---",
+        "index",
+        "(mdx)",
+        "(3p-integration)"
+    ]
+}

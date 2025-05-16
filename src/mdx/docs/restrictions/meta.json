@@ -1,0 +1,9 @@
+{
+    "title": "Re8ger's Restrictions",
+    "description": "Focus on experimental-facts and safety-responsibilities",
+    "icon": "Tablets",
+    "root": true,
+    "pages": [
+        "index"
+    ]
+}

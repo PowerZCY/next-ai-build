@@ -1,8 +1,16 @@
-import { appConfig } from "@/lib/appConfig";
+import { appConfig, generatedLocales, showBanner } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
+// Fumadocs 数学公式样式
+import 'katex/dist/katex.css';
+import 'nprogress/nprogress.css'
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
+import NProgressBar from '@/app/[locale]/nProgressBar'
+import { ClerkProviderClient } from "@/components/ClerkProviderClient";
+import { RootProvider } from "fumadocs-ui/provider";
+import { cn } from '@/lib/fuma-search-util';
+import { Banner } from "fumadocs-ui/components/banner";
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +54,6 @@ export async function generateMetadata({
   }
 }
 
-
 export default async function RootLayout({
   children,
   params: paramsPromise  // 重命名参数
@@ -57,10 +64,32 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
+  const t = await getTranslations({ locale, namespace: 'home' });
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body>{children}</body>
+        <body>
+          <NProgressBar />
+          <RootProvider
+            i18n={{
+              locale: locale,
+              // available languages
+              locales: generatedLocales,
+              // translations for UI
+              translations: { cn }[locale],
+            }}
+          >
+            {showBanner ? 
+              (<Banner variant="rainbow" changeLayout={false}>
+                <p className="text-xl">{t('banner')}</p>
+              </Banner>)
+                : (<></>)
+            }
+            <ClerkProviderClient locale={locale}>
+              {children}
+            </ClerkProviderClient>
+          </RootProvider>
+        </body>
         <GoogleAnalyticsScript />
       </NextIntlClientProvider>
     </html>

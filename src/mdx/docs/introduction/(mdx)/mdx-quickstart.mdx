@@ -1,0 +1,119 @@
+---
+title: Fuma MDX
+description: 基于MDX, 但提供更多常用页面UI组件, 让文档编辑更丝滑, 页面设计更美观
+icon: ReceiptText
+---
+
+# Example
+
+## Cards
+
+<Cards>
+  <Card icon={<HousePlus className="text-purple-300" />} title="How">
+    hahaha
+  </Card>
+</Cards>
+
+```js title="js"
+  console.log("jj")
+```
+
+## Accordions
+
+<Accordions>
+  <Accordion id="faq" title="Why docs">
+    Cause you're DaShaBi
+  </Accordion>
+</Accordions>
+
+## Files
+<File name="jj" />
+
+<Files>
+  <File icon={<HousePlus className="text-purple-300" />} name="1" />
+  <Folder name="22" defaultOpen disabled>
+    <File name="33" />
+  </Folder>
+  <Folder name="44" defaultOpen>
+    <File name="55" />
+  </Folder>
+  <Folder name="kk" defaultOpen className="opacity-50" disabled>
+    <File name="ss" />
+  </Folder>
+  <Folder name="EMPTY" className="opacity-50" disabled/>
+</Files>
+
+
+
+### Tabs
+<Tabs groupId="package-manager" persist items={["npm", "pnpm", "yarn", "bun"]}>
+  ```bash tab="npm"
+  npm install fumadocs-ui fumadocs-core
+  ```
+
+  ```bash tab="pnpm"
+  pnpm add fumadocs-ui fumadocs-core
+  ```
+
+  ```bash tab="yarn"
+  yarn add fumadocs-ui fumadocs-core
+  ```
+
+  ```bash tab="bun"
+  bun add fumadocs-ui fumadocs-core
+  ```
+</Tabs>
+
+### Mermaid
+```math
+  e^A=\sum_{n = 0}^{\infty}\frac{1}{n!}A^n
+```
+
+<Mermaid
+  chart="
+graph LR
+    classDef startend fill:#F5EBFF,stroke:#BE8FED,stroke-width:2px;
+    classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
+    classDef decision fill:#FFF6CC,stroke:#FFBC52,stroke-width:2px;
+    
+    A([开始]):::startend --> B(Open):::process
+    B -.->|用户创建| U1(用户):::decision
+    B --> C(In Progress):::process
+    C -.->|开发者接手| U2(开发者):::decision
+    C --> D(Closed):::process
+    D -.->|开发者解决| U2
+    D --> E(Reopened):::process
+    E -.->|用户反馈未解决| U1
+    E --> F(In Progress):::process
+    F -.->|开发者重新处理| U2
+    F --> G(On Hold):::process
+    G -.->|管理者决定暂停| U3(管理者):::decision
+    G --> H(Closed):::process
+    H -.->|开发者最终放弃| U2
+    H --> I([结束]):::startend  
+
+"/>
+
+## Callout
+<Callout title="提示框" type="error">
+  提示框类型info|warning|error, 默认为info
+</Callout>
+
+<div className="fd-steps">
+  <div className="[&_h2]:fd-step">
+    ggsimida
+  </div>
+  <div className="[&_h2]:fd-step">
+    hahah
+  </div>
+  <div className="[&_h2]:fd-step">
+    hh
+  </div>
+</div>
+
+### Normal Tabs
+<Tabs groupId="haha" persist items={["ts", "js", "java"]}>
+  <Tab value="ts">hh</Tab>
+  <Tab value="js">jj</Tab>
+  <Tab value="java">kk</Tab>
+</Tabs>

@@ -1,3 +1,4 @@
+import { clerkMiddleware, ClerkMiddlewareAuth, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { appConfig } from "@/lib/appConfig";
@@ -12,25 +13,39 @@ const intlMiddleware = createMiddleware({
   localeDetection: false  // 添加此配置以禁用自动语言检测
 });
 
-export function middleware(request: NextRequest) {
+// TODO
+const allowPassWhitelist = createRouteMatcher(['/(.*)'])
+
+export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
+  if (!allowPassWhitelist(req)) {
+      const { userId, redirectToSignIn } = await auth()
+      if (!userId) {
+          return redirectToSignIn()
+      }
+      console.log('User is authorized:', userId)
+  }
+
   // 处理根路径到默认语言的永久重定向
-  if (request.nextUrl.pathname === '/') {
+  if (req.nextUrl.pathname === '/') {
     const defaultLocale = appConfig.i18n.defaultLocale;
-    return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url), 301);
+    return NextResponse.redirect(new URL(`/${defaultLocale}`, req.url), 301);
   }
 
   // 处理尾部斜杠的重定向
-  if (request.nextUrl.pathname.length > 1 && request.nextUrl.pathname.endsWith('/')) {
-    const newUrl = new URL(request.nextUrl.pathname.slice(0, -1), request.url);
+  if (req.nextUrl.pathname.length > 1 && req.nextUrl.pathname.endsWith('/')) {
+    const newUrl = new URL(req.nextUrl.pathname.slice(0, -1), req.url);
     return NextResponse.redirect(newUrl, 301);
   }
 
-  return intlMiddleware(request);
-}
+  return intlMiddleware(req);
+}, { debug: appConfig.clerk.debug }
+);
 
 export const config = {
   matcher: [
-    // 修改 matcher 配置以确保正确匹配所有路由
-    '/((?!api|_next|_vercel|.*\\..*).*)'
-  ]
+      // Skip Next.js internals and all static files, unless found in search params
+      '/((?!_next|[^?]*.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+      // Always run for API routes
+      '/(api|trpc)(.*)',
+  ],
 };

@@ -240,3 +240,4 @@ psql -d <database-name>
 \d <table>  # 显示表结构
 \q          # 退出
 ```
+

@@ -1,0 +1,13 @@
+{
+    "title": "Re8ger's Tool Manuals",
+    "description": "Focus on system-integrity and efficiency-first",
+    "icon": "SplinePointer",
+    "root": true,
+    "pages": [
+        "---Guide---",
+        "index",
+        "(software)",
+        "(terminal)",
+        "(plugin)"
+    ]
+}
