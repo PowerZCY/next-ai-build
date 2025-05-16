@@ -5,6 +5,7 @@ import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButto
 import { type JSX } from 'react';
 import { globalLucideIcons as icons } from '@/components/global-icon';
 import { useTranslations } from 'next-intl';
+import { clerkAuthInModal } from '@/lib/appConfig';
 
 export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
   const t = useTranslations('clerk');
@@ -16,7 +17,7 @@ export default function ClerkUser({ locale }: { locale: string }): JSX.Element {
       </ClerkLoading>
       <ClerkLoaded>
         <SignedOut>
-          <SignInButton mode="modal">
+          <SignInButton mode={clerkAuthInModal ? 'modal' : 'redirect'}>
             <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
               {t('signIn')}
             </button>

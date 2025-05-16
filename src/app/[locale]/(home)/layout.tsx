@@ -2,7 +2,9 @@ import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.
 import { Footer } from '@/components/footer';
 import GoToTop from '@/components/go-to-top';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import { FumaBannerSuit } from '@/components/fuma-banner-suit';
 import type { ReactNode } from 'react';
+import { showBanner } from '@/lib/appConfig';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   return {
@@ -39,8 +41,9 @@ export default async function Layout({
         enabled: true,
         mode: 'light-dark-system',
       }}
-      className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25"
+      className={`dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25 ${showBanner ? 'has-banner' : 'no-banner'}`}
     >
+      <FumaBannerSuit showText={showBanner}/>
       {children}
       <Footer />
       <GoToTop />

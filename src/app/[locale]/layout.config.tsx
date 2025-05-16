@@ -7,6 +7,7 @@ import Image from 'next/image';
 // import ClerkOrganization from '@/components/ClerkOrganization';
 import ClerkUser from '@/components/ClerkUser';
 import { i18n } from '@/i18n';
+import { appConfig } from '@/lib/appConfig';
 
 // 首页普通菜单
 export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
@@ -138,6 +139,6 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
     // 导航Header, 语言切换
     i18n,
     // 导航Header, Github链接
-    githubUrl: "https://github.com/caofanCPU/next-ai-build",
+    githubUrl: appConfig.github,
   };
 }

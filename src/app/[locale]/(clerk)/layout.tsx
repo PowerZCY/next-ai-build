@@ -9,8 +9,9 @@
 
 import { baseOptions } from '@/app/[locale]/layout.config';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import { FumaBannerSuit } from '@/components/fuma-banner-suit';
 import { ReactNode } from 'react';
-
+import { clerkPageBanner } from '@/lib/appConfig';
 async function homeOptions(locale: string): Promise<HomeLayoutProps>{
   const resolvedBaseOptions = await baseOptions(locale);
   return {
@@ -38,8 +39,9 @@ export default async function RootLayout({
         enabled: true,
         mode: 'light-dark-system',
       }}
-    className="dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25"
+      className={`dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25 ${clerkPageBanner ? 'has-banner' : 'no-banner'}`}
     >
+      <FumaBannerSuit showText={clerkPageBanner}/>
       {children}
     </HomeLayout>
   );

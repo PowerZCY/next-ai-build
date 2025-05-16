@@ -2,7 +2,8 @@
 export const appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
-  githubBaseUrl: 'https://github.com/PowerZCY/next-ai-build/blob/main/',
+  githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || 'https://github.com/PowerZCY/next-ai-build/blob/main/',
+  github: process.env.NEXT_PUBLIC_GITHUB || 'https://github.com/PowerZCY/next-ai-build/',
 
   // 国际化配置
   // - 英语 (en)
@@ -43,12 +44,14 @@ export const appConfig = {
   style: {
     icon: {
       // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
-      uniformColor: "text-purple-500"
+      uniformColor: process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500"
     },
-    showBanner: true,
+    showBanner: process.env.NEXT_PUBLIC_STYLE_SHOW_BANNER === 'true',
+    clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === 'true',
+    clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === 'true',
     watermark: {
-      enabled: true,
-      text: "巽川·怀因"
+      enabled: process.env.STYLE_WATERMARK_ENABLED === 'true',
+      text: process.env.NSTYLE_WATERMARK_TEXT || "巽川·怀因"
     }
   },
   mdxSourceDir: {
@@ -69,6 +72,8 @@ export const appConfig = {
 export const iconColor = appConfig.style.icon.uniformColor
 export const watermark = appConfig.style.watermark
 export const showBanner = appConfig.style.showBanner
+export const clerkPageBanner = appConfig.style.clerkPageBanner
+export const clerkAuthInModal = appConfig.style.clerkAuthInModal
 
 // 辅助函数：检查是否为支持的语言
 function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.locales[number] {

@@ -3,14 +3,11 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
 // Fumadocs 数学公式样式
-import 'katex/dist/katex.css';
-import 'nprogress/nprogress.css'
 import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
 import NProgressBar from '@/app/[locale]/nProgressBar'
 import { ClerkProviderClient } from "@/components/ClerkProviderClient";
 import { RootProvider } from "fumadocs-ui/provider";
 import { cn } from '@/lib/fuma-search-util';
-import { Banner } from "fumadocs-ui/components/banner";
 
 export const dynamic = 'force-dynamic'
 
@@ -79,12 +76,6 @@ export default async function RootLayout({
               translations: { cn }[locale],
             }}
           >
-            {showBanner ? 
-              (<Banner variant="rainbow" changeLayout={false}>
-                <p className="text-xl">{t('banner')}</p>
-              </Banner>)
-                : (<></>)
-            }
             <ClerkProviderClient locale={locale}>
               {children}
             </ClerkProviderClient>

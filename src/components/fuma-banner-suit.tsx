@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect } from 'react';
-import { showBanner } from '@/lib/appConfig';
+import { Banner } from 'fumadocs-ui/components/banner';
+import { useTranslations } from 'next-intl';
 
-export function FumaBannerSuit() {
-  useEffect(() => {
-    // 如果设置了banner, 就需要调节header的高度
-    document.documentElement.style.setProperty('--fd-banner-height', showBanner ? '2.5rem' : '-0.5rem');
-  }, []);
-
+export function FumaBannerSuit({ showText }: { showText: boolean }) {
+  const t = useTranslations('home');
   return (
-    <></>
+    showText ?
+      (<Banner variant="rainbow" changeLayout={true}>
+        <p className="text-xl">{t('banner')}</p>
+      </Banner>)
+      : (<Banner variant="normal" changeLayout={true} />)
   );
 }
 
