@@ -18,7 +18,7 @@ icon: Highlighter
 | sql✅ | diff✅ | sql✅ |  |
 
 ## Shiki基础语法
-<Callout title="注意" type="warn">
+<Callout title="注意" type="success">
   使用`title`属性来指定代码块的标题, **只有指定了title, 才会显示图标。**
 </Callout>
 
@@ -673,10 +673,11 @@ SELECT * FROM users;
 
 ### xml
 
-```xml title="shiki.xml"
+```xml title="shiki.xml" lineNumbers
 <greeting>
   <to>Re8ger</to>
-  <message>Hello Re8ger</message>
+  // focus
+  <message>Hello Re8ger</message> // [!code focus]
 </greeting>
 ```
 
@@ -684,14 +685,14 @@ SELECT * FROM users;
 ### yml
 
 <Tabs groupId="yml" items={["yml", "yaml"]}>
-  ```yml title="shiki.yml" tab="yml"
+  ```yml title="shiki.yml" tab="yml" lineNumbers
   message: Hello Re8ger
   details:
     recipient: Re8ger
     date: 2024-01-01
   ```
 
-  ```yaml title="shiki.yaml" tab="yaml"
+  ```yaml title="shiki.yaml" tab="yaml" lineNumbers=6
   message: Hello Re8ger
   details:
     recipient: Re8ger

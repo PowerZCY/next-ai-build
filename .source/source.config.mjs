@@ -59,8 +59,8 @@ var appConfig = {
     clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === "true",
     clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === "true",
     watermark: {
-      enabled: process.env.STYLE_WATERMARK_ENABLED === "true",
-      text: process.env.NSTYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
+      enabled: process.env.ENABLE_WATERMARK === "true",
+      text: process.env.STYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
     }
   },
   mdxSourceDir: {
