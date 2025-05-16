@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
 // Fumadocs 数学公式样式
-import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
+// import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
 import NProgressBar from '@/app/[locale]/nProgressBar'
 import { ClerkProviderClient } from "@/components/ClerkProviderClient";
 import { RootProvider } from "fumadocs-ui/provider";
@@ -80,7 +80,7 @@ export default async function RootLayout({
             </ClerkProviderClient>
           </RootProvider>
         </body>
-        <GoogleAnalyticsScript />
+        {/* <GoogleAnalyticsScript /> */}
       </NextIntlClientProvider>
     </html>
   )
