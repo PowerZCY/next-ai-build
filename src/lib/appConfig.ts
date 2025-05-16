@@ -50,8 +50,9 @@ export const appConfig = {
     clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === 'true',
     clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === 'true',
     watermark: {
-      enabled: process.env.STYLE_WATERMARK_ENABLED === 'true',
-      text: process.env.NSTYLE_WATERMARK_TEXT || "巽川·怀因"
+      // 只有NEXT_PUBLIC_的变量才能被client组件访问!
+      enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === 'true',
+      text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "巽川·怀因"
     }
   },
   mdxSourceDir: {
