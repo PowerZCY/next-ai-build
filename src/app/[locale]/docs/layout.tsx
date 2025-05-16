@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 // https://fumadocs.dev/docs/ui/layouts/notebook
 import { GithubInfo } from 'fumadocs-ui/components/github-info';
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
+import { appConfig } from '@/lib/appConfig';
 
 async function docsOptions(locale: string): Promise<DocsLayoutProps> {
   const options = await baseOptions(locale);
@@ -67,7 +68,9 @@ export default async function Layout({
   return (
     <DocsLayout {...customeOptions} 
       searchToggle={{
-        enabled: true
+        // https://docs.orama.com/open-source/supported-languages/using-chinese-with-orama
+        // Not support zh for it's huge tokenizers and stopwords
+        enabled: locale === appConfig.i18n.defaultLocale
       }}
       themeSwitch={{
         enabled: true,
