@@ -1,4 +1,4 @@
-import { appConfig, generatedLocales, showBanner } from "@/lib/appConfig";
+import { appConfig, generatedLocales } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import './globals.css'
@@ -61,7 +61,6 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
-  const t = await getTranslations({ locale, namespace: 'home' });
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>

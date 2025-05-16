@@ -12,7 +12,8 @@ import { z } from "zod";
 var appConfig = {
   // 基础配置
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://re8ger.com",
-  githubBaseUrl: "https://github.com/PowerZCY/next-ai-build/blob/main/",
+  githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || "https://github.com/PowerZCY/next-ai-build/blob/main/",
+  github: process.env.NEXT_PUBLIC_GITHUB || "https://github.com/PowerZCY/next-ai-build/",
   // 国际化配置
   // - 英语 (en)
   // - 简体中文 (zh)
@@ -52,12 +53,14 @@ var appConfig = {
   style: {
     icon: {
       // 所有图标默认颜色, 注意在SVG中fill参数填充色映射为#AC62FD
-      uniformColor: "text-purple-500"
+      uniformColor: process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500"
     },
-    showBanner: true,
+    showBanner: process.env.NEXT_PUBLIC_STYLE_SHOW_BANNER === "true",
+    clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === "true",
+    clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === "true",
     watermark: {
-      enabled: true,
-      text: "\u5DFD\u5DDD\xB7\u6000\u56E0"
+      enabled: process.env.STYLE_WATERMARK_ENABLED === "true",
+      text: process.env.NSTYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
     }
   },
   mdxSourceDir: {
@@ -77,6 +80,8 @@ var appConfig = {
 var iconColor = appConfig.style.icon.uniformColor;
 var watermark = appConfig.style.watermark;
 var showBanner = appConfig.style.showBanner;
+var clerkPageBanner = appConfig.style.clerkPageBanner;
+var clerkAuthInModal = appConfig.style.clerkAuthInModal;
 var generatedLocales = appConfig.i18n.locales.map((loc) => ({
   name: appConfig.i18n.localeLabels[loc],
   locale: loc
