@@ -71,7 +71,7 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           description: 'FumaMDX tips',
           url: `/${locale}/docs//introduction/fuma-mdx`,
           menu: {
-            className: 'lg:col-start-3',
+            className: 'lg:col-start-2 lg:row-start-1',
           },
         },
         {
@@ -80,7 +80,7 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           description: 'MDX Snippets',
           url: `/${locale}/docs/introduction/mdx-snippets`,
           menu: {
-            className: 'lg:col-start-2',
+            className: 'lg:col-start-2 lg:row-start-2',
           },
         },
         {
@@ -98,7 +98,7 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           description: 'Mermaid showcase.',
           url: `/${locale}/docs/introduction/mdx-mermaid`,
           menu: {
-            className: 'lg:col-start-2',
+            className: 'lg:col-start-3 lg:row-start-2',
           },
         },
       ],
