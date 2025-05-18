@@ -14,6 +14,7 @@ import { createGenerator as createTypeTableGenerator } from 'fumadocs-typescript
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
 
 import { globalLucideIcons as icons } from '@/components/global-icon';
+import { TrophyCard } from '@/components/mdx/trophyCard';
 
 // 创建一个语言标识符到图标组件的映射
 const languageToIconMap: Record<string, React.ReactNode> = {
@@ -87,7 +88,8 @@ const fumadocsUiComponents = {
   Tabs,
   Pre,
   Mermaid,
-  TypeTable
+  TypeTable,
+  TrophyCard
 };
 
 const customUiComponents = {
