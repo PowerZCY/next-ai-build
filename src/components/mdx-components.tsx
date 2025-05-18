@@ -9,6 +9,9 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { globalLucideIcons } from '@/components/global-icon';
 import type { MDXComponents, MDXProps } from 'mdx/types';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { createGenerator as createTypeTableGenerator } from 'fumadocs-typescript';
+import { AutoTypeTable } from 'fumadocs-typescript/ui';
 
 import { globalLucideIcons as icons } from '@/components/global-icon';
 
@@ -83,12 +86,15 @@ const fumadocsUiComponents = {
   Tab,
   Tabs,
   Pre,
-  Mermaid
+  Mermaid,
+  TypeTable
 };
 
 const customUiComponents = {
   
 }
+
+const typeTableGenerator = createTypeTableGenerator();
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -104,6 +110,9 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
         </CodeBlock>
       );
     },
+    AutoTypeTable: (props) => (
+      <AutoTypeTable {...props} generator={typeTableGenerator} />
+    ),
     // 全局处理图片放大
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     img: (props) => <ImageZoom {...(props as any)} />,

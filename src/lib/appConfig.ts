@@ -1,7 +1,7 @@
 
 export const appConfig = {
   // 基础配置
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://re8ger.com',
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'https://ddaas.de8ger.com',
   githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || 'https://github.com/PowerZCY/next-ai-build/blob/main/',
   github: process.env.NEXT_PUBLIC_GITHUB || 'https://github.com/PowerZCY/next-ai-build/',
 
