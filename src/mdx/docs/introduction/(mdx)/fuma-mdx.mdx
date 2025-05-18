@@ -52,6 +52,10 @@ icon: LandPlot
 
 <Tabs groupId="callout" items={["example", "source", "@keywords"]}>
   <Tab value="example">
+    <Callout type="info">
+      这是`无标题`的info提示框
+    </Callout>
+    
     <Callout title="info提示框" type="info">
       这是`info`提示框, 用于提示信息
     </Callout>
@@ -66,7 +70,11 @@ icon: LandPlot
     </Callout>
   </Tab>
 
-  ```mdx title="提示框示例" tab="source" 
+  ```mdx title="提示框示例" tab="source"
+  <Callout type="info">
+    这是`无标题`的info提示框
+  </Callout> 
+
   <Callout title="info提示框" type="info">
     这是`info`提示框, 用于提示信息
   </Callout>
