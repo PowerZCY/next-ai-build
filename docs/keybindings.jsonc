@@ -2137,7 +2137,8 @@
   },
   {
     "key": "ctrl+alt+`",
-    "command": "mdx.toggleInlineCode"
+    "command": "mdx.toggleInlineCode",
+    "when": "editorTextFocus && !editorReadonly && editorLangId == 'mdx'"
   },
   {
     "key": "cmd+b",
@@ -2166,6 +2167,7 @@
   },
   {
     "key": "ctrl+alt+b",
-    "command": "markdown.extension.editing.toggleBold"
+    "command": "mdx.toggleStrong",
+    "when": "editorTextFocus && !editorReadonly && editorLangId == 'mdx'"
   }
 ]

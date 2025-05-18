@@ -5,30 +5,34 @@
 			"```text",
 			"  ###### mdx代码生成关键词速览 ######",
 			"",
-			"  @mdxfm: 生成mdx文件头信息",
-			"  @mdxmsg: 生成mdx提示信息",
-			"  @mdxinstalltab: 生成mdx安装命令Tab",
-			"  @mdxcg: 生成mdx卡片组",
-			"  @mdxscard: 生成mdx单张卡片",
-			"  @mdxtabs: 生成mdx标签Tab组",
-			"  @mdxstab: 生成mdx单个标签Tab组子项",
-			"  @mdxitabs: 生成mdx引入文件Tab组",
-			"  @mdxistab: 生成mdx单个引入文件Tab组子项",
-			"  @mdxif: 生成mdx单独引入文件",
-			"  @mdxfaq: 生成mdx问答组",
-			"  @mdxsfaq: 生成mdx问答组子项",
-			"  @mdxfiles: 生成mdx文件系统示意图",
-			"  @mdxfile: 生成mdx单个文件",
-			"  @mdxlfile: 生成mdx🔐锁定文件",
-			"  @mdxfolder: 生成mdx文件夹",
-			"  @mdxifolder: 生成mdx置灰文件夹",
-			"  @mdxefolder: 生成mdx空文件夹",
-			"  @mdxsteps: 生成mdx步骤组",
-			"  @mdxsstep: 生成mdx步骤组子项",
-			"  @mdxcode: 生成mdx代码块, 支持语言为ts|js|bash|python|go|rust|javaruby|swift|kotlin",
-			"  @mdxmermaid: 生成mdx图标Mermaid",
-			"  @mdxspage: 生成mdx单页面",
-			"  @mdxmath: 生成mdx数学公式",
+      "  @mdxfm           :  生成mdx文件头信息",
+      "  @mdxmsg          :  生成mdx提示信息",
+      "  @mdxmsgi         :  生成mdx提示[info]信息",
+      "  @mdxmsgw         :  生成mdx提示[warn]信息",
+      "  @mdxmsge         :  生成mdx提示[error]信息",
+      "  @mdxmsgs         :  生成mdx提示[success]信息",
+      "  @mdxinstalltab   :  生成mdx安装命令Tab",
+      "  @mdxcg           :  生成mdx卡片组",
+      "  @mdxscard        :  生成mdx单张卡片",
+      "  @mdxtabs         :  生成mdx标签Tab组",
+      "  @mdxstab         :  生成mdx单个标签Tab组子项",
+      "  @mdxitabs        :  生成mdx引入文件Tab组",
+      "  @mdxistab        :  生成mdx单个引入文件Tab组子项",
+      "  @mdxif           :  生成mdx单独引入文件",
+      "  @mdxfaq          :  生成mdx问答组",
+      "  @mdxsfaq         :  生成mdx问答组子项",
+      "  @mdxfiles        :  生成mdx文件系统示意图",
+      "  @mdxfile         :  生成mdx单个文件",
+      "  @mdxlfile        :  生成mdx🔐锁定文件",
+      "  @mdxfolder       :  生成mdx文件夹",
+      "  @mdxifolder      :  生成mdx置灰文件夹",
+      "  @mdxefolder      :  生成mdx空文件夹",
+      "  @mdxsteps        :  生成mdx步骤组",
+      "  @mdxsstep        :  生成mdx步骤组子项",
+      "  @mdxcode         :  生成mdx代码块",
+      "  @mdxmath         :  生成mdx数学公式",
+      "  @mdxmermaid      :  生成mdx图标Mermaid",
+      "  @mdxspage        :  生成mdx单页面",
 			"",
 			"```",
 			"${0}"
@@ -59,6 +63,54 @@
 			"${0}"
 		],
 		"description": "MDX Callout",
+		"isFileTemplate": false
+	},
+  "mdx-callout-info-msg": {
+		"prefix": "@mdxmsgi",
+		"body": [
+			"<Callout title=\"${1}\" type=\"info\">",
+			  "${2}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout info",
+		"isFileTemplate": false
+	},
+  "mdx-callout-warn-msg": {
+		"prefix": "@mdxmsgw",
+		"body": [
+			"<Callout title=\"${1}\" type=\"warn\">",
+			  "${2}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout warn",
+		"isFileTemplate": false
+	},
+  "mdx-callout-error-msg": {
+		"prefix": "@mdxmsge",
+		"body": [
+			"<Callout title=\"${1}\" type=\"error\">",
+			  "${2}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout error",
+		"isFileTemplate": false
+	},
+  "mdx-callout-success-msg": {
+		"prefix": "@mdxmsgs",
+		"body": [
+			"<Callout title=\"${1}\" type=\"success\">",
+			  "${2}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout success",
 		"isFileTemplate": false
 	},
 	"mdx-cards-grop": {
@@ -248,7 +300,7 @@
 		"isFileTemplate": false
 	},
 	"mdx-file-system-folder-ignore": {
-		"prefix": "@mdxifolde",
+		"prefix": "@mdxifolder",
 		"body": [
 			"<Folder name=\"${1}\"> defaultOpen className=\"opacity-50\" disabled",
 			"  <File name=\"${2}\" />",
@@ -310,7 +362,8 @@
 		"prefix": "@mdxmermaid",
 		"body": [
 			"<Mermaid",
-			"  chart=\"",
+      "title=\"${2}\"",
+			"chart=\"",
 			"${1}",
 			"",
 			"\"/>",
