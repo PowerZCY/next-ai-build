@@ -335,42 +335,43 @@ icon: LandPlot
 
 ## Mermaid绘图
 
-<Mermaid
-title="人生路径图·By 李笑来"
-chart="
-flowchart LR
-  S[起点]
-  ST[自学]
-  K[知识]
-  OK[其他知识]
-  IK[投资知识]
-  SK[销售知识]
-  PK[生产知识]
-  P[追求]
-  I[投资]
-  SA[销售]
-  PR[生产]
-  MF[(精神财富)]
-  PF[(物质财富)]
-  DO[作更多的事]
+<Tabs groupId="mermaid" items={[ "example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Mermaid
+    title="人生路径图·By 李笑来"
+    chart="
+    flowchart LR
+      S[起点]
+      ST[自学]
+      K[知识]
+      OK[其他知识]
+      IK[投资知识]
+      SK[销售知识]
+      PK[生产知识]
+      P[追求]
+      I[投资]
+      SA[销售]
+      PR[生产]
+      MF[(精神财富)]
+      PF[(物质财富)]
+      DO[作更多的事]
 
-  S--->ST--->K
-  K--->OK
-  K--->IK
-  K--->SK
-  K--->PK
-  OK--->P--->MF
-  IK--->I--->PF
-  SK--->SA--->PF
-  PK--->PR--->PF
+      S--->ST--->K
+      K--->OK
+      K--->IK
+      K--->SK
+      K--->PK
+      OK--->P--->MF
+      IK--->I--->PF
+      SK--->SA--->PF
+      PK--->PR--->PF
 
-  MF--->DO
-  PF--->DO
-  S-...->|时间|DO
+      MF--->DO
+      PF--->DO
+      S-...->|时间|DO
 
-"/>
-
-<Tabs groupId="mermaid" items={[ "source", "@keywords"]}>
+    "/>
+  </Tab>
   ```mdx title="Mermaid绘图示例" tab="source" 
   <Mermaid
     title="人生路径图·By 李笑来"
@@ -418,14 +419,14 @@ flowchart LR
 
 <Tabs groupId="math" items={["example", "source", "@keywords"]}>
   <Tab value="example">
-    ```math
-      \int_0^1 f(x)dx
+    ```math title="正态分布公式
+      f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
     ```
   </Tab>
 
   ````mdx title="数学公式示例" tab="source" 
-    ```math
-      \int_0^1 f(x)dx
+    ```math title="正态分布公式"
+      f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
     ```
   ````
 

@@ -1,6 +1,6 @@
 'use client';
  
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { watermark as watermarkConfig } from '@/lib/appConfig';
@@ -9,10 +9,10 @@ import { globalLucideIcons as icons } from '@/components/global-icon';
 export function Mermaid({ chart, title }: { chart: string; title?: string }) {
   const id = useId();
   const [svg, setSvg] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null!);
   const { resolvedTheme } = useTheme();
  
   useEffect(() => {
+    let isMounted = true;
     void renderChart();
  
     async function renderChart() {
@@ -29,25 +29,27 @@ export function Mermaid({ chart, title }: { chart: string; title?: string }) {
       try {
         mermaid.initialize(mermaidConfig);
         const { svg } = await mermaid.render(
-          // strip invalid characters for `id` attribute
           id.replaceAll(':', ''),
-          chart.replaceAll('\\n', '\n'),
-          containerRef.current,
+          chart.replaceAll('\\n', '\n')
         );
         let svgWithWatermark = svg;
         if (watermarkConfig.enabled && watermarkConfig.text) {
           svgWithWatermark = addWatermarkToSvg(svg, watermarkConfig.text);
         }
-        setSvg(svgWithWatermark);
+        if (isMounted) setSvg(svgWithWatermark);
       } catch (error) {
         console.error('Error while rendering mermaid', error);
       }
     }
+    return () => {
+      isMounted = false;
+      setSvg('');
+    };
   }, [chart, id, resolvedTheme]);
  
   return (
     <div>
-      <div ref={containerRef} dangerouslySetInnerHTML={{ __html: svg }} />
+      <div dangerouslySetInnerHTML={{ __html: svg }} />
       {title && (
         <div
           className="mt-2 flex items-center justify-center text-center text-[13px] font-italic text-[#AC62FD]"
