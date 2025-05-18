@@ -11,7 +11,7 @@ import { z } from "zod";
 // src/lib/appConfig.ts
 var appConfig = {
   // 基础配置
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://re8ger.com",
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://ddaas.de8ger.com",
   githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || "https://github.com/PowerZCY/next-ai-build/blob/main/",
   github: process.env.NEXT_PUBLIC_GITHUB || "https://github.com/PowerZCY/next-ai-build/",
   // 国际化配置
@@ -59,8 +59,9 @@ var appConfig = {
     clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === "true",
     clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === "true",
     watermark: {
-      enabled: process.env.ENABLE_WATERMARK === "true",
-      text: process.env.STYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
+      // 只有NEXT_PUBLIC_的变量才能被client组件访问!
+      enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === "true",
+      text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
     }
   },
   mdxSourceDir: {

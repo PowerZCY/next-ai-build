@@ -37,6 +37,10 @@ description: 小白开箱即用的用户管理系统, 涵盖登录、权限、�
 
 ### Config URL
 `ClerkProvider`支持url参数配置, 配置方式也有如下3种, 官方推荐使用环境变量, 其次是代码级配置, 不建议使用Clerk Dashboard的远程配置
+<Callout title="Clerk动态Locale问题" type="error">
+  截至Clerk版本`^6.19.4`, 多语言项目, 配置了NextJS [locale]路由段的项目, 不要使用自定义登录页面, 而是使用模态框弹出登录框的方式
+  详细原因参见[issue](https://github.com/clerk/javascript/issues/5935)
+</Callout>
 
 <Tabs groupId="clerk-config" items={["env", "props", "dashboard"]}>
   ```txt title=".env.local" tab="env"
@@ -69,8 +73,8 @@ description: 小白开箱即用的用户管理系统, 涵盖登录、权限、�
 
 如下是一个简单包装过的Clerk用户组件:
 
-<include lang="tsx" meta='title="cf.tsx"'>
-  ../../../../components/ClerkUser.tsx
+<include cwd lang="tsx" meta='title="ClerkUser.tsx"'>
+  src/components/ClerkUser.tsx
 </include>
 
 
