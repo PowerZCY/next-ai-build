@@ -20,18 +20,6 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
       active: 'nested-url',
     },
     {
-      icon: <icons.LayoutTemplate />,
-      text: t1('showcase'),
-      url: `/${locale}/docs/introduction`,
-      active: 'url',
-    },
-    {
-      icon: <icons.GlobeLock />,
-      text: t1('legal'),
-      url: `/${locale}/legal`,
-      active: 'url',
-    },
-    {
       type: 'custom',
       // false就先排左边的菜单, true就先排右边的按钮
       secondary: true,
@@ -78,12 +66,12 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           url: `/${locale}/docs/introduction`,
         },
         {
-          icon: <icons.Mmd />,
-          text: 'Graph',
-          description: 'Mermaid showcase.',
-          url: `/${locale}/docs/introduction/mermaid`,
+          icon: <icons.ShieldUser />,
+          text: 'FumaMDX',
+          description: 'FumaMDX tips',
+          url: `/${locale}/docs//introduction/fuma-mdx`,
           menu: {
-            className: 'lg:col-start-2',
+            className: 'lg:col-start-3',
           },
         },
         {
@@ -105,12 +93,12 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           },
         },
         {
-          icon: <icons.ShieldUser />,
-          text: 'Privacy Policy',
-          description: 'Privacy Policy',
-          url: `/${locale}/docs/legislations/privacy`,
+          icon: <icons.Mmd />,
+          text: 'Graph',
+          description: 'Mermaid showcase.',
+          url: `/${locale}/docs/introduction/mermaid`,
           menu: {
-            className: 'lg:col-start-3',
+            className: 'lg:col-start-2',
           },
         },
       ],
