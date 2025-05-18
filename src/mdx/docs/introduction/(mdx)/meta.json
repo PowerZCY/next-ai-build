@@ -3,9 +3,11 @@
     "icon": "MDX",
     "root": false,
     "pages": [
-        "mdx-quickstart",
+        "fuma-mdx",
         "mdx-snippets",
         "mdx-shiki",
+        "mdx-mermaid",
+        "mdx-math",
         "..."
     ]
 }

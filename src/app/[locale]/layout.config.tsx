@@ -96,7 +96,7 @@ export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
           icon: <icons.Mmd />,
           text: 'Graph',
           description: 'Mermaid showcase.',
-          url: `/${locale}/docs/introduction/mermaid`,
+          url: `/${locale}/docs/introduction/mdx-mermaid`,
           menu: {
             className: 'lg:col-start-2',
           },

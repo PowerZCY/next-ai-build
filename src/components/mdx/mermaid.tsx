@@ -61,8 +61,9 @@ export function Mermaid({ chart, title }: { chart: string; title?: string }) {
 }
 
 function addWatermarkToSvg(svg: string, watermark: string) {
-  const watermarkText = `\n    <text
-      x="99%"
+  const watermarkText = `
+    <text
+      x="100%"
       y="98%"
       text-anchor="end"
       font-size="12"
@@ -70,6 +71,9 @@ function addWatermarkToSvg(svg: string, watermark: string) {
       fill="#AC62FD"
       opacity="0.40"
       class="pointer-events-none"
-    >${watermark}</text>\n  `;
+      dx="-8"
+      dy="-4"
+    >${watermark}</text>
+  `;
   return svg.replace('</svg>', `${watermarkText}</svg>`);
 }
