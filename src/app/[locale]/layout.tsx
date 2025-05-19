@@ -1,14 +1,10 @@
 import { appConfig, generatedLocales } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
-import './globals.css'
-// Fumadocs 数学公式样式
-// import { GoogleAnalyticsScript } from "@/components/script/GoogleAnalyticsScript";
-import NProgressBar from '@/app/[locale]/nProgressBar'
-import { ClerkProviderClient } from "@/components/ClerkProviderClient";
-import { RootProvider } from "fumadocs-ui/provider";
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import './globals.css';
+import NProgressBar from '@/app/[locale]/nProgressBar';
 import { cn } from '@/lib/fuma-search-util';
-
+import { RootProvider } from "fumadocs-ui/provider";
 export const dynamic = 'force-dynamic'
 
 // 网站元数据
@@ -75,9 +71,7 @@ export default async function RootLayout({
               translations: { cn }[locale],
             }}
           >
-            <ClerkProviderClient locale={locale}>
-              {children}
-            </ClerkProviderClient>
+            {children}
           </RootProvider>
         </body>
         {/* <GoogleAnalyticsScript /> */}

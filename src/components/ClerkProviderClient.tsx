@@ -20,8 +20,6 @@ export function ClerkProviderClient({
   const waitlistUrlWithLocale = `/${locale}${appConfig.clerk.waitlistUrl}`;
   const currentLocalization = clerkIntl[locale as keyof typeof clerkIntl];
 
-  console.log(`ClerkProviderClient - signInUrl for ClerkProvider: ${signInUrlWithLocale}`);
-
   return (
     <ClerkProvider
       signInUrl={signInUrlWithLocale}
