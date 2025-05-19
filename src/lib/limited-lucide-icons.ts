@@ -35,6 +35,7 @@ export {
     Handshake,
     Highlighter,
     HousePlus,
+    Keyboard,
     LandPlot,
     Layout,
     LayoutTemplate,

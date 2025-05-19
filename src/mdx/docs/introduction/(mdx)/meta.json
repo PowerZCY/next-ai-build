@@ -5,6 +5,7 @@
     "pages": [
         "fuma-mdx",
         "mdx-snippets",
+        "keybindings",
         "mdx-shiki",
         "mdx-mermaid",
         "mdx-math",
