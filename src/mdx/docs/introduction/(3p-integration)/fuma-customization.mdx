@@ -1,0 +1,123 @@
+---
+title: FumaDocs组件自定义指北
+description: 熟悉FumaDocs组件原理, 根据其扩展口完成自定义
+---
+
+## FumaDocs接入
+
+### 基础接入
+<Callout>
+  参照[官网文档](https://fumadocs.dev/docs/ui/manual-installation), 完成基础环境配置
+</Callout>
+
+### 核心流程处理
+
+<TrophyCard title="说明" icon={<Fingerprint />}>
+  - `source.config.ts` 负责配置文档源、插件链、schema等, 是内容解析和编译的入口
+
+  - `src/lib/source.ts` 注册各类文档数据源，决定内容如何被加载和路由
+
+  - `src/components/mdx-components.tsx` 定义自定义MDX组件和渲染逻辑, 影响最终页面的交互和视觉
+</TrophyCard>
+
+<Mermaid
+title="FumaDocs处理流程"
+chart="
+flowchart TD
+    %% 主流程
+    A[MDX] --> B[配置 source.config.ts]
+    B --> C[MDX解析/插件链]
+    C --> D[生成 React 组件]
+    D --> E[注册数据源 source.ts]
+    E --> F[集成自定义渲染 mdx-components.tsx]
+    F --> G[打包进前端应用]
+    G --> H[React组件渲染为HTML]
+    H --> I[最终网页展示]
+
+    %% 横向扩展（分组，靠近主流程）
+    subgraph S1[配置扩展]
+      B1[自定义 schema/元数据]
+    end
+    subgraph S2[解析扩展]
+      C1[代码块 Transformer]
+      C2[remark/rehype 插件]
+    end
+    subgraph S3[数据源扩展]
+      E1[生成 index.ts]
+    end
+
+    B -- 配置扩展 --> B1
+    C -- 代码块扩展 --> C1
+    C -- 语法扩展 --> C2
+    E -- 索引扩展 --> E1
+
+    %% 阶段分区
+    subgraph 静态/编译阶段
+      B
+      C
+      D
+      E
+      F
+      G
+    end
+    subgraph 运行时/SSR/SSG
+      H
+      I
+    end
+"/>
+
+
+### 自定义流程处理
+
+结合上述流程, 从用户视角看, FumaDocs的扩展口主要集中在:
+
+- `src/lib/source.ts` 路由+数据源+元数据处理, **内容如何被加载和路由**, 侧重于HTML的主干结构
+- `source.config.ts`插件链的配置扩展, **原始mdx内容如何被解析为React组件**, 侧重于基础内容
+- `src/components/mdx-components.tsx` React组件扩展, **组件如何被渲染**, 侧重于样式和交互
+
+<Tabs groupId="customization" items={["src/lib/source.ts", "source.config.ts", "src/components/mdx-components.tsx"]}>
+  <Tab value="src/lib/source.ts">
+    <include cwd lang="ts" meta='title="自定义Schema"'>
+      ./src/lib/source.ts
+    </include>
+  </Tab>
+  <Tab value="source.config.ts">
+    <include cwd lang="ts" meta='title="自定义Transformer"'>
+      ./source.config.ts
+    </include>
+  </Tab>
+  <Tab value="src/components/mdx-components.tsx">
+    <include cwd lang="tsx" meta='title="自定义组件"'>
+      ./src/components/mdx-components.tsx
+    </include>
+  </Tab>
+</Tabs>
+
+## 网站布局调整
+
+FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的排序规则
+
+- 整个导航是由`nav`组件(选择器ID为`#nd-nav`)定义的, FumaDocs的默认Header整体分为左右两部分: 
+  - 左侧为网站Logo+标题, 以及可以自定义的菜单栏
+  - 右侧为可选搜索框, 然后是主题切换按钮, 然后是语言切换按钮, 然后是用户自定义的按钮, 最后是Github按钮链接
+- `LinkItemType`类型, 有关键字段`secondary`, 决定按钮是否在导航栏右侧
+- `LinkItemType`类型, 关键字段`type`, 定义为`custom`时, `children`就可以使用我们自己的组件了, 不过适配默认的样式风格会花点时间
+
+### 自定义Header(Alpha)
+
+<Callout title="Alpha" type="warn">
+  当前自定义Header的方案处于Alpha阶段, 在flex多端适配上还存在问题, 请谨慎鉴用!
+
+  长期方案是基于FumaDocs的`nav`组件重写, 实现完全自定义的需求
+</Callout>
+
+- 更改Header右侧的按钮顺序, 使用自定义的搜索框、主题切换、语言切换、Github按钮组件, 然后全部定义为`type=custom secondary=true`的LinkItemType
+- 默认Header的样式是写死的, 总是悬浮并且和顶部有缝隙, 在滚动页面时会在缝隙处留下网页内容残影, 使用CSS样式强制覆盖
+- 默认Banner的样式也是写死的, 对于动态配置Banner支持不够, 也可使用CSS样式强制覆盖
+
+<include cwd lang="css" meta='title="强制覆盖fuma.css"'>
+  ./src/styles/fuma.css
+</include>
+
+
+
