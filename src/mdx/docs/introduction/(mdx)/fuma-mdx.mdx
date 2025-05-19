@@ -285,20 +285,14 @@ icon: LandPlot
   <Tab value="example">
     <Accordions>
       <Accordion id="how-to-put-elephant" title="怎样把大象装进冰箱?">
-        <div className="fd-steps">
-          <div className="[&_h2]:fd-step">
-            <h2>步骤1:</h2>
-            <p>打开冰箱门</p>
-          </div>
-          <div className="[&_h2]:fd-step">
-            <h2>步骤2:</h2>
-            <p>把大象装进去</p>
-          </div>
-          <div className="[&_h2]:fd-step">
-            <h2>步骤3:</h2>
-            <p>关上冰箱门</p>
-          </div>
-        </div>
+        ### 1. 步骤1 [!toc]
+        打开冰箱门
+
+        ### 2. 步骤2 [!toc]
+        把大象装进去
+
+        ### 3. 步骤3 [!toc]
+        关上冰箱门
       </Accordion>
       <Accordion id="faq" title="FAQ使用说明">
         `id`字段可选, 如果指定, 那么该faq就能生成分享链接
@@ -309,20 +303,14 @@ icon: LandPlot
   ```mdx title="FAQ问答组示例" tab="source" 
   <Accordions>
     <Accordion id="how-to-put-elephant" title="怎样把大象装进冰箱?">
-      <div className="fd-steps">
-        <div className="[&_h2]:fd-step">
-          <h2>步骤1:</h2>
-          <p>打开冰箱门</p>
-        </div>
-        <div className="[&_h2]:fd-step">
-          <h2>步骤2:</h2>
-          <p>把大象装进去</p>
-        </div>
-        <div className="[&_h2]:fd-step">
-          <h2>步骤3:</h2>
-          <p>关上冰箱门</p>
-        </div>
-      </div>
+      ### 1. 步骤1 [!toc]
+      打开冰箱门
+
+      ### 2. 步骤2 [!toc]
+      把大象装进去
+
+      ### 3. 步骤3 [!toc]
+      关上冰箱门
     </Accordion>
     <Accordion id="faq" title="FAQ使用说明">
       `id`字段可选, 如果指定, 那么该faq就能生成分享链接
@@ -333,8 +321,6 @@ icon: LandPlot
   ```txt title="触发关键词" tab="@keywords"   
   @mdxfaq     生成mdx问答组
   @mdxsfaq    生成mdx问答组子项
-  @mdxsteps   生成mdx步骤组
-  @mdxsstep   生成mdx步骤组子项
   ```
 </Tabs>
 

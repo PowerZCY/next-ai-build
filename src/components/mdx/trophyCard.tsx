@@ -12,10 +12,8 @@ export function TrophyCard({
   return (
     <div
       className="
-        border-2 rounded-xl px-4 py-1
-        border-lime-300
-        bg-[#F8FAFC] text-[#334155]
-        dark:bg-[#18181b] dark:text-[#F1F5F9]
+        border-2 rounded-xl px-4 py-2
+        border-purple-200 dark:border-gray-500
       "
     >
       <div className="flex items-center font-bold text-sm">
