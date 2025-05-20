@@ -1,0 +1,131 @@
+diff --git a/dist/components/layout/toc-clerk.d.ts.map b/dist/components/layout/toc-clerk.d.ts.map
+index 30dfe1ce45819999661e37005f3c0238a596b678..478144443e205959381138a5ff0cbe45bdae2f7b 100644
+--- a/dist/components/layout/toc-clerk.d.ts.map
++++ b/dist/components/layout/toc-clerk.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"toc-clerk.d.ts","sourceRoot":"","sources":["../../../src/components/layout/toc-clerk.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,sBAAsB,CAAC;AAOxD,MAAM,CAAC,OAAO,UAAU,aAAa,CAAC,EAAE,KAAK,EAAE,EAAE;IAAE,KAAK,EAAE,WAAW,EAAE,CAAA;CAAE,2CA2FxE"}
+\ No newline at end of file
++{"version":3,"file":"toc-clerk.d.ts","sourceRoot":"","sources":["../../../src/components/layout/toc-clerk.tsx"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,sBAAsB,CAAC;AA8BxD,MAAM,CAAC,OAAO,UAAU,aAAa,CAAC,EAAE,KAAK,EAAE,EAAE;IAAE,KAAK,EAAE,WAAW,EAAE,CAAA;CAAE,2CAyFxE"}
+\ No newline at end of file
+diff --git a/dist/components/layout/toc-clerk.js b/dist/components/layout/toc-clerk.js
+index 7c128748acf238d7fd63a446876f35d5a0679fed..58bd8c8effdf362d62acd20d2910b61093327659 100644
+--- a/dist/components/layout/toc-clerk.js
++++ b/dist/components/layout/toc-clerk.js
+@@ -1,10 +1,32 @@
+ 'use client';
+-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
++import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+ import * as Primitive from 'fumadocs-core/toc';
+ import { useEffect, useRef, useState } from 'react';
+ import { cn } from '../../utils/cn.js';
+ import { TocThumb } from '../../components/layout/toc-thumb.js';
+ import { TocItemsEmpty } from '../../components/layout/toc.js';
++// Helper functions based on toc-clerk.tsx
++function getItemOffset(depth) {
++    // This is the main padding-left for the TOC item text
++    if (depth <= 2)
++        return 14; // e.g., pl for h2
++    if (depth === 3)
++        return 26; // e.g., pl for h3
++    return 36; // e.g., pl for h4
++}
++function getLineOffset(depth) {
++    // This is the offset for the line/decoration *within* the padded Primitive.TOCItem
++    // e.g., if depth >=3, line is at 10px from the start of the content box of TOCItem
++    return depth >= 3 ? 10 : 0;
++}
++// New helper function to extract step info from URL
++function getStepInfoFromUrl(url) {
++    const match = url.match(/^#(\d+)-/);
++    if (match && match[1]) {
++        return { isStep: true, stepNumber: match[1] };
++    }
++    return { isStep: false, stepNumber: null };
++}
+ export default function ClerkTOCItems({ items }) {
+     const containerRef = useRef(null);
+     const [svg, setSvg] = useState();
+@@ -18,21 +40,25 @@ export default function ClerkTOCItems({ items }) {
+             let w = 0, h = 0;
+             const d = [];
+             for (let i = 0; i < items.length; i++) {
+-                const element = container.querySelector(`a[href="#${items[i].url.slice(1)}"]`);
++                const item = items[i];
++                const element = container.querySelector(`a[href="${item.url}"]`);
+                 if (!element)
+                     continue;
+                 const styles = getComputedStyle(element);
+-                const offset = getLineOffset(items[i].depth) + 1, top = element.offsetTop + parseFloat(styles.paddingTop), bottom = element.offsetTop +
++                const currentLineOffset = getLineOffset(item.depth);
++                const visualElementX = getItemOffset(item.depth) + currentLineOffset;
++                const top = element.offsetTop + parseFloat(styles.paddingTop);
++                const bottom = element.offsetTop +
+                     element.clientHeight -
+                     parseFloat(styles.paddingBottom);
+-                w = Math.max(offset, w);
++                w = Math.max(visualElementX, w);
+                 h = Math.max(h, bottom);
+-                d.push(`${i === 0 ? 'M' : 'L'}${offset} ${top}`);
+-                d.push(`L${offset} ${bottom}`);
++                d.push(`${i === 0 ? 'M' : 'L'}${visualElementX} ${top}`);
++                d.push(`L${visualElementX} ${bottom}`);
+             }
+             setSvg({
+                 path: d.join(' '),
+-                width: w + 1,
++                width: w + 2, // Adjusted for a 3px stroke (1.5px on each side of center)
+                 height: h,
+             });
+         }
+@@ -45,29 +71,31 @@ export default function ClerkTOCItems({ items }) {
+     }, [items]);
+     if (items.length === 0)
+         return _jsx(TocItemsEmpty, {});
+-    return (_jsxs(_Fragment, { children: [svg ? (_jsx("div", { className: "absolute start-0 top-0 rtl:-scale-x-100", style: {
++    return (_jsxs("div", { className: "relative", children: [svg ? (_jsx("div", { className: "absolute start-0 top-0 rtl:-scale-x-100 pointer-events-none z-[5]", style: {
+                     width: svg.width,
+                     height: svg.height,
+-                    maskImage: `url("data:image/svg+xml,${
+-                    // Inline SVG
+-                    encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="black" stroke-width="1" fill="none" /></svg>`)}")`,
+-                }, children: _jsx(TocThumb, { containerRef: containerRef, className: "mt-(--fd-top) h-(--fd-height) bg-fd-primary transition-all" }) })) : null, _jsx("div", { className: "flex flex-col", ref: containerRef, children: items.map((item, i) => (_jsx(TOCItem, { item: item, upper: items[i - 1]?.depth, lower: items[i + 1]?.depth }, item.url))) })] }));
+-}
+-function getItemOffset(depth) {
+-    if (depth <= 2)
+-        return 14;
+-    if (depth === 3)
+-        return 26;
+-    return 36;
+-}
+-function getLineOffset(depth) {
+-    return depth >= 3 ? 10 : 0;
++                    maskImage: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>`)}")`,
++                }, children: _jsx(TocThumb, { containerRef: containerRef, className: "bg-fd-primary transition-all duration-500 ease-in-out" }) })) : null, _jsx("div", { className: "flex flex-col", ref: containerRef, children: items.map((item, i) => (_jsx(EnhancedClerkTOCItemInternal, { item: item, upperDepth: items[i - 1]?.depth, lowerDepth: items[i + 1]?.depth }, item.url))) })] }));
+ }
+-function TOCItem({ item, upper = item.depth, lower = item.depth, }) {
+-    const offset = getLineOffset(item.depth), upperOffset = getLineOffset(upper), lowerOffset = getLineOffset(lower);
++function EnhancedClerkTOCItemInternal({ item, upperDepth = item.depth, lowerDepth = item.depth, }) {
++    const { isStep, stepNumber } = getStepInfoFromUrl(item.url);
++    const lineOffsetWithinItem = getLineOffset(item.depth);
++    const upperLineOffsetWithinItem = getLineOffset(upperDepth);
++    const lowerLineOffsetWithinItem = getLineOffset(lowerDepth);
++    const CIRCLE_DIAMETER_PX = 14;
++    const CIRCLE_RADIUS_PX = CIRCLE_DIAMETER_PX / 2;
+     return (_jsxs(Primitive.TOCItem, { href: item.url, style: {
+             paddingInlineStart: getItemOffset(item.depth),
+-        }, className: "prose relative py-1.5 text-sm text-fd-muted-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary", children: [offset !== upperOffset ? (_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 16 16", className: "absolute -top-1.5 start-0 size-4 rtl:-scale-x-100", children: _jsx("line", { x1: upperOffset, y1: "0", x2: offset, y2: "12", className: "stroke-fd-foreground/10", strokeWidth: "1" }) })) : null, _jsx("div", { className: cn('absolute inset-y-0 w-px bg-fd-foreground/10', offset !== upperOffset && 'top-1.5', offset !== lowerOffset && 'bottom-1.5'), style: {
+-                    insetInlineStart: offset,
+-                } }), item.title] }));
++        }, className: "prose group relative py-1.5 text-sm text-fd-muted-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary", children: [lineOffsetWithinItem !== upperLineOffsetWithinItem ? (_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 16 16", className: "absolute -top-1.5 size-4 rtl:-scale-x-100 pointer-events-none", style: { insetInlineStart: Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem), zIndex: 1 }, children: _jsx("line", { x1: upperLineOffsetWithinItem - Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem), y1: "0", x2: lineOffsetWithinItem - Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem), y2: "12", className: cn('stroke-fd-foreground/10', 'group-data-[active=true]:stroke-fd-primary'), strokeWidth: "1", strokeLinecap: "round" }) })) : null, _jsx("div", { className: cn('absolute inset-y-0 w-px pointer-events-none', 'bg-fd-foreground/10 group-data-[active=true]:bg-fd-primary', lineOffsetWithinItem !== upperLineOffsetWithinItem && 'top-1.5', lineOffsetWithinItem !== lowerLineOffsetWithinItem && 'bottom-1.5'), style: {
++                    insetInlineStart: lineOffsetWithinItem,
++                    zIndex: 1,
++                } }), isStep && stepNumber && (_jsx("span", { className: cn('absolute z-10 flex size-[14px] rounded-full justify-center items-center', 'bg-black text-white dark:bg-white dark:text-black', 'group-data-[active=true]:bg-fd-primary group-data-[active=true]:text-white dark:group-data-[active=true]:text-black', 'font-medium text-xs'), style: {
++                    left: lineOffsetWithinItem - CIRCLE_RADIUS_PX,
++                    top: '50%',
++                    transform: 'translateY(-50%)',
++                }, children: stepNumber })), _jsx("span", { style: {
++                    position: 'relative',
++                    zIndex: 1,
++                    // marginLeft: isStep ? lineOffsetWithinItem : undefined,
++                }, children: item.title })] }));
+ }
