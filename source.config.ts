@@ -138,6 +138,7 @@ export default defineConfig({
           }
         },
         // 2. Fumadocs 的默认 Transformers
+        // /core/src/mdx-plugins/rehype-code.ts, 定义了: 行高亮、单词高亮、Diff高亮、代码聚焦、从元数据上解析代码行编号
         ...(rehypeCodeDefaultOptions.transformers ?? []),
         // 3. 您现有的 transformer
         {
@@ -159,6 +160,8 @@ export default defineConfig({
         },
       ],
     },
+    // packages/core/src/server/get-toc.ts, remark().use(remarkPlugins).use(remarkHeading)
+    // 关于目录Heading的处理, FumaDocs底层已经指定了顺序: 用户指定的remarkPlugins先执行, 然后执行remarkHeading, 最后交由渲染Page调用toc-clerk.tsx逻辑
     remarkPlugins: [
       remarkSteps,
       remarkMath, 

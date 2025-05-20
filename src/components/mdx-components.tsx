@@ -6,7 +6,6 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { globalLucideIcons } from '@/components/global-icon';
 import type { MDXComponents, MDXProps } from 'mdx/types';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
@@ -82,8 +81,6 @@ const fumadocsUiComponents = {
   ImageZoom,
   Accordion,
   Accordions,
-  Step,
-  Steps,
   Tab,
   Tabs,
   Pre,
@@ -98,6 +95,7 @@ const customUiComponents = {
 
 const typeTableGenerator = createTypeTableGenerator();
 
+// 这里只是渲染层处理, 将HAST渲染为React组件, 即HTML代码
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,

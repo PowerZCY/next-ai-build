@@ -19,6 +19,9 @@ function remarkRemoveFrontmatter() {
   };
 }
 
+// remark(), 将MDX文件解析为MDAST
+// 解析层remarkPlugins(), 将MDAST解析为HAST
+// 渲染层rehypePlugins(), 将HAST渲染为React组件, 即HTML代码
 const processor = remark()
   // 解析md文件标识头
   .use(remarkFrontmatter, ['yaml'])
