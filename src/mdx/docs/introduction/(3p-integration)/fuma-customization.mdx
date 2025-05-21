@@ -1,6 +1,6 @@
 ---
-title: FumaDocs组件自定义指北
-description: 熟悉FumaDocs组件原理, 根据其扩展口完成自定义
+title: FumaDocs接入指北
+description: 熟悉FumaDocs组件原理, 组件自定义经验分享
 ---
 
 ## FumaDocs接入
@@ -12,14 +12,6 @@ description: 熟悉FumaDocs组件原理, 根据其扩展口完成自定义
 
 ### 核心流程处理
 
-<TrophyCard title="说明" icon={<Fingerprint />}>
-  - `source.config.ts` 负责配置文档源、插件链、schema等, 是内容解析和编译的入口
-
-  - `src/lib/source.ts` 注册各类文档数据源，决定内容如何被加载和路由
-
-  - `src/components/mdx-components.tsx` 定义自定义MDX组件和渲染逻辑, 影响最终页面的交互和视觉
-</TrophyCard>
-
 <Mermaid
 title="FumaDocs处理流程"
 chart="
@@ -27,34 +19,64 @@ flowchart TD
     %% 主流程
     A[MDX] --> B[配置 source.config.ts]
     B --> C[MDX解析/插件链]
-    C --> D[生成 React 组件]
-    D --> E[注册数据源 source.ts]
-    E --> F[集成自定义渲染 mdx-components.tsx]
+    C --> C1[Remark阶段 \n MDAST]
+    C1 --> C2[Rehype阶段 \n HAST]
+    C2 --> D[生成React组件]
+    D --> E[注册数据源 \n source.ts]
+    E --> F[集成自定义渲染 \n mdx-components.tsx]
     F --> G[打包进前端应用]
     G --> H[React组件渲染为HTML]
     H --> I[最终网页展示]
 
-    %% 横向扩展（分组，靠近主流程）
+    %% Remark 阶段细化
+    subgraph R1[Remark插件链 \n 操作MDAST]
+      direction TB
+      R1a[remark-steps \n 步骤识别/属性注入]
+      R1b[remark-heading \n 提取标题/生成TOC]
+      R1c[其他remark插件 \n 如gfm、math等]
+    end
+    C1 -- 依次执行 --> R1a
+    R1a --> R1b
+    R1b --> R1c
+    R1c --> C2
+
+    %% Rehype 阶段细化
+    subgraph R2[Rehype插件链 \n 操作HAST]
+      direction TB
+      R2a[rehype-slug \n 标题id]
+      R2b[rehype-autolink-headings \n 锚点]
+      R2c[rehype-toc \n TOC生成/覆盖]
+      R2d[rehype-katex/其他HTML增强]
+      R2e[rehype-code \n 代码高亮/代码块Transformer]
+    end
+    C2 -- 依次执行 --> R2a
+    R2a --> R2b
+    R2b --> R2c
+    R2c --> R2d
+    R2d --> R2e
+    R2e --> D
+
+    %% 横向扩展（分组, 靠近主流程）
     subgraph S1[配置扩展]
-      B1[自定义 schema/元数据]
+      B1[自定义schema/元数据]
     end
     subgraph S2[解析扩展]
-      C1[代码块 Transformer]
-      C2[remark/rehype 插件]
+      S2b[remark/rehype插件]
     end
     subgraph S3[数据源扩展]
-      E1[生成 index.ts]
+      E1[生成index.ts]
     end
 
     B -- 配置扩展 --> B1
-    C -- 代码块扩展 --> C1
-    C -- 语法扩展 --> C2
+    C -- 语法扩展 --> S2b
     E -- 索引扩展 --> E1
 
     %% 阶段分区
     subgraph 静态/编译阶段
       B
       C
+      C1
+      C2
       D
       E
       F
@@ -66,14 +88,14 @@ flowchart TD
     end
 "/>
 
-
 ### 自定义流程处理
 
-结合上述流程, 从用户视角看, FumaDocs的扩展口主要集中在:
+<TrophyCard title="结合上述流程, 从用户视角看, FumaDocs的扩展口" icon={<Fingerprint />}>
+  - `src/lib/source.ts` 路由+数据源+元数据处理, **内容如何被加载和路由**, 侧重于HTML的主干结构
+  - `source.config.ts`插件链的配置扩展, **原始mdx内容如何被解析为React组件**, 侧重于基础内容
+  - `src/components/mdx-components.tsx` React组件扩展, **组件如何被渲染**, 侧重于样式和交互
+</TrophyCard>
 
-- `src/lib/source.ts` 路由+数据源+元数据处理, **内容如何被加载和路由**, 侧重于HTML的主干结构
-- `source.config.ts`插件链的配置扩展, **原始mdx内容如何被解析为React组件**, 侧重于基础内容
-- `src/components/mdx-components.tsx` React组件扩展, **组件如何被渲染**, 侧重于样式和交互
 
 <Tabs groupId="customization" items={["src/lib/source.ts", "source.config.ts", "src/components/mdx-components.tsx"]}>
   <Tab value="src/lib/source.ts">
@@ -225,9 +247,6 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
   * 魔改源码打补丁的方案, 在FumaDocs升级时会失效, 需要重新魔改
   * **因此, 强烈推荐给FumaDocs官方咨询、讨论、提PR**, 让FumaDocs也越发好用!
 </Callout>
-
-
-
 
 ### 强制覆盖fuma.css
 <include cwd lang="css" meta='title="强制覆盖fuma.css"'>
