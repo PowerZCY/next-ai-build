@@ -27,8 +27,7 @@
       "  @mdxfolder       :  生成mdx文件夹📂",
       "  @mdxifolder      :  生成mdx置灰文件夹🔒",
       "  @mdxefolder      :  生成mdx空文件夹📁",
-      "  @mdxsteps        :  生成mdx步骤组🔄",
-      "  @mdxsstep        :  生成mdx步骤组子项➡️",
+      "  @mdxstep         :  生成mdx步骤①②③",
       "  @mdxcode         :  生成mdx代码块💻",
       "  @mdxmath         :  生成mdx数学公式π",
       "  @mdxmermaid      :  生成mdx图标Mermaid📊",
@@ -320,30 +319,13 @@
 		"description": "MDX File System Folder",
 		"isFileTemplate": false
 	},
-	"mdx-steps": {
-		"prefix": "@mdxsteps",
+	"mdx-step": {
+		"prefix": "@mdxstep",
 		"body": [
-			"<div className=\"fd-steps\">",
-			"  <div className=\"[&_h2]:fd-step\">",
-			"    ${1}",
-			"  </div>",
-			"  ",
-			"</div>",
-			"",
+			"### ${1}. ${2}",
 			"${0}"
 		],
-		"description": "MDX Steps",
-		"isFileTemplate": false
-	},
-	"mdx-steps-item": {
-		"prefix": "@mdxsstep",
-		"body": [
-			"<div className=\"[&_h2]:fd-step\">",
-			"  ${1}",
-			"</div>",
-			"${0}"
-		],
-		"description": "MDX Steps Item",
+		"description": "MDX H3 Step",
 		"isFileTemplate": false
 	},
 	"mdx-code-block": {
