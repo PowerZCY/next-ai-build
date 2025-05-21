@@ -3,13 +3,13 @@
     "icon": "T3P",
     "root": false,
     "pages": [
-        "[Clerk][Clerk官方说明书](https://clerk.com/docs/quickstarts/setup-clerk)",
-        "clerk-customization",
-        "[Link][FumaDocs官方说明书](https://fumadocs.dev/docs/ui)",
-        "fuma-customization",
-        "[Link][AnimeJS官方说明书](https://animejs.com/documentation/)",
-        "[Link][SimpleIcons](https://simpleicons.org/)",
-        "[Link][LucideIcons](https://lucide.dev/icons/)",
-        "[Link][Huly](https://docs.huly.io/getting-started/introduction-huly/)"
+      "clerk-customization",
+      "fuma-customization",
+      "[Clerk][Clerk官方说明书](https://clerk.com/docs/quickstarts/setup-clerk)",
+      "[Link][FumaDocs官方说明书](https://fumadocs.dev/docs/ui)",
+      "[Link][AnimeJS官方说明书](https://animejs.com/documentation/)",
+      "[Link][SimpleIcons](https://simpleicons.org/)",
+      "[Link][LucideIcons](https://lucide.dev/icons/)",
+      "[Link][Huly官方说明书](https://docs.huly.io/getting-started/introduction-huly/)"
     ]
 }

@@ -113,8 +113,123 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
 
 - 更改Header右侧的按钮顺序, 使用自定义的搜索框、主题切换、语言切换、Github按钮组件, 然后全部定义为`type=custom secondary=true`的LinkItemType
 - 默认Header的样式是写死的, 总是悬浮并且和顶部有缝隙, 在滚动页面时会在缝隙处留下网页内容残影, 使用CSS样式强制覆盖
-- 默认Banner的样式也是写死的, 对于动态配置Banner支持不够, 也可使用CSS样式强制覆盖
+- 默认Banner的样式也是写死的, 对于动态配置Banner支持不够, 也可使用CSS样式强制覆盖, 参见下文的css文本部分
 
+## 自定义组件
+* 前面已经详细分析过FumaDocs对于整个mdx处理的完整流程, 整体分为mdx解析、mdx组件生成、mdx组件渲染三个阶段
+* 这三个阶段我们都可以自定义, 只不过FumaDocs有一些默认顺序是固定的, 完全复写成本代价比较高
+* 因此, 我们优先使用FumaDocs提供的扩展口, 如果实在不够用, 再考虑自定义组件
+
+### 自定义样式组件
+
+* 当需要特殊展示某些内容, 或者更本质一点, 包装mdx里的html代码块: 提效或者美颜, 此时自定义组件就很方便了
+* Fuma通过`mdx-components.tsx`提供了易用的组件扩展, 我们只需要关注自定义组件的入参和html代码转换逻辑即可
+
+<Tabs groupId="custom-components" items={["trophyCard.tsx", "mdx-components.tsx"]}>
+  <Tab value="trophyCard.tsx">
+    <include cwd lang="tsx" meta='title="trophyCard.tsx"'>
+      src/components/mdx/trophyCard.tsx
+    </include>
+  </Tab>
+
+  ```tsx title="mdx-components.tsx" tab="mdx-components.tsx"
+  export function getMDXComponents(components?: MDXComponents): MDXComponents {
+    return {
+      // ...原有组件代码
+
+      // 将新组件代码添加到components中即可
+      TrophyCard  // [!code highlight] [!code focus]
+    };
+  }
+  ```
+</Tabs>
+
+### 自定义流程处理插件
+* 当涉及到mdx原始数据解析时, 我们就需要自定义流程处理插件, 例如在`source.config.ts`中配置FumaDocs提供的remark/rehype插件
+* FomaDocs提供了比较丰富的remark/rehype插件, 我们可以仿照它的处理方式自己写一个插件, 然后配置到`source.config.ts`中
+* 但现在我们要做一个稍微难一点事情, 就是魔改FumaDocs的插件默认行为:
+  - 现在FumaDocs的目录标题解析参考了Clerk的样式处理, 但属于阉割版本的: 步骤组件的标题只在正文中处理, 没有在目录上渲染出步骤的⭕️
+  - 通过源码分析, FumaDocs的`remark-mdx-steps`插件就是用来处理正文步骤渲染的, 而`remark-heading`插件是在之后默认执行的, 它生成slug数据为魔改目录提供了可能
+  - 然后`toc-clerk.tsx`组件会根据`remark-heading`生成的slug数据, 渲染生成最终的目录效果
+  - 魔改后的`toc-clerk.tsx`组件, 会根据`remark-heading`插件生成的标题数据, 渲染生成最终的步骤⭕️效果
+* 魔改的流程如下:
+
+<Tabs items={["源码魔改", "应用补丁"]}>
+  <Tab value="源码魔改">
+    ### 源码魔改
+    ### 1. Fork源码
+    ```zsh title="环境准备"
+    git clone https://github.com/fumadocs/fumadocs.git
+    # 进入根目录
+    cd fumadocs
+    # 安装依赖
+    pnpm install
+    # 构建
+    pnpm build
+    # 启动项目
+    pnpm --filter=docs dev
+    ```
+    ### 2. 修改组件源码
+
+    ### 3. 再次构建, 生成js文件
+    ```zsh title="打包构建"
+    pnpm build
+    ```
+
+    ### 4. 准备补丁文件
+    * 一般会有3个文件: `XXX.js`, `XXX.d.ts`, `XXX.d.tsx`
+    * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.js`
+    * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.d.ts`
+    * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.d.tsx`
+    * 拷贝到单独的文件夹中，方便后续替换
+  </Tab>
+
+  <Tab value="应用补丁">
+    ### 应用补丁
+    ### 1. 清理项目环境
+    * 清理项目环境, 删除node_modules、pnpm-lock.yaml
+
+    ### 2. 重装依赖
+    ```zsh title="重装依赖"
+    pnpm install
+    ```
+
+    ### 3. 开始pnpm patch会话
+    ```zsh title="pnpm patch"
+    pnpm patch fumadocs-ui@15.3.3 --edit-dir
+    ```
+
+    ### 4. 补丁替换
+    * 补丁文件覆盖替换`node_modules/fumadocs/dist/src/components/toc-clerk.js`
+    * 补丁文件覆盖替换`node_modules/fumadocs/dist/src/components/toc-clerk.d.ts`
+    * 补丁文件覆盖替换`node_modules/fumadocs/dist/src/components/toc-clerk.d.tsx`
+
+    ### 5. 提交补丁
+    ```zsh title="提交补丁"
+    pnpm patch-commit <之前的临时目录路径>
+    ```
+    * 提交补丁后, 会生成一个补丁文件, 文件名类似`fumadocs-ui-15.3.3-patch-1.patch`
+    * 同时`package.json`中也会有`pnpm.patchedDependencies`字段, 记录了补丁文件的路径信息
+
+    ### 6. 验证补丁
+    * 再一次清理项目环境, 删除node_modules、pnpm-lock.yaml
+    * 再次重装依赖
+    * 启动项目, 验证补丁效果: 但你查看本文档时, 就能看到正文和目录上都有对应的步骤⭕️效果
+
+    ### 7. Done
+    * 在不升级FumaDocs版本的前提下, 该补丁会一直生效, 重装环境时会自动应用, 无需再管了
+  </Tab>
+</Tabs>
+
+<Callout title="风险提醒" type="error">
+  * 魔改源码打补丁的方案, 在FumaDocs升级时会失效, 需要重新魔改
+  * **因此, 强烈推荐给FumaDocs官方咨询、讨论、提PR**, 让FumaDocs也越发好用!
+</Callout>
+
+
+
+
+### 强制覆盖fuma.css
 <include cwd lang="css" meta='title="强制覆盖fuma.css"'>
   ./src/styles/fuma.css
 </include>
