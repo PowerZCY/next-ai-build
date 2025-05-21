@@ -7,6 +7,7 @@
 			"",
       "  @mdxfm           :  生成mdx文件头📝信息",
       "  @mdxmsg          :  生成mdx提示💬信息",
+      "  @mdx1msg         :  生成mdx提示[清爽info]ℹ️信息",
       "  @mdxmsgi         :  生成mdx提示[infoℹ️]信息",
       "  @mdxmsgw         :  生成mdx提示[warn⚠️]信息",
       "  @mdxmsge         :  生成mdx提示[error❌]信息",
@@ -62,6 +63,18 @@
 			"${0}"
 		],
 		"description": "MDX Callout",
+		"isFileTemplate": false
+	},
+  "mdx-callout-simple-msg": {
+		"prefix": "@mdx1msg",
+		"body": [
+			"<Callout>",
+			  "${1}",
+			"</Callout>",
+			"",
+			"${0}"
+		],
+		"description": "MDX Callout without title",
 		"isFileTemplate": false
 	},
   "mdx-callout-info-msg": {
