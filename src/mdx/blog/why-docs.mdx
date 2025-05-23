@@ -1,84 +1,537 @@
 ---
-title: Why do you need a docs?
-description: You've read so many docs, but are they necessary?
-date: 2024-05-26
+title: Why DDaaS?
+description: Docs Driven as a Service
+date: 2025-05-23
 author: Fuma Nama
 ---
 
-People often ask me, do we really need a framework to build docs sites? Well, **You don't**.
+<Callout title="FumaMDX·All in One" type="success">
+  所有需要的语法和工具, 都在这儿
+</Callout>
 
-Documentation sites are so important in software development,
-an internal docs for developers in your company to understand the architecture,
-a docs for frameworks,
-a docs for web standards...
 
-Building docs is simple, but difficult.
+# Overview
+<Callout title="使用方式" type="info">
+1. 基于效率的考量, 对于高频使用语法, 一并提供对应的触发关键词, [模板配置](./mdx-snippets)
+2. 语法示例会使用3个Tab标签
+    - 示例, tab标题为 `example`
+    - 源码, tab标题为 `source`, 方便直接copy
+    - 触发关键词, [tab标题为 `@keywords`](./mdx-snippets)
+</Callout>
 
-There are so many paradigms to build a docs, but writing a beginner-friendly docs could be difficult.
-As a result, people tends to use powerful docs frameworks, making the docs site interactive and straightforward.
+| 基础         | 高级         |
+| ------------ | ------------ |
+| 文档头部     | 步骤组       |
+| 提示框       | Mermaid绘图  |
+| 文字处理     | 数学公式     |
+| 卡片组       | 文件层级     |
+| Tab标签组    | 内部文件引用 |
+| FAQ问答组    | 接口参数定义  |
 
-## Over-Engineered
 
-For the docs of a small library/API service, you probably don't need to setup a Next.js site and spend time writing your site.
-Neither Nextra nor Fumadocs could be better than GitHub wiki and Swagger docs in this case.
+## 文档头部
+<Tabs groupId="header" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    # 标题 [!toc]
+    描述
+  </Tab>
 
-They offer a good, descent UI, basic functionalities, and a proper workflow of authoring docs.
-The DX is good enough, I can't think of a reason to switch to a full-powered docs framework just to make your docs looks fancy.
+  ```yml title="文档头部示例" tab="source" 
+  ---
+    title: 标题, 不允许为空
+    description: 描述, 尽量不为空
+    icon: Docs, 图标为可选; 如果标识了icon字段但未设置icon值或者是不支持的icon值, 则显示默认图标
+  ---
+  ```
 
-I'll just recommend writing your docs in markdown, make it accessible on your GitHub repository.
+  ```txt title="触发关键词" tab="@keywords" 
+    @mdxfm  生成mdx文件头信息
+  ```
+</Tabs>
 
-## Why Framework?
+## 提示框
 
-Now you may wonder, why major services and frameworks have their own docs sites built with docs frameworks?
+<Tabs groupId="callout" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Callout type="info">
+      这是`无标题`的info提示框
+    </Callout>
+    
+    <Callout title="info提示框" type="info">
+      这是`info`提示框, 用于提示信息
+    </Callout>
+    <Callout title="warn提示框" type="warn">
+      这是`warn`提示框, 用于警告信息
+    </Callout>
+    <Callout title="success提示框" type="success">
+      这是`success`提示框, 用于成功信息
+    </Callout>
+    <Callout title="error提示框" type="error">
+      这是`error`提示框, 用于错误信息
+    </Callout>
+  </Tab>
 
-Of course, _Usually_ using things like GitHub Wiki is adequate, but it is not always true.
-Let's take Component Library for example, you cannot showcase your components with Markdown.
-You will constantly find an ordinary Markdown document lacks of capability and flexibility.
+  ```mdx title="提示框示例" tab="source"
+  <Callout type="info">
+    这是`无标题`的info提示框
+  </Callout> 
 
-Documentation frameworks aim to solve this problem, with the ability to integrate with major libraries like **React.js** and **Vue.js**.
-Good examples are Vitepress, Mintlify and Nextra - They made writing a docs more convenient and effective, while offering a better, dedicated experience to readers.
+  <Callout title="info提示框" type="info">
+    这是`info`提示框, 用于提示信息
+  </Callout>
 
-For anything more than a simple library or API service, **it is worth a try.**
+  <Callout title="warn提示框" type="warn">
+    这是warn提示框, 用于警告信息
+  </Callout>
 
-### Reinvent the Wheels
+  <Callout title="success提示框" type="success">
+    这是`success`提示框, 用于成功信息
+  </Callout>
 
-I would never recommend building a "custom docs site" on your own, without a proper docs framework.
-Despite the **Don't re-invent the wheels** principle, your hand-made docs site actually takes way more efforts to make it descent.
+  <Callout title="error提示框" type="error">
+    这是`error`提示框, 用于错误信息
+  </Callout>
+  ```
 
-1. Document Search
-2. A user-friendly navigation experience
-3. Reading experience
-4. UI/UX Design
+  ```txt title="触发关键词" tab="@keywords" 
+    @mdxmsgi
+    @mdxmsgw
+    @mdxmsge
+    @mdxmsgs
+    @mdxmsg   预留的触发关键词, 自己指定类型, 省去记忆
+  ```
+</Tabs>
 
-Implementing them properly already sounds nerve-racking, right?
+## 文字处理
 
-The docs itself, is definitely not your first priority. Never should you spend your precious time re-inventing the wheels - **it isn't worth**.
+<Tabs groupId="text-processing" items={["example", "source"]}>
+  <Tab value="example">
+  ### 这是3级标题, 使用`###`号 [!toc]
+  **这是加粗文字**, 高频使用快捷键 `⌃ + ⌥ + B`
 
-From my perspective, I'd rather use GitHub Wiki than re-inventing the wheels.
-Why don't pick a descent solution? It saves your indispensable time, and help reducing the shitty docs sites on the internet.
+  *这是斜体文字*, 高频使用快捷键 `⌃ + ⌥ + I`
 
-## What we focus at Fumadocs?
+  ~~这是删除线文字~~, 高频使用快捷键 `⌃ + ⌥ + X`
 
-I personally value reading experience more than a fancy eye-catching UI.
-You may notice, we do not have animations everywhere, and we avoided many fancy designs.
+  这是`高亮文字`, 高频使用快捷键 ```⌃ + ⌥ + ` ```
 
-Fanciness of UI should stay only in landing page, a docs site should focus on **content.**
-Navigation elements are helpers to browse your site, never should they take up too much space on the screen.
+  * 这是列表项文字, `●`标记
+      - 这是子项行文字, `缩进4个空格(推荐)`|或者一个Tab
+      * 这是子项行文字, `缩进4个空格(推荐)`|或者一个Tab
 
-One thing I hated the most is the design of _two sidebars_, it is confusing and meaningless.
-You can just organize all items to a single, clean sidebar, but people instead added two hamburger buttons to the navbar.
+  这是<u>下划线文字</u>
 
-<div className='mx-auto max-w-[400px]'>
+  这是<mark>黄色背景标记文字</mark>
 
-![Next.js Docs](/banner.png)
+  [这是超链接](https://ddaas.d8ger.com)
+  </Tab>
 
-</div>
+  ```mdx title="文字处理示例" tab="source"
+  ### 这是3级标题, 使用`###`号
+  **这是加粗文字**, 高频使用快捷键 `⌃ + ⌥ + B`
 
-My favourite docs site is still [Linear docs](https://linear.app/docs), looks good and simple.
+  *这是斜体文字*, 高频使用快捷键 `⌃ + ⌥ + I`
 
-## Conclusion
+  ~~这是删除线文字~~, 高频使用快捷键 `⌃ + ⌥ + X`
 
-1. You don't need a full-powered docs framework for a small library
-2. Don't make a docs site on your own, use a proper docs framework
-3. Fumadocs focuses on reading experience
-4. You should focus on content, too
+  这是`高亮文字`, 高频使用快捷键 ```⌃ + ⌥ + ` ```
+
+  * 这是项目行文字, `●`标记
+      - 子项行文字, `缩进4个空格(推荐)`|或者一个Tab
+      * 子项行文字, `缩进4个空格(推荐)`|或者一个Tab
+
+  这是<u>下划线文字</u>
+
+  这是<mark>黄色背景标记文字</mark>
+
+  [这是超链接](https://ddaas.d8ger.com)
+  ```
+</Tabs>
+
+## 卡片组
+
+<Tabs groupId="card" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Cards>
+      <Card icon={<DPA />}  href="./ddaas" title="图标+跳转">
+        **`所见即所得`**(What you see is what you get, and what you'll get is what you've ever seen)
+      </Card>
+      <Card href="./mdx-snippets" title="无图标+跳转">
+        充分利用现代IDE的**代码模板**注入功能, 省去大量重复编码操作, 提高开发效率
+      </Card>
+      <Card title="无图标+无跳转">
+        只是问题卡片
+      </Card>
+    </Cards>
+  </Tab>
+
+  ```mdx title="卡片组mdx源码" tab="source" 
+    <Cards>
+      <Card icon={<DPA />}  href="./ddaas" title="图标+跳转">
+        **`所见即所得`**(What you see is what you get, and what you'll get is what you've ever seen)
+      </Card>
+      <Card href="./mdx-snippets" title="无图标+跳转">
+        充分利用现代IDE的**代码模板**注入功能, 省去大量重复编码操作, 提高开发效率
+      </Card>
+      <Card title="无图标+无跳转">
+        只是问题卡片
+      </Card>
+    </Cards>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords" 
+    @mdxcg
+    @mdxscard
+  ```
+</Tabs>
+
+### 卡片参数 [!toc]
+<TypeTable
+  type={{
+    title: {
+      required: true,
+      type: "string",
+      description: "卡片标题",
+      default: "",
+      deprecated: false,
+    },
+    description: {
+      required: true,
+      type: "string",
+      description: "卡片描述, 支持markdown语法",
+      default: "",
+      deprecated: false,
+    },
+    icon: {
+      required: false,
+      type: "ReactNode",
+      description: "卡片图标, 支持iconify图标, 例如<DPA />",
+      default: "",
+      deprecated: false,
+    },
+    href: { 
+      required: false,
+      type: "string",
+      description: "卡片跳转链接, 支持外部链接和内部链接, 内部链接最好使用相对路径, 例如 ./ddaas ",
+      default: "",
+      deprecated: false,
+    }
+}}
+/>
+
+
+## Tab标签组
+
+### 简单模式
+<Tabs groupId="easy-tabs" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Tabs groupId="example-easy-tabs" items={["tab1", "tab2"]}>
+      <Tab value="tab1">
+        这是Tab1
+      </Tab>
+      <Tab value="tab2">
+        这是Tab2  
+      </Tab>
+    </Tabs>
+  </Tab>
+
+  ```mdx title="简单模式示例" tab="source" 
+  <Tabs groupId="example-easy-tabs" items={["tab1", "tab2"]}>
+    <Tab value="tab1">
+      这是Tab1
+    </Tab>
+    <Tab value="tab2">
+      这是Tab2  
+    </Tab>
+  </Tabs>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxtabs  生成mdx标签Tab组
+  @mdxstab  生成mdx单个标签Tab组子项
+  ```
+</Tabs>
+
+
+### 安装包模式
+<Tabs groupId="install-tabs" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Tabs groupId="package-manager" persist items={["npm", "pnpm"]}>
+      ```bash tab="npm"
+      npm install clerk@clerk-next
+      ```
+    
+      ```bash tab="pnpm"
+      pnpm add clerk@clerk-next
+      ```
+    </Tabs>
+  </Tab>
+
+
+  ````mdx title="安装包模式示例" tab="source" 
+  <Tabs groupId="package-manager" persist items={["npm", "pnpm"]}>
+    ```bash tab="npm"
+    npm install clerk@clerk-next
+    ```
+  
+    ```bash tab="pnpm"
+    pnpm add clerk@clerk-next
+    ```
+  </Tabs>
+  ````
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxinstalltab  生成mdx安装命令Tab
+  ```
+</Tabs>
+
+## FAQ问答组
+
+<Tabs groupId="faq" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Accordions>
+      <Accordion id="how-to-put-elephant" title="怎样把大象装进冰箱?">
+        ### 1. 步骤1 [!toc]
+        打开冰箱门
+
+        ### 2. 步骤2 [!toc]
+        把大象装进去
+
+        ### 3. 步骤3 [!toc]
+        关上冰箱门
+      </Accordion>
+      <Accordion id="faq" title="FAQ使用说明">
+        `id`字段可选, 如果指定, 那么该faq就能生成分享链接
+      </Accordion>
+    </Accordions>
+  </Tab>
+
+  ```mdx title="FAQ问答组示例" tab="source" 
+  <Accordions>
+    <Accordion id="how-to-put-elephant" title="怎样把大象装进冰箱?">
+      ### 1. 步骤1 [!toc]
+      打开冰箱门
+
+      ### 2. 步骤2 [!toc]
+      把大象装进去
+
+      ### 3. 步骤3 [!toc]
+      关上冰箱门
+    </Accordion>
+    <Accordion id="faq" title="FAQ使用说明">
+      `id`字段可选, 如果指定, 那么该faq就能生成分享链接
+    </Accordion>
+  </Accordions>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxfaq     生成mdx问答组
+  @mdxsfaq    生成mdx问答组子项
+  ```
+</Tabs>
+
+## 标题式步骤组
+* [上文FAQ问答示例](#how-to-put-elephant)就是一个简单的步骤组演示, 只不过它在目录中隐藏了步骤标题
+
+<Callout title="弃用FumaDocs的Step组件" type="error">
+  FumaDocs提供的`remarkSteps`插件, 支持标题式步骤组, 这更符合人类习惯
+
+  所以, 本项目从代码层面弃用`Step`组件, 强力支持标题式步骤组的写法
+</Callout>
+
+
+### 标题式步骤组规则
+* 不支持步骤组嵌套, 因为FumaDocs底层暂不支持, 重写代价大, 并且从DDaaS角度, 如果需要步骤组嵌套, 说明文档不够简练、不容易懂
+* 命名规则规则: `###`(强烈推荐固定写法) + `空格` + `步骤编号数字≤19` + `英文.` + `至少1个空格` + `标题名称`, 例如: `### 1. 三级标题的步骤1`
+* 不满足规则的, 会自动降级为普通标题; 步骤编号也由文档指定, `TOC底层解析不会自动递增编号, 正文渲染会自动递增`, 便于发现更改错误
+* 多个步骤组之间用不同层级的**普通标题**分隔开来, 例如: h2、h4的标题
+
+
+<Tabs items={["如何使用标题式步骤组"]}>
+  <Tab value="如何使用标题式步骤组">
+    ### 1. 使用快捷命令
+    `@mdxstep`, 生成标准格式
+
+    ### 2. 输入步骤编号
+    注意编号需要你自己维护递增
+
+    ### 3. 输入步骤标题
+    
+    
+    ### 4. 输入描述
+    
+  </Tab>
+</Tabs>
+
+
+## Mermaid绘图
+
+<Tabs groupId="mermaid" items={[ "example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Mermaid
+    title="人生路径图·By 李笑来"
+    chart="
+    flowchart LR
+      S[起点]
+      ST[自学]
+      K[知识]
+      OK[其他知识]
+      IK[投资知识]
+      SK[销售知识]
+      PK[生产知识]
+      P[追求]
+      I[投资]
+      SA[销售]
+      PR[生产]
+      MF[(精神财富)]
+      PF[(物质财富)]
+      DO[作更多的事]
+
+      S--->ST--->K
+      K--->OK
+      K--->IK
+      K--->SK
+      K--->PK
+      OK--->P--->MF
+      IK--->I--->PF
+      SK--->SA--->PF
+      PK--->PR--->PF
+
+      MF--->DO
+      PF--->DO
+      S-...->|时间|DO
+
+    "/>
+  </Tab>
+  ```mdx title="Mermaid绘图示例" tab="source" 
+  <Mermaid
+    title="人生路径图·By 李笑来"
+    chart="
+    flowchart LR
+      S[起点]
+      ST[自学]
+      K[知识]
+      OK[其他知识]
+      IK[投资知识]
+      SK[销售知识]
+      PK[生产知识]
+      P[追求]
+      I[投资]
+      SA[销售]
+      PR[生产]
+      MF[(精神财富)]
+      PF[(物质财富)]
+      DO[做更多的事]
+
+      S--->ST--->K
+      K--->OK
+      K--->IK
+      K--->SK
+      K--->PK
+      OK--->P--->MF
+      IK--->I--->PF
+      SK--->SA--->PF
+      PK--->PR--->PF
+
+      MF--->DO
+      PF--->DO
+      S-...->|时间|DO
+
+    "/>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxmermaid  生成mdx图标Mermaid
+  ```
+</Tabs>
+
+
+## 数学公式
+
+<Tabs groupId="math" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    ```math title="正态分布公式
+      f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+    ```
+  </Tab>
+
+  ````mdx title="数学公式示例" tab="source" 
+    ```math title="正态分布公式"
+      f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+    ```
+  ````
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxmath  生成mdx数学公式
+  ```
+</Tabs>
+
+## 文件层级
+
+<Tabs groupId="file-system" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <Files>
+      <Folder name="这是默认展开的文件夹" defaultOpen>
+        <File name="这是普通文件.tsx" />
+        <File icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
+        <Folder name="这是置灰文件夹" defaultOpen className="opacity-50">
+          <File name="继承父目录的置灰文件1.tsx" />
+          <File name="继承父目录的置灰文件2.txt" />
+        </Folder>
+        <Folder name="这是默认关闭的文件夹">
+          <File name="Search.tsx" />
+        </Folder>
+      </Folder>
+      <Folder name="这是空文件夹" className="opacity-50" disabled/>
+    </Files>
+  </Tab>
+
+  ```mdx title="文件层级示例" tab="source" 
+  <Files>
+    <Folder name="这是默认展开的文件夹" defaultOpen>
+      <File name="这是普通文件.tsx" />
+      <File icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
+      <Folder name="这是置灰文件夹" defaultOpen className="opacity-50">
+        <File name="继承父目录的置灰文件1.tsx" />
+        <File name="继承父目录的置灰文件2.txt" />
+      </Folder>
+      <Folder name="这是默认关闭的文件夹">
+        <File name="Search.tsx" />
+      </Folder>
+    </Folder>
+    <Folder name="这是空文件夹" className="opacity-50" disabled/>
+  </Files>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxfiles    生成mdx文件系统示意图
+  @mdxfile     生成mdx单个文件
+  @mdxlfile    生成mdx🔐锁定文件
+  @mdxfolder   生成mdx文件夹
+  @mdxifolder  生成mdx置灰文件夹
+  @mdxefolder  生成mdx空文件夹
+  ```
+</Tabs>
+
+
+## 内部文件引用
+
+<Tabs groupId="internal-file-reference" items={["example", "source", "@keywords"]}>
+  <Tab value="example">
+    <include cwd lang="ts" meta='title="i18n.ts"'>
+      src/i18n.ts
+    </include>
+  </Tab>
+
+  ```mdx title="内部文件引用示例" tab="source" 
+  <include cwd lang="ts" meta='title="i18n.ts"'>
+    src/i18n.ts
+  </include>
+  ```
+
+  ```txt title="触发关键词" tab="@keywords"   
+  @mdxitabs   生成mdx引入文件Tab组
+  @mdxistab   生成mdx单个引入文件Tab组子项
+  @mdxif      生成mdx单独引入文件
+  ```
+</Tabs>

@@ -24,7 +24,7 @@ const languageToIconMap: Record<string, React.ReactNode> = {
   http: <icons.Http />,
   java: <icons.Java />,
   json: <icons.Json />,
-  jsonc: <icons.ChevronsLeftRightEllipsis />,
+  jsonc: <icons.SquareDashedBottomCode />,
   log: <icons.Log />,
   mdx: <icons.MDX />,
   regex: <icons.Regex />,
