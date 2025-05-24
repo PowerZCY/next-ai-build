@@ -1,13 +1,3 @@
-// source.config.ts
-import { defineDocs, defineConfig, defineCollections, frontmatterSchema, metaSchema } from "fumadocs-mdx/config";
-import { fileGenerator, remarkDocGen, remarkInstall } from "fumadocs-docgen";
-import { remarkTypeScriptToJavaScript } from "fumadocs-docgen/remark-ts2js";
-import { rehypeCodeDefaultOptions, remarkSteps } from "fumadocs-core/mdx-plugins";
-import rehypeKatex from "rehype-katex";
-import remarkMath from "remark-math";
-import { remarkAutoTypeTable } from "fumadocs-typescript";
-import { z } from "zod";
-
 // src/lib/appConfig.ts
 var appConfig = {
   // 基础配置
@@ -89,6 +79,14 @@ var generatedLocales = appConfig.i18n.locales.map((loc) => ({
 }));
 
 // source.config.ts
+import { rehypeCodeDefaultOptions, remarkSteps } from "fumadocs-core/mdx-plugins";
+import { fileGenerator, remarkDocGen, remarkInstall } from "fumadocs-docgen";
+import { remarkTypeScriptToJavaScript } from "fumadocs-docgen/remark-ts2js";
+import { defineConfig, defineDocs, frontmatterSchema, metaSchema } from "fumadocs-mdx/config";
+import { remarkAutoTypeTable } from "fumadocs-typescript";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+import { z } from "zod";
 var mdxSourceDir = appConfig.mdxSourceDir;
 var createTitleSchema = () => z.string({
   required_error: "Title is required",
@@ -128,18 +126,23 @@ var docs = defineDocs({
     })
   }
 });
-var blog = defineCollections({
+var blog = defineDocs({
   dir: mdxSourceDir.blog,
-  type: "doc",
-  async: false,
-  // @ts-ignore - Temporarily suppress deep instantiation error
-  schema: frontmatterSchema.extend({
-    title: createTitleSchema(),
-    description: createDescriptionSchema(),
-    author: z.string(),
-    date: z.string().date().or(z.date()).optional(),
-    keywords: z.array(z.string()).optional()
-  })
+  docs: {
+    async: false,
+    // @ts-ignore - Temporarily suppress deep instantiation error
+    schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      author: z.string(),
+      keywords: z.array(z.string()).optional()
+    })
+  },
+  meta: {
+    schema: metaSchema.extend({
+      description: z.string().optional()
+    })
+  }
 });
 var legal = defineDocs({
   dir: mdxSourceDir.legal,

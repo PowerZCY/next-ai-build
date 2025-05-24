@@ -1,14 +1,14 @@
-import { defineDocs, defineConfig, defineCollections, frontmatterSchema, metaSchema} from 'fumadocs-mdx/config';
+import { appConfig } from '@/lib/appConfig';
+import { rehypeCodeDefaultOptions, remarkSteps } from 'fumadocs-core/mdx-plugins';
 import { fileGenerator, remarkDocGen, remarkInstall } from 'fumadocs-docgen';
 import { remarkTypeScriptToJavaScript } from 'fumadocs-docgen/remark-ts2js';
-import { rehypeCodeDefaultOptions, remarkSteps} from 'fumadocs-core/mdx-plugins';
+import { defineConfig, defineDocs, frontmatterSchema, metaSchema } from 'fumadocs-mdx/config';
+import { remarkAutoTypeTable } from 'fumadocs-typescript';
+import type { Element } from 'hast';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
-import { remarkAutoTypeTable } from 'fumadocs-typescript';
+import type { ShikiTransformerContext as TransformerContext } from 'shiki';
 import { z } from 'zod';
-import { appConfig } from '@/lib/appConfig';
-import type { Element } from 'hast';
-import type { ShikiTransformerContext as TransformerContext } from 'shiki'; 
 
 const mdxSourceDir = appConfig.mdxSourceDir
 
@@ -62,18 +62,23 @@ export const docs = defineDocs({
   },
 });
 
-export const blog = defineCollections({
+export const blog = defineDocs({
   dir: mdxSourceDir.blog,
-  type: 'doc',
-  async: false,
-  // @ts-ignore - Temporarily suppress deep instantiation error
-  schema: frontmatterSchema.extend({
-    title: createTitleSchema(),
-    description: createDescriptionSchema(),
-    author: z.string(),
-    date: z.string().date().or(z.date()).optional(),
-    keywords: z.array(z.string()).optional(),
-  }),
+  docs: {
+    async: false,
+    // @ts-ignore - Temporarily suppress deep instantiation error
+    schema: frontmatterSchema.extend({
+      title: createTitleSchema(),
+      description: createDescriptionSchema(),
+      author: z.string(),
+      keywords: z.array(z.string()).optional(),
+    }),
+  },
+  meta: {
+    schema: metaSchema.extend({
+      description: z.string().optional(),
+    }),
+  },
 });
 
 export const legal = defineDocs({
