@@ -48,6 +48,7 @@ export {
     Pi,
     ReceiptText,
     Regex,
+    Rss,
     Search,
     Share,
     SquareDashedBottomCode,

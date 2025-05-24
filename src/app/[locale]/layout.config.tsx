@@ -17,7 +17,6 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
       icon: <icons.AlbumIcon />,
       text: t1('blog'),
       url: `/${locale}/blog`,
-      active: 'nested-url',
     },
     {
       type: 'custom',

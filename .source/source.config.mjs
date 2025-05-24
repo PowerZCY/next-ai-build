@@ -134,7 +134,7 @@ var blog = defineDocs({
     schema: frontmatterSchema.extend({
       title: createTitleSchema(),
       description: createDescriptionSchema(),
-      author: z.string(),
+      author: z.string().optional(),
       keywords: z.array(z.string()).optional()
     })
   },
