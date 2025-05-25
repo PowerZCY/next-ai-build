@@ -39,8 +39,15 @@ const nextConfig: NextConfig = {
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
-    parallelServerCompiles: true
+    parallelServerCompiles: true,
   },
+
+  // Ensuring outputFileTracingIncludes is a top-level property
+  outputFileTracingIncludes: {
+    // Ensure MDX files for the llm-content API route are included in the serverless function
+    // Adjust the key if your API route path is different in the output structure
+    '/api/llm-content': ['./src/mdx/**/*'], 
+  }
 };
 
 export default withNextIntl(withMDX(nextConfig));

@@ -1,10 +1,6 @@
 import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
-import { fileGenerator, remarkDocGen, remarkInstall } from 'fumadocs-docgen';
 import remarkMdx from 'remark-mdx';
-import { remarkAutoTypeTable } from 'fumadocs-typescript';
-import { remarkInclude } from 'fumadocs-mdx/config';
-import { type Page } from '@/lib/source';
 import remarkFrontmatter from 'remark-frontmatter';
 import { visit } from 'unist-util-visit';
 
@@ -28,26 +24,27 @@ const processor = remark()
   // 移除md文件标识头
   .use(remarkRemoveFrontmatter)
   .use(remarkMdx)
-  .use(remarkInclude)
-  .use(remarkGfm)
-  .use(remarkAutoTypeTable)
-  .use(remarkDocGen, { generators: [fileGenerator()] })
-  .use(remarkInstall);
+  .use(remarkGfm);
 
-export async function getLLMText(page: Page) {
-//   console.log('page data for getLLMText:', page.data);
-  const processed = await processor.process({
-    path: page.data._file.absolutePath,
-    value: page.data.content,
-  });
+export async function getLLMText(mdxContent: string, title?: string, description?: string) {
+  if (typeof mdxContent !== 'string') {
+    console.error('getLLMText: mdxContent received was not a string. Type:', typeof mdxContent);
+    return `# Error\n\nInvalid content received by text processor.`;
+  }
 
-  const contentWithoutFrontmatter = processed.value as string;
+  try {
+    const processed = await processor.process(mdxContent);
+    const contentWithoutFrontmatter = processed.value as string;
 
-  const markdownParts = [
-    `# ${page.data.title}`,
-    page.data.description,
-    contentWithoutFrontmatter.trim()
-  ];
+    const markdownParts = [
+      title ? `# ${title}` : null,
+      description,
+      contentWithoutFrontmatter.trim()
+    ];
 
-  return markdownParts.filter(part => part != null).join('\n\n');
+    return markdownParts.filter(part => part != null).join('\n\n');
+  } catch (processingError) {
+    console.error('Error during remark processing in getLLMText:', processingError);
+    return `# Error\n\nError processing MDX content.`;
+  }
 }
