@@ -203,7 +203,7 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
     * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.js`
     * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.d.ts`
     * 文件: `node_modules/fumadocs/dist/src/components/toc-clerk.d.tsx`
-    * 拷贝到单独的文件夹中，方便后续替换
+    * 拷贝到单独的文件夹中, 方便后续替换
   </Tab>
 
   <Tab value="应用补丁">
@@ -253,5 +253,59 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
   ./src/styles/fuma.css
 </include>
 
+## Vercel中文件读取报错问题
+
+### 问题描述
+
+* 在将包含 Fumadocs 的 Next.js 应用部署到 Vercel 后, 一个用于提取 MDX 页面内容的 API 路由 (`/api/llm-content`), 在本地开发时工作正常
+* 但在 Vercel 的 Serverless Function 环境中持续抛出 `ENOENT: no such file or directory` 错误
+* 错误日志指示, 系统尝试打开类似 `/vercel/path0/src/mdx/docs/...` 的路径, 这是一个构建时的绝对路径, 在运行时无效
+
+### 分析过程
+
+1.  初步怀疑 `remark` 插件: 最初认为问题出在 `getLLMText` 函数中使用的 `remark` 插件链（如 `remark-include`, `remark-docgen` 等）在运行时试图访问文件系统
+2.  简化 `remark` 插件: 逐步移除了这些可能导致问题的插件, 但错误依旧
+3.  日志诊断 `page` 对象: 通过在 API 路由中添加详细日志, 发现在尝试访问 `page.data.content` 属性（由 `docsSource.getPage()` 返回）时, 错误就会发生。这表明 Fumadocs 在运行时延迟加载此属性, 并错误地使用了构建时的文件路径
+4.  确认元数据可访问: 测试表明, 访问 `page.data.title` 等其他元数据是安全的, 不会触发文件读取错误
+
+### 解决方案
+* 核心解决方案是避免在 API 路由运行时让 Fumadocs 的内部机制去加载文件内容, 而是由我们主动、正确地读取文件
+
+### 1. Next.config.ts配置
+* 确保 MDX 文件被打包到 Vercel Serverless Function: 
+  * 修改 `next.config.ts`, 在顶层配置中添加 `outputFileTracingIncludes`, 明确指定将 `src/mdx/docs/**/*` 目录下的所有文件包含在 `/api/llm-content` 路由的部署包中
+
+### 2. getLLMText函数
+* 修改 `getLLMText` 函数 (`src/lib/get-llm-text.ts`): 
+  * 更改函数签名, 使其接受 MDX 内容字符串、标题和描述作为参数: `async function getLLMText(mdxContent: string, title?: string, description?: string)`
+  * 内部 `remark` 处理器使用简化的插件集 (`remark-frontmatter`, `remark-remove-frontmatter`, `remark-mdx`, `remark-gfm`), 仅处理传入的字符串内容
+
+### 3. API 路由
+* 修改 API 路由 (`src/app/api/llm-content/route.ts`): 
+  * 调用 `docsSource.getPage(slug, locale)` 获取 `page` 对象, 并从中安全地提取 `title` 和 `description`
+  * 从 `page.data._file.path` 获取 MDX 文件的相对路径
+  * 使用 Node.js 的 `path.join(process.cwd(), 'src', 'mdx', 'docs', relativeMdxFilePath)` 构造在 Vercel 运行时环境中的正确绝对路径（`process.cwd()` 在 Vercel Serverless Function 中通常是 `/var/task`）
+  * 使用 `fs.readFileSync(absoluteFilePath, 'utf-8')` 同步读取文件内容
+  * 将手动读取到的 `mdxContent` 字符串以及 `title` 和 `description` 传递给更新后的 `getLLMText` 函数
+  * 包含详细的错误处理和日志记录, 特别是在文件读取失败时, 会尝试列出相关目录内容以辅助调试
+
+### 4. Done! 完整代码
+<Tabs groupId="llm-content" items={["next.config.ts", "get-llm-text.ts", "route.ts"]}>
+  <Tab value="next.config.ts">
+    <include cwd lang="ts" meta='title="next.config.ts"'>
+      ./next.config.ts
+    </include>
+  </Tab>
+  <Tab value="get-llm-text.ts">
+    <include cwd lang="ts" meta='title="get-llm-text.ts"'>
+      ./src/lib/get-llm-text.ts
+    </include>
+  </Tab>
+  <Tab value="route.ts">
+    <include cwd lang="ts" meta='title="route.ts"'>
+      ./src/app/api/llm-content/route.ts
+    </include>
+  </Tab>
+</Tabs>
 
 
