@@ -18,7 +18,7 @@ export default async function Page({
   const { slug, locale } = await params;
   const page = blogSource.getPage(slug, locale);
   if (!page) notFound();
-	
+
   const path = `${appConfig.mdxSourceDir.blog}/${page.file.path}`;
   const tocFooterElement = <TocFooter lastModified={page.data.lastModified} editPath={path} />;
  

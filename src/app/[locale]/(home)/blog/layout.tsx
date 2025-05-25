@@ -11,7 +11,6 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { locale } = await params;
- 
   return (
     <DocsLayout sidebar={{enabled: false}} tree={blogSource.pageTree[locale]}>
       {children}
