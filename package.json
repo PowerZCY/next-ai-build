@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "postinstall": "fumadocs-mdx",
-    "predev": "pnpm run lint",
+    "predev": "pnpm generate-blog-index &&pnpm run lint",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "generate-blog-index": "ts-node --project tsconfig.node.json scripts/generate-blog-index.ts",
     "check-translations": "ts-node --project tsconfig.node.json scripts/check-translations.ts",
     "clean-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts",
     "remove-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts --remove"

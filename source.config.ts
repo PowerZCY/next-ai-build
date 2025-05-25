@@ -40,6 +40,27 @@ const createIconSchema = () =>
     z.string().optional()
   );
 
+// Reusable schema for date
+const createDateSchema = () =>
+  z.preprocess((arg) => {
+    if (arg instanceof Date) {
+      // Format Date object to YYYY-MM-DD string
+      const year = arg.getFullYear();
+      const month = (arg.getMonth() + 1).toString().padStart(2, '0');
+      const day = arg.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (typeof arg === 'string') {
+      return arg.trim();
+    }
+    // For other types or null/undefined, let the subsequent string validation handle it
+    return arg; 
+  },
+  z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format or a valid Date object")
+    .refine((val) => !isNaN(new Date(val).getTime()), 'Invalid date!')
+  );
+
 export const docs = defineDocs({
   dir: mdxSourceDir.docs,
   docs: {
@@ -71,6 +92,7 @@ export const blog = defineDocs({
       title: createTitleSchema(),
       description: createDescriptionSchema(),
       author: z.string().optional(),
+      date: createDateSchema(),
       keywords: z.array(z.string()).optional(),
     }),
   },
