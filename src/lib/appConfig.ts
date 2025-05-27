@@ -54,6 +54,7 @@ export const appConfig = {
       enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === 'true',
       text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "巽川·怀因"
     },
+    cdnBaseUrl: "https://raw.githubusercontent.com/caofanCPU/wind-run-1/main/public",
     placeHolder: {
       image: "/default.webp"
     }

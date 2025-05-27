@@ -53,6 +53,7 @@ var appConfig = {
       enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === "true",
       text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
     },
+    cdnBaseUrl: "https://raw.githubusercontent.com/caofanCPU/wind-run-1/main/public",
     placeHolder: {
       image: "/default.webp"
     }
