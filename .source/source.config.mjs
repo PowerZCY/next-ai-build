@@ -52,6 +52,9 @@ var appConfig = {
       // 只有NEXT_PUBLIC_的变量才能被client组件访问!
       enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === "true",
       text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "\u5DFD\u5DDD\xB7\u6000\u56E0"
+    },
+    placeHolder: {
+      image: "/default.webp"
     }
   },
   mdxSourceDir: {
@@ -73,6 +76,7 @@ var watermark = appConfig.style.watermark;
 var showBanner = appConfig.style.showBanner;
 var clerkPageBanner = appConfig.style.clerkPageBanner;
 var clerkAuthInModal = appConfig.style.clerkAuthInModal;
+var placeHolderImage = appConfig.style.placeHolder.image;
 var generatedLocales = appConfig.i18n.locales.map((loc) => ({
   name: appConfig.i18n.localeLabels[loc],
   locale: loc
@@ -190,6 +194,8 @@ var source_config_default = defineConfig({
   lastModifiedTime: "git",
   mdxOptions: {
     providerImportSource: "@/components/mdx-components",
+    // 禁用 remark-image 的默认行为, 图片统一使用远程URL
+    remarkImageOptions: false,
     rehypeCodeOptions: {
       lazy: true,
       experimentalJSEngine: true,

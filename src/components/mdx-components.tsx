@@ -4,7 +4,7 @@ import { Mermaid } from '@/components/mdx/mermaid';
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
-import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
+import { ImageZoom } from '@/components/mdx/image-zoom';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { globalLucideIcons } from '@/components/global-icon';
 import type { MDXComponents, MDXProps } from 'mdx/types';

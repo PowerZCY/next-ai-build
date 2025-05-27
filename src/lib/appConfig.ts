@@ -53,6 +53,9 @@ export const appConfig = {
       // 只有NEXT_PUBLIC_的变量才能被client组件访问!
       enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === 'true',
       text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "巽川·怀因"
+    },
+    placeHolder: {
+      image: "/default.webp"
     }
   },
   mdxSourceDir: {
@@ -75,6 +78,7 @@ export const watermark = appConfig.style.watermark
 export const showBanner = appConfig.style.showBanner
 export const clerkPageBanner = appConfig.style.clerkPageBanner
 export const clerkAuthInModal = appConfig.style.clerkAuthInModal
+export const placeHolderImage = appConfig.style.placeHolder.image
 
 // 辅助函数：检查是否为支持的语言
 function isSupportedLocale(locale: string): locale is typeof appConfig.i18n.locales[number] {
