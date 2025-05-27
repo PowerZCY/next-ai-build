@@ -129,4 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 .DS_Store
-data/json/tmp*
+.source/index.ts
+.source/source.config.mjs
+
