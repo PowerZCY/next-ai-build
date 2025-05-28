@@ -14,6 +14,7 @@ export {
     Building2,
     Bug,
     Circle,
+    CircleSmall,
     Check,
     ChevronDown,
     ChevronLeft,

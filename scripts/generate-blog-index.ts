@@ -167,7 +167,7 @@ async function generateBlogIndex() {
       // Ensure there's a space before href if iconProp is present and not empty
       const finalIconProp = iconProp ? `${iconProp} ` : '';
 
-      return `  <Card ${finalIconProp}href="${article.href}" title="${escapedTitle}">\n    ${cardContent}\n  </Card>\n`;
+      return `  <ZiaCard ${finalIconProp}href="${article.href}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`;
     };
 
     if (featuredArticles.length > 0) {

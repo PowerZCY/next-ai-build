@@ -15,6 +15,7 @@ import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import { globalLucideIcons as icons } from '@/components/global-icon';
 import { TrophyCard } from '@/components/mdx/trophyCard';
 import { ImageGrid } from '@/components/mdx/imageGrid';
+import { ZiaCard } from '@/components/mdx/zia-card';
 
 // 创建一个语言标识符到图标组件的映射
 const languageToIconMap: Record<string, React.ReactNode> = {
@@ -88,7 +89,8 @@ const fumadocsUiComponents = {
   Mermaid,
   TypeTable,
   TrophyCard,
-  ImageGrid
+  ImageGrid,
+  ZiaCard
 };
 
 const customUiComponents = {
