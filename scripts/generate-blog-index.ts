@@ -196,7 +196,7 @@ async function generateBlogIndex() {
     // 单独添加 Monthly Summary 区块
     if (iocArticle) {
       mdxContent += `\n## Monthly Summary\n\n<Cards>\n`;
-      const iocHref = BLOG_PREFIX ? `./${BLOG_PREFIX}/${IOC_SLUG}` : `${IOC_SLUG}`;
+      const iocHref = BLOG_PREFIX ? `./${BLOG_PREFIX}/${IOC_SLUG}` : `./${IOC_SLUG}`;
       mdxContent += `  <ZiaCard href="${iocHref}" title="Overview">\n    ${iocArticle.date || ''}\n  </ZiaCard>\n`;
       mdxContent += `</Cards>\n`;
     }
