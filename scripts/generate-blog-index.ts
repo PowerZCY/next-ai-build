@@ -25,6 +25,8 @@ const BLOG_MDX_PATH = path.join(process.cwd(), 'src/mdx/blog');
 const INDEX_MDX_FILE = path.join(BLOG_MDX_PATH, 'index.mdx');
 const META_JSON_FILE = path.join(BLOG_MDX_PATH, 'meta.json');
 const IOC_MDX_FILE = path.join(BLOG_MDX_PATH, 'ioc.mdx');
+const BLOG_PREFIX = 'blog'; // 文章路径前缀，便于不同工程复用，如无前缀可设为 ''
+const IOC_SLUG = 'ioc'; // ioc 索引页 slug，便于统一维护
 
 function parseFrontmatter(fileContent: string): Frontmatter {
   const frontmatter: Frontmatter = {};
@@ -102,7 +104,7 @@ async function generateBlogIndex() {
     }
     
     // ioc 相关处理
-    const iocSlug = 'ioc';
+    const iocSlug = IOC_SLUG;
     const featuredSlugs = meta.pages
       .map(p => p.endsWith('.mdx') ? p.slice(0, -4) : p)
       .filter(slug => slug !== 'index' && slug !== '...' && slug !== iocSlug && slug !== `!${iocSlug}`);
@@ -112,9 +114,9 @@ async function generateBlogIndex() {
     console.log(`Found ${allArticles.length} all articles.`);
 
     // ioc 文章单独处理
-    const iocArticle = allArticles.find(a => a.slug === iocSlug);
+    const iocArticle = allArticles.find(a => a.slug === IOC_SLUG);
 
-    const filteredArticles = allArticles.filter(a => a.slug !== iocSlug);
+    const filteredArticles = allArticles.filter(a => a.slug !== IOC_SLUG);
 
     if (filteredArticles.length === 0 && featuredSlugs.length === 0) {
       console.warn("No articles found or featured. The generated index might be empty or minimal.");
@@ -175,7 +177,8 @@ async function generateBlogIndex() {
       // Ensure there's a space before href if iconProp is present and not empty
       const finalIconProp = iconProp ? `${iconProp} ` : '';
 
-      return `  <ZiaCard ${finalIconProp}href="./blog/${article.slug}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`;
+      const href = BLOG_PREFIX ? `./${BLOG_PREFIX}/${article.slug}` : `./${article.slug}`;
+      return `  <ZiaCard ${finalIconProp}href="${href}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`;
     };
 
     if (featuredArticles.length > 0) {
@@ -193,7 +196,8 @@ async function generateBlogIndex() {
     // 单独添加 Monthly Summary 区块
     if (iocArticle) {
       mdxContent += `\n## Monthly Summary\n\n<Cards>\n`;
-      mdxContent += `  <ZiaCard href="./blog/ioc" title="博客历史分析">\n    ${iocArticle.date || ''}\n  </ZiaCard>\n`;
+      const iocHref = BLOG_PREFIX ? `./${BLOG_PREFIX}/${IOC_SLUG}` : `${IOC_SLUG}`;
+      mdxContent += `  <ZiaCard href="${iocHref}" title="Overview">\n    ${iocArticle.date || ''}\n  </ZiaCard>\n`;
       mdxContent += `</Cards>\n`;
     }
 
@@ -218,7 +222,7 @@ async function generateMonthlyBlogSummary() {
   // 读取所有文章
   const articles = await getAllBlogArticles();
   // 过滤掉没有 date 的文章和 slug 为 ioc 的文章
-  const articlesWithDate = articles.filter(a => a.date && a.slug !== 'ioc');
+  const articlesWithDate = articles.filter(a => a.date && a.slug !== IOC_SLUG);
 
   // 按月分组
   const monthMap: Record<string, {date: string, title: string}[]> = {};
@@ -246,7 +250,7 @@ async function generateMonthlyBlogSummary() {
   } catch {}
 
   // 生成内容
-  let mdx = frontmatter ? `${frontmatter}\n\n\n## 月刊\n<Files>\n` : `\n## 月刊\n<Files>\n`;
+  let mdx = frontmatter ? `${frontmatter}\n\n\n## Overview\n<Files>\n` : `\n## Overview\n<Files>\n`;
   for (const month of sortedMonths) {
     // Folder 名称格式 YYYY-MM(文章数量)
     const count = monthMap[month].length;
