@@ -13,6 +13,7 @@ export {
     Blocks,
     Building2,
     Bug,
+    Car,
     Circle,
     CircleSmall,
     Check,
