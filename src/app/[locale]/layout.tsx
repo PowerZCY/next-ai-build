@@ -5,6 +5,15 @@ import './globals.css';
 import NProgressBar from '@/app/[locale]/nProgressBar';
 import { cn } from '@/lib/fuma-search-util';
 import { RootProvider } from "fumadocs-ui/provider";
+import { Montserrat } from "next/font/google";
+import { cn as cnUtils } from '@/lib/utils';
+
+const montserrat = Montserrat({
+  weight: ['400'], // 400 是 Regular
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export const dynamic = 'force-dynamic'
 
 // 网站元数据
@@ -60,7 +69,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body>
+        <body className={cnUtils(montserrat.className)}>
           <NProgressBar />
           <RootProvider
             i18n={{
