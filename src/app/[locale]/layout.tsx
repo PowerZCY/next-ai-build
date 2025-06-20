@@ -83,7 +83,6 @@ export default async function RootLayout({
             {children}
           </RootProvider>
         </body>
-        {/* <GoogleAnalyticsScript /> */}
       </NextIntlClientProvider>
     </html>
   )

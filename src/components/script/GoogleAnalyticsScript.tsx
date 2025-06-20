@@ -6,6 +6,11 @@ import Script from "next/script";
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!;
 
 export function GoogleAnalyticsScript() {
+  // 只在生产环境中加载 Microsoft Clarity
+  if (process.env.NODE_ENV !== 'production') {
+    return null
+  }
+  
   return (
     <>
       <Script
