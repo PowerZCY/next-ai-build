@@ -73,11 +73,11 @@ export function ImageZoom({
           {...props}
           src={imgSrc}
           onError={handleError}
-          sizes="(max-width: 768px) 100vw, 400px"
-          style={{ width: '100%', height: 'auto', maxWidth: 400 }}
+          sizes="(max-width: 400px) 100vw, 300px"
+          style={{ width: '100%', height: 'auto', maxWidth: 300 }}
           alt={props.alt ?? ''}
-          width={400}
-          height={300}
+          width={300}
+          height={225}
         />
       )}
     </Zoom>

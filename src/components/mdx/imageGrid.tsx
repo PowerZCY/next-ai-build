@@ -3,9 +3,11 @@ import { ImageZoom } from '@/components/mdx/image-zoom';
 import { appConfig } from '@/lib/appConfig';
 
 export function ImageGrid({
+  type="url",
   images,
   altPrefix = '',
 }: {
+  type: "url" | "local";
   images: string[];
   altPrefix?: string;
 }) {
@@ -22,7 +24,7 @@ export function ImageGrid({
       {images.map((img, idx) => (
         <ImageZoom
           key={img}
-          src={`${basePath}/${img}`}
+          src={type === "url" ? img : `${basePath}/${img}`}
           alt={`${altPrefix}-${idx+1}`}
         />
       ))}
