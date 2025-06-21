@@ -19,6 +19,7 @@ export function ImageGrid({
         gridTemplateColumns: 'repeat(2, 1fr)',
         gap: '16px',
         justifyItems: 'center',
+        alignItems: 'center', 
       }}
     >
       {images.map((img, idx) => (
