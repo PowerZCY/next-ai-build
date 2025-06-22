@@ -6,10 +6,9 @@ import NProgressBar from '@/app/[locale]/nProgressBar';
 import { cn } from '@/lib/fuma-search-util';
 import { RootProvider } from "fumadocs-ui/provider";
 import { Montserrat } from "next/font/google";
-import { cn as cnUtils } from '@/lib/utils';
 
-const montserrat = Montserrat({
-  weight: ['400'], // 400 是 Regular
+export const montserrat = Montserrat({
+  weight: ['400'],
   subsets: ['latin'],
   display: 'swap',
 });
@@ -69,7 +68,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body className={cnUtils(montserrat.className)}>
+        <body>
           <NProgressBar />
           <RootProvider
             i18n={{

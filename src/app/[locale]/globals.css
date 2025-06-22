@@ -35,4 +35,11 @@
 .dark {
   --clerk-icon-stroke-color: #616161; /* Dark theme */
 }
+/* 
+ * 英文和数字字符使用Montserrat字体
+ * 中文使用华文楷体
+ */
+body {
+  font-family: 'Montserrat', "STKaiti", "华文楷体", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;;
+}
 
