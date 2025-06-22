@@ -7,23 +7,25 @@ interface TocFooterProps {
   /**
    * The last modified date of the page.
    */
-  lastModified: Date | undefined;
+  lastModified: string | undefined;
   /**
    * The path to the file for the \"Edit on GitHub\" link.
    * This should be the relative path from the repository root, e.g., 'src/mdx/docs/your-page.mdx'.
    */
-  editPath: string;
+  editPath?: string | undefined;
+  /**
+   * Whether to show the copy button.
+   */
+  showCopy?: boolean | undefined;
 }
 
-export function TocFooter({ lastModified, editPath }: TocFooterProps) {
-  const githubBaseUrl = appConfig.githubBaseUrl;
-  const fullEditUrl = `${githubBaseUrl}${editPath}`;
-
+export function TocFooter({ lastModified, showCopy, editPath }: TocFooterProps) {
+  const showEdit = appConfig.githubBaseUrl && editPath;
   return (
     <div className="flex flex-col gap-y-2 items-start m-4">
-      <LastUpdatedDate gitTimestamp={lastModified} />
-      <LLMCopyButton />
-      <EditOnGitHub url={fullEditUrl} />
+      <LastUpdatedDate date={lastModified} />
+      {showCopy && <LLMCopyButton />}
+      {showEdit && <EditOnGitHub url={`${appConfig.githubBaseUrl}${editPath}`} />}
     </div>
   );
 } 

@@ -22,7 +22,7 @@ export default async function Page({
   }
 
   const path = `${appConfig.mdxSourceDir.docs}/${page.file.path}`;
-  const tocFooterElement = <TocFooter lastModified={page.data.lastModified} editPath={path} />;
+  const tocFooterElement = <TocFooter lastModified={page.data.date} showCopy={true} editPath={path} />;
  
   // Markdown content requires await if you config 'async: true' in source.config.ts
   // const { body: MdxContent, toc } = await page.data.load();
@@ -37,7 +37,6 @@ export default async function Page({
       article={{
         className: 'max-sm:pb-16',
       }}
-      // lastUpdate={page.data.lastModified}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-2">{page.data.description}</DocsDescription>

@@ -7,6 +7,7 @@ import {
 } from 'fumadocs-ui/page';
 import { getMDXComponents } from '@/components/mdx-components';
 import { NotFoundPage } from '@/components/404-page';
+import { TocFooter } from '@/components/toc';
 
 export default async function Page({
   params,
@@ -18,7 +19,7 @@ export default async function Page({
   if (!page) {
     return <NotFoundPage />;
   }
-	
+  const tocFooterElement = <TocFooter lastModified={page.data.date} showCopy={false} />;
  
   // Markdown content requires await if you config 'async: true' in source.config.ts
   // const { body: MdxContent, toc } = await page.data.load();
@@ -26,13 +27,13 @@ export default async function Page({
  
   return (
     <DocsPage 
-      tableOfContent={{ style: 'clerk', single: false}}
+    tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement }}
+    tableOfContentPopover={{ footer: tocFooterElement }}
       toc={page.data.toc}
       full={page.data.full}
       article={{
         className: 'max-sm:pb-16',
       }}
-      // lastUpdate={page.data.lastModified}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-2">{page.data.description}</DocsDescription>

@@ -22,7 +22,7 @@ export default async function Page({
   }
 
   const path = `${appConfig.mdxSourceDir.blog}/${page.file.path}`;
-  const tocFooterElement = <TocFooter lastModified={page.data.lastModified} editPath={path} />;
+  const tocFooterElement = <TocFooter lastModified={page.data.date} showCopy={true} editPath={path} />;
  
  
   // Markdown content requires await if you config 'async: true' in source.config.ts
