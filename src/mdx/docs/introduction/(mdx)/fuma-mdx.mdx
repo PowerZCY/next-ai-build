@@ -2,6 +2,7 @@
 title: Fuma·MDX
 description: 语法说明书
 icon: LandPlot
+date: 2025-06-23
 ---
 
 <Callout title="FumaMDX·All in One" type="success">
@@ -9,7 +10,7 @@ icon: LandPlot
 </Callout>
 
 
-# Overview
+## Overview
 <Callout title="使用方式" type="info">
 1. 基于效率的考量, 对于高频使用语法, 一并提供对应的触发关键词, [模板配置](./mdx-snippets)
 2. 语法示例会使用3个Tab标签
@@ -28,7 +29,7 @@ icon: LandPlot
 | FAQ问答组    | 接口参数定义  |
 
 
-## 文档头部
+### 文档头部
 <Tabs groupId="header" items={["example", "source", "@keywords"]}>
   <Tab value="example">
     # 标题 [!toc]
@@ -48,7 +49,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## 提示框
+### 提示框
 
 <Tabs groupId="callout" items={["example", "source", "@keywords"]}>
   <Tab value="example">
@@ -101,7 +102,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## 文字处理
+### 文字处理
 
 <Tabs groupId="text-processing" items={["example", "source"]}>
   <Tab value="example">
@@ -147,7 +148,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## 卡片组
+### 卡片组
 
 <Tabs groupId="card" items={["example", "source", "@keywords"]}>
   <Tab value="example">
@@ -184,7 +185,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-### 卡片参数 [!toc]
+#### 卡片参数 [!toc]
 <TypeTable
   type={{
     title: {
@@ -219,9 +220,9 @@ icon: LandPlot
 />
 
 
-## Tab标签组
+### Tab标签组
 
-### 简单模式
+#### 简单模式
 <Tabs groupId="easy-tabs" items={["example", "source", "@keywords"]}>
   <Tab value="example">
     <Tabs groupId="example-easy-tabs" items={["tab1", "tab2"]}>
@@ -252,7 +253,7 @@ icon: LandPlot
 </Tabs>
 
 
-### 安装包模式
+#### 安装包模式
 <Tabs groupId="install-tabs" items={["example", "source", "@keywords"]}>
   <Tab value="example">
     <Tabs groupId="package-manager" persist items={["npm", "pnpm"]}>
@@ -284,7 +285,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## FAQ问答组
+### FAQ问答组
 
 <Tabs groupId="faq" items={["example", "source", "@keywords"]}>
   <Tab value="example">
@@ -329,7 +330,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## 标题式步骤组
+### 标题式步骤组
 * [上文FAQ问答示例](#how-to-put-elephant)就是一个简单的步骤组演示, 只不过它在目录中隐藏了步骤标题
 
 <Callout title="弃用FumaDocs的Step组件" type="error">
@@ -339,7 +340,7 @@ icon: LandPlot
 </Callout>
 
 
-### 标题式步骤组规则
+#### 标题式步骤组规则
 * 不支持步骤组嵌套, 因为FumaDocs底层暂不支持, 重写代价大, 并且从DDaaS角度, 如果需要步骤组嵌套, 说明文档不够简练、不容易懂
 * 命名规则规则: `###`(强烈推荐固定写法) + `空格` + `步骤编号数字≤19` + `英文.` + `至少1个空格` + `标题名称`, 例如: `### 1. 三级标题的步骤1`
 * 不满足规则的, 会自动降级为普通标题; 步骤编号也由文档指定, `TOC底层解析不会自动递增编号, 正文渲染会自动递增`, 便于发现更改错误
@@ -363,7 +364,7 @@ icon: LandPlot
 </Tabs>
 
 
-## Mermaid绘图
+### Mermaid绘图
 
 <Tabs groupId="mermaid" items={[ "example", "source", "@keywords"]}>
   <Tab value="example">
@@ -445,7 +446,7 @@ icon: LandPlot
 </Tabs>
 
 
-## 数学公式
+### 数学公式
 
 <Tabs groupId="math" items={["example", "source", "@keywords"]}>
   <Tab value="example">
@@ -465,7 +466,7 @@ icon: LandPlot
   ```
 </Tabs>
 
-## 文件层级
+### 文件层级
 
 <Tabs groupId="file-system" items={["example", "source", "@keywords"]}>
   <Tab value="example">
@@ -513,7 +514,7 @@ icon: LandPlot
 </Tabs>
 
 
-## 内部文件引用
+### 内部文件引用
 
 <Tabs groupId="internal-file-reference" items={["example", "source", "@keywords"]}>
   <Tab value="example">
