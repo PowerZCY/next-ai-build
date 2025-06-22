@@ -63,7 +63,7 @@ export function NotFoundPage() {
           <div className="flex justify-center items-center gap-8 pt-8 opacity-60">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <SiteIcon/>
-              <span>Re8ger</span>
+              <span>Woops!</span>
             </div>
             <div className="w-1 h-1 bg-purple-500 rounded-full animate-ping" />
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
