@@ -33,6 +33,7 @@
       "  @mdxmath         :  生成mdx数学公式π",
       "  @mdxmermaid      :  生成mdx图标Mermaid📊",
       "  @mdxspage        :  生成mdx单页面📄",
+      "  @mdximage      :  生成mdx📷图片组",
       "",
       "```",
       "${0}"
@@ -53,18 +54,6 @@
     "description": "MDX Front Matter",
     "isFileTemplate": true
   },
-  "mdx-callout-msg": {
-    "prefix": "@mdxmsg",
-    "body": [
-      "<Callout title=\"${1}\" type=\"${2}\">",
-      "${3}",
-      "</Callout>",
-      "",
-      "${0}"
-    ],
-    "description": "MDX Callout",
-    "isFileTemplate": false
-  },
   "mdx-callout-simple-msg": {
     "prefix": "@mdx1msg",
     "body": [
@@ -75,6 +64,18 @@
       "${0}"
     ],
     "description": "MDX Callout without title",
+    "isFileTemplate": false
+  },
+  "mdx-callout-msg": {
+    "prefix": "@mdxmsg",
+    "body": [
+      "<Callout title=\"${1}\" type=\"${2}\">",
+      "${3}",
+      "</Callout>",
+      "",
+      "${0}"
+    ],
+    "description": "MDX Callout",
     "isFileTemplate": false
   },
   "mdx-callout-info-msg": {
@@ -385,6 +386,21 @@
       "  ${1}",
       "```",
       "",
+      "${0}"
+    ],
+    "description": "MDX Math Block",
+    "isFileTemplate": false
+  },
+  "mdx-image-grid": {
+    "prefix": "@mdximage",
+    "body": [
+      "<ImageGrid",
+      "  type=\"url\"",
+      "  images={[",
+      "    \"https://raw.githubusercontent.com/caofanCPU/wind-run-1/main/public/${1}.webp\"",
+      "  ]}",
+      "  altPrefix=\"${1}\"",
+      "/>",
       "${0}"
     ],
     "description": "MDX Math Block",
