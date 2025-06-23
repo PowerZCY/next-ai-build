@@ -221,7 +221,7 @@ async function generateBlogIndex() {
     if (iocArticle) {
       mdxContent += `\n## Monthly Summary\n\n<Cards>\n`;
       const iocHref = BLOG_PREFIX ? `./${BLOG_PREFIX}/${IOC_SLUG}` : `./${IOC_SLUG}`;
-      mdxContent += `  <ZiaCard href="${iocHref}" title="Overview">\n    ${iocArticle.date || ''}\n  </ZiaCard>\n`;
+      mdxContent += `  <ZiaCard href="${iocHref}" title="Overview">\n    ${getCurrentDateString()}\n  </ZiaCard>\n`;
       mdxContent += `</Cards>\n`;
     }
 
