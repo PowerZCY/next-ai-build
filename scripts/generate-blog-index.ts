@@ -53,6 +53,27 @@ function getIconComponentString(iconName?: string): string | undefined {
   return `<${iconName} />`;
 }
 
+function getCurrentDateString(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function updateFrontmatterDate(frontmatter: string): string {
+  const currentDate = getCurrentDateString();
+  
+  // Check if date field exists
+  if (frontmatter.includes('date:')) {
+    // Replace existing date
+    return frontmatter.replace(/date:\s*[^\n]*/, `date: ${currentDate}`);
+  } else {
+    // Add date field before the closing ---
+    return frontmatter.replace(/---$/, `date: ${currentDate}\n---`);
+  }
+}
+
 async function getAllBlogArticles(): Promise<ProcessedArticle[]> {
   const articles: ProcessedArticle[] = [];
   try {
@@ -162,6 +183,9 @@ async function generateBlogIndex() {
       console.warn('Could not read existing index.mdx or parse its frontmatter. Using default frontmatter.');
     }
 
+    // Update date field in frontmatter
+    currentFileFrontmatter = updateFrontmatterDate(currentFileFrontmatter);
+
     let mdxContent = `${currentFileFrontmatter}\n\n`;
 
     const createCard = (article: ProcessedArticle): string => {
@@ -249,8 +273,16 @@ async function generateMonthlyBlogSummary() {
     if (match && match[0]) frontmatter = match[0];
   } catch {}
 
+  // 如果没有 frontmatter，使用默认的
+  if (!frontmatter) {
+    frontmatter = '---\ntitle: Monthly Summary\ndescription: Index and Summary\n---';
+  }
+
+  // 更新 frontmatter 中的 date 字段
+  frontmatter = updateFrontmatterDate(frontmatter);
+
   // 生成内容
-  let mdx = frontmatter ? `${frontmatter}\n\n\n## Overview\n<Files>\n` : `\n## Overview\n<Files>\n`;
+  let mdx = `${frontmatter}\n\n\n## Overview\n<Files>\n`;
   if (sortedMonths.length === 0) {
     mdx += '  <File name="Comming Soon" className="opacity-50" disabled/>\n';
   } else {
