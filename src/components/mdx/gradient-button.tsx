@@ -37,19 +37,19 @@ export function GradientButton({
           hover:from-purple-500 hover:to-pink-600
           dark:from-purple-500 dark:to-pink-600 
           dark:hover:from-purple-600 dark:hover:to-pink-700
-          text-gray-900 dark:text-white font-bold shadow-lg hover:shadow-xl
+          text-white text-base font-bold shadow-lg hover:shadow-xl
           transition-all duration-300
           rounded-full
         "
       >
-        <Link href={href} target="_blank" rel="noopener noreferrer">
+        <Link href={href} target="_blank" rel="noopener noreferrer" className="no-underline hover:no-underline">
           <span>{title}</span>
           <span className="ml-1">
             {icon ? 
               React.cloneElement(icon as React.ReactElement<{ className?: string }>, { 
-                className: "h-4 w-4 text-gray-900 dark:text-white" 
+                className: "h-4 w-4 text-white" 
               }) : 
-              <icons.LogIn className="h-4 w-4 text-gray-900 dark:text-white" />
+              <icons.ArrowRight className="h-4 w-4 text-white" />
             }
           </span>
         </Link>

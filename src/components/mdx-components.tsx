@@ -16,6 +16,7 @@ import { globalLucideIcons as icons } from '@/components/global-icon';
 import { TrophyCard } from '@/components/mdx/trophyCard';
 import { ImageGrid } from '@/components/mdx/imageGrid';
 import { ZiaCard } from '@/components/mdx/zia-card';
+import { GradientButton } from '@/components/mdx/gradient-button';
 
 // 创建一个语言标识符到图标组件的映射
 const languageToIconMap: Record<string, React.ReactNode> = {
@@ -90,7 +91,8 @@ const fumadocsUiComponents = {
   TypeTable,
   TrophyCard,
   ImageGrid,
-  ZiaCard
+  ZiaCard,
+  GradientButton
 };
 
 const customUiComponents = {

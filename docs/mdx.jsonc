@@ -35,6 +35,7 @@
       "  @mdxspage        :  生成mdx单页面📄",
       "  @mdximage      :  生成mdx📷图片组",
       "  @mdxlimage     :  生成mdx📷本地图片组",
+      "  @mdxbutton     :  生成mdx🔘渐变按钮",
       "",
       "```",
       "${0}"
@@ -420,6 +421,20 @@
       "${0}"
     ],
     "description": "MDX Image Grid Local",
+    "isFileTemplate": false
+  },
+  "mdx-gradient-button": {
+    "prefix": "@mdxbutton",
+    "body": [
+      "<GradientButton",
+      "  title=\"${1}\"",
+      "  href=\"${2}\"",
+      "  align=\"left\"",
+      "/>",
+      "",
+      "${0}"
+    ],
+    "description": "MDX Gradient Button, align: left|center|right",
     "isFileTemplate": false
   }
 }
