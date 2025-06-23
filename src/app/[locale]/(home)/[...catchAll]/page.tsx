@@ -7,19 +7,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { legalSource } from '@/lib/source';
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { NotFoundPage } from '@/components/404-page';
 
-export default async function NotFound({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
+export default async function NotFound() {
   return (
-    <DocsLayout sidebar={{enabled: false}} tree={legalSource.pageTree[locale]}>
-      <NotFoundPage />
-    </DocsLayout>
+    <NotFoundPage />
   );
 } 
