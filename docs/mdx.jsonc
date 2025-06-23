@@ -34,6 +34,7 @@
       "  @mdxmermaid      :  生成mdx图标Mermaid📊",
       "  @mdxspage        :  生成mdx单页面📄",
       "  @mdximage      :  生成mdx📷图片组",
+      "  @mdxlimage     :  生成mdx📷本地图片组",
       "",
       "```",
       "${0}"
@@ -397,13 +398,28 @@
       "<ImageGrid",
       "  type=\"url\"",
       "  images={[",
-      "    \"https://raw.githubusercontent.com/caofanCPU/wind-run-1/main/public/${1}.webp\"",
+      "    \"/${1}.webp\"",
       "  ]}",
       "  altPrefix=\"${1}\"",
       "/>",
       "${0}"
     ],
-    "description": "MDX Math Block",
+    "description": "MDX Image Grid",
+    "isFileTemplate": false
+  },
+  "mdx-image-grid-local": {
+    "prefix": "@mdxlimage",
+    "body": [
+      "<ImageGrid",
+      "  type=\"local\"",
+      "  images={[",
+      "    \"/${1}.webp\"",
+      "  ]}",
+      "  altPrefix=\"${2}\"",
+      "/>",
+      "${0}"
+    ],
+    "description": "MDX Image Grid Local",
     "isFileTemplate": false
   }
 }

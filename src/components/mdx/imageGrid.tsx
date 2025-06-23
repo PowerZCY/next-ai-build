@@ -25,7 +25,7 @@ export function ImageGrid({
       {images.map((img, idx) => (
         <ImageZoom
           key={img}
-          src={type === "url" ? img : `${basePath}/${img}`}
+          src={type === "url" ? `${basePath}/${img}` :  img}
           alt={`${altPrefix}-${idx+1}`}
         />
       ))}
