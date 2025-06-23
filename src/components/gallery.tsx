@@ -1,10 +1,9 @@
 'use client'
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { globalLucideIcons as icons } from "@/components/global-icon"
-import Image from "next/image"
 import { useTranslations } from 'next-intl'
+import Image from "next/image"
+import { GradientButton } from "./mdx/gradient-button"
 
 export function Gallery() {
   const t = useTranslations('gallery');
@@ -50,22 +49,18 @@ export function Gallery() {
                 onClick={() => handleDownload(index)}
                 className="bg-black/50 hover:bg-black/70 p-2 rounded-full text-white/80 hover:text-white transition-all duration-300"
               >
-                <icons.Download className="h-5 w-5" />
+                <icons.Download className="h-5 w-5 text-white" />
               </button>
             </div>
           </div>
         ))}
       </div>
       <div className="text-center mt-12">
-        <Button
-          asChild
-          size="lg"
-          className="bg-linear-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-black dark:text-white"
-        >
-          <Link href="https://preview.reve.art/" target="_blank" rel="noopener noreferrer">
-            {t('button')} <icons.ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        <GradientButton
+          title={t('button')}
+          href="https://preview.reve.art/"
+          align="center"
+        />
       </div>
     </section>
   )

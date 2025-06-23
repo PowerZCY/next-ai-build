@@ -43,6 +43,8 @@ export {
     LibraryIcon,
     Link,
     Loader2,
+    LogIn,
+    LogOut,
     MoreHorizontal,
     PanelLeft,
     PanelsTopLeft,

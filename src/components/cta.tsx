@@ -1,9 +1,7 @@
 'use client'
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { globalLucideIcons as icons } from "@/components/global-icon"
-import { useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl';
+import { GradientButton } from "./mdx/gradient-button";
 
 export function CTA() {
   const t = useTranslations('cta');
@@ -18,11 +16,11 @@ export function CTA() {
           <br />
           {t('description2')}
         </p>
-        <Button asChild size="lg" className="bg-white text-purple-900 hover:bg-gray-100">
-          <Link href="https://preview.reve.art/" target="_blank" rel="noopener noreferrer">
-            {t('button')} <icons.ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        <GradientButton
+          title={t('button')}
+          href="https://preview.reve.art/"
+          align="center"
+        />
       </div>
     </section>
   )

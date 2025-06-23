@@ -107,7 +107,11 @@ for (const iconNameKey in limitedIconsModule) {
       
       const StyledIcon = (props: LucideProps): React.ReactElement => {
         const originalClassName = props.className || '';
-        const newClassName = `${iconColor} ${originalClassName}`.trim(); // User changed to 500
+        // Check if user provided a text color class, if so, don't use global color
+        const hasTextColor = /\btext-\w+(-\d+)?\b/.test(originalClassName);
+        const newClassName = hasTextColor 
+          ? originalClassName 
+          : `${iconColor} ${originalClassName}`.trim();
         return <ComponentToRender {...props} className={newClassName} />;
       };
       StyledIcon.displayName = `Styled(${iconName})`;
