@@ -1,0 +1,83 @@
+{
+  "name": "@windrun-huaiin/third-ui",
+  "version": "1.0.0",
+  "description": "Third-party integrated UI components for windrun-huaiin projects",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./clerk": {
+      "types": "./dist/clerk/index.d.ts",
+      "import": "./dist/clerk/index.mjs",
+      "require": "./dist/clerk/index.js"
+    },
+    "./main": {
+      "types": "./dist/main/index.d.ts",
+      "import": "./dist/main/index.mjs",
+      "require": "./dist/main/index.js"
+    },
+    "./fuma": {
+      "types": "./dist/fuma/index.d.ts",
+      "import": "./dist/fuma/index.mjs",
+      "require": "./dist/fuma/index.js"
+    },
+    "./fuma/mdx": {
+      "types": "./dist/fuma/mdx/index.d.ts",
+      "import": "./dist/fuma/mdx/index.mjs",
+      "require": "./dist/fuma/mdx/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/localizations": "catalog:",
+    "@clerk/nextjs": "catalog:",
+    "@clerk/types": "catalog:",
+    "@windrun-huaiin/base-ui": "workspace:*",
+    "@windrun-huaiin/lib": "workspace:*",
+    "fumadocs-core": "catalog:",
+    "fumadocs-typescript": "catalog:",
+    "fumadocs-ui": "catalog:",
+    "next": "catalog:",
+    "next-intl": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "mermaid": "catalog:",
+    "next-themes": "catalog:",
+    "react-medium-image-zoom": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/mdx": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "react",
+    "nextjs",
+    "clerk",
+    "fumadocs"
+  ],
+  "author": "D8ger",
+  "license": "MIT"
+} 
