@@ -85,7 +85,6 @@ web_modules/
 **/.next/
 **/out/
 **/dist/
-**/lib/
 **/build/
 **/esm/
 **/cjs/
