@@ -89,14 +89,13 @@ const fumadocsUiComponents = {
   Pre,
   Mermaid,
   TypeTable,
+};
+
+const customUiComponents = {
   TrophyCard,
   ImageGrid,
   ZiaCard,
   GradientButton
-};
-
-const customUiComponents = {
-  
 }
 
 const typeTableGenerator = createTypeTableGenerator();
