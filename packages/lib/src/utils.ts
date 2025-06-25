@@ -12,25 +12,25 @@ export function formatTimestamp(timestamp: string, formatter: string) {
     return fail;
   }
 
-  // 假设 gitTimestamp 是毫秒时间戳字符串
+  // Assume gitTimestamp is a millisecond timestamp string
   const timestampMs = parseInt(timestamp, 10);
   if (isNaN(timestampMs)) {
      return fail;
   }
 
-  const date = new Date(timestampMs); // 或者如果确定是秒级用 fromUnixTime(timestampSeconds)
+  const date = new Date(timestampMs); // or if it is determined to be seconds, use fromUnixTime(timestampSeconds)
 
-  // 检查日期是否有效
+  // Check if the date is valid
   if (!isValid(date)) {
     return fail;
   }
 
-  // 格式化日期
+  // Format the date
   try {
-     // 'yyyy-MM-dd HH:mm:ss' 是 date-fns 的格式化模式
+     // 'yyyy-MM-dd HH:mm:ss' is the date-fns formatting pattern
      return format(date, formatter);
   } catch (error) {
-     // format也可能因无效日期抛错（虽然isValid应该已经捕获）
+     // format may also throw an error due to an invalid date (although isValid should have already caught it)
      console.error("Error formatting date:", error);
      return fail;
   }

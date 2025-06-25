@@ -6,6 +6,7 @@ export default defineConfig({
     utils: 'src/utils.ts',
     'limited-lucide-icons': 'src/limited-lucide-icons.ts',
     'llm-utils': 'src/llm-utils.ts',
+    'common-app-config': 'src/common-app-config.ts',
   },
   format: ['cjs', 'esm'],
   dts: true,

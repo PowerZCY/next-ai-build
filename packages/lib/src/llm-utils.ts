@@ -15,13 +15,13 @@ function remarkRemoveFrontmatter() {
   };
 }
 
-// remark(), 将MDX文件解析为MDAST
-// 解析层remarkPlugins(), 将MDAST解析为HAST
-// 渲染层rehypePlugins(), 将HAST渲染为React组件, 即HTML代码
+// remark(), parse the MDX file into MDAST
+// remarkPlugins(), parse the MDAST into HAST
+// rehypePlugins(), render the HAST into React components, i.e. HTML code
 const processor = remark()
-  // 解析md文件标识头
+  // parse the md file header
   .use(remarkFrontmatter, ['yaml'])
-  // 移除md文件标识头
+  // remove the md file header
   .use(remarkRemoveFrontmatter)
   .use(remarkMdx)
   .use(remarkGfm);

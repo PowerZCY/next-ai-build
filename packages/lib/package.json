@@ -25,6 +25,11 @@
       "types": "./dist/llm-utils.d.ts",
       "import": "./dist/llm-utils.mjs",
       "require": "./dist/llm-utils.js"
+    },
+    "./common-app-config": {
+      "types": "./dist/common-app-config.d.ts",
+      "import": "./dist/common-app-config.mjs",
+      "require": "./dist/common-app-config.js"
     }
   },
   "files": [

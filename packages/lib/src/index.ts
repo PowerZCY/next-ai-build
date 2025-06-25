@@ -1,8 +1,8 @@
-// 导出工具函数
+// export the utility functions
 export * from './utils';
 
-// 导出图标
+// export the icons
 export * from './limited-lucide-icons';
 
-// 导出 LLM 相关功能
+// export the LLM related functions
 export * from './llm-utils'; 
