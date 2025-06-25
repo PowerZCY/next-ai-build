@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl';
-import { GradientButton } from "./mdx/gradient-button";
+import { GradientButton } from "@/components/mdx/gradient-button";
 
 export function CTA() {
   const t = useTranslations('cta');

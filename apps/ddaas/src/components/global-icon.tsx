@@ -1,15 +1,17 @@
 /* 
- * 针对项目中使用的icon, 进行统一管理
- * 1. 严格控制引入icon数量, 减少项目包大小, 按需使用
- * 2. 统一处理样式定制化, 项目内icon保持风格一致
- * 3. 主要支持mdx文件中引入icon, 报错提前
+ * For the icon used in the project, unified management is required
+ * 1. Strictly control the number of icons introduced to reduce the project package size and use them as needed
+ * 2. Unify the style customization, and keep the icon style consistent within the project
+ * 3. Mainly support the introduction of icons in mdx files, and report errors in advance
 */
 
 import React from 'react';
 import { type LucideProps } from 'lucide-react';
 import Image from 'next/image';
 import * as limitedIconsModule from '@windrun-huaiin/lib/limited-lucide-icons';
-import { iconColor } from '@/lib/appConfig';
+
+// Attention: This icon color will be used in the entire project, and it depends on the ENV variable NEXT_PUBLIC_STYLE_ICON_COLOR
+const iconColor = process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500";
 
 // Define all custom image-based icons in this object
 const customImageIcons = {
@@ -131,8 +133,7 @@ type GlobalIconsType =
   { [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent } &
   { [K in keyof typeof customImageIcons]: StyledLucideIconComponent };
 
-// Object containing globally available icon components
-// 所有的图标都要从这里导入, 并且图标会占据项目包的体积, 因此最好提前设计规划好
+// All icons should be imported from here, and icons will occupy the project package size, so it is best to design and plan in advance
 export const globalLucideIcons = {
   ...styledLimitedIconsPart,
   ...customImageIcons, // Spread all custom image icons
