@@ -1,0 +1,7 @@
+packages:
+  - 'packages/*'
+  - 'apps/ddaas'
+
+shared-workspace-lockfile: true
+prefer-workspace-packages: true
+save-workspace-protocol: true

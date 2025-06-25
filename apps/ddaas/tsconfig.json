@@ -30,7 +30,7 @@
     }
   },
   "include": [
-    "next-env.d.ts",
+    "apps/ddaas/next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"

@@ -1,18 +1,16 @@
 {
-  "name": "my-v0-project",
+  "name": "windrun-huaiin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "fumadocs-mdx",
-    "predev": "pnpm generate-blog-index &&pnpm run lint",
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "generate-blog-index": "ts-node --project tsconfig.node.json scripts/generate-blog-index.ts",
-    "check-translations": "ts-node --project tsconfig.node.json scripts/check-translations.ts",
-    "clean-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts",
-    "remove-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts --remove"
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "start": "pnpm -r start", 
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean",
+    "ddaas:dev": "pnpm --filter=ddaas dev",
+    "ddaas:build": "pnpm --filter=ddaas build",
+    "ddaas:start": "pnpm --filter=ddaas start"
   },
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
@@ -88,6 +86,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/hast": "^3.0.4",
     "@types/node": "^22.15.18",
@@ -123,21 +122,5 @@
     "patchedDependencies": {
       "fumadocs-ui@15.3.3": "patches/fumadocs-ui@15.3.3.patch"
     }
-  },
-  "files": [
-    "src",
-    "public",
-    "messages",
-    ".eslintrc.json",
-    "components.json",
-    "LICENSE",
-    "next-env.d.ts",
-    "next.config.mjs",
-    "postcss.config.mjs",
-    "tailwind.config.ts",
-    "tsconfig.json",
-    "!**/scripts/**",
-    "!**/*.test.{js,ts}",
-    "!**/*.log"
-  ]
+  }
 }

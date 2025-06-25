@@ -1,0 +1,24 @@
+# pnpm workspace configuration
+
+# Use workspace packages by default
+prefer-workspace-packages=true
+
+# Save workspace protocol
+save-workspace-protocol=true
+
+# Shared workspace lockfile
+shared-workspace-lockfile=true
+
+# Auto install peers
+auto-install-peers=true
+
+# Dedupe injected dependencies
+dedupe-injected-deps=true
+
+# Hoist pattern for better performance
+hoist-pattern[]=*eslint*
+hoist-pattern[]=*prettier*
+hoist-pattern[]=*typescript*
+
+# Enable pnpm patches
+enable-pre-post-scripts=true 
