@@ -1,0 +1,1433 @@
+# Next.js + pnpm 多工程改造技术方案
+
+根据项目需求，将现有单工程改造为多工程架构，提高代码复用性和可维护性。
+
+## 🏗️ 多工程架构设计
+
+### 1. 整体架构概览
+
+```
+next-ai-build-workspace/
+├── 📁 packages/                        # 可复用的包
+│   ├── 📁 lib/                         # @next-ai-build/lib - 工具类库
+│   ├── 📁 base-ui/                     # @next-ai-build/base-ui - 基础UI组件
+│   ├── 📁 third-ui/                    # @next-ai-build/third-ui - 第三方封装组件
+│   ├── 📁 scripts/                     # @next-ai-build/scripts - 自动化脚本
+│   └── 📁 configs/                     # @next-ai-build/configs - 通用配置
+│
+├── 📁 apps/                            # 应用程序目录
+│   ├── 📁 main-website/                # 主网站 (原项目重构)
+│   ├── 📁 docs-site/                   # 文档网站 (未来扩展)
+│   └── 📁 admin-portal/                # 管理后台 (未来扩展)
+│
+├── 📁 shared/                          # 共享资源
+│   ├── 📁 types/                       # 共享类型定义
+│   ├── 📁 configs/                     # 共享配置 (复杂/个性化配置)
+│   ├── 📁 assets/                      # 共享静态资源
+│   ├── 📁 constants/                   # 共享常量
+│   ├── 📁 utils/                       # 共享工具函数 (复杂逻辑)
+│   └── 📁 hooks/                       # 共享 React Hooks
+│
+├── 📁 tools/                           # 开发工具 (可选)
+│   └── 📁 build-utils/                 # 构建工具
+│
+├── package.json                        # 根配置
+├── pnpm-workspace.yaml                 # pnpm workspace 配置
+├── turbo.json                          # Turborepo 构建配置
+└── README.md                           # 项目说明
+```
+
+## 🤔 关键问题解答
+
+### 问题A：shared/assets 资源自动解析机制
+
+#### 资源管理实现方案
+
+**方案：符号链接 + 构建脚本（推荐）**
+
+在每个应用的构建过程中，自动创建符号链接将共享资源映射到本地 `public/` 目录：
+
+```typescript
+// packages/scripts/src/lib/asset-manager.ts
+import { promises as fs } from 'fs';
+import path from 'path';
+
+export class AssetManager {
+  constructor(
+    private appPath: string,
+    private sharedAssetsPath: string = '../../shared/assets'
+  ) {}
+
+  async linkSharedAssets() {
+    const publicDir = path.join(this.appPath, 'public');
+    const sharedDir = path.resolve(this.appPath, this.sharedAssetsPath);
+    
+    // 确保 public 目录存在
+    await fs.mkdir(publicDir, { recursive: true });
+    
+    // 创建共享资源的符号链接
+    const linkMappings = [
+      { source: 'icons', target: 'shared/icons' },
+      { source: 'images', target: 'shared/images' },
+      { source: 'fonts', target: 'shared/fonts' }
+    ];
+    
+    for (const { source, target } of linkMappings) {
+      const sourcePath = path.join(sharedDir, source);
+      const targetPath = path.join(publicDir, target);
+      
+      try {
+        // 检查源文件是否存在
+        await fs.access(sourcePath);
+        
+        // 创建目标目录
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        
+        // 创建符号链接
+        await fs.symlink(path.relative(path.dirname(targetPath), sourcePath), targetPath);
+        
+        console.log(`✅ Linked ${source} -> ${target}`);
+      } catch (error) {
+        console.warn(`⚠️ Failed to link ${source}:`, error);
+      }
+    }
+  }
+}
+```
+
+**CLI命令集成：**
+
+```typescript
+// packages/scripts/src/commands/link-assets.ts
+import { AssetScanner } from '../lib/asset-scanner';
+import path from 'path';
+
+export async function linkAssetsCommand(options: { path?: string } = {}) {
+  const projectPath = path.resolve(options.path || process.cwd());
+  const sharedAssetsPath = path.resolve(projectPath, '../../shared/assets');
+  const publicPath = path.join(projectPath, 'public');
+  
+  const scanner = new AssetScanner(sharedAssetsPath, publicPath);
+  await scanner.scanAndLinkAssets();
+}
+```
+
+**应用的 package.json 脚本配置：**
+
+```json
+{
+  "scripts": {
+    "prebuild": "next-ai-scripts link-assets",
+    "predev": "next-ai-scripts link-assets", 
+    "build": "next build",
+    "dev": "next dev",
+    "assets:sync": "next-ai-scripts link-assets --watch"
+  }
+}
+```
+
+**监听模式支持（开发时自动同步）：**
+
+```typescript
+// packages/scripts/src/commands/watch-assets.ts
+import chokidar from 'chokidar';
+import { AssetScanner } from '../lib/asset-scanner';
+
+export async function watchAssetsCommand(options: { path?: string } = {}) {
+  const projectPath = path.resolve(options.path || process.cwd());
+  const sharedAssetsPath = path.resolve(projectPath, '../../shared/assets');
+  
+  console.log('👀 监听共享资源变化...');
+  
+  const watcher = chokidar.watch(sharedAssetsPath, {
+    ignored: /(^|[\/\\])\../, // 忽略隐藏文件
+    persistent: true
+  });
+
+  const scanner = new AssetScanner(sharedAssetsPath, path.join(projectPath, 'public'));
+
+  watcher
+    .on('add', async () => {
+      console.log('📁 检测到新资源，重新同步...');
+      await scanner.scanAndLinkAssets();
+    })
+    .on('unlink', async () => {
+      console.log('🗑️ 检测到资源删除，重新同步...');
+      await scanner.scanAndLinkAssets();
+    });
+}
+```
+
+#### 使用方式
+
+**类型安全的资源使用：**
+
+```tsx
+// apps/main-website/src/components/Header.tsx
+import Image from 'next/image';
+import { SHARED_ASSETS } from '@/generated/shared-assets';
+
+export function Header() {
+  return (
+    <header>
+      {/* 使用自动生成的类型安全路径 */}
+      <Image 
+        src={SHARED_ASSETS.icons.logo}  // 自动补全 + 类型检查
+        alt="Logo" 
+        width={120} 
+        height={40} 
+      />
+      
+      {/* 使用默认头像 */}
+      <Image 
+        src={SHARED_ASSETS.images.defaultAvatar}
+        alt="Default Avatar" 
+        width={32} 
+        height={32} 
+      />
+    </header>
+  );
+}
+```
+
+**动态资源获取：**
+
+```tsx
+// apps/main-website/src/components/IconDisplay.tsx
+import { getAssetPath } from '@/generated/shared-assets';
+
+interface IconDisplayProps {
+  iconName: string;
+}
+
+export function IconDisplay({ iconName }: IconDisplayProps) {
+  const iconPath = getAssetPath('icons', iconName);
+  
+  if (!iconPath) {
+    return <div>图标未找到</div>;
+  }
+  
+  return <img src={iconPath} alt={iconName} />;
+}
+```
+
+#### 完整的自动化工作流程
+
+**1. 开发者添加新资源时：**
+
+```bash
+# 1. 开发者在 shared/assets 添加新资源
+cp new-logo.svg shared/assets/icons/brand/
+
+# 2. 脚本自动检测变化（如果开启了监听模式）
+# 或者手动运行同步命令
+pnpm assets:sync
+
+# 3. 自动执行以下操作：
+# ✅ 扫描 shared/assets 目录
+# ✅ 创建符号链接到 public/shared/
+# ✅ 重新生成 src/generated/shared-assets.ts
+# ✅ 更新 TypeScript 类型定义
+
+# 4. 开发者立即可以使用类型安全的资源引用
+# SHARED_ASSETS.icons.newLogo (自动补全)
+```
+
+**2. 生成的文件示例：**
+
+```typescript
+// src/generated/shared-assets.ts (自动生成)
+// 🚨 此文件由脚本自动生成，请勿手动修改
+// Generated at: 2024-01-20T10:30:00.000Z
+
+export const SHARED_ASSETS = {
+  icons: {
+    logo: '/shared/icons/brand/logo.svg',
+    newLogo: '/shared/icons/brand/new-logo.svg',
+    github: '/shared/icons/social/github.svg',
+    arrow: '/shared/icons/ui/arrow.svg'
+  },
+  images: {
+    defaultAvatar: '/shared/images/placeholders/avatar.webp',
+    heroBackground: '/shared/images/backgrounds/hero-bg.webp'
+  },
+  fonts: {
+    inter: '/shared/fonts/inter/Inter-Regular.woff2'
+  }
+} as const;
+
+// 类型推导和辅助函数...
+```
+
+**3. 目录结构映射：**
+
+```
+shared/assets/                          public/shared/ (符号链接)
+├── icons/                          →   ├── icons/ -> ../../shared/assets/icons/
+│   ├── brand/                      →   │   ├── brand/
+│   │   ├── logo.svg               →   │   │   ├── logo.svg
+│   │   └── favicon.ico            →   │   │   └── favicon.ico
+│   ├── social/                     →   │   └── social/
+│   │   └── github.svg             →   │       └── github.svg
+│   └── ui/                         →   └── ui/
+│       └── arrow.svg              →       └── arrow.svg
+├── images/                         →   ├── images/ -> ../../shared/assets/images/
+│   └── placeholders/               →   │   └── placeholders/
+│       └── avatar.webp            →   │       └── avatar.webp
+└── fonts/                          →   └── fonts/ -> ../../shared/assets/fonts/
+    └── inter/                      →       └── inter/
+        └── Inter-Regular.woff2     →           └── Inter-Regular.woff2
+```
+
+**4. CLI 命令扩展：**
+
+```bash
+# 基本同步
+pnpm next-ai-scripts link-assets
+
+# 监听模式（开发时）
+pnpm next-ai-scripts link-assets --watch
+
+# 强制重新生成（清理并重建所有链接）
+pnpm next-ai-scripts link-assets --force
+
+# 只生成类型文件，不创建链接
+pnpm next-ai-scripts generate-asset-types
+
+# 检查链接完整性
+pnpm next-ai-scripts check-assets
+```
+
+**自动资源路径映射：**
+
+```typescript
+// packages/scripts/src/lib/asset-scanner.ts
+import { promises as fs } from 'fs';
+import path from 'path';
+import { glob } from 'fast-glob';
+
+export class AssetScanner {
+  constructor(
+    private sharedAssetsPath: string,
+    private publicPath: string
+  ) {}
+
+  /**
+   * 自动扫描 shared/assets 目录并创建符号链接
+   */
+  async scanAndLinkAssets() {
+    console.log('🔍 扫描共享资源...');
+    
+    // 扫描所有资源文件
+    const assetFiles = await glob('**/*', {
+      cwd: this.sharedAssetsPath,
+      onlyFiles: true,
+      dot: false
+    });
+
+    // 获取所有目录结构
+    const directories = new Set<string>();
+    assetFiles.forEach(file => {
+      const dir = path.dirname(file);
+      if (dir !== '.') {
+        directories.add(dir);
+      }
+    });
+
+    // 创建目录结构的符号链接 (推荐方式)
+    await this.linkDirectories(directories);
+
+    console.log(`✅ 链接了 ${directories.size} 个资源目录，包含 ${assetFiles.length} 个文件`);
+    
+    // 生成类型安全的资源映射
+    await this.generateAssetMap(assetFiles);
+  }
+
+  /**
+   * 创建目录级别的符号链接 (性能更好)
+   */
+  private async linkDirectories(directories: Set<string>) {
+    const sharedPublicPath = path.join(this.publicPath, 'shared');
+    
+    // 确保目标目录存在
+    await fs.mkdir(sharedPublicPath, { recursive: true });
+
+    for (const dir of directories) {
+      const sourcePath = path.join(this.sharedAssetsPath, dir);
+      const targetPath = path.join(sharedPublicPath, dir);
+      
+      try {
+        // 检查源目录是否存在
+        await fs.access(sourcePath);
+        
+        // 创建父目录
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        
+        // 创建符号链接 (相对路径)
+        const relativePath = path.relative(path.dirname(targetPath), sourcePath);
+        await fs.symlink(relativePath, targetPath, 'dir');
+        
+        console.log(`📁 ${dir} -> /shared/${dir}`);
+      } catch (error) {
+        // 如果符号链接已存在或其他错误，跳过
+        if ((error as any).code !== 'EEXIST') {
+          console.warn(`⚠️ 无法链接目录 ${dir}:`, error);
+        }
+      }
+    }
+  }
+
+  /**
+   * 自动生成类型安全的资源映射文件
+   */
+  private async generateAssetMap(assetFiles: string[]) {
+    const assetMap: Record<string, Record<string, string>> = {};
+    
+    // 按目录分组
+    for (const file of assetFiles) {
+      const dir = path.dirname(file);
+      const filename = path.basename(file, path.extname(file));
+      const webPath = `/shared/${file}`;
+      
+      if (!assetMap[dir]) {
+        assetMap[dir] = {};
+      }
+      
+      // 使用 camelCase 作为键名
+      const key = filename.replace(/[-_]/g, ' ')
+        .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+        .replace(/\s/g, '');
+      
+      assetMap[dir][key.charAt(0).toLowerCase() + key.slice(1)] = webPath;
+    }
+
+    // 生成 TypeScript 文件
+    const typeContent = this.generateAssetTypes(assetMap);
+    const outputPath = path.join(this.publicPath, '../src/generated/shared-assets.ts');
+    
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+    await fs.writeFile(outputPath, typeContent, 'utf-8');
+    
+    console.log('📝 已生成资源映射: src/generated/shared-assets.ts');
+  }
+
+  private generateAssetTypes(assetMap: Record<string, Record<string, string>>): string {
+    const entries = Object.entries(assetMap).map(([dir, files]) => {
+      const fileEntries = Object.entries(files)
+        .map(([key, path]) => `    ${key}: '${path}'`)
+        .join(',\n');
+      
+      return `  ${dir.replace(/[^a-zA-Z0-9]/g, '_')}: {\n${fileEntries}\n  }`;
+    }).join(',\n');
+
+    return `// 🚨 此文件由脚本自动生成，请勿手动修改
+// Generated at: ${new Date().toISOString()}
+
+export const SHARED_ASSETS = {
+${entries}
+} as const;
+
+// 类型推导
+export type SharedAssets = typeof SHARED_ASSETS;
+
+// 辅助函数：获取资源路径
+export function getAssetPath(category: keyof SharedAssets, asset: string): string | undefined {
+  return (SHARED_ASSETS[category] as any)?.[asset];
+}
+
+// 使用示例:
+// import { SHARED_ASSETS, getAssetPath } from '@/generated/shared-assets';
+// const logoPath = SHARED_ASSETS.icons.logo;
+// const avatarPath = getAssetPath('images', 'defaultAvatar');
+`;
+  }
+}
+```
+
+### 问题B：配置优先级和覆盖策略
+
+#### 配置优先级层次
+
+配置的优先级从高到低如下：
+
+```
+应用配置 (apps/*/next.config.ts) 
+    ↓ 覆盖
+共享个性化配置 (shared/configs/*) 
+    ↓ 覆盖  
+基础通用配置 (packages/configs/*)
+```
+
+#### 实现配置合并策略
+
+**1. 基础配置层 (packages/configs/)**
+
+```typescript
+// packages/configs/src/next/base.config.ts
+import type { NextConfig } from 'next';
+
+export const baseNextConfig: Partial<NextConfig> = {
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  },
+  
+  experimental: {
+    optimizePackageImports: ['@next-ai-build/base-ui'],
+  },
+  
+  // 基础的环境变量
+  env: {
+    NEXT_PUBLIC_APP_ENV: process.env.NODE_ENV || 'development'
+  }
+};
+```
+
+**2. 共享配置层 (shared/configs/)**
+
+```typescript
+// shared/configs/deployment/vercel/next-config.ts
+import type { NextConfig } from 'next';
+import { baseNextConfig } from '@next-ai-build/configs/next';
+
+export function createVercelConfig(overrides: Partial<NextConfig> = {}): NextConfig {
+  return {
+    ...baseNextConfig,
+    
+    // Vercel 特定配置
+    images: {
+      ...baseNextConfig.images,
+      domains: ['cdn.example.com', 'assets.vercel.com'],
+      // 允许应用覆盖 domains
+      ...overrides.images
+    },
+    
+    // Vercel 环境变量
+    env: {
+      ...baseNextConfig.env,
+      NEXT_PUBLIC_DEPLOYMENT_PLATFORM: 'vercel',
+      ...overrides.env
+    },
+    
+    // 允许应用覆盖其他配置
+    ...overrides
+  };
+}
+```
+
+**3. 应用配置层 (apps/*/next.config.ts)**
+
+```typescript
+// apps/main-website/next.config.ts
+import { createVercelConfig } from '@shared/configs/deployment/vercel/next-config';
+import { createMDX } from 'fumadocs-mdx/next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
+const withMDX = createMDX();
+
+// 应用特定的配置覆盖
+const appConfig = createVercelConfig({
+  // 覆盖图片域名，添加应用特定的域名
+  images: {
+    domains: ['cdn.example.com', 'assets.vercel.com', 'my-app-cdn.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'favicon.im',
+      }
+    ]
+  },
+  
+  // 应用特定的环境变量
+  env: {
+    NEXT_PUBLIC_APP_NAME: 'Main Website',
+    NEXT_PUBLIC_API_BASE_URL: process.env.API_BASE_URL || 'https://api.example.com'
+  },
+  
+  // 应用特定的实验性功能
+  experimental: {
+    webpackBuildWorker: true,
+    parallelServerBuildTraces: true,
+  },
+  
+  // 应用特定的重写规则
+  async rewrites() {
+    return [
+      {
+        source: '/shared/:path*',
+        destination: '/../../shared/assets/:path*'
+      }
+    ];
+  }
+});
+
+export default withNextIntl(withMDX(appConfig));
+```
+
+#### 配置合并工具
+
+```typescript
+// packages/lib/src/config/config-merger.ts
+import { deepMerge } from '../utils/deep-merge';
+
+export function mergeConfigs<T extends Record<string, any>>(
+  base: T,
+  shared: Partial<T>,
+  app: Partial<T>
+): T {
+  // 深度合并配置，后者覆盖前者
+  return deepMerge(deepMerge(base, shared), app);
+}
+
+// 特殊数组合并策略（如 images.domains）
+export function mergeArrayConfigs<T>(
+  base: T[] = [],
+  shared: T[] = [],
+  app: T[] = []
+): T[] {
+  // 去重合并数组
+  return [...new Set([...base, ...shared, ...app])];
+}
+```
+
+#### 配置验证机制
+
+```typescript
+// packages/lib/src/config/config-validator.ts
+import { z } from 'zod';
+
+const NextConfigSchema = z.object({
+  reactStrictMode: z.boolean().optional(),
+  images: z.object({
+    domains: z.array(z.string()).optional(),
+    formats: z.array(z.string()).optional(),
+  }).optional(),
+  env: z.record(z.string()).optional(),
+});
+
+export function validateConfig(config: unknown) {
+  try {
+    return NextConfigSchema.parse(config);
+  } catch (error) {
+    console.error('❌ Invalid Next.js configuration:', error);
+    throw error;
+  }
+}
+```
+
+### 问题1：scripts 包的构建、发布和使用方式
+
+#### 包结构设计
+
+```
+packages/scripts/
+├── src/
+│   ├── index.ts                       # 导出所有功能
+│   ├── cli/
+│   │   ├── index.ts                   # CLI 主入口
+│   │   ├── commands/
+│   │   │   ├── check-translations.ts  # 翻译检查命令
+│   │   │   ├── clean-translations.ts  # 翻译清理命令
+│   │   │   ├── generate-blog.ts       # 博客生成命令
+│   │   │   └── init-project.ts        # 新项目初始化
+│   │   └── utils/
+│   │       └── cli-utils.ts
+│   ├── lib/                          # 可编程调用的API
+│   │   ├── translation-checker.ts    # 翻译检查器类
+│   │   ├── blog-generator.ts         # 博客生成器类
+│   │   └── project-initializer.ts    # 项目初始化器类
+│   └── types/
+│       └── index.ts
+├── bin/
+│   └── next-ai-scripts.js            # CLI 可执行文件
+├── templates/                        # 模板文件
+│   ├── project/
+│   │   ├── package.json.template
+│   │   ├── next.config.template.ts
+│   │   └── tsconfig.template.json
+│   ├── blog/
+│   │   └── article.template.mdx
+│   └── i18n/
+│       ├── en.template.json
+│       └── zh.template.json
+├── package.json
+├── tsconfig.json
+├── README.md
+└── CHANGELOG.md
+```
+
+#### package.json 配置
+
+```json
+{
+  "name": "@next-ai-build/scripts",
+  "version": "1.0.0",
+  "description": "Automation scripts for Next.js AI Build projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "next-ai-scripts": "./bin/next-ai-scripts.js",
+    "nai": "./bin/next-ai-scripts.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/cli/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts src/cli/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@next-ai-build/lib": "workspace:*",
+    "commander": "^11.0.0",
+    "inquirer": "^9.0.0",
+    "chalk": "^5.0.0",
+    "fast-glob": "^3.3.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0"
+  }
+}
+```
+
+#### CLI 入口文件 (bin/next-ai-scripts.js)
+
+```javascript
+#!/usr/bin/env node
+
+const { program } = require('commander');
+const { checkTranslations, cleanTranslations, generateBlog, initProject } = require('../dist/cli/index.js');
+
+program
+  .name('next-ai-scripts')
+  .description('Automation scripts for Next.js AI Build projects')
+  .version(require('../package.json').version);
+
+program
+  .command('check-translations')
+  .description('Check translation files for missing keys')
+  .option('-p, --path <path>', 'Project path', process.cwd())
+  .action(checkTranslations);
+
+program
+  .command('clean-translations')
+  .description('Clean unused translation keys')
+  .option('-p, --path <path>', 'Project path', process.cwd())
+  .option('--remove', 'Actually remove unused keys')
+  .action(cleanTranslations);
+
+program
+  .command('generate-blog')
+  .description('Generate blog index')
+  .option('-p, --path <path>', 'Project path', process.cwd())
+  .action(generateBlog);
+
+program
+  .command('init')
+  .description('Initialize a new Next.js AI Build project')
+  .option('-t, --template <template>', 'Template type', 'basic')
+  .action(initProject);
+
+program.parse();
+```
+
+#### 使用方式
+
+**1. 作为依赖安装：**
+```bash
+# 在新项目中安装
+pnpm add -D @next-ai-build/scripts
+
+# package.json scripts 中使用
+{
+  "scripts": {
+    "check-translations": "next-ai-scripts check-translations",
+    "clean-translations": "next-ai-scripts clean-translations --remove",
+    "generate-blog": "next-ai-scripts generate-blog"
+  }
+}
+```
+
+**2. 全局安装：**
+```bash
+# 全局安装
+npm install -g @next-ai-build/scripts
+
+# 直接使用
+next-ai-scripts init my-new-site
+nai check-translations
+```
+
+**3. 编程方式调用：**
+```typescript
+import { TranslationChecker, BlogGenerator } from '@next-ai-build/scripts';
+
+const checker = new TranslationChecker({
+  projectPath: './my-project',
+  locales: ['en', 'zh']
+});
+
+const result = await checker.check();
+```
+
+### 问题2：使用 apps/ 目录并支持多网站部署
+
+#### apps 目录结构
+
+```
+apps/
+├── 📁 main-website/                   # 主网站
+│   ├── src/
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── vercel.json                    # Vercel 部署配置
+│   └── README.md
+│
+├── 📁 docs-site/                      # 文档网站
+│   ├── src/
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── vercel.json
+│   └── README.md
+│
+└── 📁 admin-portal/                   # 管理后台
+    ├── src/
+    ├── package.json
+    ├── next.config.ts
+    ├── vercel.json
+    └── README.md
+```
+
+#### 部署配置
+
+**每个应用的 vercel.json：**
+```json
+{
+  "buildCommand": "cd ../.. && pnpm build --filter=main-website",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && pnpm install",
+  "ignoreCommand": "cd ../.. && pnpm dlx turbo-ignore main-website"
+}
+```
+
+**Turborepo 配置支持多应用：**
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "main-website#build": {
+      "dependsOn": ["@next-ai-build/lib#build", "@next-ai-build/base-ui#build", "@next-ai-build/third-ui#build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "docs-site#build": {
+      "dependsOn": ["@next-ai-build/lib#build", "@next-ai-build/base-ui#build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    }
+  }
+}
+```
+
+#### 添加新网站的流程
+
+**1. 使用脚本初始化：**
+```bash
+# 使用我们的脚本工具
+pnpm next-ai-scripts init --template=docs-site apps/new-docs-site
+```
+
+**2. 手动创建：**
+```bash
+# 创建新应用目录
+mkdir apps/new-site
+cd apps/new-site
+
+# 初始化 package.json
+pnpm init
+
+# 安装依赖
+pnpm add next react react-dom
+pnpm add -D @next-ai-build/lib @next-ai-build/base-ui @next-ai-build/third-ui
+```
+
+**3. 配置部署：**
+```bash
+# Vercel 部署
+vercel --cwd apps/new-site
+
+# Cloudflare Pages
+# 在 Cloudflare 控制台配置：
+# Build command: cd ../.. && pnpm build --filter=new-site
+# Build output directory: apps/new-site/.next
+```
+
+### 问题3：shared 目录的完整规划
+
+#### 扩展后的 shared 结构
+
+```
+shared/
+├── 📁 types/                          # 类型定义
+│   ├── common.ts                      # 通用类型
+│   ├── api.ts                         # API 类型
+│   ├── ui.ts                          # UI 组件类型
+│   ├── i18n.ts                        # 国际化类型
+│   └── index.ts
+│
+├── 📁 configs/                        # 复杂/个性化配置
+│   ├── deployment/                    # 部署配置
+│   │   ├── vercel/
+│   │   │   ├── edge-config.ts         # Vercel Edge 配置
+│   │   │   └── middleware-config.ts   # 中间件配置
+│   │   ├── cloudflare/
+│   │   │   ├── wrangler.template.toml
+│   │   │   └── workers-config.ts
+│   │   └── docker/
+│   │       ├── Dockerfile.template
+│   │       └── docker-compose.yml
+│   ├── database/                      # 数据库配置
+│   │   ├── prisma/
+│   │   │   ├── base.schema.prisma
+│   │   │   └── migrations-config.ts
+│   │   └── drizzle/
+│   │       └── base-config.ts
+│   ├── analytics/                     # 分析工具配置
+│   │   ├── google-analytics.ts
+│   │   ├── microsoft-clarity.ts
+│   │   └── posthog.ts
+│   ├── auth/                          # 认证配置
+│   │   ├── clerk/
+│   │   │   ├── theme-config.ts
+│   │   │   └── organization-config.ts
+│   │   └── auth0/
+│   │       └── config.ts
+│   └── monitoring/                    # 监控配置
+│       ├── sentry.config.ts
+│       └── error-tracking.ts
+│
+├── 📁 assets/                         # 共享静态资源
+│   ├── icons/                         # 通用图标
+│   │   ├── brand/
+│   │   │   ├── logo.svg
+│   │   │   └── favicon.ico
+│   │   ├── social/
+│   │   │   ├── github.svg
+│   │   │   └── twitter.svg
+│   │   └── ui/
+│   │       ├── arrow.svg
+│   │       └── check.svg
+│   ├── images/                        # 通用图片
+│   │   ├── placeholders/
+│   │   │   ├── avatar.webp
+│   │   │   └── default.webp
+│   │   └── backgrounds/
+│   │       ├── hero-bg.webp
+│   │       └── pattern.svg
+│   └── fonts/                         # 字体文件
+│       └── inter/
+│           ├── Inter-Regular.woff2
+│           └── Inter-Bold.woff2
+│
+├── 📁 constants/                      # 共享常量
+│   ├── api-endpoints.ts               # API 端点
+│   ├── ui-constants.ts                # UI 常量
+│   ├── feature-flags.ts               # 功能开关
+│   └── environment.ts                 # 环境变量定义
+│
+├── 📁 utils/                          # 共享工具函数 (复杂逻辑)
+│   ├── validation/                    # 验证工具
+│   │   ├── schemas.ts
+│   │   └── validators.ts
+│   ├── security/                      # 安全工具
+│   │   ├── encryption.ts
+│   │   └── sanitization.ts
+│   └── performance/                   # 性能工具
+│       ├── cache.ts
+│       └── optimization.ts
+│
+└── 📁 hooks/                          # 共享 React Hooks
+    ├── useFeatureFlag.ts
+    ├── useAnalytics.ts
+    └── useAuth.ts
+```
+
+#### shared vs packages/configs 使用原则
+
+| 类型 | 存放位置 | 使用场景 | 示例 |
+|------|----------|----------|------|
+| **简单、通用配置** | `packages/configs/` | 可直接复用的标准配置 | `tsconfig.base.json`, `eslint.config.js` |
+| **复杂、个性化配置** | `shared/configs/` | 需要定制或依赖较多的配置 | Clerk 主题配置、Vercel Edge 配置 |
+| **应用特定配置** | `apps/*/` | 每个应用独有的配置 | 特定的 `next.config.ts` |
+
+#### 实际使用示例
+
+```typescript
+// shared/configs/auth/clerk/theme-config.ts
+import { Appearance } from '@clerk/types';
+import { brandColors } from '../../constants/ui-constants';
+
+export const createClerkAppearance = (isDark: boolean): Appearance => ({
+  baseTheme: isDark ? 'dark' : 'light',
+  variables: {
+    colorPrimary: brandColors.primary,
+    colorBackground: isDark ? brandColors.dark.background : brandColors.light.background,
+    // 复杂的主题配置逻辑...
+  },
+  elements: {
+    // 复杂的元素样式配置...
+  }
+});
+```
+
+```typescript
+// apps/main-website/src/lib/auth-config.ts
+import { createClerkAppearance } from '@shared/configs/auth/clerk/theme-config';
+import { useTheme } from 'next-themes';
+
+export function useClerkConfig() {
+  const { theme } = useTheme();
+  return {
+    appearance: createClerkAppearance(theme === 'dark'),
+    // 应用特定的 Clerk 配置
+  };
+}
+```
+
+## 📦 详细包划分方案
+
+### 2.1 📦 `@next-ai-build/lib` - 工具类库
+
+**目标**: 提供通用的工具函数和配置，可独立发布到 npm
+
+```
+packages/lib/
+├── src/
+│   ├── index.ts                        # 主导出文件
+│   ├── config/
+│   │   ├── app-config.ts              # 原 appConfig.ts (通用化)
+│   │   ├── i18n-config.ts             # 国际化配置工具
+│   │   └── index.ts
+│   ├── utils/
+│   │   ├── utils.ts                   # 原 utils.ts
+│   │   ├── icons.ts                   # 原 limited-lucide-icons.ts
+│   │   └── index.ts
+│   ├── types/
+│   │   ├── common.ts                  # 通用类型定义
+│   │   ├── i18n.ts                    # 国际化类型
+│   │   └── index.ts
+│   └── constants/
+│       ├── defaults.ts                # 默认配置常量
+│       └── index.ts
+├── package.json
+├── tsconfig.json
+├── README.md
+└── CHANGELOG.md
+```
+
+### 2.2 🎨 `@next-ai-build/base-ui` - 基础UI组件
+
+**目标**: 基于成熟框架封装的通用UI组件
+
+```
+packages/base-ui/
+├── src/
+│   ├── index.ts                        # 主导出
+│   ├── components/
+│   │   ├── ui/                        # 原 shadcn/ui 组件 (优化版)
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   └── ...
+│   │   ├── layout/
+│   │   │   ├── hero.tsx               # 原 hero.tsx
+│   │   │   ├── features.tsx           # 原 features.tsx
+│   │   │   ├── footer.tsx             # 原 footer.tsx
+│   │   │   ├── cta.tsx                # 原 cta.tsx
+│   │   │   └── gallery.tsx            # 原 gallery.tsx
+│   │   ├── navigation/
+│   │   │   ├── toc.tsx                # 原 toc.tsx
+│   │   │   ├── toc-base.tsx           # 原 toc-base.tsx
+│   │   │   └── go-to-top.tsx          # 原 go-to-top.tsx
+│   │   ├── content/
+│   │   │   ├── tips.tsx               # 原 tips.tsx
+│   │   │   ├── seo-content.tsx        # 原 seo-content.tsx
+│   │   │   └── 404-page.tsx           # 原 404-page.tsx
+│   │   └── icons/
+│   │       └── global-icon.tsx        # 原 global-icon.tsx
+│   ├── styles/
+│   │   ├── globals.css                # 基础样式
+│   │   └── components.css             # 组件样式
+│   ├── hooks/
+│   │   └── index.ts                   # 通用 hooks
+│   └── utils/
+│       └── cn.ts                      # className 工具
+├── package.json
+├── tsconfig.json
+├── tailwind.config.js                 # Tailwind 配置
+├── README.md
+└── stories/                           # Storybook 文档 (可选)
+```
+
+### 2.3 🔌 `@next-ai-build/third-ui` - 第三方封装组件
+
+**目标**: 对第三方服务和工具的封装组件
+
+```
+packages/third-ui/
+├── src/
+│   ├── index.ts
+│   ├── clerk/                         # Clerk 认证组件
+│   │   ├── index.ts
+│   │   ├── components/
+│   │   │   ├── ClerkProviderClient.tsx  # 原组件
+│   │   │   ├── ClerkUser.tsx            # 原组件
+│   │   │   ├── ClerkOrganization.tsx    # 原组件
+│   │   │   └── index.ts
+│   │   ├── config/
+│   │   │   ├── clerk-intl.ts            # 原 clerk-intl.ts
+│   │   │   └── index.ts
+│   │   └── types/
+│   │       └── index.ts
+│   ├── fumadocs/                      # Fumadocs 组件
+│   │   ├── index.ts
+│   │   ├── components/
+│   │   │   ├── fuma-banner-suit.tsx     # 原组件
+│   │   │   ├── mdx/                     # 原 mdx 组件
+│   │   │   │   ├── airticalCard.tsx
+│   │   │   │   ├── gradient-button.tsx
+│   │   │   │   ├── image-zoom.tsx
+│   │   │   │   ├── imageGrid.tsx
+│   │   │   │   ├── mermaid.tsx
+│   │   │   │   ├── trophyCard.tsx
+│   │   │   │   └── zia-card.tsx
+│   │   │   └── mdx-components.tsx       # 原 mdx-components.tsx
+│   │   ├── config/
+│   │   │   ├── source-config.ts         # 原 source.config.ts 模板
+│   │   │   └── fuma-search-util.ts      # 原文件
+│   │   └── utils/
+│   │       └── get-llm-text.ts          # 原文件
+│   ├── analytics/                     # 分析工具组件
+│   │   ├── GoogleAnalyticsScript.tsx   # 原文件
+│   │   ├── MicrosoftClarityScript.tsx   # 原文件
+│   │   └── index.ts
+│   └── i18n/                          # 国际化组件
+│       ├── LanguageDetector.tsx         # 原文件
+│       ├── LanguageSwitcher.tsx         # 原文件
+│       └── index.ts
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+### 2.4 ⚙️ `@next-ai-build/configs` - 通用配置
+
+**目标**: 可复用的配置文件和模板
+
+```
+packages/configs/
+├── src/
+│   ├── index.ts
+│   ├── next/
+│   │   ├── next.config.template.ts    # Next.js 配置模板
+│   │   └── index.ts
+│   ├── typescript/
+│   │   ├── tsconfig.base.json         # 基础 TS 配置
+│   │   ├── tsconfig.web.json          # Web 项目配置
+│   │   ├── tsconfig.lib.json          # 库项目配置
+│   │   └── index.ts
+│   ├── eslint/
+│   │   ├── base.js                    # 基础 ESLint 配置
+│   │   ├── next.js                    # Next.js ESLint 配置
+│   │   └── index.js
+│   ├── tailwind/
+│   │   ├── base.config.js             # 基础 Tailwind 配置
+│   │   ├── components.config.js       # 组件 Tailwind 配置
+│   │   └── index.js
+│   ├── postcss/
+│   │   ├── postcss.config.template.js
+│   │   └── index.js
+│   └── pnpm/
+│       ├── pnpmfile.js                # pnpm 配置
+│       └── index.js
+├── templates/                         # 项目模板
+│   ├── package.json.template
+│   ├── README.template.md
+│   └── gitignore.template
+├── package.json
+└── README.md
+```
+
+## ⚙️ 核心配置文件
+
+### 根目录 pnpm-workspace.yaml
+
+```yaml
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - 'shared/*'
+  - 'tools/*'
+
+# 可选：指定依赖提升策略
+package-manager: pnpm
+
+# 配置共享依赖
+shared-workspace-lockfile: true
+```
+
+### 根目录 package.json
+
+```json
+{
+  "name": "next-ai-build-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Next.js AI Build Workspace - Modular architecture for reusable components and tools",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean",
+    "typecheck": "pnpm -r typecheck",
+    "publish:all": "pnpm -r publish",
+    "changeset": "changeset",
+    "version-packages": "changeset version"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "typescript": "^5.8.3",
+    "turbo": "^2.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.1.2",
+      "@types/react-dom": "19.1.3"
+    }
+  }
+}
+```
+
+## 🚀 完整的项目初始化工作流
+
+### 使用脚本创建新网站
+
+```bash
+# 1. 使用模板初始化
+pnpm next-ai-scripts init --template=website apps/my-new-site
+
+# 2. 安装依赖 (自动执行)
+cd apps/my-new-site && pnpm install
+
+# 3. 配置部署 (可选)
+pnpm next-ai-scripts setup-deployment --platform=vercel
+
+# 4. 启动开发
+pnpm dev
+```
+
+### 脚本自动生成内容
+
+- 基础项目结构
+- 合适的 `package.json` 依赖配置
+- 部署配置文件
+- 基础的页面和组件模板
+
+## 📋 迁移实施计划
+
+### 阶段一：基础设施搭建 (1-2天)
+
+1. **创建 workspace 结构**
+   ```bash
+   # 1. 重命名原项目
+   mv next-ai-build next-ai-build-backup
+   
+   # 2. 创建新的 workspace 结构
+   mkdir next-ai-build-workspace
+   cd next-ai-build-workspace
+   
+   # 3. 初始化 workspace
+   pnpm init
+   
+   # 4. 创建包目录结构
+   mkdir -p packages/{lib,base-ui,third-ui,scripts,configs}
+   mkdir -p apps/{main-website}
+   mkdir -p shared/{types,configs,assets,constants,utils,hooks}
+   ```
+
+2. **配置 workspace 基础设施**
+   - 创建 `pnpm-workspace.yaml`
+   - 配置根目录 `package.json`
+   - 设置 TypeScript 基础配置
+   - 配置 ESLint 和 Prettier
+
+### 阶段二：核心包开发 (3-5天)
+
+1. **开发 `@next-ai-build/lib`**
+   - 提取和重构 `appConfig.ts`
+   - 移植 `utils.ts` 和相关工具函数
+   - 创建类型定义
+   - 编写单元测试
+
+2. **开发 `@next-ai-build/base-ui`**
+   - 移植 shadcn/ui 组件
+   - 重构布局组件
+   - 优化样式系统
+   - 创建 Storybook 文档
+
+### 阶段三：专用包开发 (2-3天)
+
+1. **开发 `@next-ai-build/third-ui`**
+   - 重构 Clerk 组件
+   - 重构 Fumadocs 组件
+   - 封装分析工具组件
+
+2. **开发 `@next-ai-build/scripts`**
+   - 重构现有脚本
+   - 创建 CLI 工具
+   - 添加模板系统
+
+### 阶段四：配置包和网站重构 (2-3天)
+
+1. **开发 `@next-ai-build/configs`**
+   - 创建配置模板
+   - 设置最佳实践配置
+
+2. **重构主网站**
+   - 迁移内容到新结构
+   - 集成各个包
+   - 测试完整功能
+
+### 阶段五：测试和发布 (1-2天)
+
+1. **全面测试**
+   - 单元测试
+   - 集成测试
+   - 端到端测试
+
+2. **文档编写**
+   - 各包的 README
+   - 使用指南
+   - 迁移指南
+
+3. **发布准备**
+   - 版本管理
+   - 发布流程
+   - CI/CD 配置
+
+## 🔧 关键技术细节
+
+### 依赖管理策略
+
+```json
+// 每个包的 package.json 示例
+{
+  "name": "@next-ai-build/base-ui",
+  "dependencies": {
+    "@next-ai-build/lib": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "next": ">=14"
+  }
+}
+```
+
+### 构建配置共享
+
+```javascript
+// packages/configs/src/next/next.config.template.ts
+import { createNextConfig } from '@next-ai-build/configs/next'
+
+export default createNextConfig({
+  // 项目特定配置
+  experimental: {
+    // ...
+  }
+})
+```
+
+### 类型共享机制
+
+```typescript
+// shared/types/index.ts
+export interface BaseAppConfig {
+  baseUrl: string
+  i18n: I18nConfig
+  // ...
+}
+
+// packages/lib/src/types/index.ts
+export * from '../../../shared/types'
+```
+
+## 📦 发布和版本管理
+
+### 使用 Changesets 进行版本管理
+
+```bash
+# 安装 changesets
+pnpm add -DW @changesets/cli
+
+# 初始化
+pnpm changeset init
+
+# 创建 changeset
+pnpm changeset
+
+# 版本升级
+pnpm changeset version
+
+# 发布
+pnpm changeset publish
+```
+
+### CI/CD 配置
+
+```yaml
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    branches: [main]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm changeset publish
+```
+
+## 🎯 总结
+
+这个优化后的架构方案解决了以下关键问题：
+
+1. **scripts 包的完整生命周期**：从开发到发布到使用的完整流程
+2. **多应用支持**：使用 `apps/` 目录支持多个独立部署的应用
+3. **灵活的共享资源管理**：`shared/` 目录支持各种复杂配置和资源共享
+4. **标准化的工作流**：统一的创建、开发、测试、发布流程
+
+通过这个方案，可以实现高度模块化的代码复用，同时保持各个包的独立性和可维护性。每个包都可以独立发布和版本管理，支持多个网站项目的快速创建和部署。
