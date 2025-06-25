@@ -4,7 +4,7 @@ import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 
 const Dialog = DialogPrimitive.Root
 

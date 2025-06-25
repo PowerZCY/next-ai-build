@@ -6,7 +6,7 @@ import { VariantProps, cva } from "class-variance-authority"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
 import { useIsMobile } from "@/components/ui/use-mobile"
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"

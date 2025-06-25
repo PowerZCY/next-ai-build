@@ -1,6 +1,6 @@
 import Link from 'fumadocs-core/link';
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 
 export function AirticalCards(props: HTMLAttributes<HTMLDivElement>) {
   return (

@@ -5,7 +5,7 @@ import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 
 const ToastProvider = ToastPrimitives.Provider
 

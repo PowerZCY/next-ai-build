@@ -1,0 +1,75 @@
+{
+  "name": "@windrun-huaiin/lib",
+  "version": "0.1.0",
+  "description": "Common utilities and configuration",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.js"
+    },
+    "./limited-lucide-icons": {
+      "types": "./dist/limited-lucide-icons.d.ts",
+      "import": "./dist/limited-lucide-icons.mjs",
+      "require": "./dist/limited-lucide-icons.js"
+    },
+    "./llm-utils": {
+      "types": "./dist/llm-utils.d.ts",
+      "import": "./dist/llm-utils.mjs",
+      "require": "./dist/llm-utils.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "utilities",
+    "config",
+    "typescript",
+    "react",
+    "nextjs"
+  ],
+  "author": "Windrun Huaiin",
+  "license": "MIT",
+  "dependencies": {
+    "clsx": "catalog:",
+    "tailwind-merge": "catalog:",
+    "date-fns": "catalog:",
+    "remark": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-mdx": "catalog:",
+    "remark-frontmatter": "catalog:",
+    "unist-util-visit": "catalog:",
+    "lucide-react": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "tsup": "catalog:",
+    "@types/node": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 

@@ -3,7 +3,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,

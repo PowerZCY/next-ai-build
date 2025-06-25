@@ -6,7 +6,7 @@ import useEmblaCarousel, {
 } from "embla-carousel-react"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 import { Button } from "@/components/ui/button"
 
 type CarouselApi = UseEmblaCarouselType[1]

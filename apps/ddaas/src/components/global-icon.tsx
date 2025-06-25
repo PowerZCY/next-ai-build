@@ -8,7 +8,7 @@
 import React from 'react';
 import { type LucideProps } from 'lucide-react';
 import Image from 'next/image';
-import * as limitedIconsModule from '@/lib/limited-lucide-icons';
+import * as limitedIconsModule from '@windrun-huaiin/lib/limited-lucide-icons';
 import { iconColor } from '@/lib/appConfig';
 
 // Define all custom image-based icons in this object

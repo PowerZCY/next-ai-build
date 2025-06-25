@@ -1,7 +1,7 @@
 import * as React from "react"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (

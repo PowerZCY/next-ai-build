@@ -4,7 +4,7 @@ import * as React from "react"
 import { globalLucideIcons as icons } from "@/components/global-icon"
 import { DayPicker } from "react-day-picker"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@windrun-huaiin/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
