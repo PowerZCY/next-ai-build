@@ -3,7 +3,7 @@
 import { globalLucideIcons as icons } from "@/components/global-icon"
 import { useTranslations } from 'next-intl'
 import Image from "next/image"
-import { GradientButton } from "./mdx/gradient-button"
+import { GradientButton } from "@/components/mdx/gradient-button"
 
 export function Gallery() {
   const t = useTranslations('gallery');

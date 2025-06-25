@@ -111,6 +111,7 @@ export function createCommonAppConfig(options?: {
     clerkPageBanner: config.style.clerkPageBanner,
     clerkAuthInModal: config.style.clerkAuthInModal,
     placeHolderImage: config.style.placeHolder.image,
+    clerk: config.clerk,
   };
 
   return {
