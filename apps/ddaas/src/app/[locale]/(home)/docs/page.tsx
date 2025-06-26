@@ -1,4 +1,4 @@
-import { NotFoundPage } from '@/components/404-page';
+import { NotFoundPage } from '@windrun-huaiin/base-ui';
 
   export default async function D8gerPage() {
   return (

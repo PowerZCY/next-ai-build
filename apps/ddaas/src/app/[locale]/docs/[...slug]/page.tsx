@@ -5,10 +5,9 @@ import {
   DocsPage,
   DocsTitle,
 } from 'fumadocs-ui/page';
-import { getMDXComponents } from '@/components/mdx-components';
-import { TocFooter } from '@/components/toc';
-import { appConfig } from '@/lib/appConfig';
-import { NotFoundPage } from '@/components/404-page';
+import { getMDXComponents, appConfig } from '@/lib/appConfig';
+import { TocFooter } from '@windrun-huaiin/third-ui/fuma';
+import { NotFoundPage } from '@windrun-huaiin/base-ui';
 
 export default async function Page({
   params,
@@ -22,7 +21,12 @@ export default async function Page({
   }
 
   const path = `${appConfig.mdxSourceDir.docs}/${page.file.path}`;
-  const tocFooterElement = <TocFooter lastModified={page.data.date} showCopy={true} editPath={path} />;
+  const tocFooterElement = <TocFooter 
+    lastModified={page.data.date} 
+    showCopy={true} 
+    editPath={path}
+    githubBaseUrl={appConfig.githubBaseUrl}
+  />;
  
   // Markdown content requires await if you config 'async: true' in source.config.ts
   // const { body: MdxContent, toc } = await page.data.load();

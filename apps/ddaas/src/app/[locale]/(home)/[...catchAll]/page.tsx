@@ -7,7 +7,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { NotFoundPage } from '@/components/404-page';
+import { NotFoundPage } from '@windrun-huaiin/base-ui';
 
 export default async function NotFound() {
   return (

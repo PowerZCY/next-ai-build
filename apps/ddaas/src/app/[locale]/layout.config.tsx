@@ -1,11 +1,11 @@
 import Preview from '@/../public/banner.png';
-import { globalLucideIcons as icons, SiteIcon } from '@/components/global-icon';
+import { globalLucideIcons as icons, SiteIcon } from '@windrun-huaiin/base-ui';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
-// import ClerkOrganization from '@/components/ClerkOrganization';
-import ClerkUser from '@/components/ClerkUser';
+// import { ClerkOrganization } from '@windrun-huaiin/third-ui/clerk';
+import { ClerkUser } from '@windrun-huaiin/third-ui/clerk';
 import { i18n } from '@/i18n';
 import { appConfig } from '@/lib/appConfig';
 
@@ -23,7 +23,7 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
       // false就先排左边的菜单, true就先排右边的按钮
       secondary: true,
       // NicknameFilter 假设在其内部也使用了 useNickname
-      children: <ClerkUser locale={locale} />
+      children: <ClerkUser locale={locale} clerkAuthInModal={appConfig.style.clerkAuthInModal} />
     },
     // {
     //   type: 'custom',

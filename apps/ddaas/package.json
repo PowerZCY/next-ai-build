@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@windrun-huaiin/lib": "workspace:*",
+    "@windrun-huaiin/base-ui": "workspace:*",
+    "@windrun-huaiin/third-ui": "workspace:*",
     "@clerk/localizations": "catalog:",
     "@clerk/nextjs": "catalog:",
     "@clerk/themes": "catalog:",

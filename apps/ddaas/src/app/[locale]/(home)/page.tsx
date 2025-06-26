@@ -1,9 +1,5 @@
 import { Hero } from "@/components/hero"
-import { Features } from "@/components/features"
-import { Gallery } from "@/components/gallery"
-import { Tips } from "@/components/tips"
-import { SeoContent } from "@/components/seo-content"
-import { CTA } from "@/components/cta"
+import { Features, Gallery, Tips, SeoContent, CTA } from "@windrun-huaiin/third-ui/main"
 
 export default function Home() {
   return (

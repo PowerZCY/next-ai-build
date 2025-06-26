@@ -1,11 +1,11 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
-import { Footer } from '@/components/footer';
-import GoToTop from '@/components/go-to-top';
+import { Footer } from '@windrun-huaiin/third-ui/main';
+import GoToTop from '@windrun-huaiin/third-ui/main';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@/components/fuma-banner-suit';
+import { FumaBannerSuit } from '@windrun-huaiin/third-ui/fuma';
 import type { ReactNode } from 'react';
 import { showBanner } from '@/lib/appConfig';
-import { ClerkProviderClient } from '@/components/ClerkProviderClient';
+import { ClerkProviderClient } from '@windrun-huaiin/third-ui/clerk';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   return {
