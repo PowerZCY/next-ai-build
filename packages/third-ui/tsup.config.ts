@@ -14,6 +14,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
+  publicDir: './src/styles',
   noExternal: [],
   external: [
     'react',

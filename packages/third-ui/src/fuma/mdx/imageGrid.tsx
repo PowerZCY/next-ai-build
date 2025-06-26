@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+
 import { ImageZoom } from '@/fuma/mdx/image-zoom';
 
 export function ImageGrid({

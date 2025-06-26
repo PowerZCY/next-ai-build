@@ -1,7 +1,8 @@
-import React from 'react';
+'use client';
+
+import { Button, globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
 import Link from "fumadocs-core/link";
-import { Button } from "@windrun-huaiin/base-ui";
-import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
+import React from 'react';
 
 export function GradientButton({
   title,

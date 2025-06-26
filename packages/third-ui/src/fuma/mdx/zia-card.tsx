@@ -1,7 +1,9 @@
+'use client';
+
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
+import { cn } from '@windrun-huaiin/lib/utils';
 import Link from 'fumadocs-core/link';
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '@windrun-huaiin/lib/utils';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 
 export type ZiaCardProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
   icon?: ReactNode;

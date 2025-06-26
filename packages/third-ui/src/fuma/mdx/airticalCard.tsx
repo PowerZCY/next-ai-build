@@ -1,6 +1,8 @@
+'use client';
+
+import { cn } from '@windrun-huaiin/lib/utils';
 import Link from 'fumadocs-core/link';
 import type { HTMLAttributes, ReactNode } from 'react';
-import { cn } from '@windrun-huaiin/lib/utils';
 
 export function AirticalCards(props: HTMLAttributes<HTMLDivElement>) {
   return (

@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-
 /* 
  * 文档主题皮肤, 参考https://fumadocs.dev/docs/ui/theme
  * neutral
@@ -16,8 +15,7 @@
 @import 'katex/dist/katex.css';
 @import 'nprogress/nprogress.css';
 
-@import '../../styles/fuma.css';
-@import '../../styles/cta.css';
+@import '@windrun-huaiin/third-ui/styles/third-ui.css';
 
 /* 
  * 强制NProgress进度条颜色为紫色
