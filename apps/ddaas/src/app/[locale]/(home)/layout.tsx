@@ -1,6 +1,5 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
-import { Footer } from '@windrun-huaiin/third-ui/main';
-import GoToTop from '@windrun-huaiin/third-ui/main';
+import { Footer, GoToTop } from '@windrun-huaiin/third-ui/main';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import { FumaBannerSuit } from '@windrun-huaiin/third-ui/fuma';
 import type { ReactNode } from 'react';

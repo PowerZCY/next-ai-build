@@ -8,6 +8,11 @@ const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    '@windrun-huaiin/base-ui',
+    '@windrun-huaiin/third-ui',
+    '@windrun-huaiin/lib',
+  ],
   // eslint: {
   //   ignoreDuringBuilds: true,
   // },

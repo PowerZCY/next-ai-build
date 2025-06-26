@@ -56,23 +56,25 @@
   "author": "Windrun Huaiin",
   "license": "MIT",
   "dependencies": {
-    "clsx": "catalog:",
-    "tailwind-merge": "catalog:",
-    "date-fns": "catalog:",
-    "remark": "catalog:",
-    "remark-gfm": "catalog:",
-    "remark-mdx": "catalog:",
-    "remark-frontmatter": "catalog:",
-    "unist-util-visit": "catalog:",
-    "lucide-react": "catalog:"
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.0",
+    "date-fns": "2.30.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx": "^3.1.0",
+    "remark-frontmatter": "^5.0.0",
+    "unist-util-visit": "^5.0.0",
+    "lucide-react": "^0.511.0"
   },
   "devDependencies": {
-    "typescript": "catalog:",
-    "tsup": "catalog:",
-    "@types/node": "catalog:"
+    "typescript": "^5.8.3",
+    "tsup": "^8.3.5",
+    "@types/node": "^22.15.18"
   },
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": "^19.1.0"
   },
   "publishConfig": {
     "access": "public"

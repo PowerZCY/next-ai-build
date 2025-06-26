@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from "next/link";
+import Link from "fumadocs-core/link";
 import { Button } from "@windrun-huaiin/base-ui";
 import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
 

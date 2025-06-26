@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 
-export default function GoToTop() {
+export function GoToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
   // listen to scroll event

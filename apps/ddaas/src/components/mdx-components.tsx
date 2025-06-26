@@ -1,21 +1,23 @@
-import defaultMdxComponents from 'fumadocs-ui/mdx';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
-import { Mermaid } from '@/fuma/mdx/mermaid';
-import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
-import { Callout } from 'fumadocs-ui/components/callout';
-import { File, Folder, Files } from 'fumadocs-ui/components/files';
-import { ImageZoom } from '@/fuma/mdx/image-zoom';
-import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import type { MDXComponents, MDXProps } from 'mdx/types';
-import { TypeTable } from 'fumadocs-ui/components/type-table';
-import { createGenerator as createTypeTableGenerator } from 'fumadocs-typescript';
-import { AutoTypeTable } from 'fumadocs-typescript/ui';
+import defaultMdxComponents from "fumadocs-ui/mdx";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import {
+  Mermaid,
+  ImageZoom,
+  TrophyCard,
+  ImageGrid,
+  ZiaCard,
+  GradientButton,
+} from "@windrun-huaiin/third-ui/fuma/mdx";
+import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
+import { Callout } from "fumadocs-ui/components/callout";
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
+import type { MDXComponents, MDXProps } from "mdx/types";
+import { TypeTable } from "fumadocs-ui/components/type-table";
+import { createGenerator as createTypeTableGenerator } from "fumadocs-typescript";
+import { AutoTypeTable } from "fumadocs-typescript/ui";
 
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
-import { TrophyCard } from '@/fuma/mdx/trophyCard';
-import { ImageGrid } from '@/fuma/mdx/imageGrid';
-import { ZiaCard } from '@/fuma/mdx/zia-card';
-import { GradientButton } from '@/fuma/mdx/gradient-button';
+import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
 
 // MDX 组件全局配置接口
 export interface MDXComponentsConfig {
@@ -53,21 +55,21 @@ const languageToIconMap: Record<string, React.ReactNode> = {
 
 // source.config.ts 中自定义transformer:parse-code-language中调用, 搭配使用
 function tryToMatchIcon(
-  props: Readonly<MDXProps & { 'data-language'?: string; title?: string }>, // 明确 props 的类型
+  props: Readonly<MDXProps & { "data-language"?: string; title?: string }>, // 明确 props 的类型
   iconMap: Record<string, React.ReactNode>
 ): React.ReactNode | undefined {
   let lang: string | undefined;
 
   // 1. 优先从 props['data-language'] 获取
-  const dataLanguage = props['data-language'] as string | undefined;
+  const dataLanguage = props["data-language"] as string | undefined;
 
-  if (dataLanguage && dataLanguage.trim() !== '') {
+  if (dataLanguage && dataLanguage.trim() !== "") {
     lang = dataLanguage.trim().toLowerCase();
   } else {
     // 2. 如果 data-language 不可用，则回退到从 title 解析
     const title = props.title as string | undefined;
     if (title) {
-      const titleParts = title.split('.');
+      const titleParts = title.split(".");
       // 确保文件名部分不是空的 (例如 ".css" 这种标题是不合法的)
       if (titleParts.length > 1 && titleParts[0] !== "") {
         const extension = titleParts.pop()?.toLowerCase();
@@ -75,7 +77,7 @@ function tryToMatchIcon(
           lang = extension;
         }
       }
-    } 
+    }
   }
   let customIcon: React.ReactNode | undefined;
   if (lang && iconMap[lang]) {
@@ -102,13 +104,16 @@ const fumadocsUiComponents = {
 const customUiComponents = {
   TrophyCard,
   ZiaCard,
-  GradientButton
-}
+  GradientButton,
+};
 
 const typeTableGenerator = createTypeTableGenerator();
 
 // 这里只是渲染层处理, 将HAST渲染为React组件, 即HTML代码
-export function getMDXComponents(components?: MDXComponents, config?: MDXComponentsConfig): MDXComponents {
+export function getMDXComponents(
+  components?: MDXComponents,
+  config?: MDXComponentsConfig
+): MDXComponents {
   return {
     ...defaultMdxComponents,
     pre: (props) => {
@@ -138,17 +143,11 @@ export function getMDXComponents(components?: MDXComponents, config?: MDXCompone
     ),
     // 全局配置的 ImageGrid 组件
     ImageGrid: (props) => (
-      <ImageGrid
-        {...props}
-        cdnBaseUrl={config?.cdnBaseUrl}
-      />
+      <ImageGrid {...props} cdnBaseUrl={config?.cdnBaseUrl} />
     ),
     // 全局配置的 ImageZoom 组件
     ImageZoom: (props) => (
-      <ImageZoom
-        {...props}
-        fallbackSrc={config?.placeHolderImage}
-      />
+      <ImageZoom {...props} fallbackSrc={config?.placeHolderImage} />
     ),
     ...fumadocsUiComponents,
     ...customUiComponents,
@@ -158,7 +157,4 @@ export function getMDXComponents(components?: MDXComponents, config?: MDXCompone
   };
 }
 
-// 工厂函数：创建一个预配置的 getMDXComponents 函数
-export function createMDXComponents(config?: MDXComponentsConfig) {
-  return (components?: MDXComponents) => getMDXComponents(components, config);
-}
+export const useMDXComponents = getMDXComponents;

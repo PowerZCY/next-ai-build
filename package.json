@@ -5,7 +5,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
-    "start": "pnpm -r start", 
+    "start": "pnpm -r start",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
     "ddaas:dev": "pnpm --filter=@windrun-huaiin/ddaas-website dev",
@@ -13,7 +13,7 @@
     "ddaas:start": "pnpm --filter=@windrun-huaiin/ddaas-website start"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1"
+    "@changesets/cli": "^2.29.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
