@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { globalLucideIcons as icons } from '@/components/global-icon';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 export default function GoToTop() {
   const [isVisible, setIsVisible] = useState(false);
 

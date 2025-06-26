@@ -1,7 +1,7 @@
 import { clerkMiddleware, ClerkMiddlewareAuth, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
-import { appConfig } from "./lib/appConfig";
+import { appConfig } from "@/lib/appConfig";
 
 const intlMiddleware = createMiddleware({
   // 多语言配置

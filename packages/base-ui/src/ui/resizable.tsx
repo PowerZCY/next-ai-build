@@ -1,9 +1,9 @@
 "use client"
 
-import { globalLucideIcons as icons } from "@/components/global-icon"
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 import * as ResizablePrimitive from "react-resizable-panels"
 
-import { cn } from "@windrun-huaiin/lib/utils"
+import { cn } from "@lib/utils"
 
 const ResizablePanelGroup = ({
   className,

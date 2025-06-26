@@ -20,14 +20,19 @@
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.mjs",
       "require": "./dist/components/*.js"
-    }
+    },
+    "./src/*": "./src/*",
+    "./styles/base-ui.css": "./dist/base-ui.css"
   },
   "files": [
+    "src",
     "dist",
+    "package.json",
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build:css": "postcss src/styles/base-ui.css -o dist/base-ui.css",
+    "build": "tsup && pnpm build:css",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"

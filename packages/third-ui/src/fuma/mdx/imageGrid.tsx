@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageZoom } from '@/fuma/mdx/image-zoom';
+import { ImageZoom } from '@third-ui/fuma/mdx/image-zoom';
 
 export function ImageGrid({
   type="url",

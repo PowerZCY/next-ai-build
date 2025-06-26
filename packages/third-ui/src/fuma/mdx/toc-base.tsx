@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
-import { Button } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { Button } from '@base-ui/ui/button';
 
 const cache = new Map<string, string>();
 

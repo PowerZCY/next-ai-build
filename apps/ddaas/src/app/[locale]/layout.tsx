@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import './globals.css';
 import NProgressBar from '@/app/[locale]/nProgressBar';
-import { fumaI19nCn } from '@windrun-huaiin/third-ui/lib';
+import { fumaI18nCn } from '@third-ui/lib';
 import { RootProvider } from "fumadocs-ui/provider";
 import { Montserrat } from "next/font/google";
 
@@ -76,7 +76,7 @@ export default async function RootLayout({
               // available languages
               locales: generatedLocales,
               // translations for UI
-              translations: { fumaI19nCn }[locale],
+              translations: { fumaI18nCn }[locale],
             }}
           >
             {children}

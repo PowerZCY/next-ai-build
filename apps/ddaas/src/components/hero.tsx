@@ -3,8 +3,8 @@
 
 import Image from "next/image"
 import { useTranslations } from 'next-intl'
-import { globalLucideIcons as icons} from '@windrun-huaiin/base-ui'
-import { GradientButton } from "@windrun-huaiin/third-ui/fuma/mdx"
+import { globalLucideIcons as icons} from '@base-ui/components/global-icon'
+import { GradientButton } from "@third-ui/fuma/mdx"
 
 export function Hero() {
   const t = useTranslations('hero');

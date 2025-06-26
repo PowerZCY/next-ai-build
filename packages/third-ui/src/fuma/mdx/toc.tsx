@@ -1,6 +1,6 @@
 'use client';
 
-import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from '@/components/mdx/toc-base';
+import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from '@third-ui/fuma/mdx/toc-base';
 
 interface TocFooterProps {
   /**

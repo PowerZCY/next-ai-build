@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { getLLMText } from '@windrun-huaiin/lib/llm-utils';
+import { getLLMText } from '@lib/llm-utils';
 import { docsSource } from '@/lib/source';
 import { appConfig } from '@/lib/appConfig';
 import fs from 'node:fs'; // For reading file content

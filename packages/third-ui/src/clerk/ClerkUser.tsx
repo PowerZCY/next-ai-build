@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { type JSX } from 'react';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 import { useTranslations } from 'next-intl';
+import { type JSX } from 'react';
 
 interface ClerkUserProps {
   locale: string;

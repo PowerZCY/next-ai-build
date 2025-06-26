@@ -30,7 +30,8 @@
       "types": "./dist/common-app-config.d.ts",
       "import": "./dist/common-app-config.mjs",
       "require": "./dist/common-app-config.js"
-    }
+    },
+    "./src/*": "./src/*"
   },
   "files": [
     "dist",

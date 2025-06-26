@@ -8,7 +8,7 @@
 import React from 'react';
 import { type LucideProps } from 'lucide-react';
 import Image from 'next/image';
-import * as limitedIconsModule from '@windrun-huaiin/lib/limited-lucide-icons';
+import * as limitedIconsModule from '@lib/limited-lucide-icons';
 
 // Attention: This icon color will be used in the entire project, and it depends on the ENV variable NEXT_PUBLIC_STYLE_ICON_COLOR
 const iconColor = process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500";

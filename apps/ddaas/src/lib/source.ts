@@ -1,5 +1,5 @@
 import { docs, legal, blog } from '.source';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { i18n } from '@/i18n';
 import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';
 import { createElement } from 'react';

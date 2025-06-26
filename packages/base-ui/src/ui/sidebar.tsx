@@ -3,21 +3,21 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { globalLucideIcons as icons } from "@/components/global-icon"
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 
-import { useIsMobile } from "@/ui/use-mobile"
-import { cn } from "@windrun-huaiin/lib/utils"
-import { Button } from "@/ui/button"
-import { Input } from "@/ui/input"
-import { Separator } from "@/ui/separator"
-import { Sheet, SheetContent } from "@/ui/sheet"
-import { Skeleton } from "@/ui/skeleton"
+import { useIsMobile } from "@base-ui/ui/use-mobile"
+import { cn } from "@lib/utils"
+import { Button } from "@base-ui/ui/button"
+import { Input } from "@base-ui/ui/input"
+import { Separator } from "@base-ui/ui/separator"
+import { Sheet, SheetContent } from "@base-ui/ui/sheet"
+import { Skeleton } from "@base-ui/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/ui/tooltip"
+} from "@base-ui/ui/tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

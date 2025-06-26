@@ -11,14 +11,14 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { globalLucideIcons as icons } from "@/components/global-icon"
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/ui/dropdown-menu'
-import { LanguageButton } from '@/ui/language-button'
+} from '@base-ui/ui/dropdown-menu'
+import { LanguageButton } from '@base-ui/ui/language-button'
 
 interface LanguageSwitcherProps {
   locales: readonly string[];

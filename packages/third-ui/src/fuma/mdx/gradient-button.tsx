@@ -1,6 +1,7 @@
 'use client';
 
-import { Button, globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
+import { Button } from "@base-ui/ui/button";
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon";
 import Link from "fumadocs-core/link";
 import React from 'react';
 

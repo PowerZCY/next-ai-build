@@ -6,8 +6,8 @@ import {
   DocsTitle,
 } from 'fumadocs-ui/page';
 import { getMDXComponents } from '@/components/mdx-components';
-import { NotFoundPage } from '@windrun-huaiin/base-ui';
-import { TocFooter } from '@/components/mdx/toc';
+import { NotFoundPage } from '@base-ui/components/404-page';
+import { TocFooter } from '@third-ui/fuma/mdx/toc';
 
 export default async function Page({
   params,

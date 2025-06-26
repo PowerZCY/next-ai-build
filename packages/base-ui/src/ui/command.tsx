@@ -3,10 +3,10 @@
 import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
-import { globalLucideIcons as icons } from "@/components/global-icon"
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 
-import { cn } from "@windrun-huaiin/lib/utils"
-import { Dialog, DialogContent } from "@/ui/dialog"
+import { cn } from "@lib/utils"
+import { Dialog, DialogContent } from "@base-ui/ui/dialog"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,

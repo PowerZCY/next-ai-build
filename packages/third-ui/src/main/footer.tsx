@@ -1,6 +1,6 @@
 'use client'
 
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from "next/link";
 

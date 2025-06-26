@@ -3,14 +3,15 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "outDir": "./dist",
-    "rootDir": "./src",
     "declaration": true,
     "declarationDir": "./dist",
     "incremental": false,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"]
+      "@third-ui/*": ["./*"],
+      "@base-ui/*": ["../../base-ui/src/*"],
+      "@lib/*": ["../../lib/src/*"]
     }
   },
   "include": [

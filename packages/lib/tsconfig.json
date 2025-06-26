@@ -9,7 +9,11 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "jsx": "react-jsx",
-    "incremental": false
+    "incremental": false,
+    "baseUrl": "./src",
+    "paths": {
+      "@lib/*": ["./*"]
+    }
   },
   "include": [
     "src/**/*"

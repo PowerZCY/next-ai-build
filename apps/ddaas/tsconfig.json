@@ -25,8 +25,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [ "./src/*" ],
-      // 配置Fumadocs的source, 强制使用别名路径
-      ".source/*": ["./.source/*"]
+      ".source/*": ["./.source/*"],
+      "@third-ui/*": ["../../packages/third-ui/src/*"],
+      "@base-ui/*": ["../../packages/base-ui/src/*"],
+      "@lib/*": ["../../packages/lib/src/*"]
     }
   },
   "include": [

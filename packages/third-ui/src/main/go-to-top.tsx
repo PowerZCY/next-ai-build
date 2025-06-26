@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 
 export function GoToTop() {
   const [isVisible, setIsVisible] = useState(false);

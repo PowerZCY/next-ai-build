@@ -1,2 +1,4 @@
-@import "./fuma.css"; 
-@import "./cta.css";
+@import '@windrun-huaiin/base-ui/styles/base-ui.css';
+@import 'tailwindcss';
+@import './fuma.css';
+@import './cta.css';

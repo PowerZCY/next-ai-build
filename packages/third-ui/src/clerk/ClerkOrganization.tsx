@@ -1,5 +1,5 @@
 import { OrganizationSwitcher } from '@clerk/nextjs';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui'; 
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon'; 
 interface ClerkOrganizationProps {
   className?: string;
   locale: string;

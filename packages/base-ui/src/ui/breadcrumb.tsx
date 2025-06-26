@@ -1,8 +1,8 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { globalLucideIcons as icons } from "@/components/global-icon"
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 
-import { cn } from "@windrun-huaiin/lib/utils"
+import { cn } from "@lib/utils"
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,

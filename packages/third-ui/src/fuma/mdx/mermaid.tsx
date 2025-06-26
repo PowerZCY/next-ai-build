@@ -1,6 +1,6 @@
 'use client';
 
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useEffect, useId, useState } from 'react';

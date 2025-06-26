@@ -1,4 +1,4 @@
-import { createCommonAppConfig, createI18nHelpers, LOCALE_PRESETS } from "@windrun-huaiin/lib/common-app-config";
+import { createCommonAppConfig, createI18nHelpers, LOCALE_PRESETS } from "@lib/common-app-config";
 
 // 创建应用配置
 export const appConfig = {

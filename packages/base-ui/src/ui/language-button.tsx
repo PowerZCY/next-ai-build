@@ -8,7 +8,7 @@
  */
 
 import * as React from "react"
-import { cn } from "@windrun-huaiin/lib/utils"
+import { cn } from "@lib/utils"
 
 export interface LanguageButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {

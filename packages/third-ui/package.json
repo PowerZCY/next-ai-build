@@ -36,14 +36,18 @@
       "import": "./dist/lib/index.mjs",
       "require": "./dist/lib/index.js"
     },
-    "./styles/third-ui.css": "./dist/third-ui.css"
+    "./styles/third-ui.css": "./dist/third-ui.css",
+    "./src/*": "./src/*"
   },
   "files": [
+    "src",
     "dist",
+    "package.json",
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build:css": "postcss src/styles/third-ui.css -o dist/third-ui.css",
+    "build": "tsup && pnpm build:css",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"

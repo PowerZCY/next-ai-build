@@ -7,7 +7,7 @@ import {
   ImageGrid,
   ZiaCard,
   GradientButton,
-} from "@windrun-huaiin/third-ui/fuma/mdx";
+} from "@third-ui/fuma/mdx";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import { Callout } from "fumadocs-ui/components/callout";
 import { File, Folder, Files } from "fumadocs-ui/components/files";
@@ -17,7 +17,7 @@ import { TypeTable } from "fumadocs-ui/components/type-table";
 import { createGenerator as createTypeTableGenerator } from "fumadocs-typescript";
 import { AutoTypeTable } from "fumadocs-typescript/ui";
 
-import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
+import { globalLucideIcons as icons } from "@base-ui/components/global-icon";
 
 // MDX 组件全局配置接口
 export interface MDXComponentsConfig {

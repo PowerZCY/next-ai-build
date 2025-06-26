@@ -1,11 +1,11 @@
 import Preview from '@/../public/banner.png';
-import { globalLucideIcons as icons, SiteIcon } from '@windrun-huaiin/base-ui';
+import { globalLucideIcons as icons, SiteIcon } from '@base-ui/components/global-icon';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
-// import { ClerkOrganization } from '@windrun-huaiin/third-ui/clerk';
-import { ClerkUser } from '@windrun-huaiin/third-ui/clerk';
+// import { ClerkOrganization } from '@third-ui/clerk';
+import { ClerkUser } from '@third-ui/clerk';
 import { i18n } from '@/i18n';
 import { appConfig } from '@/lib/appConfig';
 

@@ -1,8 +1,7 @@
 'use client'
 
-import React from 'react';
+import { GradientButton } from "@third-ui/fuma/mdx/gradient-button";
 import { useTranslations } from 'next-intl';
-import { GradientButton } from "@/fuma/mdx/gradient-button";
 
 export function CTA() {
   const t = useTranslations('cta');
