@@ -3,7 +3,7 @@
 import React from 'react';
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { type JSX } from 'react';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 import { useTranslations } from 'next-intl';
 
 interface ClerkUserProps {

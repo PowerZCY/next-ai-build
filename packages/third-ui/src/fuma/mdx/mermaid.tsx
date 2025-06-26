@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 
 interface MermaidProps {
   chart: string;

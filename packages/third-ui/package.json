@@ -30,6 +30,11 @@
       "types": "./dist/fuma/mdx/index.d.ts",
       "import": "./dist/fuma/mdx/index.mjs",
       "require": "./dist/fuma/mdx/index.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.mjs",
+      "require": "./dist/lib/index.js"
     }
   },
   "files": [
@@ -44,20 +49,18 @@
   },
   "dependencies": {
     "@clerk/localizations": "catalog:",
-    "@clerk/nextjs": "catalog:",
     "@clerk/types": "catalog:",
     "@windrun-huaiin/base-ui": "workspace:*",
     "@windrun-huaiin/lib": "workspace:*",
     "fumadocs-core": "catalog:",
     "fumadocs-typescript": "catalog:",
     "fumadocs-ui": "catalog:",
+    "mermaid": "catalog:",
+    "react-medium-image-zoom": "catalog:",
     "next": "catalog:",
     "next-intl": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "mermaid": "catalog:",
     "next-themes": "catalog:",
-    "react-medium-image-zoom": "catalog:"
+    "@clerk/nextjs": "catalog:"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

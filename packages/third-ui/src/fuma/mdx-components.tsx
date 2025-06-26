@@ -11,7 +11,7 @@ import { TypeTable } from 'fumadocs-ui/components/type-table';
 import { createGenerator as createTypeTableGenerator } from 'fumadocs-typescript';
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
 
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui';
 import { TrophyCard } from '@/fuma/mdx/trophyCard';
 import { ImageGrid } from '@/fuma/mdx/imageGrid';
 import { ZiaCard } from '@/fuma/mdx/zia-card';
@@ -162,6 +162,3 @@ export function getMDXComponents(components?: MDXComponents, config?: MDXCompone
 export function createMDXComponents(config?: MDXComponentsConfig) {
   return (components?: MDXComponents) => getMDXComponents(components, config);
 }
-
-// export a `useMDXComponents()` that returns MDX components
-export const useMDXComponents = getMDXComponents;

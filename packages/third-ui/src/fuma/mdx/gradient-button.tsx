@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from "next/link";
-import { Button } from "@windrun-huaiin/base-ui/ui/button";
-import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui/components/global-icon";
+import { Button } from "@windrun-huaiin/base-ui";
+import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui";
 
 export function GradientButton({
   title,

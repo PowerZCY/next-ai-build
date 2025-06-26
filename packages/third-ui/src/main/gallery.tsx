@@ -1,6 +1,6 @@
 'use client'
 
-import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui/components/global-icon"
+import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui"
 import { useTranslations } from 'next-intl'
 import Image from "next/image"
 import { GradientButton } from "@/fuma/mdx/gradient-button"
