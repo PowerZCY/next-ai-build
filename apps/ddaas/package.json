@@ -15,9 +15,6 @@
     "remove-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts --remove"
   },
   "dependencies": {
-    "@windrun-huaiin/lib": "workspace:*",
-    "@windrun-huaiin/base-ui": "workspace:*",
-    "@windrun-huaiin/third-ui": "workspace:*",
     "@clerk/localizations": "^3.16.0",
     "@clerk/nextjs": "^6.19.4",
     "@clerk/themes": "^2.2.45",
@@ -52,6 +49,9 @@
     "@radix-ui/react-tooltip": "^1.2.6",
     "@tailwindcss/typography": "latest",
     "@types/mdx": "^2.0.13",
+    "@windrun-huaiin/base-ui": "workspace:*",
+    "@windrun-huaiin/lib": "workspace:*",
+    "@windrun-huaiin/third-ui": "workspace:*",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -91,6 +91,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/hast": "^3.0.4",
     "@types/node": "^22.15.18",
@@ -111,7 +112,6 @@
     "typescript": "^5.8.3",
     "unist-util-visit": "^5.0.0"
   },
-
   "files": [
     "src",
     "public",

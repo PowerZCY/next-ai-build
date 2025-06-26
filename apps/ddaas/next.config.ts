@@ -8,6 +8,7 @@ const withMDX = createMDX();
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
+  // Monorepo development config
   transpilePackages: [
     '@windrun-huaiin/base-ui',
     '@windrun-huaiin/third-ui',
@@ -20,12 +21,12 @@ const nextConfig: NextConfig = {
   //   ignoreBuildErrors: true,
   // },
   
-  // mdx需要的配置
+  // mdx config
   reactStrictMode: true,
 
   images: {
     unoptimized: true,
-    // 允许加载图片的host
+    // allow remote image host
     remotePatterns: [
       {
         protocol: 'https',
@@ -36,7 +37,7 @@ const nextConfig: NextConfig = {
         hostname: 'preview.reve.art',
       }
     ],
-    // 允许加载svg图片
+    // allow remote svg image
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },

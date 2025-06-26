@@ -18,17 +18,7 @@ import { createGenerator as createTypeTableGenerator } from "fumadocs-typescript
 import { AutoTypeTable } from "fumadocs-typescript/ui";
 
 import { globalLucideIcons as icons } from "@base-ui/components/global-icon";
-
-// MDX 组件全局配置接口
-export interface MDXComponentsConfig {
-  watermark?: {
-    enabled?: boolean;
-    text?: string;
-  };
-  githubBaseUrl?: string;
-  cdnBaseUrl?: string;
-  placeHolderImage?: string;
-}
+import { appConfig } from "@/lib/appConfig";
 
 // 创建一个语言标识符到图标组件的映射
 const languageToIconMap: Record<string, React.ReactNode> = {
@@ -112,7 +102,6 @@ const typeTableGenerator = createTypeTableGenerator();
 // 这里只是渲染层处理, 将HAST渲染为React组件, 即HTML代码
 export function getMDXComponents(
   components?: MDXComponents,
-  config?: MDXComponentsConfig
 ): MDXComponents {
   return {
     ...defaultMdxComponents,
@@ -137,17 +126,17 @@ export function getMDXComponents(
     Mermaid: (props) => (
       <Mermaid
         {...props}
-        watermarkEnabled={config?.watermark?.enabled}
-        watermarkText={config?.watermark?.text}
+        watermarkEnabled={appConfig.style.watermark.enabled}
+        watermarkText={appConfig.style.watermark.text}
       />
     ),
     // 全局配置的 ImageGrid 组件
     ImageGrid: (props) => (
-      <ImageGrid {...props} cdnBaseUrl={config?.cdnBaseUrl} />
+      <ImageGrid {...props} cdnBaseUrl={appConfig.style.cdnBaseUrl} />
     ),
     // 全局配置的 ImageZoom 组件
     ImageZoom: (props) => (
-      <ImageZoom {...props} fallbackSrc={config?.placeHolderImage} />
+      <ImageZoom {...props} fallbackSrc={appConfig.style.placeHolder.image} />
     ),
     ...fumadocsUiComponents,
     ...customUiComponents,

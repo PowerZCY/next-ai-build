@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+
+@source "../../../../../packages/third-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "../../../../../packages/base-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "../../../src/**/*.{js,ts,jsx,tsx}";
+
 /* 
  * 文档主题皮肤, 参考https://fumadocs.dev/docs/ui/theme
  * neutral
