@@ -29,6 +29,9 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "package.json",
+    "README.md",
+    "LICENSE"
   ]
 } 

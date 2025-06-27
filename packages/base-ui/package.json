@@ -33,7 +33,8 @@
     "src",
     "dist",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build:css": "postcss src/styles/base-ui.css -o dist/base-ui.css",
