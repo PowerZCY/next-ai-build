@@ -1,6 +1,6 @@
 # @windrun-huaiin/ddaas-website
 
-## 1.0.0
+## 1.2.0
 
 ### Major Changes
 
