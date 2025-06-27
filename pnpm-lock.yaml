@@ -545,6 +545,9 @@ importers:
       fumadocs-core:
         specifier: 15.3.3
         version: 15.3.3(@types/react@19.1.2)(next@15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      fumadocs-mdx:
+        specifier: 11.6.3
+        version: 11.6.3(acorn@8.15.0)(fumadocs-core@15.3.3(@types/react@19.1.2)(next@15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(next@15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       fumadocs-typescript:
         specifier: 4.0.4
         version: 4.0.4(typescript@5.8.3)
@@ -578,6 +581,9 @@ importers:
       tailwind-merge:
         specifier: ^3.0.0
         version: 3.3.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.67
     devDependencies:
       '@types/mdx':
         specifier: ^2.0.13

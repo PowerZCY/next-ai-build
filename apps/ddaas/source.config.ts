@@ -1,84 +1,26 @@
 import { appConfig } from '@/lib/appConfig';
+import { createCommonDocsSchema, createCommonMetaSchema, remarkInstallOptions } from '@third-ui/lib/fuma-schema-check-util';
 import { rehypeCodeDefaultOptions, remarkSteps } from 'fumadocs-core/mdx-plugins';
 import { fileGenerator, remarkDocGen, remarkInstall } from 'fumadocs-docgen';
 import { remarkTypeScriptToJavaScript } from 'fumadocs-docgen/remark-ts2js';
-import { defineConfig, defineDocs, frontmatterSchema, metaSchema } from 'fumadocs-mdx/config';
+import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
 import type { Element } from 'hast';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import type { ShikiTransformerContext as TransformerContext } from 'shiki';
-import { z } from 'zod';
 
 const mdxSourceDir = appConfig.mdxSourceDir
-
-// Reusable schema for title
-const createTitleSchema = () =>
-  z.string({
-    required_error: "Title is required",
-    invalid_type_error: "Title must be a string and cannot be null",
-  })
-  .trim()
-  .min(1, { message: "Title cannot be empty or consist only of whitespace" });
-
-// Reusable schema for description
-const createDescriptionSchema = () =>
-  z.preprocess(
-    (val) => {
-      if (typeof val === 'string') {
-        return val.trim() === "" || val === null ? undefined : val.trim();
-      }
-      return val === null ? undefined : val;
-    },
-    z.string().optional()
-  );
-
-// Reusable schema for icon
-const createIconSchema = () =>
-  z.preprocess(
-    (val) => (val === "" || val === null ? undefined : val),
-    z.string().optional()
-  );
-
-// Reusable schema for date
-const createDateSchema = () =>
-  z.preprocess((arg) => {
-    if (arg instanceof Date) {
-      // Format Date object to YYYY-MM-DD string
-      const year = arg.getFullYear();
-      const month = (arg.getMonth() + 1).toString().padStart(2, '0');
-      const day = arg.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    if (typeof arg === 'string') {
-      return arg.trim();
-    }
-    // For other types or null/undefined, let the subsequent string validation handle it
-    return arg; 
-  },
-  z.string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format or a valid Date object")
-    .refine((val) => !isNaN(new Date(val).getTime()), 'Invalid date!')
-  );
 
 export const docs = defineDocs({
   dir: mdxSourceDir.docs,
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
-    schema: frontmatterSchema.extend({
-      title: createTitleSchema(),
-      description: createDescriptionSchema(),
-      icon: createIconSchema(),
-      date: createDateSchema(),
-      author: z.string().optional(),
-      keywords: z.array(z.string()).optional(),
-    }),
+    schema: createCommonDocsSchema(),
   },
   meta: {
-    schema: metaSchema.extend({
-      description: z.string().optional(),
-    }),
+    schema: createCommonMetaSchema(),
   },
 });
 
@@ -87,19 +29,10 @@ export const blog = defineDocs({
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
-    schema: frontmatterSchema.extend({
-      title: createTitleSchema(),
-      description: createDescriptionSchema(),
-      icon: createIconSchema(),
-      date: createDateSchema(),
-      author: z.string().optional(),
-      keywords: z.array(z.string()).optional(),
-    }),
+    schema: createCommonDocsSchema(),
   },
   meta: {
-    schema: metaSchema.extend({
-      description: z.string().optional(),
-    }),
+    schema: createCommonMetaSchema(),
   },
 });
 
@@ -108,28 +41,12 @@ export const legal = defineDocs({
   docs: {
     async: false,
     // @ts-ignore - Temporarily suppress deep instantiation error
-    schema: frontmatterSchema.extend({
-      title: createTitleSchema(),
-      description: createDescriptionSchema(),
-      icon: createIconSchema(),
-      date: createDateSchema(),
-      author: z.string().optional(),
-      keywords: z.array(z.string()).optional(),
-    }),
+    schema: createCommonDocsSchema(),
   },
   meta: {
-    schema: metaSchema.extend({
-      description: z.string().optional(),
-    }),
+    schema: createCommonMetaSchema(),
   },
 });
-
-
-const remarkInstallOptions = {
-  persist: {
-    id: 'package-manager',
-  },
-};
 
 export default defineConfig({
   lastModifiedTime: 'git',

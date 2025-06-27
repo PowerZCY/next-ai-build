@@ -58,11 +58,13 @@
     "@windrun-huaiin/base-ui": "workspace:*",
     "@windrun-huaiin/lib": "workspace:*",
     "fumadocs-core": "15.3.3",
+    "fumadocs-mdx": "11.6.3",
     "fumadocs-typescript": "4.0.4",
     "fumadocs-ui": "15.3.3",
     "mermaid": "^11.6.0",
     "react-medium-image-zoom": "^5.2.14",
-    "@clerk/nextjs": "^6.19.4"
+    "@clerk/nextjs": "^6.19.4",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
     "react": "^19.1.0",
