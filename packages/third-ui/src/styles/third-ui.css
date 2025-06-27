@@ -2,23 +2,23 @@
 @import './fuma.css';
 @import './cta.css';
 
-/* Loading component animation style */
+/* Loading Animation Keyframes */
 @keyframes loading-dot-pulse {
   0% {
+    transform: scale(0.2);
     opacity: 0;
-    transform: scale(0);
   }
-  20% {
+  25% { /* Peak of the pulse, more prominent */
+    transform: scale(1.2);
     opacity: 1;
-    transform: scale(1);
   }
-  80% {
-    opacity: 1;
-    transform: scale(1);
+  50% { /* Start to fade and shrink */
+      transform: scale(0.8);
+      opacity: 0.7;
   }
-  100% {
+  100% { /* Fully faded and shrunk back */
+    transform: scale(0.2);
     opacity: 0;
-    transform: scale(0);
   }
 }
 
