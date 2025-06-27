@@ -5,10 +5,10 @@
  * 3. Mainly support the introduction of icons in mdx files, and report errors in advance
 */
 
-import React from 'react';
+import * as limitedIconsModule from '@lib/limited-lucide-icons';
 import { type LucideProps } from 'lucide-react';
 import Image from 'next/image';
-import * as limitedIconsModule from '@lib/limited-lucide-icons';
+import React from 'react';
 
 // Attention: This icon color will be used in the entire project, and it depends on the ENV variable NEXT_PUBLIC_STYLE_ICON_COLOR
 const iconColor = process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500";
@@ -139,15 +139,30 @@ export const globalLucideIcons = {
   ...customImageIcons, // Spread all custom image icons
 } satisfies GlobalIconsType; // Use satisfies for better type checking without up-casting
 
+// Default fallback icon - centralized configuration
+const DEFAULT_FALLBACK_ICON = 'BTC' as const;
+
 /**
- * use iconKey to lode icon safety
+ * use iconKey to load icon safely
  * @param iconKey translation or configuration
- * @param fallbackKey default as 'BTC'
+ * @param createElement whether to return a React element instead of component
  */
 export function getGlobalIcon(
-  iconKey: string,
-  fallbackKey: keyof typeof globalLucideIcons = 'BTC'
-) {
+  iconKey: string | undefined
+): StyledLucideIconComponent;
+export function getGlobalIcon(
+  iconKey: string | undefined,
+  createElement: true
+): React.ReactElement | undefined;
+export function getGlobalIcon(
+  iconKey: string | undefined,
+  createElement?: boolean
+): StyledLucideIconComponent | React.ReactElement | undefined {
+  // Handle undefined iconKey case (for getIconElement compatibility)
+  if (!iconKey) {
+    return createElement ? undefined : globalLucideIcons[DEFAULT_FALLBACK_ICON];
+  }
+  
   const Icon = globalLucideIcons[iconKey as keyof typeof globalLucideIcons];
   if (!Icon) {
     if (process.env.NODE_ENV !== 'production') {
@@ -157,9 +172,24 @@ export function getGlobalIcon(
         `[global-icon] iconKey "${iconKey}" is not defined in globalIcons, please check!`
       );
     }
-    return globalLucideIcons[fallbackKey];
+    const FallbackIcon = globalLucideIcons[DEFAULT_FALLBACK_ICON];
+    return createElement ? React.createElement(FallbackIcon) : FallbackIcon;
   }
-  return Icon;
+  
+  return createElement ? React.createElement(Icon) : Icon;
+}
+
+/**
+ * Get icon element (for fumadocs source compatibility)
+ * This is a wrapper around getGlobalIcon for backwards compatibility
+ * @param icon icon key from frontmatter
+ */
+export function getIconElement(
+  icon: string | undefined, 
+): React.ReactElement | undefined {
+  // Note: defaultIconKey parameter is kept for backwards compatibility but ignored
+  // The function now uses the centralized DEFAULT_FALLBACK_ICON
+  return getGlobalIcon(icon, true);
 }
 
 // Define the site icon as a functional component

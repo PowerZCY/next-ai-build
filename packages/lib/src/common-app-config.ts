@@ -1,4 +1,4 @@
-// 所有支持的语言及其标签
+// Supported languages and their labels
 const ALL_LOCALE_LABELS = {
   en: "English",
   zh: "简体中文",
@@ -20,7 +20,7 @@ const ALL_LOCALE_LABELS = {
 
 export type SupportedLocale = keyof typeof ALL_LOCALE_LABELS;
 
-// 从环境变量获取语言配置的辅助函数
+// Helper function to get language configuration from environment variables
 function getLocaleLabels(locales: string[]) {
   return Object.fromEntries(
     locales.map(locale => [
@@ -30,13 +30,13 @@ function getLocaleLabels(locales: string[]) {
   );
 }
 
-// 通用应用配置创建函数
+// Common application configuration creation function
 export function createCommonAppConfig(options?: {
-  // 可选：手动指定支持的语言，如果不指定则从环境变量读取
+  // Optional: manually specify supported languages, otherwise read from environment variables
   locales?: string[];
   defaultLocale?: string;
 }) {
-  // 优先级：手动配置 > 环境变量 > 默认值
+  // Priority: manual configuration > environment variables > default values
   const locales = options?.locales ?? 
                   process.env.NEXT_PUBLIC_I18N_LOCALES?.split(',').map(s => s.trim()) ?? 
                   ['en', 'zh'];
@@ -48,12 +48,12 @@ export function createCommonAppConfig(options?: {
   const storagePrefix = process.env.NEXT_PUBLIC_I18N_STORAGE_PREFIX || 'WINDRUN-HUAIIN';
 
   const config = {
-    // 基础配置
+    // Basic configuration
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL || '',
     githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || '',
     github: process.env.NEXT_PUBLIC_GITHUB || '',
 
-    // 国际化配置
+    // Internationalization configuration
     i18n: {
       locales: locales as readonly string[],
       defaultLocale,
@@ -67,7 +67,7 @@ export function createCommonAppConfig(options?: {
       messageRoot: process.env.NEXT_PUBLIC_I18N_MESSAGE_ROOT || 'messages',
     },
 
-    // 样式配置
+    // Style configuration
     style: {
       icon: {
         uniformColor: process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500"
@@ -85,7 +85,7 @@ export function createCommonAppConfig(options?: {
       }
     },
 
-    // Clerk 配置
+    // Clerk configuration
     clerk: {
       signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || "/sign-in",
       fallbackSignInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || "/",
@@ -95,15 +95,15 @@ export function createCommonAppConfig(options?: {
       debug: process.env.CLERK_DEBUG === 'true',
     },
 
-    // MDX 源文件目录配置
+    // MDX source file directory configuration
     mdxSourceDir: {
       docs: process.env.NEXT_PUBLIC_MDX_DOCS_DIR || "src/mdx/docs",
       blog: process.env.NEXT_PUBLIC_MDX_BLOG_DIR || "src/mdx/blog", 
       legal: process.env.NEXT_PUBLIC_MDX_LEGAL_DIR || "src/mdx/legal"
-    }
+    },
   };
 
-  // 便捷常量 - 避免深层嵌套访问
+  // Convenient constants - avoid deep nested access
   const shortcuts = {
     iconColor: config.style.icon.uniformColor,
     watermark: config.style.watermark,
@@ -120,7 +120,7 @@ export function createCommonAppConfig(options?: {
   };
 }
 
-// 创建国际化辅助函数
+// Create internationalization helper functions
 export function createI18nHelpers(i18nConfig: ReturnType<typeof createCommonAppConfig>['i18n']) {
   function isSupportedLocale(locale: string): locale is typeof i18nConfig.locales[number] {
     return (i18nConfig.locales as readonly string[]).includes(locale);
@@ -142,23 +142,23 @@ export function createI18nHelpers(i18nConfig: ReturnType<typeof createCommonAppC
   };
 }
 
-// 便捷的配置预设
+// Convenient configuration presets
 export const LOCALE_PRESETS = {
-  // 只支持英文
+  // Only support English
   EN_ONLY: { locales: ['en'] as string[], defaultLocale: 'en' as string },
   
-  // 中英双语
+  // English and Chinese
   EN_ZH: { locales: ['en', 'zh'] as string[], defaultLocale: 'en' as string },
   
-  // 亚洲主要语言
+  // Main Asian languages
   ASIA: { locales: ['en', 'zh', 'ja', 'ko'] as string[], defaultLocale: 'en' as string },
   
-  // 欧洲主要语言
+  // Main European languages
   EUROPE: { locales: ['en', 'fr', 'de', 'es', 'it'] as string[], defaultLocale: 'en' as string },
   
-  // 全球化
+  // Globalization
   GLOBAL: { locales: ['en', 'zh', 'ja', 'ko', 'fr', 'de', 'es', 'it', 'pt', 'ru'] as string[], defaultLocale: 'en' as string },
   
-  // 无国际化（只有默认语言）
+  // No internationalization (only default language)
   NONE: { locales: [] as string[], defaultLocale: 'en' as string }
 }; 

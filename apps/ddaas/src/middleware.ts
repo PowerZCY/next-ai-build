@@ -43,7 +43,7 @@ export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, req: NextReques
 
 export const config = {
   matcher: [
-      // Skip Next.js internals and all static files, unless found in search params, skip api and trpc
-      '/((?!api|trpc|_next|sitemap.xml?|robots.txt?|[^?]*.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Skip Next.js internals and all static files, unless found in search params, skip api and trpc
+    "/((?!api|trpc|_next|sitemap.xml?|robots.txt?|[^?]*.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
   ],
 };
