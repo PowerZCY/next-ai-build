@@ -1,20 +1,18 @@
 "use client";
 
-import { NotFoundIcon, SiteIcon } from "@base-ui/components/global-icon";
+import { NotFoundIcon } from "@base-ui/components/global-icon";
+import { SiteIcon } from "@base-ui/lib/site-icon";
 import { useEffect, useState } from "react";
 
 export function NotFoundPage() {
   const [glitchText, setGlitchText] = useState("404");
 
-  // 调试信息
-  console.log('[404 PAGE] Rendering NotFoundPage component...');
-
-  // 数字持续缓慢变化效果
+  // glitch effect
   useEffect(() => {
     const glitchChars = ["4", "0", "4", "?", "#", "!", "*", "&", "%", "$"];
 
     const interval = setInterval(() => {
-      // 80% 的概率显示 "404"，20% 的概率显示随机字符
+      // 80% probability to display "404", 20% probability to display random characters
       if (Math.random() < 0.5) {
         setGlitchText("404");
       } else {
@@ -24,16 +22,16 @@ export function NotFoundPage() {
         ).join("");
         setGlitchText(randomChars);
       }
-    }, 600); // 每1.5秒变化一次
+    }, 600); // every 1.5 seconds
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[75vh] w-full px-4 py-8">
-      {/* 主要内容区域 */}
+      {/* main content area */}
       <div className="text-center space-y-8 max-w-2xl">
-        {/* 404数字 - 带故障效果 */}
+        {/* 404 number - glitch effect */}
         <div className="relative flex justify-center">
           <h1
             className="text-8xl md:text-9xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-purple-700 bg-clip-text text-transparent select-none"
@@ -45,13 +43,13 @@ export function NotFoundPage() {
           >
             {glitchText}
           </h1>
-          {/* 扫描线效果 */}
+          {/* scan line effect */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="h-full w-full bg-gradient-to-b from-transparent via-purple-500/10 to-transparent animate-pulse" />
           </div>
         </div>
 
-        {/* 错误信息 */}
+        {/* error message */}
         <div className="space-y-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
             Page Not Found
@@ -61,7 +59,7 @@ export function NotFoundPage() {
           </p>
         </div>
 
-        {/* 装饰性元素 */}
+        {/* decorative elements */}
         <div className="flex justify-center items-center gap-8 pt-8 opacity-60">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <SiteIcon />
@@ -75,9 +73,9 @@ export function NotFoundPage() {
         </div>
       </div>
 
-      {/* 背景装饰 */}
+      {/* background decoration */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        {/* 网格背景 */}
+        {/* grid background */}
         <div
           className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
           style={{
@@ -89,7 +87,7 @@ export function NotFoundPage() {
           }}
         />
 
-        {/* 浮动粒子 */}
+        {/* floating particles */}
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}

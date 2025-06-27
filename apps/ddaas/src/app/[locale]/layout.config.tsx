@@ -1,5 +1,6 @@
 import Preview from '@/../public/banner.png';
-import { globalLucideIcons as icons, SiteIcon } from '@base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { SiteIcon } from '@base-ui/lib/site-icon';
 import { type LinkItemType } from 'fumadocs-ui/layouts/docs';
 import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { getTranslations } from 'next-intl/server';

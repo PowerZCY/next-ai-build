@@ -7,10 +7,11 @@
 
 import { BUILTIN_ICON_COMPONENTS } from '@base-ui/assets';
 import { themeIconColor } from '@base-ui/lib/theme-util';
-import { getIconConfig } from '@base-ui/lib/icon-config';
+
 import * as limitedIconsModule from '@lib/limited-lucide-icons';
 import { type LucideProps } from 'lucide-react';
 import React from 'react';
+
 
 // Type for styled Lucide icon components (accepts LucideProps)
 type StyledLucideIconComponent = (props: LucideProps) => React.ReactElement;
@@ -123,67 +124,12 @@ export function getIconElement(
   return getGlobalIcon(icon, true);
 }
 
-/**
- * render SiteIcon
- * @param configKey 
- * @param className 
- * @param errorMessage
- */
-function renderConfiguredIcon(
-  configKey: keyof import('@base-ui/lib/icon-config').IconConfig,
-  className: string,
-  errorMessage: string
-): React.ReactElement {
-  const configuredIcon = getIconConfig(configKey);
-  
-  // Only throw error if user completely didn't configure (undefined)
-  // If user configured but passed empty string, use default icon
-  if (configuredIcon === undefined) {
-    // throw error when config is completely missing, avoid legal risks
-    throw new Error(errorMessage);
-  }
-  
-  // if configured is a string (icon key name)
-  if (typeof configuredIcon === 'string') {
-    // if user configured empty string, use default icon
-    if (configuredIcon.trim() === '') {
-      const DefaultIconComponent = globalLucideIcons[DEFAULT_FALLBACK_ICON];
-      return <DefaultIconComponent className={className} />;
-    }
-    
-    const IconComponent = globalLucideIcons[configuredIcon as keyof typeof globalLucideIcons];
-    if (!IconComponent) {
-      throw new Error(`[${configKey}] Invalid icon key "${configuredIcon}", please check globalLucideIcons for available keys.`);
-    }
-    return <IconComponent className={className} />;
-  }
-  
-  // if configured is a custom component, wrap it with theme color
-  const CustomIconComponent = configuredIcon as React.ComponentType<{ className?: string }>;
-  
-  // Apply theme color to custom component
-  // Check if className already has text color, if so, don't override
-  const hasTextColor = /\btext-\w+(-\d+)?\b/.test(className);
-  const finalClassName = hasTextColor 
-    ? className 
-    : `${themeIconColor} ${className}`.trim();
-    
-  return <CustomIconComponent className={finalClassName} />;
-}
-
 // Define the default site icon as a functional component (for export)
 export const DefaultSiteIcon = () => (
   <globalLucideIcons.Zap className={`h-8 w-8 rounded-full p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 ${themeIconColor}`} />
 );
 
-// Define the site icon as a functional component (supports configuration)
-export const SiteIcon = () => {
-  return renderConfiguredIcon(
-    'siteIcon',
-    'h-8 w-8 rounded-full p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20',
-    '[SiteIcon] Site icon is not configured. Please use configureIcons({ siteIcon: YourCustomIcon }) or configureIcons({ siteIcon: "IconKeyName" }) to set a custom site icon to avoid legal risks.'
-  );
-};
+// Note: SiteIcon is available from @base-ui/lib/site-icon as a separate client component
 
 // Define 404 not found icon as a functional component (fixed, no configuration)
 export const NotFoundIcon = () => (
