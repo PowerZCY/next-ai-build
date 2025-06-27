@@ -16,7 +16,7 @@ export function GradientButton({
   href: string;
   align?: 'left' | 'center' | 'right';
 }) {
-  // 根据对齐方式设置justify类
+  // set justify class according to alignment
   const getAlignmentClass = () => {
     switch (align) {
       case 'center':
