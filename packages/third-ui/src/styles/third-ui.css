@@ -1,3 +1,43 @@
 @import '@windrun-huaiin/base-ui/styles/base-ui.css';
 @import './fuma.css';
 @import './cta.css';
+
+/* Loading component animation style */
+@keyframes loading-dot-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* NProgress progress bar style */
+#nprogress .bar {
+  background: #AC62FD !important; /* purple */
+  height: 1px !important;
+}
+
+/* Icon stroke colors for light/dark themes */
+:root {
+  --clerk-icon-stroke-color: #616161; /* Light theme */
+}
+
+.dark {
+  --clerk-icon-stroke-color: #616161; /* Dark theme */
+}
+
+/* English and numeric characters use Montserrat font, Chinese use STKaiti */
+body {
+  font-family: 'Montserrat', "STKaiti", "STKaiti", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
+}

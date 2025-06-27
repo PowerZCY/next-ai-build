@@ -8,3 +8,5 @@ export * from './seo-content';
 export * from './cta';
 export * from './footer';
 export * from './go-to-top';
+export * from './loading';
+export * from './nprogress-bar';

@@ -2,7 +2,7 @@ import { appConfig, generatedLocales } from "@/lib/appConfig";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import './globals.css';
-import NProgressBar from '@/app/[locale]/nProgressBar';
+import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { fumaI18nCn } from '@third-ui/lib';
 import { RootProvider } from "fumadocs-ui/provider";
 import { Montserrat } from "next/font/google";

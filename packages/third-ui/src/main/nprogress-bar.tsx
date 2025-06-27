@@ -3,10 +3,10 @@ import NProgress from 'nprogress'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-// 去掉NProgress进度条的spinner圆圈
+// remove NProgress progress bar spinner circle
 NProgress.configure({ showSpinner: false })
 
-export default function NProgressBar() {
+export function NProgressBar() {
   const pathname = usePathname()
   const previousPath = useRef(pathname)
 
@@ -21,4 +21,4 @@ export default function NProgressBar() {
   }, [pathname])
 
   return null
-}
+} 

@@ -13,6 +13,7 @@ import { FumaBannerSuit } from '@third-ui/fuma';
 import { ReactNode } from 'react';
 import { clerkPageBanner } from '@/lib/appConfig';
 import { ClerkProviderClient } from '@third-ui/clerk';
+
 async function homeOptions(locale: string): Promise<HomeLayoutProps>{
   const resolvedBaseOptions = await baseOptions(locale);
   return {

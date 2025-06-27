@@ -5,7 +5,7 @@
 @source "../../../src/**/*.{js,ts,jsx,tsx}";
 
 /* 
- * 文档主题皮肤, 参考https://fumadocs.dev/docs/ui/theme
+ * theme corlor, see https://fumadocs.dev/docs/ui/theme
  * neutral
  * black
  * vitepress
@@ -21,28 +21,3 @@
 @import 'nprogress/nprogress.css';
 
 @import '@windrun-huaiin/third-ui/styles/third-ui.css';
-
-/* 
- * 强制NProgress进度条颜色为紫色
- */
-#nprogress .bar {
-  background: #AC62FD !important; /* 紫色 */
-  height: 1px !important;
-}
-
-/* Icon stroke colors for light/dark themes */
-:root {
-  --clerk-icon-stroke-color: #616161; /* Light theme */
-}
-
-.dark {
-  --clerk-icon-stroke-color: #616161; /* Dark theme */
-}
-/* 
- * 英文和数字字符使用Montserrat字体
- * 中文使用华文楷体
- */
-body {
-  font-family: 'Montserrat', "STKaiti", "华文楷体", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
-}
-
