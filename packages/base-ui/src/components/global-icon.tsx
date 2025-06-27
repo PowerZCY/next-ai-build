@@ -139,6 +139,29 @@ export const globalLucideIcons = {
   ...customImageIcons, // Spread all custom image icons
 } satisfies GlobalIconsType; // Use satisfies for better type checking without up-casting
 
+/**
+ * use iconKey to lode icon safety
+ * @param iconKey translation or configuration
+ * @param fallbackKey default as 'BTC'
+ */
+export function getGlobalIcon(
+  iconKey: string,
+  fallbackKey: keyof typeof globalLucideIcons = 'BTC'
+) {
+  const Icon = globalLucideIcons[iconKey as keyof typeof globalLucideIcons];
+  if (!Icon) {
+    if (process.env.NODE_ENV !== 'production') {
+      // 只在开发环境警告
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[global-icon] iconKey "${iconKey}" is not defined in globalIcons, please check!`
+      );
+    }
+    return globalLucideIcons[fallbackKey];
+  }
+  return Icon;
+}
+
 // Define the site icon as a functional component
 export const SiteIcon = () => (
   <globalLucideIcons.Zap className={`h-8 w-8 rounded-full p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 ${iconColor}`} />

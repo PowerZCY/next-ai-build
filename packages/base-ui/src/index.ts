@@ -55,9 +55,9 @@ export * from './ui/use-toast';
 export * from './components/404-page';
 export * from './components/global-icon';
 export * from './components/go-to-top';
-export * from './components/LanguageDetector';
-export * from './components/LanguageSwitcher';
+export * from './components/language-detector';
+export * from './components/language-switcher';
 
 // Script Components
-export * from './components/script/GoogleAnalyticsScript';
-export * from './components/script/MicrosoftClarityScript'; 
+export * from './components/script/google-analytics-script';
+export * from './components/script/microsoft-clarity-script'; 

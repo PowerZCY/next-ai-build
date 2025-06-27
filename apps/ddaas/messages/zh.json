@@ -15,6 +15,74 @@
     "about": "使用 Reve Image 每天享受 20 张免费图片",
     "heroImageAlt": "Reve Image AI 生成的艺术作品展示平台的强大功能"
   },
+  "usage": {
+    "title": "How to use",
+    "eyesOn": "Newspaper Template",
+    "description": "",
+    "steps": [
+      {
+        "title": "Select a Template",
+        "description": "Click on your favorite template on the left side to get started.",
+        "iconKey": "MousePointerClick"
+      },
+      {
+        "title": "Customize Your Content",
+        "description": "Edit text directly in the text area and hover over images to upload new ones.",
+        "iconKey": "Pencil"
+      },
+      {
+        "title": "Download & Share",
+        "description": "Download as an image, PDF, or share to X, Instagram, etc",
+        "iconKey": "Download"
+      }
+    ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "",
+    "items":[
+      {
+        "question": "What is this newspaper template website?",
+        "answer": "This newspaper template website allows you to create and customize professional-looking newspapers using easy-to-use templates. You can edit text, upload images, and download or share your creations."
+      },
+      {
+        "question": "Is the newspaper template website free to use?",
+        "answer": "Yes, our newspaper template website is completely free! Access all features—templates, editing tools, and watermark-free downloads—without any cost or hidden fees. Perfect for commercial use!"
+      },
+      {
+        "question": "How do I edit the text and images?",
+        "answer": "To edit text, simply click into the text field and start typing your content. To change images, hover over the image placeholder and select the option to upload a new image from your device."
+      },
+      {
+        "question": "Do I need design experience to use the newspaper template website?",
+        "answer": "No design experience is required! Our intuitive interface and pre-designed templates make it easy for anyone to create a polished newspaper."
+      },
+      {
+        "question": "Can I preview my newspaper before downloading?",
+        "answer": "Yes, you can see real-time updates as you edit. The preview feature lets you review your newspaper to ensure it looks perfect before saving or sharing."
+      },
+      {
+        "question": "What file formats can I download my newspaper in?",
+        "answer": "You can download your newspaper as a high-quality PDF, PNG, JPG, WEBP, or SVG, suitable for printing or digital sharing."
+      },
+      {
+        "question": "Can I save my work and come back to it later?",
+        "answer": "Currently, you can complete your newspaper in one session. Future updates may include a save feature."
+      },
+      {
+        "question": "Are there limits to how many newspapers I can create?",
+        "answer": "No limits! You can create as many newspapers as you like, all for free."
+      },
+      {
+        "question": "Can I use my own fonts or colors?",
+        "answer": "You can use pre-set fonts and color schemes in our free online newspaper templates for a professional look. Custom font uploads may be available in future updates."
+      },
+      {
+        "question": "How can I share my finished newspaper?",
+        "answer": "After completing your newspaper, you can download it as a PDF, PNG, JPG, WEBP, or SVG and share it via email, social media, or print it for physical distribution."
+      }
+    ]
+  },
   "features": {
     "title": "为什么选择",
     "eyesOn": "Reve Image",
