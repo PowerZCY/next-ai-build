@@ -58,4 +58,4 @@ export const BUILTIN_ICON_COMPONENTS = {
   T3P: T3PIcon,
   Http: HttpIcon,
   Scheme: SchemeIcon,
-} as const; 
+} as const;

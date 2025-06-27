@@ -6,6 +6,7 @@ import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { fumaI18nCn } from '@third-ui/lib';
 import { RootProvider } from "fumadocs-ui/provider";
 import { Montserrat } from "next/font/google";
+import { configureIcons } from '@base-ui/lib/icon-config';
 
 export const montserrat = Montserrat({
   weight: ['400'],
@@ -62,6 +63,11 @@ export default async function RootLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }) {
+  // 在模块顶层立即执行配置
+console.log('[ROOT LAYOUT] Configuring icons...');
+configureIcons({ siteIcon: 'Download' });
+console.log('[ROOT LAYOUT] Icons configured successfully');
+
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();

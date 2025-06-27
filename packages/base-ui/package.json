@@ -21,6 +21,11 @@
       "import": "./dist/components/*.mjs",
       "require": "./dist/components/*.js"
     },
+    "./lib/*": {
+      "types": "./dist/lib/*.d.ts",
+      "import": "./dist/lib/*.mjs",
+      "require": "./dist/lib/*.js"
+    },
     "./src/*": "./src/*",
     "./styles/base-ui.css": "./dist/base-ui.css"
   },

@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 export function NotFoundPage() {
   const [glitchText, setGlitchText] = useState("404");
 
+  // 调试信息
+  console.log('[404 PAGE] Rendering NotFoundPage component...');
+
   // 数字持续缓慢变化效果
   useEffect(() => {
     const glitchChars = ["4", "0", "4", "?", "#", "!", "*", "&", "%", "$"];
