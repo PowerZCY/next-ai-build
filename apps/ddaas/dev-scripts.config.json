@@ -1,0 +1,22 @@
+{
+  "i18n": {
+    "locales": ["en", "zh"],
+    "defaultLocale": "en",
+    "messageRoot": "messages"
+  },
+  "scan": {
+    "include": ["src/**/*.{tsx,ts,jsx,js}"],
+    "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.d.ts", "node_modules/**"]
+  },
+  "blog": {
+    "mdxDir": "src/mdx/blog",
+    "outputFile": "index.mdx",
+    "metaFile": "meta.json",
+    "iocSlug": "ioc",
+    "prefix": "blog"
+  },
+  "output": {
+    "logDir": "scripts",
+    "verbose": false
+  }
+}

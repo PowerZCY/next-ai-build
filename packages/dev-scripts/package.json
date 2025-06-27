@@ -1,0 +1,34 @@
+{
+  "name": "@windrun-huaiin/dev-scripts",
+  "version": "1.0.0",
+  "description": "Development scripts for multilingual projects",
+  "main": "dist/index.js",
+  "bin": {
+    "dev-scripts": "./bin/dev-scripts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": ["i18n", "blog", "mdx", "translations", "fumadocs"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fast-glob": "^3.3.2",
+    "commander": "^12.0.0",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.0.0"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ]
+} 

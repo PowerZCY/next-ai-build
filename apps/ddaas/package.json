@@ -9,10 +9,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-blog-index": "ts-node --project tsconfig.node.json scripts/generate-blog-index.ts",
-    "check-translations": "ts-node --project tsconfig.node.json scripts/check-translations.ts",
-    "clean-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts",
-    "remove-translations": "ts-node --project tsconfig.node.json scripts/clean-translations.ts --remove"
+    "generate-blog-index": "dev-scripts generate-blog-index",
+    "check-translations": "dev-scripts check-translations",
+    "clean-translations": "dev-scripts clean-translations",
+    "remove-translations": "dev-scripts clean-translations --remove"
   },
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
@@ -91,6 +91,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@windrun-huaiin/dev-scripts": "workspace:*",
     "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/hast": "^3.0.4",
