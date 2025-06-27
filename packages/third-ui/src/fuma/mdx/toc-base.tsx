@@ -8,7 +8,7 @@ import { Button } from '@base-ui/ui/button';
 
 const cache = new Map<string, string>();
 
-export function LLMCopyButton() {
+export function LLMCopyButton({ llmApiUrl }: { llmApiUrl?: string } = {}) {
   const [isLoading, setLoading] = useState(false);
   const params = useParams();
   const locale = params.locale as string;
@@ -17,8 +17,10 @@ export function LLMCopyButton() {
   const [checked, onClick] = useCopyButton(async () => {
     setLoading(true);
 
-    const path = slug.join('/');
-    const apiUrl = `/api/llm-content?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
+    // Handle cases where slug might be undefined or empty
+    const path = (slug && Array.isArray(slug)) ? slug.join('/') : '';
+    const apiPrefix = llmApiUrl || '/api/llm-content';
+    const apiUrl = `${apiPrefix}?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
     console.log('Fetching LLM content from:', apiUrl);
 
     try {
@@ -44,7 +46,7 @@ export function LLMCopyButton() {
       variant="ghost"
       size="sm"
       loading={isLoading}
-      // 强制按钮左对齐
+      // force button to left align
       className="justify-start px-0 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300"
       onClick={onClick}
     >
