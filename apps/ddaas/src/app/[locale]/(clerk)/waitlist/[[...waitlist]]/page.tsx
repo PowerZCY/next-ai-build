@@ -9,12 +9,6 @@
 
 'use client';
 
-import { Waitlist } from '@clerk/nextjs';
+import { createWaitlistPage } from '@third-ui/clerk';
 
-export default function SignUpPage() {
-  return (
-    <div className="flex-1 flex justify-center mt-10">
-      <Waitlist />
-    </div>
-  );
-}
+export default createWaitlistPage();

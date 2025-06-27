@@ -9,12 +9,6 @@
 
 'use client';
 
-import { SignUp } from '@clerk/nextjs';
+import { createSignUpPage } from '@third-ui/clerk';
 
-export default function SignUpPage() {
-  return (
-    <div className="flex-1 flex justify-center mt-0 mb-32">
-      <SignUp />
-    </div>
-  );
-}
+export default createSignUpPage();
