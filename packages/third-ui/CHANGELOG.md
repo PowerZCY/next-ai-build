@@ -1,5 +1,18 @@
 # @windrun-huaiin/third-ui
 
+## 3.2.0
+
+### Minor Changes
+
+- - Align the version of all packages to 3.1.0
+  - Release version 3.1.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.1.0
+  - @windrun-huaiin/lib@3.1.0
+
 ## 1.4.0
 
 ### Minor Changes

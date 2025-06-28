@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 3.1.0
+
+### Minor Changes
+
+- - Align the version of all packages to 3.1.0
+  - Release version 3.1.0
+
 ## 1.4.0
 
 ### Minor Changes
