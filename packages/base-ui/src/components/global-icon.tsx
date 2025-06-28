@@ -74,7 +74,7 @@ const styledLimitedIconsPart = tempStyledLimitedIcons as {
 };
 
 // Wrap built-in SVG components with the same className handling logic
-const wrappedBuiltinIcons: Record<string, StyledLucideIconComponent> = {};
+const tempWrappedBuiltinIcons: Partial<Record<keyof typeof BUILTIN_ICON_COMPONENTS, StyledLucideIconComponent>> = {};
 for (const [iconName, IconComponent] of Object.entries(BUILTIN_ICON_COMPONENTS)) {
   const WrappedIcon = (props: LucideProps): React.ReactElement => {
     const originalClassName = props.className || '';
@@ -104,13 +104,17 @@ for (const [iconName, IconComponent] of Object.entries(BUILTIN_ICON_COMPONENTS))
     return <IconComponent {...finalProps} />;
   };
   WrappedIcon.displayName = `Wrapped(${iconName})`;
-  wrappedBuiltinIcons[iconName] = WrappedIcon;
+  tempWrappedBuiltinIcons[iconName as keyof typeof BUILTIN_ICON_COMPONENTS] = WrappedIcon;
 }
+
+const wrappedBuiltinIconsPart = tempWrappedBuiltinIcons as {
+  [K in keyof typeof BUILTIN_ICON_COMPONENTS]: StyledLucideIconComponent;
+};
 
 // All icons should be imported from here, and icons will occupy the project package size, so it is best to design and plan in advance
 export const globalLucideIcons = {
   ...styledLimitedIconsPart,
-  ...wrappedBuiltinIcons, // Spread all wrapped built-in icon components
+  ...wrappedBuiltinIconsPart, // Spread all wrapped built-in icon components
 };
 
 // Default fallback icon - centralized configuration

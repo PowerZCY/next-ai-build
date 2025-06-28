@@ -9,7 +9,7 @@ const LogIcon = React.forwardRef<SVGSVGElement, LucideProps>(
       role="img"   
       className={className} 
       {...props}
-      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
       <path d="M568.896 910.208h-512V113.792h739.52V512h-56.832V170.688H113.792v682.624H512z"
         fill={themeSvgIconColor} p-id="12257">
       </path>

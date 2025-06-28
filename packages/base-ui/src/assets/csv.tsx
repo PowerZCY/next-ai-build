@@ -9,7 +9,7 @@ const CSVIcon = React.forwardRef<SVGSVGElement, LucideProps>(
       role="img" 
       className={className} 
       {...props}
-      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M158.72 517.12h61.44v394.24c0 28.27776 22.92224 51.2 51.2 51.2h614.4c28.27776 0 51.2-22.92224 51.2-51.2V317.44h-204.8c-28.27776 0-51.2-22.92224-51.2-51.2V61.44H271.36c-28.27776 0-51.2 22.92224-51.2 51.2v97.28H158.72V76.8c0-42.41408 34.38592-76.8 76.8-76.8h481.28l281.6 281.6v665.6c0 42.41408-34.38592 76.8-76.8 76.8H235.52c-42.41408 0-76.8-34.38592-76.8-76.8v-430.08z"
         fill={themeSvgIconColor} p-id="8469">

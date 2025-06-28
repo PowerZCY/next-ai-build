@@ -8,7 +8,7 @@ const CSSIcon = React.forwardRef<SVGSVGElement, LucideProps>(
       ref={ref} 
       role="img" 
       className={className} {...props}
-      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
       <path fill={themeSvgIconColor}
         d="M23.5 12H8c.89-2.3 4.02-4 7.75-4s6.86 1.7 7.75 4M14 12h15.5c-.89 2.3-4.02 4-7.75 4s-6.86-1.7-7.75-4m3.5 8H2c.89-2.3 4.02-4 7.75-4s6.86 1.7 7.75 4M8 20h15.5c-.89 2.3-4.02 4-7.75 4S8.89 22.3 8 20"
       />
