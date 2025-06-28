@@ -8,5 +8,6 @@ export default defineConfig({
   sourcemap: true,
   minify: false,
   outDir: 'dist',
-  external: ['typescript']
+  external: ['typescript'],
+  treeshake: true
 }) 

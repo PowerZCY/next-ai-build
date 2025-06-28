@@ -15,7 +15,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "incremental": false
+    "incremental": false,
+    "baseUrl": ".",
+    "paths": {
+      "@dev-scripts/*": ["src/*"]
+    }
   },
   "include": [
     "src/**/*"

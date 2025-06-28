@@ -1,11 +1,11 @@
-// 翻译信息接口
+// translation info interface
 export interface TranslationInfo {
-  namespaces: Map<string, string> // 变量名 -> 命名空间
-  keys: string[] // 完整的翻译键路径
+  namespaces: Map<string, string> // variable name -> namespace
+  keys: string[] // full translation key path
 }
 
 /**
- * 从文件内容中提取翻译键和命名空间
+ * extract translation keys and namespaces from file content
  */
 export function extractTranslationsInfo(content: string, filePath: string): TranslationInfo {
   const result: TranslationInfo = {
@@ -13,15 +13,15 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
     keys: []
   }
 
-  // 匹配 getTranslations({ locale, namespace: 'namespace' }) 或 getTranslations('namespace')
+  // match getTranslations({ locale, namespace: 'namespace' }) or getTranslations('namespace')
   const getTranslationsPattern = /getTranslations\(\s*(?:{[^}]*namespace:\s*['"]([^'"]+)['"][^}]*}|['"]([^'"]+)['"])\s*\)/g
   let match: RegExpExecArray | null
 
   while ((match = getTranslationsPattern.exec(content)) !== null) {
     const namespace = match[1] || match[2]
     if (namespace) {
-      // 尝试找到赋值语句，如 const t = await getTranslations(...)
-      // 查找前面最近的 const 声明
+      // try to find assignment statement, like const t = await getTranslations(...)
+      // find the nearest const declaration
       const linesBefore = content.substring(0, match.index).split('\n');
       for (let i = linesBefore.length - 1; i >= Math.max(0, linesBefore.length - 5); i--) {
         const line = linesBefore[i];
@@ -34,13 +34,13 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
     }
   }
 
-  // 匹配 useTranslations('namespace')
+  // match useTranslations('namespace')
   const useTranslationsPattern = /useTranslations\(\s*['"]([^'"]+)['"]\s*\)/g
   while ((match = useTranslationsPattern.exec(content)) !== null) {
     const namespace = match[1]
 
-    // 尝试找到赋值语句，如 const t = useTranslations(...)
-    // 查找包含 useTranslations 的行
+    // try to find assignment statement, like const t = useTranslations(...)
+    // find the line containing useTranslations
     const currentLine = content.substring(0, match.index).split('\n').pop() || '';
     const constMatch = /const\s+(\w+)\s*=/.exec(currentLine);
     if (constMatch) {
@@ -48,14 +48,14 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
     }
   }
 
-  // 匹配 t('key') 或 t("key")，并检查 t 是否与已知命名空间关联
-  // 修改 t 函数调用的匹配模式
+  // match t('key') or t("key"), and check if t is associated with known namespaces
+  // modify the matching pattern of t function call
   const tPatterns = [
-    // 普通字符串键: t('key') 或 t("key")
+    // normal string key: t('key') or t("key")
     /(\w+)\(\s*['"]([^'"]+)['"]\s*\)/g,
-    // 模板字符串键: t(`tags.${id}`) 或 t(`section.${key}`)
+    // template string key: t(`tags.${id}`) or t(`section.${key}`)
     /(\w+)\(\s*`([^`]+)`\s*\)/g,
-    // 变量形式的键: t(item.key) 或 t(item.id)
+    // variable key: t(item.key) or t(item.id)
     /(\w+)\(\s*(\w+)\.(\w+)\s*\)/g
   ];
 
@@ -64,30 +64,30 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
     while ((match = pattern.exec(content)) !== null) {
       const funcName = match[1];
 
-      // 如果函数名与已知命名空间变量关联
+      // if the function name is associated with known namespaces
       if (result.namespaces.has(funcName)) {
         const namespace = result.namespaces.get(funcName);
         if (!namespace) continue;
 
         if (pattern.source.includes('`')) {
-          // 处理模板字符串
+          // handle template string
           const templateStr = match[2];
-          // 提取静态部分（变量前面的部分）
+          // extract static part (the part before the variable)
           const staticPart = templateStr.split(/\${(?:id|key)}/)[0].trim();
           if (staticPart && !staticPart.includes('/')) {
-            // 对于 tags.${id} 这样的形式，记录整个 tags 命名空间
+            // for tags.${id}这样的形式，记录整个 tags 命名空间
             const segments = staticPart.split('.');
             if (segments.length > 0) {
-              // 记录基础路径
+              // record the base path
               result.keys.push(`${namespace}.${segments[0]}`);
-              // 如果是多层级的，也记录完整路径
+              // if it is multi-level, also record the full path
               if (segments.length > 1) {
                 result.keys.push(`${namespace}.${segments.join('.')}`);
               }
 
-              // 特殊处理 tags 命名空间
+              // special handling for tags namespace
               if (segments[0] === 'tags') {
-                // 添加所有已知的 tag 键
+                // add all known tag keys
                 ['productUpdates', 'tutorials', 'makeMoney', 'roadOverSea', 'insights'].forEach(tag => {
                   result.keys.push(`${namespace}.tags.${tag}`);
                 });
@@ -95,29 +95,29 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
             }
           }
         } else if (pattern.source.includes('\\w+\\.\\w+')) {
-          // 处理变量形式键 t(item.key)
+          // handle variable key t(item.key)
           const varName = match[2];
           const propName = match[3];
 
-          // 从文件内容中查找该变量的可能值
+          // find the possible value of the variable in the file content
           const varPattern = new RegExp(`${varName}\\s*=\\s*{[^}]*key:\\s*['"]([^'"]+)['"]`);
           const varMatch = content.match(varPattern);
 
           if (varMatch) {
-            // 如果找到了变量定义，添加实际的键
+            // if the variable definition is found, add the actual key
             result.keys.push(`${namespace}.${varMatch[1]}`);
           } else {
-            // 如果没找到具体定义，尝试从上下文推断
-            // 检查是否在 MenuItem 类型的数组或对象中使用
+            // if the specific definition is not found, try to infer from the context
+            // check if it is used in an array or object of MenuItem type
             if (content.includes('MenuItem[]') || content.includes('MenuItem}')) {
-              // 添加所有可能的菜单键
+              // add all possible menu keys
               ['journey'].forEach(menuKey => {
                 result.keys.push(`${namespace}.${menuKey}`);
               });
             }
           }
         } else {
-          // 处理普通字符串键
+          // handle normal string key
           const key = match[2];
           if (!key.includes('/') && key !== '') {
             result.keys.push(`${namespace}.${key}`);
@@ -127,18 +127,18 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
     }
   }
 
-  // 匹配 <FormattedMessage id="key" />
+  // match <FormattedMessage id="key" />
   const formattedMessagePattern = /<FormattedMessage[^>]*id=['"]([^'"]+)['"]/g
   while ((match = formattedMessagePattern.exec(content)) !== null) {
     const key = match[1]
     if (!key.includes('/') && key !== '') {
-      // 对于 FormattedMessage，我们需要猜测命名空间
-      // 通常会在同一文件中找到 useTranslations 调用
+      // for FormattedMessage, we need to guess the namespace
+      // usually we can find useTranslations call in the same file
       if (result.namespaces.size > 0) {
         const namespace = Array.from(result.namespaces.values())[0]
         result.keys.push(`${namespace}.${key}`)
       } else {
-        // 如果找不到命名空间，尝试从文件路径推断
+        // if the namespace is not found, try to infer from the file path
         const pathMatch = filePath.match(/\[locale\]\/(?:\([^)]+\)\/)?([^/]+)/)
         if (pathMatch && pathMatch[1]) {
           const possibleNamespace = pathMatch[1]
@@ -152,7 +152,7 @@ export function extractTranslationsInfo(content: string, filePath: string): Tran
 }
 
 /**
- * 从对象中获取所有键（包括嵌套键）
+ * get all keys from an object (including nested keys)
  */
 export function getAllKeys(obj: Record<string, any>, prefix: string = ''): string[] {
   let keys: string[] = []
@@ -170,7 +170,7 @@ export function getAllKeys(obj: Record<string, any>, prefix: string = ''): strin
 }
 
 /**
- * 检查键是否存在于翻译文件中
+ * check if the key exists in the translation file
  */
 export function checkKeyExists(key: string, translations: Record<string, any>): boolean {
   const parts = key.split('.')
@@ -187,14 +187,14 @@ export function checkKeyExists(key: string, translations: Record<string, any>): 
 }
 
 /**
- * 检查命名空间是否存在于翻译文件中
+ * check if the namespace exists in the translation file
  */
 export function checkNamespaceExists(namespace: string, translations: Record<string, any>): boolean {
   return translations[namespace] !== undefined
 }
 
 /**
- * 从翻译对象中删除指定键
+ * remove the specified key from the translation object
  */
 export function removeKeyFromTranslations(key: string, translations: Record<string, any>): boolean {
   const parts = key.split('.')
@@ -204,7 +204,7 @@ export function removeKeyFromTranslations(key: string, translations: Record<stri
 
   let current = translations
 
-  // 导航到最后一级的父对象
+  // navigate to the parent object of the last level
   for (const part of parts) {
     if (current[part] === undefined || typeof current[part] !== 'object') {
       return false
@@ -212,7 +212,7 @@ export function removeKeyFromTranslations(key: string, translations: Record<stri
     current = current[part]
   }
 
-  // 删除键
+  // delete the key
   if (current[lastPart] !== undefined) {
     delete current[lastPart]
     return true
@@ -222,14 +222,14 @@ export function removeKeyFromTranslations(key: string, translations: Record<stri
 }
 
 /**
- * 清理空对象（递归）
+ * clean empty objects (recursively)
  */
 export function cleanEmptyObjects(obj: Record<string, any>): Record<string, any> {
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       if (typeof obj[key] === 'object' && obj[key] !== null) {
         obj[key] = cleanEmptyObjects(obj[key])
-        // 如果对象为空，删除它
+        // if the object is empty, delete it
         if (Object.keys(obj[key]).length === 0) {
           delete obj[key]
         }

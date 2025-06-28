@@ -1,19 +1,19 @@
 export interface DevScriptsConfig {
-  // 国际化配置
+  // i18n config
   i18n: {
     locales: string[]
     defaultLocale: string
     messageRoot: string
   }
   
-  // 文件扫描配置
+  // scan config
   scan: {
     include: string[]
     exclude?: string[]
     baseDir?: string
   }
   
-  // 博客配置
+  // blog config
   blog?: {
     mdxDir: string
     outputFile?: string
@@ -22,7 +22,7 @@ export interface DevScriptsConfig {
     prefix?: string
   }
   
-  // 输出配置
+  // output config
   output: {
     logDir: string
     verbose?: boolean

@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import { DevScriptsConfig } from '../config/schema'
-import { Logger } from '../utils/logger'
-import { readJsonFile } from '../utils/file-scanner'
+import { DevScriptsConfig } from '@dev-scripts/config/schema'
+import { Logger } from '@dev-scripts/utils/logger'
+import { readJsonFile } from '@dev-scripts/utils/file-scanner'
 
 interface Frontmatter {
   title?: string
@@ -137,7 +137,7 @@ export async function generateBlogIndex(
       logger.warn(`Could not read or parse ${metaFile}. No articles will be marked as featured.`)
     }
     
-    // ioc 相关处理
+    // ioc related processing
     const featuredSlugs = meta.pages
       .map(p => p.endsWith('.mdx') ? p.slice(0, -4) : p)
       .filter(slug => slug !== 'index' && slug !== '...' && slug !== iocSlug && slug !== `!${iocSlug}`)
@@ -146,7 +146,7 @@ export async function generateBlogIndex(
     const allArticles = await getAllBlogArticles(config.blog.mdxDir, cwd, logger)
     logger.log(`Found ${allArticles.length} all articles.`)
 
-    // ioc 文章单独处理
+    // ioc article processing separately
     const iocArticle = allArticles.find(a => a.slug === iocSlug)
 
     const filteredArticles = allArticles.filter(a => a.slug !== iocSlug)
@@ -229,7 +229,7 @@ export async function generateBlogIndex(
       mdxContent += `</Cards>\n`
     }
 
-    // 单独添加 Monthly Summary 区块
+    // add Monthly Summary block separately
     if (iocArticle) {
       mdxContent += `\n## Monthly Summary\n\n<Cards>\n`
       const iocHref = blogPrefix ? `./${blogPrefix}/${iocSlug}` : `./${iocSlug}`
@@ -244,7 +244,7 @@ export async function generateBlogIndex(
     writeFileSync(indexFile, mdxContent)
     logger.success(`Successfully generated ${indexFile}`)
 
-    // 生成月度统计
+    // generate monthly statistics
     await generateMonthlyBlogSummary(config, allArticles, iocFile, iocSlug, logger)
 
     logger.log('Blog index generation completed successfully!')
@@ -259,7 +259,7 @@ export async function generateBlogIndex(
 }
 
 /**
- * 生成博客月刊统计明细
+ * generate blog monthly statistics details
  */
 async function generateMonthlyBlogSummary(
   config: DevScriptsConfig,
@@ -269,27 +269,27 @@ async function generateMonthlyBlogSummary(
   logger: Logger
 ): Promise<void> {
   try {
-    // 过滤掉没有 date 的文章和 slug 为 ioc 的文章
+    // filter out articles without date and slug is ioc
     const articlesWithDate = articles.filter(a => a.date && a.slug !== iocSlug)
 
-    // 按月分组
+    // group by month
     const monthMap: Record<string, {date: string, title: string}[]> = {}
     for (const art of articlesWithDate) {
-      // 只取前7位 yyyy-mm
+      // only take the first 7 digits yyyy-mm
       const month = art.date!.slice(0, 7)
       if (!monthMap[month]) monthMap[month] = []
       monthMap[month].push({ date: art.date!, title: art.title })
     }
 
-    // 月份倒序排列
+    // sort months in descending order
     const sortedMonths = Object.keys(monthMap).sort((a, b) => b.localeCompare(a))
 
-    // 每月内文章按日期倒序
+    // sort articles by date in descending order
     for (const month of sortedMonths) {
       monthMap[month].sort((a, b) => b.date.localeCompare(a.date))
     }
 
-    // 读取 ioc.mdx 原 frontmatter
+    // read ioc.mdx original frontmatter
     let frontmatter = ''
     try {
       const content = readFileSync(iocFile, 'utf-8')
@@ -299,28 +299,28 @@ async function generateMonthlyBlogSummary(
       // File doesn't exist, use default
     }
 
-    // 如果没有 frontmatter，使用默认的
+    // if there is no frontmatter, use the default
     if (!frontmatter) {
       frontmatter = '---\ntitle: Monthly Summary\ndescription: Index and Summary\n---'
     }
 
-    // 更新 frontmatter 中的 date 字段
+    // update date field in frontmatter
     frontmatter = updateFrontmatterDate(frontmatter)
 
-    // 生成内容
+    // generate content
     let mdx = `${frontmatter}\n\n\n## Overview\n<Files>\n`
     if (sortedMonths.length === 0) {
       mdx += '  <File name="Comming Soon" className="opacity-50" disabled/>\n'
     } else {
       for (const month of sortedMonths) {
-        // Folder 名称格式 YYYY-MM(文章数量)
+        // Folder name format YYYY-MM(article count)
         const count = monthMap[month].length
         const folderTitle = `${month}(${count})`
-        // 默认展开最新月份
+        // default open the latest month
         const defaultOpen = month === sortedMonths[0] ? ' defaultOpen' : ''
         mdx += `  <Folder name="${folderTitle}"${defaultOpen}>\n`
         for (const art of monthMap[month]) {
-          // File name="YYYY-MM-DD(Title)"
+          // File name="YYYY-MM-DD(Title)" format
           const day = art.date.slice(0, 10)
           mdx += `    <File name="${day}(${art.title})" />\n`
         }

@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs'
 import { join } from 'path'
-import { DevScriptsConfig } from '../config/schema'
+import { DevScriptsConfig } from '@dev-scripts/config/schema'
 
 export class Logger {
   private messages: string[] = []

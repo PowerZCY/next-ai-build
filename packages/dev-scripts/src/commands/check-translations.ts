@@ -1,12 +1,12 @@
-import { DevScriptsConfig } from '../config/schema'
-import { Logger } from '../utils/logger'
-import { scanFiles, loadTranslations } from '../utils/file-scanner'
+import { DevScriptsConfig } from '@dev-scripts/config/schema'
+import { Logger } from '@dev-scripts/utils/logger'
+import { scanFiles, loadTranslations } from '@dev-scripts/utils/file-scanner'
 import { 
   extractTranslationsInfo, 
   getAllKeys, 
   checkKeyExists, 
   checkNamespaceExists 
-} from '../utils/translation-parser'
+} from '@dev-scripts/utils/translation-parser'
 
 interface TranslationReport {
   [key: string]: string[]
@@ -16,29 +16,29 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
   const logger = new Logger(config)
   
   try {
-    logger.log('开始检查翻译...')
+    logger.log('start checking translations...')
 
-    // 扫描所有文件
+    // scan all files
     const scanResults = await scanFiles(config, cwd)
-    logger.log(`找到 ${scanResults.length} 个文件需要扫描`)
+    logger.log(`found ${scanResults.length} files to scan`)
 
-    // 加载翻译文件
+    // load translation files
     const translations = loadTranslations(config, cwd)
 
-    // 收集使用的翻译键和命名空间
+    // collect used translation keys and namespaces
     const foundTranslationKeys: Set<string> = new Set()
     const foundNamespaces: Set<string> = new Set()
 
-    // 扫描所有文件，提取翻译信息
+    // scan all files, extract translation information
     for (const { filePath, content } of scanResults) {
       try {
         const { namespaces, keys } = extractTranslationsInfo(content, filePath)
 
         if (keys.length > 0 || namespaces.size > 0) {
-          logger.log(`在文件 ${filePath} 中找到以下信息:`)
+          logger.log(`found the following information in the file ${filePath}:`)
 
           if (namespaces.size > 0) {
-            logger.log(`  翻译函数映射:`)
+            logger.log(`  translation function mapping:`)
             namespaces.forEach((namespace, varName) => {
               logger.log(`    - ${varName} => ${namespace}`)
               foundNamespaces.add(namespace)
@@ -46,7 +46,7 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
           }
 
           if (keys.length > 0) {
-            logger.log(`  翻译键:`)
+            logger.log(`  translation keys:`)
             keys.forEach(key => {
               logger.log(`    - ${key}`)
               foundTranslationKeys.add(key)
@@ -55,20 +55,19 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
         }
       } catch (error) {
         if (error instanceof Error) {
-          logger.error(`处理文件 ${filePath} 时出错: ${error.message}`)
+          logger.error(`error processing file ${filePath}: ${error.message}`)
         } else {
-          logger.error(`处理文件 ${filePath} 时出错: 未知错误`)
+          logger.error(`error processing file ${filePath}: unknown error`)
         }
       }
     }
 
-    logger.log('\n检查翻译文件中的键...')
-    logger.log(`在代码中找到 ${foundNamespaces.size} 个使用的命名空间: ${Array.from(foundNamespaces).join(', ')}`)
+    logger.log(`\nfound ${foundNamespaces.size} used namespaces in the code: ${Array.from(foundNamespaces).join(', ')}`)
 
-    // 检查结果
+    // check results
     const report: TranslationReport = {}
 
-    // 检查命名空间是否存在
+    // check if the namespace exists
     foundNamespaces.forEach(namespace => {
       config.i18n.locales.forEach(locale => {
         const missingNamespaceKey = `missingNamespacesIn${locale.toUpperCase()}`
@@ -79,7 +78,7 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
       })
     })
 
-    // 检查翻译键是否存在
+    // check if the translation key exists
     foundTranslationKeys.forEach(key => {
       config.i18n.locales.forEach(locale => {
         const missingKey = `missingIn${locale.toUpperCase()}`
@@ -90,7 +89,7 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
       })
     })
 
-    // 检查翻译文件的键是否一致
+    // check if the translation keys are consistent
     config.i18n.locales.forEach(locale => {
       const allKeys = getAllKeys(translations[locale])
       config.i18n.locales.forEach(otherLocale => {
@@ -102,51 +101,51 @@ export async function checkTranslations(config: DevScriptsConfig, cwd: string = 
       })
     })
 
-    // 生成报告
-    logger.log('\n=== 翻译检查报告 ===\n')
+    // generate report
+    logger.log('\n=== translation check report ===\n')
 
-    // 首先报告缺失的命名空间，这通常是最严重的问题
+    // first report missing namespaces, which is usually the most serious problem
     config.i18n.locales.forEach(locale => {
       const missingNamespaceKey = `missingNamespacesIn${locale.toUpperCase()}`
       if (report[missingNamespaceKey]?.length > 0) {
-        logger.log(`🚨 ${locale} 翻译文件中缺失的命名空间:`)
+        logger.log(`🚨 missing namespaces in the ${locale} translation file:`)
         report[missingNamespaceKey].forEach(namespace => logger.log(`  - ${namespace}`))
       } else {
-        logger.success(`${locale} 翻译文件中包含所有使用的命名空间`)
+        logger.success(`${locale} translation file has all used namespaces`)
       }
     })
 
-    // 然后报告缺失的翻译键
+    // then report missing translation keys
     config.i18n.locales.forEach(locale => {
       const missingKey = `missingIn${locale.toUpperCase()}`
       if (report[missingKey]?.length > 0) {
-        logger.log(`\n🔴 ${locale} 翻译文件中缺失的键:`)
+        logger.log(`\n🔴 missing keys in the ${locale} translation file:`)
         report[missingKey].forEach(key => logger.log(`  - ${key}`))
       } else {
-        logger.success(`${locale} 翻译文件中包含所有使用的键`)
+        logger.success(`${locale} translation file has all used keys`)
       }
     })
 
-    // 最后报告不一致的键
+    // finally report inconsistent keys
     config.i18n.locales.forEach(locale => {
       const onlyKeys = `${locale}OnlyKeys`
       if (report[onlyKeys]?.length > 0) {
-        logger.log(`\n⚠️ 仅在 ${locale} 翻译文件中存在的键:`)
+        logger.log(`\n⚠️ keys only exist in the ${locale} translation file:`)
         report[onlyKeys].forEach(key => logger.log(`  - ${key}`))
       }
     })
 
-    logger.log('\n=== 报告结束 ===\n')
-    logger.log("⚠️⚠️⚠️脚本依赖正则匹配, 针对单文件存在多个翻译命名空间, 通过命名区分解决: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
+    logger.log('\n=== report end ===\n')
+    logger.log("⚠️⚠️⚠️script depends on regular matching, for multiple translation namespaces in a single file, use naming to distinguish: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
 
-    // 保存日志文件
+    // save log file
     logger.saveToFile('check.log', cwd)
 
-    // 如果有任何问题，返回非零状态码
+    // if there are any problems, return non-zero status code
     return Object.values(report).some(keys => keys.length > 0) ? 1 : 0
 
-  } catch (error) {
-    logger.error(`检查翻译时发生错误: ${error}`)
+  } catch (error) {  
+    logger.error(`error checking translations: ${error}`)
     return 1
   }
 } 

@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import { DEFAULT_CONFIG, DevScriptsConfig, PackageJsonDevScripts } from './schema'
+import { DEFAULT_CONFIG, DevScriptsConfig, PackageJsonDevScripts } from '@dev-scripts/config/schema'
 
 /**
- * 从 package.json 加载配置
+ * load config from package.json
  */
 function loadPackageJsonConfig(cwd: string): Partial<DevScriptsConfig> | null {
   try {
@@ -13,7 +13,7 @@ function loadPackageJsonConfig(cwd: string): Partial<DevScriptsConfig> | null {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
     const devScripts: PackageJsonDevScripts = packageJson.devScripts || {}
     
-    // 转换为标准配置格式
+    // convert to standard config format
     return {
       i18n: {
         locales: devScripts.locales || DEFAULT_CONFIG.i18n.locales,
@@ -40,7 +40,7 @@ function loadPackageJsonConfig(cwd: string): Partial<DevScriptsConfig> | null {
 }
 
 /**
- * 从专用配置文件加载配置
+ * load config from special config file
  */
 function loadConfigFile(cwd: string): Partial<DevScriptsConfig> | null {
   const configFiles = [
@@ -57,7 +57,7 @@ function loadConfigFile(cwd: string): Partial<DevScriptsConfig> | null {
       if (configFile.endsWith('.json')) {
         return JSON.parse(fs.readFileSync(configPath, 'utf8'))
       } else if (configFile.endsWith('.js')) {
-        // 简单的 require，实际项目中可能需要更复杂的加载逻辑
+        // simple require, in actual project, may need more complex loading logic
         delete require.cache[configPath]
         return require(configPath)
       }
@@ -70,7 +70,7 @@ function loadConfigFile(cwd: string): Partial<DevScriptsConfig> | null {
 }
 
 /**
- * 深度合并配置对象
+ * deep merge config object
  */
 function mergeConfig(base: DevScriptsConfig, override: Partial<DevScriptsConfig>): DevScriptsConfig {
   const result = { ...base }
@@ -89,42 +89,42 @@ function mergeConfig(base: DevScriptsConfig, override: Partial<DevScriptsConfig>
 }
 
 /**
- * 加载完整配置
+ * load full config
  */
 export function loadConfig(cwd: string = typeof process !== 'undefined' ? process.cwd() : '.', override: Partial<DevScriptsConfig> = {}): DevScriptsConfig {
   let config = { ...DEFAULT_CONFIG }
   
-  // 1. 加载配置文件
+  // 1. load config file
   const fileConfig = loadConfigFile(cwd)
   if (fileConfig) {
     config = mergeConfig(config, fileConfig)
   }
   
-  // 2. 加载 package.json 配置
+  // 2. load package.json config
   const packageConfig = loadPackageJsonConfig(cwd)
   if (packageConfig) {
     config = mergeConfig(config, packageConfig)
   }
   
-  // 3. 应用命令行传入的覆盖配置
+  // 3. apply override config from command line
   config = mergeConfig(config, override)
   
   return config
 }
 
 /**
- * 验证配置有效性
+ * validate config
  */
 export function validateConfig(config: DevScriptsConfig): void {
   if (!config.i18n.locales || config.i18n.locales.length === 0) {
-    throw new Error('至少需要配置一种语言')
+    throw new Error('at least one language is required')
   }
   
   if (!config.i18n.locales.includes(config.i18n.defaultLocale)) {
-    throw new Error('默认语言必须在支持的语言列表中')
+    throw new Error('default language must be in the supported language list')
   }
   
   if (config.scan.include.length === 0) {
-    throw new Error('必须配置至少一个扫描路径')
+    throw new Error('at least one scan path is required')
   }
 } 

@@ -1,6 +1,6 @@
 import fg from 'fast-glob'
 import { readFileSync } from 'fs'
-import { DevScriptsConfig } from '../config/schema'
+import { DevScriptsConfig } from '@dev-scripts/config/schema'
 
 export interface ScanResult {
   filePath: string
@@ -8,7 +8,7 @@ export interface ScanResult {
 }
 
 /**
- * 扫描匹配的文件
+ * scan matching files
  */
 export async function scanFiles(config: DevScriptsConfig, cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'): Promise<ScanResult[]> {
   const files: string[] = await fg(config.scan.include, {
@@ -35,7 +35,7 @@ export async function scanFiles(config: DevScriptsConfig, cwd: string = typeof p
 }
 
 /**
- * 从给定路径读取JSON文件
+ * read JSON file from given path
  */
 export function readJsonFile<T = any>(filePath: string): T | null {
   try {
@@ -47,14 +47,14 @@ export function readJsonFile<T = any>(filePath: string): T | null {
 }
 
 /**
- * 获取翻译文件路径
+ * get translation file path
  */
 export function getTranslationFilePath(locale: string, config: DevScriptsConfig, cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'): string {
   return `${cwd}/${config.i18n.messageRoot}/${locale}.json`
 }
 
 /**
- * 批量读取所有语言的翻译文件
+ * load all translation files
  */
 export function loadTranslations(config: DevScriptsConfig, cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'): Record<string, Record<string, any>> {
   const translations: Record<string, Record<string, any>> = {}

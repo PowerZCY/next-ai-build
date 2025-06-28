@@ -1,14 +1,14 @@
 import { writeFileSync } from 'fs'
 import { join } from 'path'
-import { DevScriptsConfig } from '../config/schema'
-import { Logger } from '../utils/logger'
-import { scanFiles, loadTranslations, getTranslationFilePath } from '../utils/file-scanner'
+import { DevScriptsConfig } from '@dev-scripts/config/schema'
+import { Logger } from '@dev-scripts/utils/logger'
+import { scanFiles, loadTranslations, getTranslationFilePath } from '@dev-scripts/utils/file-scanner'
 import { 
   extractTranslationsInfo, 
   getAllKeys, 
   removeKeyFromTranslations,
   cleanEmptyObjects
-} from '../utils/translation-parser'
+} from '@dev-scripts/utils/translation-parser'
 
 interface CleanReport {
   [key: string]: string[]
@@ -23,29 +23,29 @@ export async function cleanTranslations(
   const logFileName = shouldRemove ? 'remove.log' : 'clean.log'
   
   try {
-    logger.log('开始检查未使用的翻译键...')
+    logger.log('start checking unused translation keys...')
 
-    // 扫描所有文件
+    // scan all files
     const scanResults = await scanFiles(config, cwd)
     logger.log(`找到 ${scanResults.length} 个文件需要扫描`)
 
-    // 加载翻译文件
+    // load translation files
     const translations = loadTranslations(config, cwd)
 
-    // 收集使用的翻译键和命名空间
+    // collect used translation keys and namespaces
     const foundTranslationKeys: Set<string> = new Set()
     const foundNamespaces: Set<string> = new Set()
 
-    // 扫描所有文件，收集使用的翻译键和命名空间
+    // scan all files, collect used translation keys and namespaces
     for (const { filePath, content } of scanResults) {
       try {
         const { namespaces, keys } = extractTranslationsInfo(content, filePath)
 
         if (keys.length > 0 || namespaces.size > 0) {
-          logger.log(`在文件 ${filePath} 中找到以下信息:`)
+          logger.log(`found the following information in the file ${filePath}:`)
 
           if (namespaces.size > 0) {
-            logger.log(`  翻译函数映射:`)
+            logger.log(`  translation function mapping:`)
             namespaces.forEach((namespace, varName) => {
               logger.log(`    - ${varName} => ${namespace}`)
               foundNamespaces.add(namespace)
@@ -53,7 +53,7 @@ export async function cleanTranslations(
           }
 
           if (keys.length > 0) {
-            logger.log(`  翻译键:`)
+            logger.log(`  translation keys:`)
             keys.forEach(key => {
               logger.log(`    - ${key}`)
               foundTranslationKeys.add(key)
@@ -62,17 +62,17 @@ export async function cleanTranslations(
         }
       } catch (error) {
         if (error instanceof Error) {
-          logger.error(`处理文件 ${filePath} 时出错: ${error.message}`)
+          logger.error(`error processing file ${filePath}: ${error.message}`)
         } else {
-          logger.error(`处理文件 ${filePath} 时出错: 未知错误`)
+          logger.error(`error processing file ${filePath}: unknown error`)
         }
       }
     }
 
-    logger.log(`\n在代码中找到 ${foundTranslationKeys.size} 个使用的翻译键`)
-    logger.log(`在代码中找到 ${foundNamespaces.size} 个使用的命名空间: ${Array.from(foundNamespaces).join(', ')}`)
+    logger.log(`\nfound ${foundTranslationKeys.size} used translation keys in the code`)
+    logger.log(`found ${foundNamespaces.size} used namespaces in the code: ${Array.from(foundNamespaces).join(', ')}`)
 
-    // 检查每个语言文件中未使用的键
+    // check unused keys in each language file
     const unusedKeys: Record<string, string[]> = {}
     const removedKeys: Record<string, string[]> = {}
     const unusedNamespaces: Record<string, string[]> = {}
@@ -82,34 +82,34 @@ export async function cleanTranslations(
       removedKeys[locale] = []
       unusedNamespaces[locale] = []
 
-      // 获取翻译文件中的所有键
+      // get all keys in the translation file
       const allTranslationKeys = getAllKeys(translations[locale])
 
-      // 获取翻译文件中的所有命名空间（顶级键）
+      // get all namespaces (top-level keys) in the translation file
       const allNamespaces = Object.keys(translations[locale] || {})
 
-      // 找出未使用的命名空间
+      // find unused namespaces
       allNamespaces.forEach(namespace => {
         if (!foundNamespaces.has(namespace)) {
           unusedNamespaces[locale].push(namespace)
         }
       })
 
-      // 找出未使用的键
+      // find unused keys
       allTranslationKeys.forEach(key => {
         if (!foundTranslationKeys.has(key)) {
           unusedKeys[locale].push(key)
         }
       })
 
-      logger.log(`\n在 ${locale} 翻译文件中找到 ${unusedKeys[locale].length} 个未使用的键`)
-      logger.log(`在 ${locale} 翻译文件中找到 ${unusedNamespaces[locale].length} 个未使用的命名空间`)
+      logger.log(`\nfound ${unusedKeys[locale].length} unused keys in the ${locale} translation file`)
+      logger.log(`found ${unusedNamespaces[locale].length} unused namespaces in the ${locale} translation file`)
     })
 
     if (shouldRemove) {
-      logger.log('\n开始删除未使用的翻译键...')
+      logger.log('\nstart deleting unused translation keys...')
 
-      // 删除每个语言文件中未使用的键
+      // delete unused keys in each language file
       config.i18n.locales.forEach(locale => {
         const translationsCopy = { ...translations[locale] }
 
@@ -119,63 +119,63 @@ export async function cleanTranslations(
           }
         })
 
-        // 删除未使用的命名空间
+        // delete unused namespaces
         unusedNamespaces[locale].forEach(namespace => {
           if (translationsCopy[namespace] !== undefined) {
             delete translationsCopy[namespace]
-            logger.log(`从 ${locale} 翻译文件中删除了未使用的命名空间: ${namespace}`)
+            logger.log(`deleted unused namespace ${namespace} from the ${locale} translation file`)
           }
         })
 
-        // 清理空对象
+        // clean empty objects
         const cleanedTranslations = cleanEmptyObjects(translationsCopy)
 
-        // 保存更新后的翻译文件
+        // save updated translation file
         const filePath = getTranslationFilePath(locale, config, cwd)
         writeFileSync(filePath, JSON.stringify(cleanedTranslations, null, 2), 'utf8')
 
-        logger.log(`从 ${locale} 翻译文件中删除了 ${removedKeys[locale].length} 个未使用的键`)
+        logger.log(`deleted ${removedKeys[locale].length} unused keys from the ${locale} translation file`)
       })
     } else {
-      logger.log('\n要删除未使用的键，请使用 --remove 参数运行脚本')
+      logger.log('\nTo delete unused keys, please run the script with the --remove parameter')
     }
 
-    // 生成报告
-    logger.log('\n=== 未使用的翻译键报告 ===\n')
+    // generate report
+    logger.log('\n=== unused translation keys report ===\n')
 
     config.i18n.locales.forEach(locale => {
       if (unusedNamespaces[locale].length > 0) {
-        logger.log(`🔍 ${locale} 翻译文件中未使用的命名空间:`)
+        logger.log(`🔍 unused namespaces in the ${locale} translation file:`)
         unusedNamespaces[locale].forEach(namespace => logger.log(`  - ${namespace}`))
       } else {
-        logger.success(`${locale} 翻译文件中没有未使用的命名空间`)
+        logger.success(`${locale} translation file has no unused namespaces`)
       }
 
       if (unusedKeys[locale].length > 0) {
-        logger.log(`\n🔍 ${locale} 翻译文件中未使用的键:`)
+        logger.log(`\n🔍 unused keys in the ${locale} translation file:`)
         unusedKeys[locale].forEach(key => logger.log(`  - ${key}`))
       } else {
-        logger.success(`${locale} 翻译文件中没有未使用的键`)
+        logger.success(`${locale} translation file has no unused keys`)
       }
 
       if (shouldRemove && removedKeys[locale].length > 0) {
-        logger.log(`\n🗑️ 从 ${locale} 翻译文件中删除的键:`)
+        logger.log(`\n🗑️ deleted keys from the ${locale} translation file:`)
         removedKeys[locale].forEach(key => logger.log(`  - ${key}`))
       }
     })
 
-    logger.log('\n=== 报告结束 ===\n')
-    logger.log("⚠️⚠️⚠️脚本依赖正则匹配, 针对单文件存在多个翻译命名空间, 通过命名区分解决: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
+    logger.log('\n=== report end ===\n')
+    logger.log("⚠️⚠️⚠️script depends on regular matching, for multiple translation namespaces in a single file, use naming to distinguish: t1 | t2 | t3 | ... ⚠️⚠️⚠️")
 
-    // 保存日志文件
+    // save log file
     logger.saveToFile(logFileName, cwd)
 
-    // 如果有任何未使用的键或命名空间，返回非零状态码
+    // if there are any unused keys or namespaces, return non-zero status code
     return (Object.values(unusedKeys).some(keys => keys.length > 0) ||
       Object.values(unusedNamespaces).some(namespaces => namespaces.length > 0)) ? 1 : 0
 
   } catch (error) {
-    logger.error(`清理翻译时发生错误: ${error}`)
+    logger.error(`error cleaning translations: ${error}`)
     return 1
   }
 } 
