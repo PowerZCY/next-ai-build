@@ -16,70 +16,70 @@
     "heroImageAlt": "Reve Image AI 生成的艺术作品展示平台的强大功能"
   },
   "usage": {
-    "title": "How to use",
-    "eyesOn": "Newspaper Template",
+    "title": "如何使用",
+    "eyesOn": "Reve Image",
     "description": "",
     "steps": [
       {
-        "title": "Select a Template",
-        "description": "Click on your favorite template on the left side to get started.",
+        "title": "选择一个模板",
+        "description": "点击左侧的模板开始。",
         "iconKey": "MousePointerClick"
       },
       {
-        "title": "Customize Your Content",
-        "description": "Edit text directly in the text area and hover over images to upload new ones.",
+        "title": "自定义内容",
+        "description": "直接在文本区域编辑文本, 将鼠标悬停在图像上以上传新图像。",
         "iconKey": "Pencil"
       },
       {
-        "title": "Download & Share",
-        "description": "Download as an image, PDF, or share to X, Instagram, etc",
+        "title": "下载 & 分享",
+        "description": "下载为图像、PDF 或分享到 X、Instagram 等。",
         "iconKey": "Download"
       }
     ]
   },
   "faq": {
-    "title": "Frequently Asked Questions",
+    "title": "常见问题",
     "description": "",
     "items":[
       {
-        "question": "What is this newspaper template website?",
-        "answer": "This newspaper template website allows you to create and customize professional-looking newspapers using easy-to-use templates. You can edit text, upload images, and download or share your creations."
+        "question": "这是什么网站？",
+        "answer": "这个网站允许你使用简单的模板创建和定制专业外观的报纸。你可以编辑文本、上传图像并下载或分享你的创作。"
       },
       {
-        "question": "Is the newspaper template website free to use?",
-        "answer": "Yes, our newspaper template website is completely free! Access all features—templates, editing tools, and watermark-free downloads—without any cost or hidden fees. Perfect for commercial use!"
+        "question": "这个网站是免费的吗？",
+        "answer": "是的, 我们的网站是完全免费的! 访问所有功能——模板、编辑工具和无水印下载——无需任何费用或隐藏费用。非常适合商业使用!"
       },
       {
-        "question": "How do I edit the text and images?",
-        "answer": "To edit text, simply click into the text field and start typing your content. To change images, hover over the image placeholder and select the option to upload a new image from your device."
+        "question": "如何编辑文本和图像？",
+        "answer": "要编辑文本, 只需点击文本字段并开始输入内容。要更改图像, 将鼠标悬停在图像占位符上并选择上传新图像的选项。"
       },
       {
-        "question": "Do I need design experience to use the newspaper template website?",
-        "answer": "No design experience is required! Our intuitive interface and pre-designed templates make it easy for anyone to create a polished newspaper."
+        "question": "我需要设计经验才能使用这个网站吗？",
+        "answer": "不需要设计经验! 我们的直观界面和预设计模板使任何人都可以轻松创建精美的报纸。"
       },
       {
-        "question": "Can I preview my newspaper before downloading?",
-        "answer": "Yes, you can see real-time updates as you edit. The preview feature lets you review your newspaper to ensure it looks perfect before saving or sharing."
+        "question": "我可以预览我的报纸吗？",
+        "answer": "是的, 你可以看到实时更新。预览功能允许你查看报纸以确保它在保存或分享之前看起来完美。"
       },
       {
-        "question": "What file formats can I download my newspaper in?",
-        "answer": "You can download your newspaper as a high-quality PDF, PNG, JPG, WEBP, or SVG, suitable for printing or digital sharing."
+        "question": "我可以下载我的报纸吗？",
+        "answer": "是的, 你可以下载你的报纸作为高质量的PDF、PNG、JPG、WEBP或SVG, 适合打印或数字分享。"
       },
       {
-        "question": "Can I save my work and come back to it later?",
-        "answer": "Currently, you can complete your newspaper in one session. Future updates may include a save feature."
+        "question": "我可以保存我的工作并稍后回来吗？",
+        "answer": "目前, 你可以在一个会话中完成你的报纸。未来更新可能包括保存功能。"
       },
       {
-        "question": "Are there limits to how many newspapers I can create?",
-        "answer": "No limits! You can create as many newspapers as you like, all for free."
+        "question": "我可以创建多少个报纸？",
+        "answer": "没有限制! 你可以创建任意数量的报纸, 全部免费。"
       },
       {
-        "question": "Can I use my own fonts or colors?",
-        "answer": "You can use pre-set fonts and color schemes in our free online newspaper templates for a professional look. Custom font uploads may be available in future updates."
+        "question": "我可以使用自己的字体或颜色吗？",
+        "answer": "你可以使用我们免费的在线报纸模板中的预设字体和颜色方案来获得专业外观。未来更新可能包括自定义字体上传。"
       },
       {
-        "question": "How can I share my finished newspaper?",
-        "answer": "After completing your newspaper, you can download it as a PDF, PNG, JPG, WEBP, or SVG and share it via email, social media, or print it for physical distribution."
+        "question": "如何分享我的报纸？",
+        "answer": "完成你的报纸后, 你可以下载为PDF、PNG、JPG、WEBP或SVG, 并通过电子邮件、社交媒体或打印进行物理分发。"
       }
     ]
   },
