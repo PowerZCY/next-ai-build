@@ -52,6 +52,7 @@ export function createCommonAppConfig(options?: {
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL || '',
     githubBaseUrl: process.env.NEXT_PUBLIC_GITHUB_BASE_URL || '',
     github: process.env.NEXT_PUBLIC_GITHUB || '',
+    githubInfoToken: process.env.NEXT_PUBLIC_FUMA_GITHUB_TOKEN || '',
 
     // Internationalization configuration
     i18n: {

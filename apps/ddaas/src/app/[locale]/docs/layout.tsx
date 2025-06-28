@@ -2,7 +2,7 @@ import { baseOptions } from '@/app/[locale]/layout.config';
 import { docsSource } from '@/lib/source';
 import type { ReactNode } from 'react';
 // https://fumadocs.dev/docs/ui/layouts/notebook
-import { GithubInfo } from 'fumadocs-ui/components/github-info';
+import { FumaGithubInfo } from '@third-ui/fuma';
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
 import { appConfig } from '@/lib/appConfig';
 
@@ -15,7 +15,12 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
       {
         type: 'custom',
         children: (
-          <GithubInfo owner="caofanCPU" repo="D8gerAutoCode" className="lg:-mx-2" />
+          <FumaGithubInfo 
+            owner="caofanCPU" 
+            repo="D8gerAutoCode" 
+            token={appConfig.githubInfoToken}
+            className="lg:-mx-2" 
+          />
         ),
       },
     ],
