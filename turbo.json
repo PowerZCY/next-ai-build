@@ -1,29 +1,116 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "TURBO_TELEMETRY_DISABLED",
+    "TURBO_TOKEN",
+    "TURBO_TEAM"
+  ],
   "tasks": {
     "copy-shared-assets": {
       "cache": true,
       "inputs": ["packages/shared-assets/public/**", "packages/shared-assets/scripts/**"],
-      "outputs": ["../../apps/*/public/shared/**"]
+      "outputs": ["../../apps/*/public/shared/**"],
+      "env": ["NODE_ENV"]
     },
     "build": {
       "dependsOn": ["^build", "@windrun-huaiin/shared-assets#copy-shared-assets"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
+    },
+    "build:prod": {
+      "dependsOn": ["^build:prod", "@windrun-huaiin/shared-assets#copy-shared-assets"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
     },
     "@windrun-huaiin/shared-assets#build": {
       "cache": false,
-      "outputs": []
+      "outputs": [],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/shared-assets#copy-shared-assets": {
+      "cache": true,
+      "inputs": ["packages/shared-assets/public/**", "packages/shared-assets/scripts/**"],
+      "outputs": ["../../apps/*/public/shared/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/dev-scripts#build": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/lib#build": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/base-ui#build": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/third-ui#build": {
+      "outputs": ["dist/**"],
+      "env": [
+        "NODE_ENV",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
+    },
+    "@windrun-huaiin/dev-scripts#build:prod": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/lib#build:prod": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/base-ui#build:prod": {
+      "outputs": ["dist/**"],
+      "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/third-ui#build:prod": {
+      "outputs": ["dist/**"],
+      "env": [
+        "NODE_ENV",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
+    },
+    "@windrun-huaiin/shared-assets#build:prod": {
+      "cache": false,
+      "outputs": [],
+      "env": ["NODE_ENV"]
     },
     "dev": {
       "dependsOn": ["copy-shared-assets"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG"
+      ]
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "env": ["NODE_ENV"]
     },
     "type-check": {
-      "outputs": []
+      "outputs": [],
+      "env": ["NODE_ENV"]
     }
   }
 } 

@@ -5,6 +5,7 @@
   "packageManager": "pnpm@10.12.1",
   "scripts": {
     "build": "turbo build",
+    "build:prod": "turbo build:prod",
     "build:nocache": "turbo run copy-shared-assets --force",
     "dev": "turbo dev --parallel",
     "start": "pnpm -r start",
@@ -15,6 +16,7 @@
     "copy-shared-assets": "turbo copy-shared-assets",
     "ddaas:dev": "turbo dev --filter=@windrun-huaiin/ddaas-website",
     "ddaas:build": "turbo build --filter=@windrun-huaiin/ddaas-website",
+    "ddaas:build:prod": "turbo build:prod --filter=@windrun-huaiin/ddaas-website",
     "ddaas:start": "pnpm --filter=@windrun-huaiin/ddaas-website start"
   },
   "devDependencies": {

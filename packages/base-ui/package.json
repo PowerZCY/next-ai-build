@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/base-ui",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Base UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -39,6 +39,7 @@
   "scripts": {
     "build:css": "postcss src/styles/base-ui.css -o dist/base-ui.css",
     "build": "tsup && pnpm build:css",
+    "build:prod": "tsup && pnpm build:css",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"

@@ -1,5 +1,22 @@
 # @windrun-huaiin/third-ui
 
+## 1.4.0
+
+### Minor Changes
+
+- Finish the build process for all packages.
+
+  - The build process for all packages is now complete.
+  - Turbo build:prod is now complete.
+  - Environment variables are now correctly passed to the build process.
+  - README.md is now updated.
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@1.4.0
+  - @windrun-huaiin/lib@1.4.0
+
 ## 1.3.0
 
 ### Minor Changes
