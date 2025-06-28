@@ -16,6 +16,37 @@ A comprehensive set of UI components built with React, TypeScript, and Tailwind 
 pnpm add @windrun-huaiin/base-ui
 ```
 
+## TailwindCSS 4.x Config
+
+- Assume you have a project structure like this:
+
+```txt
+Your-project/
+├── src/
+│   └── app/
+│       └── globals.css
+├── node_modules/
+│   ├── @windrun-huaiin/
+│   │   ├── third-ui/
+│   │   │   └── src/        # This is third-ui src
+│   │   └── base-ui/
+│   │       └── src/        # This is base-ui src
+└── package.json
+```
+
+- Then, in your `globals.css` file, you have to configure Tailwind CSS 4.x like this:
+
+```css
+@import 'tailwindcss';
+
+@source "../node_modules/@windrun-huaiin/third-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "../node_modules/@windrun-huaiin/base-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "./src/**/*.{js,ts,jsx,tsx}";
+
+/* Import styles */
+@import '@windrun-huaiin/third-ui/styles/base-ui.css';
+```
+
 ## 🎨 Built-in Icons
 
 This package includes 28 built-in icons as React components. All icons are accessible through the `globalLucideIcons` object.
@@ -95,65 +126,65 @@ NEXT_PUBLIC_STYLE_ICON_COLOR=text-blue-600
 
 MIT
 
-## 包含的组件
+## Included Components
 
-### UI 组件 (ui/)
-- Radix UI 基础组件的封装
-- 统一的样式和主题
-- 完整的 TypeScript 支持
+### UI Components (ui/)
+- Radix UI base components
+- Unified styles and themes
+- Full TypeScript support
 
-### 基础组件 (components/)
-- 404-page: 404 错误页面组件
-- cta: Call-to-Action 组件
-- features: 功能展示组件
-- footer: 页脚组件
-- gallery: 图片画廊组件
-- global-icon: 全局图标管理
-- go-to-top: 回到顶部按钮
-- LanguageDetector: 语言检测组件
-- LanguageSwitcher: 语言切换组件
-- seo-content: SEO 内容组件
-- tips: 提示组件
+### Base Components (components/)
+- 404-page: 404 error page component
+- cta: Call-to-Action component
+- features: Feature showcase component
+- footer: Footer component
+- gallery: Image gallery component
+- global-icon: Global icon management
+- go-to-top: Go to top button
+- LanguageDetector: Language detection component
+- LanguageSwitcher: Language switcher component
+- seo-content: SEO content component
+- tips: Tip component
 
-### 脚本组件 (script/)
-- GoogleAnalyticsScript: Google Analytics 脚本
-- MicrosoftClarityScript: Microsoft Clarity 脚本
+### Script Components (script/)
+- GoogleAnalyticsScript: Google Analytics script
+- MicrosoftClarityScript: Microsoft Clarity script
 
-## 使用示例
+## Usage Example
 
 ```tsx
 import { Button, NotFoundPage, LanguageSwitcher } from '@windrun-huaiin/base-ui';
 
-// 使用 UI 组件
+// Use UI components
 <Button variant="default" size="lg">
-  点击我
+  Click me
 </Button>
 
-// 使用基础组件
+// Use base components
 <NotFoundPage />
 
-// 使用语言切换组件（需要传入配置）
+// Use language switcher component (need to pass in configuration)
 <LanguageSwitcher 
   locales={['en', 'zh']}
   localeLabels={{ en: 'English', zh: '中文' }}
 />
 ```
 
-## 依赖要求
+## Dependencies
 
 - React 18+
 - Next.js 15+
 - TypeScript
 
-## 开发
+## Development
 
 ```bash
-# 构建
+# Build
 pnpm build
 
-# 开发模式
+# Development mode
 pnpm dev
 
-# 类型检查
+# Type check
 pnpm type-check
 ``` 

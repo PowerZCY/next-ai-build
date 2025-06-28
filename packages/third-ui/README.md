@@ -1,110 +1,140 @@
 # @windrun-huaiin/third-ui
 
-第三方集成 UI 组件库，包含 Clerk 认证、Fumadocs 文档和主要应用组件。
+Third-party integrated UI components library, including Clerk authentication, Fumadocs documentation, and main application components.
 
-## 安装
+## Installation
 
 ```bash
 pnpm add @windrun-huaiin/third-ui
 ```
 
-## 包含的组件
+## TailwindCSS 4.x Config
 
-### Clerk 认证组件 (clerk/)
-- `ClerkOrganization`: 组织切换器组件
-- `ClerkProviderClient`: Clerk 提供者客户端组件
-- `ClerkUser`: 用户按钮和认证组件
+- Assume you have a project structure like this:
 
-### 主要应用组件 (main/)
-- `cta`: Call-to-Action 组件
-- `features`: 功能展示组件  
-- `footer`: 页脚组件
-- `gallery`: 图片画廊组件
-- `go-to-top`: 回到顶部按钮
-- `seo-content`: SEO 内容组件
-- `tips`: 提示组件
+```txt
+Your-project/
+├── src/
+│   └── app/
+│       └── globals.css
+├── node_modules/
+│   ├── @windrun-huaiin/
+│   │   ├── third-ui/
+│   │   │   └── src/        # This is third-ui src
+│   │   └── base-ui/
+│   │       └── src/        # This is base-ui src
+└── package.json
+```
 
-### Fumadocs 文档组件 (fuma/)
-- `fuma-banner-suit`: Fumadocs 横幅套件
-- `mdx-components`: MDX 组件
-- `toc-base`: 目录基础组件
-- `toc`: 目录组件
+- Then, in your `globals.css` file, you have to configure Tailwind CSS 4.x like this:
 
-## 使用示例
+```css
+@import 'tailwindcss';
 
-### 导入所有组件
+@source "../node_modules/@windrun-huaiin/third-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "../node_modules/@windrun-huaiin/base-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "./src/**/*.{js,ts,jsx,tsx}";
+
+/* Import styles */
+@import '@windrun-huaiin/third-ui/styles/third-ui.css';
+```
+
+
+## Usage Example
+
+### Import all components
 ```tsx
 import { ClerkUser, CTA, TOC } from '@windrun-huaiin/third-ui';
 ```
 
-### 按模块导入
+### Import components by module
 ```tsx
-// 只导入 Clerk 相关组件
+// Only import Clerk related components
 import { ClerkUser, ClerkOrganization } from '@windrun-huaiin/third-ui/clerk';
 
-// 只导入主要应用组件
+// Only import main application components
 import { CTA, Features } from '@windrun-huaiin/third-ui/main';
 
-// 只导入 Fumadocs 组件  
+// Only import Fumadocs components  
 import { TOC, FumaBannerSuit } from '@windrun-huaiin/third-ui/fuma';
 ```
 
-### 使用组件
+### Use components
 ```tsx
-// Clerk 用户组件（需要传入翻译和配置）
+// Clerk user component (need to pass in translations and configuration)
 <ClerkUser 
   locale="zh"
   clerkAuthInModal={true}
-  t={{ signIn: "登录" }}
-  t2={{ terms: "服务条款", privacy: "隐私政策" }}
+  t={{ signIn: "Sign in" }}
+  t2={{ terms: "Terms of Service", privacy: "Privacy Policy" }}
 />
 
-// Clerk 组织组件
+// Clerk organization component
 <ClerkOrganization locale="zh" className="custom-class" />
 
-// 主要应用组件
+// Main application components
 <CTA />
 <Features />
 ```
 
-## 设计理念
+## Design Principles
 
-1. **模块化**：按功能域分组，支持按需导入
-2. **参数化**：去除硬编码依赖，通过 props 传递配置
-3. **类型安全**：完整的 TypeScript 支持
-4. **路径别名**：内部使用 `@/` 别名，保持代码整洁
+1. **Modularization**: Grouped by functional domain, support import on demand
+2. **Parameterization**: Remove hard-coded dependencies, pass configuration through props
+3. **Type safety**: Full TypeScript support
+4. **Path alias**: Use `@/` alias internally, keep code clean
 
-## 依赖关系
+## Dependencies
 
-- `@windrun-huaiin/base-ui`: 基础 UI 组件
-- `@windrun-huaiin/lib`: 通用工具库
-- `@clerk/nextjs`: Clerk 认证
-- `fumadocs-core`, `fumadocs-ui`: Fumadocs 文档
+- `@windrun-huaiin/base-ui`: Base UI components
+- `@windrun-huaiin/lib`: General utility library
+- `@clerk/nextjs`: Clerk authentication
+- `fumadocs-core`, `fumadocs-ui`: Fumadocs documentation
 
-## 注意事项
+## Notes
 
-- 组件已经去除了直接的 `appConfig` 依赖，需要通过 props 传递配置
-- Clerk 组件需要在应用层提供正确的翻译文本
-- 某些组件可能需要特定的 CSS 动画类（如 `animate-cta-gradient-wave`） 
+- Components have removed direct `appConfig` dependencies, and configuration is passed through props
+- Clerk components need to provide correct translations in the application layer
+- Some components may require specific CSS animation classes (e.g. `animate-cta-gradient-wave`) 
 
-# Third UI Components
+## Component List
 
-这个包提供了第三方集成的 UI 组件，包括 Clerk 认证、Fumadocs 文档和通用页面组件。
+### Clerk module
+- `ClerkProviderClient` - Clerk authentication provider
+- `ClerkUser` - User button component  
+- `ClerkOrganization` - Organization switcher component
 
-## 安装
+### Main module
+- `CTA` - Call-to-Action component
+- `Features` - Feature showcase component
+- `Footer` - Footer component
+- `Gallery` - Image gallery component
+- `GoToTop` - Go to top button
+- `SEOContent` - SEO content component
+- `Tips` - Tip component
 
-```bash
-npm install @windrun-huaiin/third-ui
-```
+### Fuma module
+- `getMDXComponents` - MDX component configuration function
+- `createMDXComponents` - MDX component factory function
+- `TocFooter` - Table of contents footer component
+- `FumaBannerSuit` - Fumadocs banner component
 
-## 使用
+### Fuma MDX submodule
+- `Mermaid` - Flowchart component
+- `ImageZoom` - Image zoom component
+- `TrophyCard` - Trophy card component
+- `ImageGrid` - Image grid component
+- `ZiaCard` - Zia card component
+- `GradientButton` - Gradient button component 
 
-### Clerk 组件
+## Usage
+
+### Clerk components
 
 ```tsx
 import { ClerkProviderClient, ClerkUser } from '@windrun-huaiin/third-ui/clerk';
 
-// 在 layout.tsx 中使用
+// Use in layout.tsx
 <ClerkProviderClient 
   signInUrl="/sign-in"
   signUpUrl="/sign-up"
@@ -113,27 +143,27 @@ import { ClerkProviderClient, ClerkUser } from '@windrun-huaiin/third-ui/clerk';
   {children}
 </ClerkProviderClient>
 
-// 在导航栏中使用
+// Use in navigation bar
 <ClerkUser clerkAuthInModal={true} />
 ```
 
-### Main 组件
+### Main components
 
 ```tsx
 import { CTA, Features, Footer } from '@windrun-huaiin/third-ui/main';
 
-// 使用各种页面组件
+// Use various page components
 <Features />
 <CTA />
 <Footer />
 ```
 
-### Fumadocs 组件
+### Fumadocs components
 
 ```tsx
 import { createMDXComponents, TocFooter } from '@windrun-huaiin/third-ui/fuma';
 
-// 创建预配置的 MDX 组件
+// Create pre-configured MDX components
 const getMDXComponents = createMDXComponents({
   watermark: {
     enabled: true,
@@ -142,11 +172,11 @@ const getMDXComponents = createMDXComponents({
   githubBaseUrl: "https://github.com/your-org/your-repo/edit/main/"
 });
 
-// 在页面中使用
+// Use in page
 const MDX = page.data.body;
 <MDX components={getMDXComponents()} />
 
-// 使用 TocFooter
+// Use TocFooter
 <TocFooter 
   lastModified={page.data.date}
   showCopy={true}
@@ -155,75 +185,26 @@ const MDX = page.data.body;
 />
 ```
 
-#### MDX 组件全局配置
+#### MDX components global configuration
 
-使用 `createMDXComponents` 工厂函数可以避免在每个 MDX 文件中重复传递配置参数：
-
-```tsx
-// 创建预配置的组件函数
-const getMDXComponents = createMDXComponents({
-  watermark: {
-    enabled: process.env.NEXT_PUBLIC_WATERMARK_ENABLED === 'true',
-    text: process.env.NEXT_PUBLIC_WATERMARK_TEXT || "Default Watermark"
-  },
-  cdnBaseUrl: "https://cdn.example.com",
-  placeHolderImage: "/default-placeholder.webp"
-});
-
-// 现在在 MDX 文件中使用组件时，配置会自动应用
-// - Mermaid: 水印会自动应用
-// - ImageGrid: CDN 基础URL会自动应用
-// - ImageZoom: 占位图片会自动应用
-```
-
-在 MDX 文件中：
+In MDX file:
 
 ```mdx
-<!-- Mermaid 图表，水印自动应用 -->
+<!-- Mermaid chart, watermark automatically applied -->
 <Mermaid
   chart="graph TD; A-->B"
   title="My Diagram"
 />
 
-<!-- 图片网格，CDN URL 自动应用 -->
+<!-- Image grid, CDN URL automatically applied -->
 <ImageGrid
   type="url"
   images={["image1.webp", "image2.webp"]}
   altPrefix="example"
 />
 
-<!-- 图片缩放，占位图片自动应用 -->
+<!-- Image zoom, placeholder image automatically applied -->
 <ImageZoom src="/some-image.jpg" alt="Example" />
 ```
 
-所有配置参数会自动从全局配置中获取，无需在每个使用处重复指定。
-
-## 组件列表
-
-### Clerk 模块
-- `ClerkProviderClient` - Clerk 认证提供者
-- `ClerkUser` - 用户按钮组件  
-- `ClerkOrganization` - 组织切换器
-
-### Main 模块
-- `CTA` - 行动召唤组件
-- `Features` - 功能特性展示
-- `Footer` - 页脚组件
-- `Gallery` - 图片画廊
-- `GoToTop` - 返回顶部按钮
-- `SEOContent` - SEO 内容组件
-- `Tips` - 提示组件
-
-### Fuma 模块
-- `getMDXComponents` - MDX 组件配置函数
-- `createMDXComponents` - MDX 组件工厂函数
-- `TocFooter` - 目录页脚组件
-- `FumaBannerSuit` - Fumadocs 横幅组件
-
-### Fuma MDX 子模块
-- `Mermaid` - 流程图组件
-- `ImageZoom` - 图片缩放组件
-- `TrophyCard` - 奖杯卡片组件
-- `ImageGrid` - 图片网格组件
-- `ZiaCard` - Zia 卡片组件
-- `GradientButton` - 渐变按钮组件 
+All configuration parameters will be automatically obtained from the global configuration, and no need to specify them in each use.
