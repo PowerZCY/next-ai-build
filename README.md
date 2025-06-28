@@ -357,6 +357,201 @@ turbo run build --filter=@windrun-huaiin/ddaas-website --dry-run
 3. **检查环境变量**: 确认环境变量配置是否完整
 4. **优化构建时间**: 分析任务依赖关系，识别优化机会
 
+
+
+
+## 📦 打包发布
+
+本项目的 `lib`、`base-ui`、`third-ui`、`dev-scripts` 包可以独立发布到 npm 仓库。
+
+### 🔍 发布前验证
+
+#### 1. **构建产物验证**
+
+```bash
+# 构建所有包
+pnpm build
+
+# 验证构建产物是否正确生成
+ls packages/lib/dist
+ls packages/base-ui/dist  
+ls packages/third-ui/dist
+ls packages/dev-scripts/dist
+```
+
+#### 2. **使用 --dry-run 验证打包**
+
+在每个包目录下执行发布前检查：
+
+```bash
+# 验证 lib 包
+cd packages/lib
+npm pack --dry-run
+
+# 验证 base-ui 包
+cd packages/base-ui
+npm pack --dry-run
+
+# 验证 third-ui 包  
+cd packages/third-ui
+npm pack --dry-run
+
+# 验证 dev-scripts 包
+cd packages/dev-scripts
+npm pack --dry-run
+cd ../..
+```
+
+**--dry-run 输出信息**:
+- 📁 **打包文件列表**: 显示将要包含在 npm 包中的文件
+- 📊 **包大小**: 显示打包后的文件大小
+- ⚠️ **警告信息**: 显示可能的配置问题
+- ✅ **验证结果**: 确认打包配置是否正确
+
+#### 3. **依赖关系检查**
+
+```bash
+# 检查包的依赖关系（使用 --dry-run 不实际发布）
+turbo run build --dry-run
+
+# 查看包的详细信息
+npm info @windrun-huaiin/lib
+npm info @windrun-huaiin/base-ui
+npm info @windrun-huaiin/third-ui
+npm info @windrun-huaiin/dev-scripts
+```
+
+### 🚀 发布方式
+
+#### 方式一：单独发布（推荐用于精确控制）
+
+**发布顺序**：按依赖关系顺序发布
+
+```bash
+# 1. 首先发布无依赖的包
+cd packages/lib
+npm publish
+cd ../..
+
+cd packages/dev-scripts
+npm publish
+cd ../..
+
+# 2. 发布依赖 lib 的包
+cd packages/base-ui  
+npm publish
+cd ../..
+
+# 3. 最后发布依赖多个包的包
+cd packages/third-ui
+npm publish
+cd ../..
+```
+
+**验证发布成功**:
+```bash
+npm info @windrun-huaiin/lib
+npm info @windrun-huaiin/base-ui
+npm info @windrun-huaiin/third-ui
+npm info @windrun-huaiin/dev-scripts
+```
+
+#### 方式二：使用 Changeset 批量发布（推荐用于版本管理）
+
+**步骤 1**: 创建发布记录
+```bash
+# 交互式创建变更记录
+pnpm changeset
+
+# 选择要发布的包和版本类型:
+# - major: 破坏性变更 (1.0.0 → 2.0.0)
+# - minor: 新功能添加 (1.0.0 → 1.1.0)  
+# - patch: 问题修复 (1.0.0 → 1.0.1)
+```
+
+**步骤 2**: 预览变更
+```bash
+# 查看变更状态
+pnpm changeset status
+
+# 使用 --dry-run 预览版本变更（不实际修改）
+pnpm changeset version --dry-run
+```
+
+**步骤 3**: 应用版本变更
+```bash
+# 应用版本变更到 package.json
+pnpm changeset version
+
+# 验证版本变更是否正确
+git diff
+```
+
+**步骤 4**: 批量发布
+```bash
+# 构建所有包
+pnpm build
+
+# 批量发布到 npm
+pnpm changeset publish
+
+# 或者使用 --dry-run 预览发布过程
+pnpm changeset publish --dry-run
+```
+
+### 📋 发布检查清单
+
+#### 发布前必检项
+
+- [ ] ✅ **npm 登录状态**: `npm whoami` 确认已登录
+- [ ] ✅ **构建成功**: `pnpm build` 无错误
+- [ ] ✅ **打包验证**: `npm pack --dry-run` 在各包目录下通过
+- [ ] ✅ **依赖版本**: workspace 依赖已替换为具体版本号
+- [ ] ✅ **文档完整**: README.md 和 LICENSE 文件存在
+- [ ] ✅ **版本合理**: 遵循语义化版本规范
+
+#### 发布依赖顺序
+
+```mermaid
+graph TD
+    A[lib - 无依赖] --> C[base-ui - 依赖lib]
+    A --> D[third-ui - 依赖lib+base-ui]
+    B[dev-scripts - 无依赖]
+    
+    style A fill:#e1f5fe
+    style B fill:#e1f5fe
+    style C fill:#fff3e0
+    style D fill:#fce4ec
+```
+
+**发布顺序**: `lib` → `dev-scripts` → `base-ui` → `third-ui`
+
+### ⚠️ 注意事项
+
+1. **版本一致性**: 确保内部依赖使用正确的版本号
+2. **构建清理**: 发布前执行 `pnpm clean && pnpm build` 确保构建产物干净
+3. **标签管理**: 发布后创建 Git 标签 `git tag v1.0.0 && git push --tags`
+4. **回滚准备**: 记录发布的版本号，便于必要时回滚
+5. **文档更新**: 发布后更新相关使用文档和安装说明
+
+### 🛠 故障排除
+
+**常见问题**:
+
+```bash
+# 问题1: 包名冲突
+npm info @windrun-huaiin/your-package-name
+
+# 问题2: 权限不足
+npm owner ls @windrun-huaiin/your-package-name
+
+# 问题3: 网络超时
+npm config set registry https://registry.npmjs.org/
+
+# 问题4: 构建失败
+pnpm clean && pnpm build
+```
+
 ## 📄 许可证
 
 本项目采用 [LICENSE](./LICENSE) 许可证。

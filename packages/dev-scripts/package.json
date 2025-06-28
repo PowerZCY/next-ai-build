@@ -12,15 +12,6 @@
     "dev": "tsup --watch",
     "prepublishOnly": "pnpm build"
   },
-  "keywords": [
-    "i18n",
-    "blog",
-    "mdx",
-    "translations",
-    "fumadocs"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "fast-glob": "^3.3.2",
     "commander": "^12.0.0",
@@ -40,5 +31,17 @@
     "package.json",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "keywords": [
+    "i18n",
+    "blog",
+    "mdx",
+    "translations",
+    "fumadocs"
+  ],
+  "author": "windrun-huaiin",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -112,6 +112,9 @@
     "radix-ui",
     "tailwindcss"
   ],
-  "author": "D8ger",
-  "license": "MIT"
+  "author": "windrun-huaiin",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

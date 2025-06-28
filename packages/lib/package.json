@@ -49,15 +49,6 @@
     "lint": "eslint src",
     "prepublishOnly": "pnpm build"
   },
-  "keywords": [
-    "utilities",
-    "config",
-    "typescript",
-    "react",
-    "nextjs"
-  ],
-  "author": "Windrun Huaiin",
-  "license": "MIT",
   "dependencies": {
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -79,6 +70,15 @@
   "peerDependencies": {
     "react": "^19.1.0"
   },
+  "keywords": [
+    "utilities",
+    "config",
+    "typescript",
+    "react",
+    "nextjs"
+  ],
+  "author": "windrun-huaiin",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }

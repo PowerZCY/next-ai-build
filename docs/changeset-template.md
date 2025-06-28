@@ -1,10 +1,10 @@
 ---
-"@windrun-huaiin/base-ui": minor
+"@windrun-huaiin/base-ui": major
 "@windrun-huaiin/third-ui": minor
-"@windrun-huaiin/lib": minor
-"@windrun-huaiin/dev-scripts": minor
-"@windrun-huaiin/shared-assets": minor
-"@windrun-huaiin/ddaas-website": minor
+"@windrun-huaiin/lib": patch
+"@windrun-huaiin/dev-scripts": none
+"@windrun-huaiin/shared-assets": alpha
+"@windrun-huaiin/ddaas-website": beta
 ---
 
 Major icon system refactor and shared assets infrastructure
