@@ -6,7 +6,7 @@
 */
 
 import { BUILTIN_ICON_COMPONENTS } from '@base-ui/assets';
-import { themeIconColor } from '@base-ui/lib/theme-util';
+import { themeIconColor, themeSvgIconSize } from '@base-ui/lib/theme-util';
 
 import * as limitedIconsModule from '@lib/limited-lucide-icons';
 import { type LucideProps } from 'lucide-react';
@@ -38,10 +38,28 @@ for (const iconNameKey in limitedIconsModule) {
         const originalClassName = props.className || '';
         // Check if user provided a text color class, if so, don't use global color
         const hasTextColor = /\btext-\w+(-\d+)?\b/.test(originalClassName);
+        // Check if user provided size/dimension classes
+        const hasSizeClass = /\b(size-\d+|w-\d+|h-\d+)\b/.test(originalClassName);
+        
         const newClassName = hasTextColor 
           ? originalClassName 
           : `${themeIconColor} ${originalClassName}`.trim();
-        return <ComponentToRender {...props} className={newClassName} />;
+        
+        // If user provided size classes in className, don't use default size
+        // Otherwise, use inline styles to ensure size precedence over external CSS
+        const finalProps = hasSizeClass 
+          ? { ...props, className: newClassName, size: undefined }
+          : { 
+              ...props, 
+              className: newClassName,
+              style: { 
+                width: props.size || themeSvgIconSize, 
+                height: props.size || themeSvgIconSize,
+                ...props.style 
+              }
+            };
+          
+        return <ComponentToRender {...finalProps} />;
       };
       StyledIcon.displayName = `Styled(${iconName})`;
       tempStyledLimitedIcons[iconName] = StyledIcon;
@@ -55,10 +73,44 @@ const styledLimitedIconsPart = tempStyledLimitedIcons as {
   [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent;
 };
 
+// Wrap built-in SVG components with the same className handling logic
+const wrappedBuiltinIcons: Record<string, StyledLucideIconComponent> = {};
+for (const [iconName, IconComponent] of Object.entries(BUILTIN_ICON_COMPONENTS)) {
+  const WrappedIcon = (props: LucideProps): React.ReactElement => {
+    const originalClassName = props.className || '';
+    // Check if user provided a text color class, if so, don't use global color
+    const hasTextColor = /\btext-\w+(-\d+)?\b/.test(originalClassName);
+    // Check if user provided size/dimension classes
+    const hasSizeClass = /\b(size-\d+|w-\d+|h-\d+)\b/.test(originalClassName);
+    
+    const newClassName = hasTextColor 
+      ? originalClassName 
+      : `${themeIconColor} ${originalClassName}`.trim();
+    
+    // If user provided size classes in className, don't use default size
+    // Otherwise, use inline styles to ensure size precedence over external CSS
+    const finalProps = hasSizeClass 
+      ? { ...props, className: newClassName, size: undefined }
+      : { 
+          ...props, 
+          className: newClassName,
+          style: { 
+            width: props.size || themeSvgIconSize, 
+            height: props.size || themeSvgIconSize,
+            ...props.style 
+          }
+        };
+      
+    return <IconComponent {...finalProps} />;
+  };
+  WrappedIcon.displayName = `Wrapped(${iconName})`;
+  wrappedBuiltinIcons[iconName] = WrappedIcon;
+}
+
 // All icons should be imported from here, and icons will occupy the project package size, so it is best to design and plan in advance
 export const globalLucideIcons = {
   ...styledLimitedIconsPart,
-  ...BUILTIN_ICON_COMPONENTS, // Spread all built-in icon components
+  ...wrappedBuiltinIcons, // Spread all wrapped built-in icon components
 };
 
 // Default fallback icon - centralized configuration

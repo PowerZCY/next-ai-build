@@ -4,12 +4,10 @@ import { themeSvgIconColor } from '@base-ui/lib/theme-util';
 
 const MermaidIcon = React.forwardRef<SVGSVGElement, LucideProps>(
   // Memmaid need special size for good view
-  ({ size = 16, color = "currentColor", className, ...props }, ref) => (
+  ({ color = "currentColor", className, ...props }, ref) => (
     <svg
       ref={ref}
       role="img"
-      width={size}
-      height={size}
       className={className}
       {...props}
       viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >

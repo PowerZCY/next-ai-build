@@ -1,14 +1,12 @@
 import React from 'react';
 import { LucideProps } from 'lucide-react';
-import { themeSvgIconColor, themeSvgIconSize } from '@base-ui/lib/theme-util';
+import { themeSvgIconColor } from '@base-ui/lib/theme-util';
 
 const SnippetsIcon = React.forwardRef<SVGSVGElement, LucideProps>(
-  ({ size = themeSvgIconSize, color = "currentColor", className, ...props }, ref) => (
+  ({ color = "currentColor", className, ...props }, ref) => (
     <svg
-     ref={ref}
+      ref={ref}
       role="img" 
-      width={size} 
-      height={size} 
       className={className} 
       {...props}
       viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
