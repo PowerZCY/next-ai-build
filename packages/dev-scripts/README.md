@@ -39,7 +39,7 @@ npm install -D @packages/dev-scripts
     "messageRoot": "messages",
     "scanDirs": ["src/**/*.{tsx,ts,jsx,js}"],
     "blogDir": "src/mdx/blog",
-    "logDir": "scripts"
+    "logDir": "logs"
   }
 }
 ```
@@ -76,7 +76,7 @@ pnpm generate-blog-index
       "src/**/*.{tsx,ts,jsx,js}"
     ],
     "blogDir": "src/mdx/blog",              // 博客MDX文件目录
-    "logDir": "scripts"                     // 日志输出目录
+    "logDir": "logs"                     // 日志输出目录
   }
 }
 ```
@@ -104,7 +104,7 @@ pnpm generate-blog-index
     "prefix": "blog"
   },
   "output": {
-    "logDir": "scripts",
+    "logDir": "logs",
     "verbose": false
   }
 }

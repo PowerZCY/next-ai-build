@@ -1,5 +1,5 @@
-import { writeFileSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync, mkdirSync } from 'fs'
+import { join, dirname } from 'path'
 import { DevScriptsConfig } from '@dev-scripts/config/schema'
 
 export class Logger {
@@ -38,27 +38,32 @@ export class Logger {
   }
   
   /**
-   * 保存日志到文件
+   * save log to file
    */
   saveToFile(filename: string, cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'): void {
     try {
       const logFilePath = join(cwd, this.config.output.logDir, filename)
+      const logDir = dirname(logFilePath)
+      
+      // create log directory if it doesn't exist
+      mkdirSync(logDir, { recursive: true })
+      
       writeFileSync(logFilePath, this.messages.join('\n'), 'utf8')
-      console.log(`日志已保存到 ${logFilePath}`)
+      console.log(`log saved to ${logFilePath}`)
     } catch (error) {
-      console.error(`保存日志文件失败: ${error}`)
+      console.error(`failed to save log file: ${error}`)
     }
   }
   
   /**
-   * 清空日志消息
+   * clear log messages
    */
   clear(): void {
     this.messages = []
   }
   
   /**
-   * 获取所有日志消息
+   * get all log messages
    */
   getMessages(): string[] {
     return [...this.messages]

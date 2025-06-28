@@ -56,7 +56,7 @@ export const DEFAULT_CONFIG: DevScriptsConfig = {
     prefix: 'blog'
   },
   output: {
-    logDir: 'scripts',
+    logDir: 'logs',
     verbose: false
   }
 } 

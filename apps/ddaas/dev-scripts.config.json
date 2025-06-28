@@ -16,7 +16,7 @@
     "prefix": "blog"
   },
   "output": {
-    "logDir": "scripts",
+    "logDir": "logs",
     "verbose": false
   }
 }

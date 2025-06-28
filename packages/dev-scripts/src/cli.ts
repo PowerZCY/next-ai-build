@@ -18,15 +18,14 @@ program
   .command('check-translations')
   .description('check the completeness and consistency of translation files')
   .option('-v, --verbose', 'show detailed logs', false)
-  .option('--config <path>', 'specify the config file path')
   .action(async (options) => {
     try {
-      const config = loadConfig(cwd, {
-        output: { 
-          verbose: options.verbose,
-          logDir: 'scripts'
-        }
-      })
+      const config = loadConfig(cwd, {}, options.verbose)
+      
+      // apply verbose option after loading
+      if (options.verbose) {
+        config.output.verbose = true
+      }
       
       validateConfig(config)
       
@@ -48,15 +47,14 @@ program
   .description('clean unused translation keys')
   .option('-v, --verbose', 'show detailed logs', false)
   .option('--remove', 'actually delete unused keys (default only show)', false)
-  .option('--config <path>', 'specify the config file path')
   .action(async (options) => {
     try {
-      const config = loadConfig(cwd, {
-        output: { 
-          verbose: options.verbose,
-          logDir: 'scripts'
-        }
-      })
+      const config = loadConfig(cwd, {}, options.verbose)
+      
+      // apply verbose option after loading
+      if (options.verbose) {
+        config.output.verbose = true
+      }
       
       validateConfig(config)
       
@@ -77,15 +75,14 @@ program
   .command('generate-blog-index')
   .description('generate blog index file')
   .option('-v, --verbose', 'show detailed logs', false)
-  .option('--config <path>', 'specify the config file path')
   .action(async (options) => {
     try {
-      const config = loadConfig(cwd, {
-        output: { 
-          verbose: options.verbose,
-          logDir: 'scripts'
-        }
-      })
+      const config = loadConfig(cwd, {}, options.verbose)
+      
+      // apply verbose option after loading
+      if (options.verbose) {
+        config.output.verbose = true
+      }
       
       validateConfig(config)
       
