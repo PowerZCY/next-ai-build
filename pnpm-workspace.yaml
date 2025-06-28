@@ -94,6 +94,11 @@ catalog:
   nprogress: ^0.2.0
   unist-util-visit: ^5.0.0
   tsup: ^8.3.5
+  fs-extra: ^11.2.0
+  glob: ^10.3.10
+  '@types/fs-extra': ^11.0.4
+  chokidar: ^3.5.3
+  tsx: ^4.1.0
 
 prefer-workspace-packages: true
 

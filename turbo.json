@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "copy-shared-assets": {
+      "cache": true,
+      "inputs": ["packages/shared-assets/public/**", "packages/shared-assets/scripts/**"],
+      "outputs": ["../../apps/*/public/shared/**"]
+    },
+    "build": {
+      "dependsOn": ["^build", "@windrun-huaiin/shared-assets#copy-shared-assets"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "@windrun-huaiin/shared-assets#build": {
+      "cache": false,
+      "outputs": []
+    },
+    "dev": {
+      "dependsOn": ["copy-shared-assets"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "type-check": {
+      "outputs": []
+    }
+  }
+} 

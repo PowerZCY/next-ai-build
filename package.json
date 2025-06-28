@@ -2,20 +2,27 @@
   "name": "windrun-huaiin",
   "version": "1.2.0",
   "private": true,
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "build": "pnpm -r build",
-    "dev": "pnpm -r --parallel dev",
+    "build": "turbo build",
+    "build:nocache": "turbo run copy-shared-assets --force",
+    "dev": "turbo dev --parallel",
     "start": "pnpm -r start",
-    "lint": "pnpm -r lint",
+    "lint": "turbo lint",
     "clean": "pnpm -r clean",
-    "ddaas:dev": "pnpm --filter=@windrun-huaiin/ddaas-website dev",
-    "ddaas:build": "pnpm --filter=@windrun-huaiin/ddaas-website build",
+    "deep-clean": "node scripts/deep-clean.js",
+    "d8": "pnpm run deep-clean",
+    "copy-shared-assets": "turbo copy-shared-assets",
+    "ddaas:dev": "turbo dev --filter=@windrun-huaiin/ddaas-website",
+    "ddaas:build": "turbo build --filter=@windrun-huaiin/ddaas-website",
     "ddaas:start": "pnpm --filter=@windrun-huaiin/ddaas-website start"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
+    "glob": "^10.3.10",
     "postcss": "catalog:",
-    "postcss-cli": "^11.0.1"
+    "postcss-cli": "^11.0.1",
+    "turbo": "^2.5.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
