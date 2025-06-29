@@ -50,8 +50,6 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.0",
     "date-fns": "2.30.0",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
@@ -66,6 +64,8 @@
     "@types/node": "^22.15.18"
   },
   "peerDependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },

@@ -1,8 +1,8 @@
 /* 
- * For the icon used in the project, unified management is required
- * 1. Strictly control the number of icons introduced to reduce the project package size and use them as needed
- * 2. Unify the style customization, and keep the icon style consistent within the project
- * 3. Mainly support the introduction of icons in mdx files, and report errors in advance
+* For the icon used in the project, unified management is required
+* 1. Strictly control the number of icons introduced to reduce the project package size and use them as needed
+* 2. Unify the style customization, and keep the icon style consistent within the project
+* 3. Mainly support the introduction of icons in mdx files, and report errors in advance
 */
 
 import { BUILTIN_ICON_COMPONENTS } from '@base-ui/assets';
@@ -12,6 +12,8 @@ import * as limitedIconsModule from '@lib/limited-lucide-icons';
 import { type LucideProps } from 'lucide-react';
 import React from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const process: any;
 
 // Type for styled Lucide icon components (accepts LucideProps)
 type StyledLucideIconComponent = (props: LucideProps) => React.ReactElement;

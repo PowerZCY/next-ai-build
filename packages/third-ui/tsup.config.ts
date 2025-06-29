@@ -15,26 +15,21 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   publicDir: './src/styles',
-  noExternal: [],
   external: [
-    'react',
-    'react-dom',
-    'next',
-    'next/image',
-    'next/link',
-    'next/navigation',
-    'next/router',
-    'next/head',
-    'next/script',
-    'next/dynamic',
-    'next/server',
-    'next/config',
-    'next/error',
-    'next/font',
-    'next/headers',
-    'next/cookies',
+    // React/Next
+    /^react$/,
+    /^react\//,
+    /^react-dom$/,
+    /^react-dom\//,
+    /^next$/,
+    /^next\//,
+    // peer dependencies
     'next-intl',
-    'next-themes'
+    'next-themes',
+    'tailwindcss',
+    'clsx',
+    'tailwind-merge',
+    'nprogress'
   ],
   esbuildOptions: (options) => {
     options.alias = {

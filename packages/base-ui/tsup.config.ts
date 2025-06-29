@@ -13,33 +13,26 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
+  // Force using rollup instead of esbuild
+  bundle: true,
+  platform: 'neutral',
+  // Explicit external configuration
   external: [
-    // React 
-    'react',
-    'react-dom',
-    // Next.js core and submodules
-    'next',
-    'next/image',
-    'next/link',
-    'next/navigation',
-    'next/router',
-    'next/head',
-    'next/script',
-    'next/dynamic',
-    'next/server',
-    'next/config',
-    'next/error',
-    'next/font',
-    'next/headers',
-    'next/cookies',
-    // Next.js plugins
+    /^react$/,
+    /^react\//,
+    /^react-dom$/,
+    /^react-dom\//,
+    /^next$/,
+    /^next\//,
     'next-intl',
-    'next-themes'
+    'next-themes',
+    'clsx',
+    'tailwind-merge',
+    'tailwindcss',
+    // Node global variables
+    'process'
   ],
-
-  esbuildOptions: (options) => {
-    options.alias = {
-      '@': './src'
-    };
-  }
+  // Disable code splitting, ensure external works correctly
+  treeshake: true,
+  minify: false
 }); 

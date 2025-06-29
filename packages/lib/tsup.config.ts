@@ -11,8 +11,9 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   dts: true,
   clean: true,
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'clsx', 'tailwind-merge'],
   splitting: false,
   sourcemap: true,
+  treeshake: true,
   minify: false,
 }) 
