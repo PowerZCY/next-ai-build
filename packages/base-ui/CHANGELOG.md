@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 3.5.0
+
+### Minor Changes
+
+- - Hotfix: remove peer dependencies from base-ui and lib, for reason like: DO NOT CREATE REPEAT REACT INSTANCES!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@3.3.0
+
 ## 3.4.0
 
 ### Minor Changes
