@@ -182,7 +182,8 @@
     "eyesOn": "Reve Image",
     "description1": "Start generating beautiful images today with your 20 free daily creations.",
     "description2": "No credit card required.",
-    "button": "Get Started Now"
+    "button": "Get Started Now",
+    "url": "https://preview.reve.art/"
   },
   "languageDetection": {
     "title": "Language Detection",

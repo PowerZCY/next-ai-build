@@ -182,7 +182,8 @@
     "eyesOn": "Reve Image",
     "description1": "今天就开始生成美丽的图像, 享受每日20次免费创作。",
     "description2": "无需信用卡。",
-    "button": "立即开始"
+    "button": "立即开始",
+    "url": "https://preview.reve.art/"
   },
   "languageDetection": {
     "title": "语言检测",

@@ -18,7 +18,7 @@ export function CTA() {
         </p>
         <GradientButton
           title={t('button')}
-          href="https://preview.reve.art/"
+          href={t('url')}
           align="center"
         />
       </div>
