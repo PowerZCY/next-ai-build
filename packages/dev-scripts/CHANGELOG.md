@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 3.3.0
+
+### Minor Changes
+
+- - Repair bundle build config for reason: DO NOT PACK REACT!
+
 ## 3.2.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 3.4.0
+
+### Minor Changes
+
+- - Repair bundle build config for reason: DO NOT PACK REACT!
+
 ## 3.3.1
 
 ### Patch Changes

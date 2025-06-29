@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 3.6.0
+
+### Minor Changes
+
+- - Repair bundle build config for reason: DO NOT PACK REACT!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@3.4.0
+
 ## 3.5.1
 
 ### Patch Changes

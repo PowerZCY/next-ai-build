@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 3.3.0
+
+### Minor Changes
+
+- - Repair bundle build config for reason: DO NOT PACK REACT!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.6.0
+  - @windrun-huaiin/third-ui@3.4.0
+  - @windrun-huaiin/lib@3.4.0
+  - @windrun-huaiin/shared-assets@3.3.0
+
 ## 3.2.1
 
 ### Patch Changes
