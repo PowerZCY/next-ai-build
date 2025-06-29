@@ -1,7 +1,7 @@
 'use client';
 
 import { NotFoundIcon } from "@base-ui/components/global-icon";
-import { SiteIcon } from "@base-ui/lib/site-icon";
+import { SiteIcon } from "@base-ui/components/site-icon";
 import { useEffect, useState } from "react";
 
 export function NotFoundPage() {

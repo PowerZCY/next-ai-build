@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 4.0.1
+
+### Patch Changes
+
+- - fix: export components should be CAREFUL!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@4.1.1
+  - @windrun-huaiin/third-ui@4.0.1
+  - @windrun-huaiin/lib@4.0.0
+  - @windrun-huaiin/shared-assets@3.3.0
+
 ## 4.0.0
 
 ### Major Changes

@@ -2,7 +2,7 @@
 
 import { type LucideProps } from 'lucide-react';
 import { cn } from '@lib/utils';
-import { useIconConfigSafe } from '@base-ui/lib/icon-context';
+import { useIconConfigSafe } from '@base-ui/components/icon-context';
 import { globalLucideIcons } from '@base-ui/components/global-icon';
 import { themeIconColor } from '@base-ui/lib/theme-util';
 

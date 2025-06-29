@@ -1,5 +1,5 @@
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
-import { NotFoundPage } from '@base-ui/components/404-page';
+import { NotFoundPage } from '@base-ui/components/client';
 import { TocFooter } from '@third-ui/fuma/mdx/toc';
 
 interface FumaPageParams {

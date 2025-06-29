@@ -6,7 +6,6 @@ export default defineConfig({
     'src/ui/index.ts',
     'src/components/index.ts',
     'src/components/client/index.ts',
-    'src/lib/index.ts'
   ],
   format: ['cjs', 'esm'],
   dts: true,

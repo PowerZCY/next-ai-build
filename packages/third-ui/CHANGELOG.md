@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 4.0.1
+
+### Patch Changes
+
+- - fix: export components should be CAREFUL!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@4.1.1
+
 ## 4.0.0
 
 ### Major Changes

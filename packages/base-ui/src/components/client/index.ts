@@ -13,3 +13,7 @@ export * from '../language-switcher';
 // Script Components (All Client-side)
 export * from '../script/google-analytics-script';
 export * from '../script/microsoft-clarity-script'; 
+
+// Icon Configuration  
+export { IconConfigProvider, type IconConfig } from '../icon-context';
+export { SiteIcon } from '../site-icon';
