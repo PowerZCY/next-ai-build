@@ -6,7 +6,7 @@ import Script from "next/script";
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID!;
 
 export function GoogleAnalyticsScript() {
-  // 只在生产环境中加载 Microsoft Clarity
+  // Only load in production environment
   if (process.env.NODE_ENV !== 'production') {
     return null
   }
@@ -47,7 +47,7 @@ export function useGoogleAnalytics() {
   };
 }
 
-// 为 window 添加 gtag 类型定义
+// Add gtag type definition to window
 declare global {
   interface Window {
     dataLayer: any[];

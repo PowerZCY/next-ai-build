@@ -4,8 +4,8 @@ import Script from 'next/script'
 
 const microsoftClarityId = process.env.NEXT_PUBLIC_MICROSOFT_CLARITY_ID!;
 
-export default function MicrosoftClarityScript() {
-  // 只在生产环境中加载 Microsoft Clarity
+export function MicrosoftClarityScript() {
+  // Only load in production environment
   if (process.env.NODE_ENV !== 'production') {
     return null
   }
