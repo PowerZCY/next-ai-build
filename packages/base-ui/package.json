@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/base-ui",
-  "version": "3.1.0",
+  "version": "3.2.1",
   "description": "Base UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -72,7 +72,7 @@
     "@radix-ui/react-toggle": "^1.1.8",
     "@radix-ui/react-toggle-group": "^1.1.9",
     "@radix-ui/react-tooltip": "^1.2.6",
-    "@windrun-huaiin/lib": "workspace:*",
+    "@windrun-huaiin/lib": "3.2.1",
     "class-variance-authority": "^0.7.1",
     "cmdk": "1.0.4",
     "embla-carousel-react": "8.5.1",
