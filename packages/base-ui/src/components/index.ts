@@ -1,10 +1,17 @@
-// Base Components
-export * from './404-page';
-export * from './global-icon';
-export * from './go-to-top';
-export * from './language-detector';
-export * from './language-switcher';
+// Server Components and Universal Components
+// ⚠️ IMPORTANT: To avoid client/server component mixing issues in Next.js bundling,
+// client components with 'use client' directive are exported separately.
+//
+// Usage:
+// - Server components: import from '@base-ui/components' (this file)
+// - Client components: import from '@base-ui/components/client'
+//
+// Example:
+// import { globalLucideIcons, getGlobalIcon } from '@base-ui/components'
+// import { NotFoundPage, GoToTop } from '@base-ui/components/client'
 
-// Script Components
-export * from './script/google-analytics-script';
-export * from './script/microsoft-clarity-script'; 
+// Main server/universal components
+export * from './global-icon';
+
+// For client components, please use:
+// import { ... } from '@base-ui/components/client' 

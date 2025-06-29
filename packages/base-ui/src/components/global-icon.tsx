@@ -147,7 +147,7 @@ export function getGlobalIcon(
   
   const Icon = globalLucideIcons[iconKey as keyof typeof globalLucideIcons];
   if (!Icon) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
       // only show in dev|test
       // eslint-disable-next-line no-console
       console.warn(

@@ -5,6 +5,7 @@ export default defineConfig({
     'src/index.ts',
     'src/ui/index.ts',
     'src/components/index.ts',
+    'src/components/client/index.ts',
     'src/lib/index.ts'
   ],
   format: ['cjs', 'esm'],
@@ -35,9 +36,7 @@ export default defineConfig({
     'next-intl',
     'next-themes'
   ],
-  banner: {
-    js: '"use client";'
-  },
+
   esbuildOptions: (options) => {
     options.alias = {
       '@': './src'
