@@ -1,5 +1,17 @@
 # @windrun-huaiin/ddaas-website
 
+## 3.1.1
+
+### Patch Changes
+
+- - Align the version of some packages to 3.2.2
+  - Try to release new version to npm repo
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.2.4
+  - @windrun-huaiin/third-ui@3.2.2
+  - @windrun-huaiin/lib@3.2.2
+  - @windrun-huaiin/shared-assets@3.2.2
+
 ## 3.1.0
 
 ### Minor Changes

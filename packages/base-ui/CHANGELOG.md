@@ -1,5 +1,14 @@
 # @windrun-huaiin/base-ui
 
+## 3.2.4
+
+### Patch Changes
+
+- - Align the version of some packages to 3.2.2
+  - Try to release new version to npm repo
+- Updated dependencies
+  - @windrun-huaiin/lib@3.2.2
+
 ## 3.1.0
 
 ### Minor Changes
