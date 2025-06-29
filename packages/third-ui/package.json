@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/third-ui",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "Third-party integrated UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

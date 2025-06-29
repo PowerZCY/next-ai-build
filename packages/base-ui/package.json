@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/base-ui",
-  "version": "3.2.4",
+  "version": "3.3.0",
   "description": "Base UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -18,7 +18,7 @@
     },
     "./components": {
       "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.mjs", 
+      "import": "./dist/components/index.mjs",
       "require": "./dist/components/index.js"
     },
     "./components/client": {

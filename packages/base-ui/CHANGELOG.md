@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 3.3.0
+
+### Minor Changes
+
+- Server components and client components separation
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@3.2.2
+
 ## 3.2.4
 
 ### Patch Changes
