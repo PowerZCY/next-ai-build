@@ -46,7 +46,6 @@ catalog:
   tailwindcss-animate: ^1.0.7
   autoprefixer: ^10.4.21
   postcss: ^8.5.6
-  react-hook-form: ^7.56.3
   '@hookform/resolvers': ^3.10.0
   zod: ^3.24.4
   fumadocs-core: 15.3.3

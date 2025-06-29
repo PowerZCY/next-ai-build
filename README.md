@@ -48,7 +48,6 @@ windrun-huaiin/
 - **身份认证**: Clerk 6.19.4 (用户管理和认证)
 - **国际化**: next-intl 3.26.5
 - **主题**: next-themes 0.4.6
-- **表单**: react-hook-form 7.56.3 + zod 3.24.4
 - **数学公式**: KaTeX 0.16.22
 - **图表**: Mermaid 11.6.0
 - **代码高亮**: Shiki 3.4.2
