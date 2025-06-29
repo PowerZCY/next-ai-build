@@ -25,7 +25,7 @@ interface LanguageSwitcherProps {
   localeLabels: Record<string, string>;
 }
 
-export default function LanguageSwitcher({ locales, localeLabels }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ locales, localeLabels }: LanguageSwitcherProps) {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()

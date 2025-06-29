@@ -35,7 +35,7 @@ interface LanguagePreference {
   timestamp: number;
 }
 
-export default function LanguageDetector({ i18nConfig }: LanguageDetectorProps) {
+export function LanguageDetector({ i18nConfig }: LanguageDetectorProps) {
   const [show, setShow] = useState(false)
   const [detectedLocale, setDetectedLocale] = useState<Locale | null>(null)
   const currentLocale = useLocale()
