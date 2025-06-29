@@ -57,7 +57,7 @@
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
     "@clerk/types": "^4.59.0",
-    "@windrun-huaiin/base-ui": "3.2.1",
+    "@windrun-huaiin/base-ui": "workspace:^",
     "fumadocs-core": "15.3.3",
     "fumadocs-mdx": "11.6.3",
     "fumadocs-typescript": "4.0.4",
