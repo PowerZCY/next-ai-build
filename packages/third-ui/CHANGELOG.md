@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 3.3.1
+
+### Patch Changes
+
+- - Clean packages and republish
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.5.1
+
 ## 3.3.0
 
 ### Minor Changes

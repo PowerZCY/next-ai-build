@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 3.5.1
+
+### Patch Changes
+
+- - Clean packages and republish
+- Updated dependencies
+  - @windrun-huaiin/lib@3.3.1
+
 ## 3.5.0
 
 ### Minor Changes

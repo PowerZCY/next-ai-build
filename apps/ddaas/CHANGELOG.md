@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 3.2.1
+
+### Patch Changes
+
+- - Clean packages and republish
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.5.1
+  - @windrun-huaiin/third-ui@3.3.1
+  - @windrun-huaiin/lib@3.3.1
+  - @windrun-huaiin/shared-assets@3.2.3
+
 ## 3.2.0
 
 ### Minor Changes

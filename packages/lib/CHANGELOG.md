@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 3.3.1
+
+### Patch Changes
+
+- - Clean packages and republish
+
 ## 3.3.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/lib",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Common utilities and configuration",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

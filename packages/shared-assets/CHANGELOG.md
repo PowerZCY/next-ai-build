@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 3.2.3
+
+### Patch Changes
+
+- - Clean packages and republish
+
 ## 3.2.2
 
 ### Patch Changes
