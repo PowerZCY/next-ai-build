@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Montserrat } from "next/font/google";
 import './globals.css';
+import React from 'react';
 
 export const montserrat = Montserrat({
   weight: ['400'],
@@ -63,7 +64,8 @@ export default async function RootLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }) {
-    const { locale } = await paramsPromise;  // 使用新名称
+  console.log('RootLayout-React version:', React.version);
+  const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
   return (

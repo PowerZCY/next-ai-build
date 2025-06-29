@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 4.0.0
+
+### Major Changes
+
+- - React version shoud be fixed at 「19.2.0-canary-3fbfb9ba-20250409」, WTF!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@4.0.0
+
 ## 3.5.0
 
 ### Minor Changes

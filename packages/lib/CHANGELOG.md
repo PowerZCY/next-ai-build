@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 4.0.0
+
+### Major Changes
+
+- - React version shoud be fixed at 「19.2.0-canary-3fbfb9ba-20250409」, WTF!
+
 ## 3.4.0
 
 ### Minor Changes

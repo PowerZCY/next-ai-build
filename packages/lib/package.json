@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/lib",
-  "version": "3.4.0",
+  "version": "4.0.0",
   "description": "Common utilities and configuration",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -66,8 +66,8 @@
   "peerDependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.3.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "19.2.0-canary-3fbfb9ba-20250409",
+    "react-dom": "19.2.0-canary-3fbfb9ba-20250409"
   },
   "keywords": [
     "utilities",

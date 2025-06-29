@@ -2,6 +2,7 @@ import { clerkMiddleware, ClerkMiddlewareAuth, createRouteMatcher } from "@clerk
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { appConfig } from "@/lib/appConfig";
+import React from 'react';
 
 const intlMiddleware = createMiddleware({
   // 多语言配置
@@ -17,6 +18,7 @@ const intlMiddleware = createMiddleware({
 const allowPassWhitelist = createRouteMatcher(['/(.*)'])
 
 export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
+  console.log('Middleware-React version:', React.version);
   if (!allowPassWhitelist(req)) {
       const { userId, redirectToSignIn } = await auth()
       if (!userId) {
