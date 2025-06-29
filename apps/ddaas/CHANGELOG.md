@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 3.2.0
+
+### Minor Changes
+
+- refactor(clean): DELETE unuse!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.4.0
+  - @windrun-huaiin/third-ui@3.3.0
+  - @windrun-huaiin/lib@3.2.2
+  - @windrun-huaiin/shared-assets@3.2.2
+
 ## 3.1.2
 
 ### Patch Changes
