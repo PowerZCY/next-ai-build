@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@types/node':
+      specifier: ^22.15.33
+      version: 22.15.34
     postcss:
       specifier: ^8.5.6
       version: 8.5.6
@@ -262,7 +265,7 @@ importers:
         specifier: ^0.511.0
         version: 0.511.0(react@19.1.0)
       next:
-        specifier: ^15.3.2
+        specifier: 15.3.2
         version: 15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-intl:
         specifier: ^3.26.5
@@ -271,10 +274,10 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
-        specifier: ^19.1.0
+        specifier: 19.1.0
         version: 19.1.0
       react-dom:
-        specifier: ^19.1.0
+        specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       tailwind-merge:
         specifier: ^3.0.0
@@ -283,6 +286,9 @@ importers:
         specifier: ^4.1.7
         version: 4.1.11
     devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.15.34
       '@types/react':
         specifier: 19.1.2
         version: 19.1.2
@@ -418,7 +424,7 @@ importers:
         specifier: ^11.6.0
         version: 11.7.0
       next:
-        specifier: ^15.3.2
+        specifier: 15.3.2
         version: 15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-intl:
         specifier: ^3.26.5
@@ -430,10 +436,10 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       react:
-        specifier: ^19.1.0
+        specifier: 19.1.0
         version: 19.1.0
       react-dom:
-        specifier: ^19.1.0
+        specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       react-medium-image-zoom:
         specifier: ^5.2.14

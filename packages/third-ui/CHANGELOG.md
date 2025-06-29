@@ -1,5 +1,17 @@
 # @windrun-huaiin/third-ui
 
+## 3.5.0
+
+### Minor Changes
+
+- - React version shoud be fixed at 19.1.0
+  - Next version shoud be fixed at 15.3.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@3.7.0
+
 ## 3.4.0
 
 ### Minor Changes
