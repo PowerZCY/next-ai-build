@@ -1,3 +1,5 @@
+'use client';
+
 // Main application components
 export * from './gallery';
 export * from './usage';

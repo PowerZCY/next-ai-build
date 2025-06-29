@@ -9,7 +9,7 @@
 
 import { baseOptions } from '@/app/[locale]/layout.config';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@third-ui/fuma';
+import { FumaBannerSuit } from '@third-ui/fuma/mdx';
 import { ReactNode } from 'react';
 import { clerkPageBanner } from '@/lib/appConfig';
 import { ClerkProviderClient } from '@third-ui/clerk';

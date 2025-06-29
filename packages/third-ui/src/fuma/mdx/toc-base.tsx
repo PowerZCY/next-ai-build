@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';

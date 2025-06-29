@@ -1,3 +1,4 @@
+'use client';
 // Clerk related components
 export * from './clerk-organization';
 export * from './clerk-provider-client';

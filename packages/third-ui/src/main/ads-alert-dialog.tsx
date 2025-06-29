@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from "react";
 import Image from "next/image";
 import { globalLucideIcons as icons } from "@base-ui/components/global-icon";

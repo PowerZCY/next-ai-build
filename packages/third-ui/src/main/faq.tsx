@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState } from "react";
 import { useTranslations } from 'next-intl';
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';

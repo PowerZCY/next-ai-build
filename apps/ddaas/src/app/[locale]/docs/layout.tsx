@@ -2,7 +2,7 @@ import { baseOptions } from '@/app/[locale]/layout.config';
 import { docsSource } from '@/lib/source';
 import type { ReactNode } from 'react';
 // https://fumadocs.dev/docs/ui/layouts/notebook
-import { FumaGithubInfo } from '@third-ui/fuma';
+import { FumaGithubInfo } from '@third-ui/fuma/mdx';
 import { DocsLayout, type DocsLayoutProps } from 'fumadocs-ui/layouts/docs';
 import { appConfig } from '@/lib/appConfig';
 

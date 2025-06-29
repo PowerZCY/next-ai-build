@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { NotFoundIcon } from "@base-ui/components/global-icon";
 import { SiteIcon } from "@base-ui/lib/site-icon";

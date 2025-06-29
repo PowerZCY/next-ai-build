@@ -1,4 +1,2 @@
-// Fumadocs related components
-export * from './fuma-banner-suit';
+// Fumadocs related components, this is a server component!
 export * from './fuma-page-genarator';
-export * from './fuma-github-info';

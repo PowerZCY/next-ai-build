@@ -36,9 +36,6 @@ export default defineConfig({
     'next-intl',
     'next-themes'
   ],
-  banner: {
-    js: '"use client";'
-  },
   esbuildOptions: (options) => {
     options.alias = {
       '@': './src'

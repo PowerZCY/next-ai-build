@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import NProgress from 'nprogress'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'

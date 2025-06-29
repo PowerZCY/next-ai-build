@@ -1,3 +1,5 @@
+'use client';
+
 import { OrganizationSwitcher } from '@clerk/nextjs';
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon'; 
 interface ClerkOrganizationProps {
