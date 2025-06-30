@@ -2,12 +2,11 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: [
-    'src/index.ts',
     'src/clerk/index.ts',
     'src/main/index.ts',
-    'src/fuma/index.ts',
+    'src/fuma/server.ts',
     'src/fuma/mdx/index.ts',
-    'src/lib/index.ts'
+    'src/lib/server.ts'
   ],
   format: ['cjs', 'esm'],
   dts: true,

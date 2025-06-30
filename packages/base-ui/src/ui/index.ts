@@ -1,4 +1,4 @@
-// UI Components - Only actively used components
+"use client";
 export * from './alert-dialog';
 export { Button, buttonVariants, type ButtonProps } from './button';
 export * from './dropdown-menu';

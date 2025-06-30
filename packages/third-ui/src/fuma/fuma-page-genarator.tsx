@@ -1,5 +1,5 @@
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
-import { NotFoundPage } from '@base-ui/components/client';
+import { NotFoundPage } from '@base-ui/components';
 import { TocFooter } from '@third-ui/fuma/mdx/toc';
 import { ReactNode } from 'react';
 

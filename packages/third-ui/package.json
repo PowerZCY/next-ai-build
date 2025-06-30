@@ -6,11 +6,6 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
     "./clerk": {
       "types": "./dist/clerk/index.d.ts",
       "import": "./dist/clerk/index.mjs",
@@ -21,20 +16,20 @@
       "import": "./dist/main/index.mjs",
       "require": "./dist/main/index.js"
     },
-    "./fuma": {
-      "types": "./dist/fuma/index.d.ts",
-      "import": "./dist/fuma/index.mjs",
-      "require": "./dist/fuma/index.js"
+    "./fuma/server": {
+      "types": "./dist/fuma/server.d.ts",
+      "import": "./dist/fuma/server.mjs",
+      "require": "./dist/fuma/server.js"
     },
     "./fuma/mdx": {
       "types": "./dist/fuma/mdx/index.d.ts",
       "import": "./dist/fuma/mdx/index.mjs",
       "require": "./dist/fuma/mdx/index.js"
     },
-    "./lib": {
-      "types": "./dist/lib/index.d.ts",
-      "import": "./dist/lib/index.mjs",
-      "require": "./dist/lib/index.js"
+    "./lib/server": {
+      "types": "./dist/lib/server.d.ts",
+      "import": "./dist/lib/server.mjs",
+      "require": "./dist/lib/server.js"
     },
     "./styles/third-ui.css": "./dist/third-ui.css",
     "./src/*": "./src/*"
