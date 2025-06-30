@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 5.0.0
+
+### Major Changes
+
+-
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@5.0.0
+
 ## 4.1.1
 
 ### Patch Changes

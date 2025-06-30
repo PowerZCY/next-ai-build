@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.0.0
+
+### Major Changes
+
+-
+
 ## 4.0.0
 
 ### Major Changes
