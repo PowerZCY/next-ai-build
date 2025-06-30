@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.1.0
+
+### Minor Changes
+
+- - Fix tsup config, pack dist should be CAREFUL!
+
 ## 4.0.0
 
 ### Major Changes

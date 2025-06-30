@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.1.0
+
+### Minor Changes
+
+- - Fix tsup config, pack dist should be CAREFUL!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.0
+  - @windrun-huaiin/third-ui@5.1.0
+  - @windrun-huaiin/lib@5.1.0
+  - @windrun-huaiin/shared-assets@4.1.0
+
 ## 5.0.0
 
 ### Major Changes

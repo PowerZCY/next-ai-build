@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.1.0
+
+### Minor Changes
+
+- - Fix tsup config, pack dist should be CAREFUL!
+
 ## 5.0.0
 
 ### Major Changes
