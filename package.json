@@ -16,6 +16,7 @@
     "easy-changeset": "dev-scripts easy-changeset",
     "dj": "pnpm run easy-changeset && pnpm changeset status",
     "djv": "pnpm changeset version",
+    "djvp": "pnpm changeset publish",
     "copy-shared-assets": "turbo copy-shared-assets",
     "ddaas:dev": "turbo dev --filter=@windrun-huaiin/ddaas-website",
     "ddaas:build": "turbo build --filter=@windrun-huaiin/ddaas-website",
