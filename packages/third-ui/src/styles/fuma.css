@@ -1,4 +1,4 @@
-/* 有 Banner 时 */
+/* Has Banner */
 .has-banner .sticky.top-0.z-40 {
   position: fixed !important;
   top: 0 !important;
@@ -15,7 +15,7 @@
   top: 2.5rem !important;
 }
 
-/* 无 Banner 时 */
+/* No Banner */
 .no-banner .sticky.top-0.z-40 {
   position: fixed !important;
   top: 0 !important;
@@ -32,30 +32,31 @@
   top: 0rem !important;
 }
 
+/* Banner */
 .has-banner main,
 .has-banner .main-content {
-  padding-top: 3rem; /* Banner高度 */
+  padding-top: 3rem; 
 }
 .no-banner main,
 .no-banner .main-content {
-  padding-top: 0.5rem; /* Banner高度 */
+  padding-top: 0.5rem; 
 }
 
-/* 自定义 Fuma 步骤组件背景色：暗色主题为白，亮色主题为黑 */
+/* Custome Fuma Steps */
 .fd-step::before {
   @apply size-5 -start-2.5 rounded-full;
-  background-color: #000; /* 默认亮色主题为黑 */
+  background-color: #000; 
   color: #fff;
-  font-size: 0.75rem;      /* 更小的字体 */
+  font-size: 0.75rem; 
   line-height: 1rem;
   margin-top: 0.4rem !important;
 }
 .dark .fd-step::before {
-  background-color: #fff !important; /* 暗色主题为白 */
+  background-color: #fff !important; 
   color: #000 !important;
 }
 
-/* fuma image-zoom样式 COPY */
+/* fuma image-zoom COPY */
 
 [data-rmiz] {
   display: block;
@@ -130,3 +131,9 @@
     transition-duration: 0.01ms !important;
   }
 } 
+
+/* i18n language width */
+div[role="dialog"].rounded-lg.border.bg-fd-popover {
+  min-width: 150px !important;
+  max-width: 150px !important;
+}

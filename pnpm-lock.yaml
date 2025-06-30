@@ -420,6 +420,9 @@ importers:
       fumadocs-ui:
         specifier: 15.3.3
         version: 15.3.3(patch_hash=013d08bf41f368bb4515048e9fa9389b885e432f2a3cba661b35d245d0748a66)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(next@15.3.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tailwindcss@4.1.11)
+      katex:
+        specifier: ^0.16.22
+        version: 0.16.22
       mermaid:
         specifier: ^11.6.0
         version: 11.7.0

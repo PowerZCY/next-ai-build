@@ -58,6 +58,7 @@
     "fumadocs-mdx": "11.6.3",
     "fumadocs-typescript": "4.0.4",
     "fumadocs-ui": "15.3.3",
+    "katex": "^0.16.22",
     "mermaid": "^11.6.0",
     "react-medium-image-zoom": "^5.2.14",
     "zod": "^3.22.4"

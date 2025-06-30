@@ -42,11 +42,11 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-  },
+  // experimental: {
+  //   webpackBuildWorker: true,
+  //   parallelServerBuildTraces: true,
+  //   parallelServerCompiles: true,
+  // },
 
   // Ensuring outputFileTracingIncludes is a top-level property
   outputFileTracingIncludes: {

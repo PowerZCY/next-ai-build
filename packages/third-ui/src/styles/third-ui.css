@@ -1,6 +1,28 @@
+/* 
+ * Fuma Docs UI
+ * theme corlor, see https://fumadocs.dev/docs/ui/theme
+ * neutral
+ * black
+ * vitepress
+ * dusk
+ * catppuccin
+ * ocean
+ * purple
+ */
+ @import 'fumadocs-ui/css/vitepress.css';
+ @import 'fumadocs-ui/css/preset.css';
+ @import 'katex/dist/katex.css';
+ /* Special Magic */
+ @import './fuma.css';
+ 
+ @import 'nprogress/nprogress.css';
+
+/* Base UI */
 @import '@windrun-huaiin/base-ui/styles/base-ui.css';
-@import './fuma.css';
+
 @import './cta.css';
+
+/* Third UI */
 
 /* Loading Animation Keyframes */
 @keyframes loading-dot-pulse {
