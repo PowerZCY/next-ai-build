@@ -2,7 +2,7 @@ import { getMDXComponents } from '@/components/mdx-components';
 import { appConfig } from '@/lib/appConfig';
 import { SiteIcon } from '@/lib/site-config';
 import { legalSource } from '@/lib/source';
-import { createFumaPage } from '@third-ui/fuma';
+import { createFumaPage } from '@third-ui/fuma/server';
 
 const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   mdxContentSource: legalSource,

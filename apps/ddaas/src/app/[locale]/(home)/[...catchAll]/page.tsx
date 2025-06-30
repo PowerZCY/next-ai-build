@@ -7,7 +7,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { NotFoundPage } from '@base-ui/components/client';
+import { NotFoundPage } from '@base-ui/components';
 import { SiteIcon } from '@/lib/site-config';
 
 export default async function NotFound() {

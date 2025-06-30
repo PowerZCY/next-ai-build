@@ -2,27 +2,31 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: [
-    'src/index.ts',
     'src/ui/index.ts',
     'src/components/index.ts',
-    'src/components/client/index.ts',
+    'src/components/server.ts',
   ],
   format: ['cjs', 'esm'],
+  outExtension: ({ format }) => {
+    return {
+      js: format === 'esm' ? '.mjs' : '.js'
+    };
+  },
   dts: true,
   splitting: false,
   sourcemap: true,
   clean: true,
-  // Force using rollup instead of esbuild
-  bundle: true,
+  publicDir: './src/styles',
   platform: 'neutral',
-  // Explicit external configuration
   external: [
+    // React/Next
     /^react$/,
     /^react\//,
     /^react-dom$/,
     /^react-dom\//,
     /^next$/,
     /^next\//,
+    // peer dependencies
     'next-intl',
     'next-themes',
     'clsx',
@@ -31,7 +35,9 @@ export default defineConfig({
     // Node global variables
     'process'
   ],
-  // Disable code splitting, ensure external works correctly
-  treeshake: true,
-  minify: false
+  esbuildOptions: (options) => {
+    options.alias = {
+      '@': './src'
+    };
+  }
 }); 

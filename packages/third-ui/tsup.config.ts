@@ -9,6 +9,11 @@ export default defineConfig({
     'src/lib/server.ts'
   ],
   format: ['cjs', 'esm'],
+  outExtension: ({ format }) => {
+    return {
+      js: format === 'esm' ? '.mjs' : '.js'
+    };
+  },
   dts: true,
   splitting: false,
   sourcemap: true,

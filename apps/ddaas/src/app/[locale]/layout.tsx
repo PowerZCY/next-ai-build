@@ -1,5 +1,5 @@
 import { appConfig, generatedLocales } from "@/lib/appConfig";
-import { fumaI18nCn } from '@third-ui/lib';
+import { fumaI18nCn } from '@third-ui/lib/server';
 import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { RootProvider } from "fumadocs-ui/provider";
 import { NextIntlClientProvider } from 'next-intl';
