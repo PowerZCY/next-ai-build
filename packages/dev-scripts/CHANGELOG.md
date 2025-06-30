@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.0.1
+
+### Patch Changes
+
+- - README update
+
 ## 6.0.0
 
 ### Major Changes

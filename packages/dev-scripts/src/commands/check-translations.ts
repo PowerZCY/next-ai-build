@@ -14,6 +14,9 @@ interface TranslationReport {
 
 export async function checkTranslations(config: DevScriptsConfig, cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'): Promise<number> {
   const logger = new Logger(config)
+  logger.warn('==============================')
+  logger.warn(`‼️  Current working directory: ⭕  ${cwd}  ⭕`)
+  logger.warn('==============================')
   
   try {
     logger.log('start checking translations...')

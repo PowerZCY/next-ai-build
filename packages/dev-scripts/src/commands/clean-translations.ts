@@ -1,14 +1,13 @@
-import { writeFileSync } from 'fs'
-import { join } from 'path'
 import { DevScriptsConfig } from '@dev-scripts/config/schema'
+import { getTranslationFilePath, loadTranslations, scanFiles } from '@dev-scripts/utils/file-scanner'
 import { Logger } from '@dev-scripts/utils/logger'
-import { scanFiles, loadTranslations, getTranslationFilePath } from '@dev-scripts/utils/file-scanner'
-import { 
-  extractTranslationsInfo, 
-  getAllKeys, 
-  removeKeyFromTranslations,
-  cleanEmptyObjects
+import {
+  cleanEmptyObjects,
+  extractTranslationsInfo,
+  getAllKeys,
+  removeKeyFromTranslations
 } from '@dev-scripts/utils/translation-parser'
+import { writeFileSync } from 'fs'
 
 interface CleanReport {
   [key: string]: string[]
@@ -21,6 +20,10 @@ export async function cleanTranslations(
 ): Promise<number> {
   const logger = new Logger(config)
   const logFileName = shouldRemove ? 'remove.log' : 'clean.log'
+  
+  logger.warn('==============================')
+  logger.warn(`‼️  Current working directory: ⭕  ${cwd}  ⭕`)
+  logger.warn('==============================')
   
   try {
     logger.log('start checking unused translation keys...')

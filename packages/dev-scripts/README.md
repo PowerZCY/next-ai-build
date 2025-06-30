@@ -185,6 +185,51 @@ Options:
 - 生成月度统计页面
 - 自动排序和分类
 
+### deep-clean
+
+一键清理 node_modules、.next、dist、.turbo、pnpm-lock.yaml 等依赖和缓存目录，自动适配 monorepo 或单工程结构。
+
+```bash
+dev-scripts deep-clean [options]
+
+Options:
+  --yes           实际删除匹配到的目录（默认只预览）
+  -v, --verbose   显示详细日志
+  --config <path> 指定配置文件路径
+  -h, --help      显示帮助信息
+```
+
+**无需任何配置，脚本会自动识别工程类型：**
+- 如果当前目录下有 `pnpm-workspace.yaml`，会按 monorepo 规则清理：
+  - 根 node_modules
+  - packages/*/node_modules
+  - apps/*/node_modules
+  - .next、dist、.turbo 及其子包下的同名目录
+  - pnpm-lock.yaml
+- 如果没有 `pnpm-workspace.yaml`，只清理：
+  - node_modules
+  - .next
+  - pnpm-lock.yaml
+
+**输出示例：**
+```
+==============================
+当前工作目录: /your/project/path
+==============================
+【Root directory dependencies】
+🗑️  [预览] /your/project/path/node_modules
+...
+如需实际删除，请加 --yes 参数。
+```
+
+实际删除时：
+```
+✅ 已删除: /your/project/path/node_modules
+✅ 已删除: /your/project/path/pnpm-lock.yaml
+...
+✅ 共清理 3 个目录或文件。
+```
+
 ## 支持的翻译模式
 
 脚本支持多种翻译使用模式：

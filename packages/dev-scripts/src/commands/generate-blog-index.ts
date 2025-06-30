@@ -113,7 +113,9 @@ export async function generateBlogIndex(
   cwd: string = typeof process !== 'undefined' ? process.cwd() : '.'
 ): Promise<number> {
   const logger = new Logger(config)
-  
+  logger.warn('==============================')
+  logger.warn(`‼️  Current working directory: ⭕  ${cwd}  ⭕`)
+  logger.warn('==============================')
   try {
     if (!config.blog) {
       logger.error('Blog configuration is missing. Please configure blog settings.')
