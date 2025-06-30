@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.1.2
+
+### Patch Changes
+
+- - README update
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.2
+  - @windrun-huaiin/third-ui@5.1.2
+  - @windrun-huaiin/lib@5.1.2
+  - @windrun-huaiin/shared-assets@4.1.2
+
 ## 5.1.1
 
 ### Patch Changes

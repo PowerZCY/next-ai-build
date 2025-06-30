@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.1.2
+
+### Patch Changes
+
+- - README update
+
 ## 4.1.1
 
 ### Patch Changes

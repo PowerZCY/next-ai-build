@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.1.2
+
+### Patch Changes
+
+- - README update
+
 ## 5.1.1
 
 ### Patch Changes
