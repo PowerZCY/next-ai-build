@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 5.0.0
+
+### Major Changes
+
+- - Server components and Client components are separated!
+  - The key point is IMPORT, once you import a client component, then you're client too!
+
 ## 4.1.0
 
 ### Minor Changes

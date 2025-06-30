@@ -1,5 +1,17 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.1.1
+
+### Patch Changes
+
+- - Server components and Client components are separated!
+  - The key point is IMPORT, once you import a client component, then you're client too!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.1
+  - @windrun-huaiin/third-ui@5.1.1
+  - @windrun-huaiin/lib@5.1.1
+  - @windrun-huaiin/shared-assets@4.1.1
+
 ## 5.1.0
 
 ### Minor Changes

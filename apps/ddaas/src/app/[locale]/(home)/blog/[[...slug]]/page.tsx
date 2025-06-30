@@ -1,8 +1,9 @@
 import { getMDXComponents } from '@/components/mdx-components';
 import { appConfig } from '@/lib/appConfig';
-import { SiteIcon } from '@/lib/site-config';
+import { NotFoundPage } from '@base-ui/components';
 import { blogSource } from '@/lib/source';
 import { createFumaPage } from '@third-ui/fuma/server';
+import { SiteIcon } from '@/lib/site-config';
 
 const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   mdxContentSource: blogSource,
@@ -11,6 +12,7 @@ const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   githubBaseUrl: appConfig.githubBaseUrl,
   showCopy: true,
   siteIcon: <SiteIcon />,
+  FallbackPage: NotFoundPage,
 });
 
 export default Page;

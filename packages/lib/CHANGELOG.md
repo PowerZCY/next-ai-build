@@ -1,5 +1,12 @@
 # @windrun-huaiin/lib
 
+## 5.1.1
+
+### Patch Changes
+
+- - Server components and Client components are separated!
+  - The key point is IMPORT, once you import a client component, then you're client too!
+
 ## 5.1.0
 
 ### Minor Changes

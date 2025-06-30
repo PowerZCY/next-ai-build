@@ -1,5 +1,12 @@
 # @windrun-huaiin/shared-assets
 
+## 4.1.1
+
+### Patch Changes
+
+- - Server components and Client components are separated!
+  - The key point is IMPORT, once you import a client component, then you're client too!
+
 ## 4.1.0
 
 ### Minor Changes

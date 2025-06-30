@@ -1,6 +1,5 @@
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
-import { NotFoundPage } from '@base-ui/components';
 import { TocFooter } from '@third-ui/fuma/mdx/toc';
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
 import { ReactNode } from 'react';
 
 interface FumaPageParams {
@@ -28,6 +27,10 @@ interface FumaPageParams {
    * The site icon component to use in NotFoundPage
    */
   siteIcon: ReactNode;
+  /* 
+   * The fallback page component to use when the page is not found
+   */
+  FallbackPage: React.ComponentType<{ siteIcon: ReactNode }>; 
 }
 
 export function createFumaPage({
@@ -37,12 +40,13 @@ export function createFumaPage({
   githubBaseUrl,
   showCopy = true,
   siteIcon,
+  FallbackPage,
 }: FumaPageParams) {
   const Page = async function Page({ params }: { params: Promise<{ locale: string; slug?: string[] }> }) {
     const { slug, locale } = await params;
     const page = mdxContentSource.getPage(slug, locale);
     if (!page) {
-      return <NotFoundPage siteIcon={siteIcon} />;
+      return <FallbackPage siteIcon={siteIcon} />;
     }
 
     const path = githubBaseUrl ? `${mdxSourceDir}/${page.file.path}` : undefined;
