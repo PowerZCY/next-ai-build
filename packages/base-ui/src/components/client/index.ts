@@ -14,6 +14,3 @@ export * from '../language-switcher';
 export * from '../script/google-analytics-script';
 export * from '../script/microsoft-clarity-script'; 
 
-// Icon Configuration  
-export { IconConfigProvider, type IconConfig } from '../icon-context';
-export { SiteIcon } from '../site-icon';

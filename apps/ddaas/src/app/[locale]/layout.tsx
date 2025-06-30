@@ -1,5 +1,4 @@
 import { appConfig, generatedLocales } from "@/lib/appConfig";
-import { IconConfigProvider } from '@base-ui/components/client';
 import { fumaI18nCn } from '@third-ui/lib';
 import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { RootProvider } from "fumadocs-ui/provider";
@@ -73,19 +72,17 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
-          <IconConfigProvider config={{ siteIcon: 'Download' }}>
-            <RootProvider
-              i18n={{
-                locale: locale,
-                // available languages
-                locales: generatedLocales,
-                // translations for UI
-                translations: { fumaI18nCn }[locale],
-              }}
-            >
-              {children}
-            </RootProvider>
-          </IconConfigProvider>
+          <RootProvider
+            i18n={{
+              locale: locale,
+              // available languages
+              locales: generatedLocales,
+              // translations for UI
+              translations: { fumaI18nCn }[locale],
+            }}
+          >
+            {children}
+          </RootProvider>
         </body>
       </NextIntlClientProvider>
     </html>

@@ -8,9 +8,10 @@
  */
 
 import { NotFoundPage } from '@base-ui/components/client';
+import { SiteIcon } from '@/lib/site-config';
 
 export default async function NotFound() {
-  return (
-    <NotFoundPage />
+  return (  
+    <NotFoundPage siteIcon={<SiteIcon />} />
   );
 } 

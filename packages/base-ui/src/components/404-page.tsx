@@ -1,10 +1,13 @@
 'use client';
 
 import { NotFoundIcon } from "@base-ui/components/global-icon";
-import { SiteIcon } from "@base-ui/components/site-icon";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
-export function NotFoundPage() {
+interface NotFoundPageProps {
+  siteIcon: ReactNode;
+}
+
+export function NotFoundPage({ siteIcon }: NotFoundPageProps) {
   const [glitchText, setGlitchText] = useState("404");
 
   // glitch effect
@@ -62,7 +65,7 @@ export function NotFoundPage() {
         {/* decorative elements */}
         <div className="flex justify-center items-center gap-8 pt-8 opacity-60">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <SiteIcon />
+            {siteIcon}
             <span>Woops!</span>
           </div>
           <div className="w-1 h-1 bg-purple-500 rounded-full animate-ping" />

@@ -12,6 +12,8 @@
 
 // Main server/universal components
 export * from './global-icon';
+// Icon Configuration  
+export { createSiteIcon } from './site-icon';
 
 // For client components, please use:
 // import { ... } from '@base-ui/components/client' 

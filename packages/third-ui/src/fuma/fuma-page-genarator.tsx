@@ -1,6 +1,7 @@
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
 import { NotFoundPage } from '@base-ui/components/client';
 import { TocFooter } from '@third-ui/fuma/mdx/toc';
+import { ReactNode } from 'react';
 
 interface FumaPageParams {
   /* 
@@ -23,6 +24,10 @@ interface FumaPageParams {
    * Whether to show the copy button, default is true
    */
   showCopy?: boolean;
+  /* 
+   * The site icon component to use in NotFoundPage
+   */
+  siteIcon: ReactNode;
 }
 
 export function createFumaPage({
@@ -31,12 +36,13 @@ export function createFumaPage({
   mdxSourceDir,
   githubBaseUrl,
   showCopy = true,
+  siteIcon,
 }: FumaPageParams) {
   const Page = async function Page({ params }: { params: Promise<{ locale: string; slug?: string[] }> }) {
     const { slug, locale } = await params;
     const page = mdxContentSource.getPage(slug, locale);
     if (!page) {
-      return <NotFoundPage />;
+      return <NotFoundPage siteIcon={siteIcon} />;
     }
 
     const path = githubBaseUrl ? `${mdxSourceDir}/${page.file.path}` : undefined;
