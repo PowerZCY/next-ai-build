@@ -11,20 +11,27 @@
     "start": "pnpm -r start",
     "lint": "turbo lint",
     "clean": "pnpm -r clean",
-    "deep-clean": "node scripts/deep-clean.js",
+    "deep-clean": "dev-scripts deep-clean",
     "d8": "pnpm run deep-clean",
+    "easy-changeset": "dev-scripts easy-changeset",
+    "dj": "pnpm run easy-changeset && pnpm changeset status",
     "copy-shared-assets": "turbo copy-shared-assets",
     "ddaas:dev": "turbo dev --filter=@windrun-huaiin/ddaas-website",
     "ddaas:build": "turbo build --filter=@windrun-huaiin/ddaas-website",
     "ddaas:build:prod": "turbo build:prod --filter=@windrun-huaiin/ddaas-website",
-    "ddaas:start": "pnpm --filter=@windrun-huaiin/ddaas-website start"
+    "ddaas:start": "pnpm --filter=@windrun-huaiin/ddaas-website start",
+    "base:build": "turbo build --filter=@windrun-huaiin/base-ui build",
+    "third:build": "turbo build --filter=@windrun-huaiin/third-ui build",
+    "cli:build": "turbo build --filter=@windrun-huaiin/dev-scripts build",
+    "source:build": "turbo build --filter=@windrun-huaiin/shared-assets build"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "glob": "^10.4.5",
     "postcss": "catalog:",
     "postcss-cli": "^11.0.1",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.4",
+    "@windrun-huaiin/dev-scripts": "workspace:*"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

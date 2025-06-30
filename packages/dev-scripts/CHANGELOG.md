@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.0.0
+
+### Major Changes
+
+- - Add new command `easy-changeset` to generate changeset template
+  - Add new command `deep-clean` to clean project env cache
+
 ## 5.0.0
 
 ### Major Changes
