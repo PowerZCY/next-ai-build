@@ -4,20 +4,20 @@
 
 ### Patch Changes
 
-- - README update
+- README update
 
 ## 4.1.1
 
 ### Patch Changes
 
-- - Server components and Client components are separated!
+- Server components and Client components are separated!
   - The key point is IMPORT, once you import a client component, then you're client too!
 
 ## 4.1.0
 
 ### Minor Changes
 
-- - Fix tsup config, pack dist should be CAREFUL!
+- Fix tsup config, pack dist should be CAREFUL!
 
 ## 4.0.0
 
@@ -29,26 +29,26 @@
 
 ### Minor Changes
 
-- - Repair bundle build config for reason: DO NOT PACK REACT!
+- Repair bundle build config for reason: DO NOT PACK REACT!
 
 ## 3.2.3
 
 ### Patch Changes
 
-- - Clean packages and republish
+- Clean packages and republish
 
 ## 3.2.2
 
 ### Patch Changes
 
-- - Align the version of some packages to 3.2.2
+- Align the version of some packages to 3.2.2
   - Try to release new version to npm repo
 
 ## 3.1.0
 
 ### Minor Changes
 
-- - Align the version of all packages to 3.1.0
+- Align the version of all packages to 3.1.0
   - Release version 3.1.0
 
 ## 1.4.0

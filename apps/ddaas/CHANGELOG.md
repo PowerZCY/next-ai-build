@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- - README update
+- README update
 - Updated dependencies
   - @windrun-huaiin/base-ui@5.1.2
   - @windrun-huaiin/third-ui@5.1.2
@@ -15,7 +15,7 @@
 
 ### Patch Changes
 
-- - Server components and Client components are separated!
+- Server components and Client components are separated!
   - The key point is IMPORT, once you import a client component, then you're client too!
 - Updated dependencies
   - @windrun-huaiin/base-ui@5.1.1
@@ -27,7 +27,7 @@
 
 ### Minor Changes
 
-- - Fix tsup config, pack dist should be CAREFUL!
+- Fix tsup config, pack dist should be CAREFUL!
 
 ### Patch Changes
 
@@ -55,7 +55,7 @@
 
 ### Patch Changes
 
-- - fix: export components should be CAREFUL!
+- fix: export components should be CAREFUL!
 - Updated dependencies
   - @windrun-huaiin/base-ui@4.1.1
   - @windrun-huaiin/third-ui@4.0.1
@@ -66,7 +66,7 @@
 
 ### Major Changes
 
-- - React version shoud be fixed at 「19.2.0-canary-3fbfb9ba-20250409」, WTF!
+- React version shoud be fixed at 「19.2.0-canary-3fbfb9ba-20250409」, WTF!
 
 ### Patch Changes
 
@@ -80,7 +80,7 @@
 
 ### Minor Changes
 
-- - Repair bundle build config for reason: DO NOT PACK REACT!
+- Repair bundle build config for reason: DO NOT PACK REACT!
 
 ### Patch Changes
 
@@ -94,7 +94,7 @@
 
 ### Patch Changes
 
-- - Clean packages and republish
+- Clean packages and republish
 - Updated dependencies
   - @windrun-huaiin/base-ui@3.5.1
   - @windrun-huaiin/third-ui@3.3.1
@@ -130,7 +130,7 @@
 
 ### Patch Changes
 
-- - Align the version of some packages to 3.2.2
+- Align the version of some packages to 3.2.2
   - Try to release new version to npm repo
 - Updated dependencies
   - @windrun-huaiin/base-ui@3.2.4
@@ -142,7 +142,7 @@
 
 ### Minor Changes
 
-- - Align the version of all packages to 3.1.0
+- Align the version of all packages to 3.1.0
   - Release version 3.1.0
 
 ### Patch Changes
