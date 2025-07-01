@@ -1,5 +1,15 @@
 # @windrun-huaiin/third-ui
 
+## 5.1.4
+
+### Patch Changes
+
+- Fix(third-ui):
+  - CTA component styles, light scan gradient
+  - Adapt theme to dark mode
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.2
+
 ## 5.1.3
 
 ### Patch Changes
