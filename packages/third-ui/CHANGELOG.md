@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.1.5
+
+### Patch Changes
+
+- Fix(third-ui): fix pack roor, republish
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.2
+
 ## 5.1.4
 
 ### Patch Changes
