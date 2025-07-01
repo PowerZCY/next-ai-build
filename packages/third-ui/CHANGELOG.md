@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.1.3
+
+### Patch Changes
+
+- Fix(third-ui): CTA component styles
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.1.2
+
 ## 5.1.2
 
 ### Patch Changes

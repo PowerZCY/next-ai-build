@@ -11,10 +11,10 @@ export function CTA() {
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           {t('title')} <span className="text-purple-400">{t('eyesOn')}</span>?
         </h2>
-        <p className="text-xl max-w-2xl mx-auto mb-8 text-white/80">
+        <p className="text-2xl mx-auto mb-8 text-white/80">
           {t('description1')}
           <br />
-          {t('description2')}
+          <span className="text-purple-400">{t('description2')}</span>
         </p>
         <GradientButton
           title={t('button')}
