@@ -12,7 +12,7 @@ export function SeoContent() {
   const t = useTranslations('seoContent');
 
   return (
-    <section className="container mx-auto px-4 py-20">
+    <section id="seo" className="container mx-auto px-4 py-20">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>
