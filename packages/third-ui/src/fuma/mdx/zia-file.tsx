@@ -37,22 +37,23 @@ export function ZiaFile({
   ...rest
 }: ZiaFileProps): React.ReactElement {
   const validHref = typeof href === 'string' && href.trim() !== '';
-  const Comp: React.ElementType = validHref ? Link : 'div';
   const validAnotion = typeof anotion === 'string' && anotion.trim() !== '';
-  return React.createElement(
-    Comp,
-    {
-      className: cn(itemVariants,  className),
-      ...(validHref ? { href } : {}),
-      ...rest,
-    },
-    <>
+
+  if (validHref) {
+    return (
+      <Link href={href} className={cn(itemVariants, className)}>
+        {icon}
+        <span>{name}</span>
+        {validAnotion && <span className={anotionClass}>{anotion}</span>}
+      </Link>
+    );
+  }
+  return (
+    <div className={cn(itemVariants, className)} {...rest}>
       {icon}
       <span>{name}</span>
-      {validAnotion && (
-        <span className={anotionClass}>{anotion}</span>
-      )}
-    </>
+      {validAnotion && <span className={anotionClass}>{anotion}</span>}
+    </div>
   );
 }
 

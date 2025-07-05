@@ -127,7 +127,14 @@ export async function generateBlogIndex(
     const metaFile = join(blogPath, config.blog.metaFile || 'meta.json')
     const iocFile = join(blogPath, `${config.blog.iocSlug || 'ioc'}.mdx`)
     const iocSlug = config.blog.iocSlug || 'ioc'
-    const blogPrefix = config.blog.prefix || 'blog'
+    let blogPrefix: string;
+    if (config.blog.prefix === undefined || config.blog.prefix === null) {
+      blogPrefix = 'blog';
+    } else if (typeof config.blog.prefix === 'string' && config.blog.prefix.trim() === '') {
+      blogPrefix = '';
+    } else {
+      blogPrefix = String(config.blog.prefix).trim();
+    }
 
     let meta: MetaJson = { pages: [] }
     const metaContent = readJsonFile<MetaJson>(metaFile)
