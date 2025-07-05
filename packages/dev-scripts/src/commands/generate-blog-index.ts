@@ -16,7 +16,6 @@ interface ProcessedArticle {
   title: string
   description?: string
   frontmatterIcon?: string
-  href: string
   date?: string
 }
 
@@ -93,7 +92,6 @@ async function getAllBlogArticles(blogDir: string, cwd: string, logger: Logger):
             title: fm.title,
             description: fm.description,
             frontmatterIcon: fm.icon,
-            href: `./blog/${slug}`, // Reverted to ./blog/slug format as per original requirement
             date: fm.date,
           })
         } catch (readError) {
@@ -216,7 +214,7 @@ export async function generateBlogIndex(
       const finalIconProp = iconProp ? `${iconProp} ` : ''
 
       const href = blogPrefix ? `./${blogPrefix}/${article.slug}` : `./${article.slug}`
-      return `  <ZiaCard ${finalIconProp}href="${href}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`
+      return `  <ZiaCard ${finalIconProp} href="${href}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`
     }
 
     if (featuredArticles.length > 0) {
@@ -275,12 +273,12 @@ async function generateMonthlyBlogSummary(
     const articlesWithDate = articles.filter(a => a.date && a.slug !== iocSlug)
 
     // group by month
-    const monthMap: Record<string, {date: string, title: string}[]> = {}
+    const monthMap: Record<string, {date: string, title: string, slug: string}[]> = {}
     for (const art of articlesWithDate) {
       // only take the first 7 digits yyyy-mm
       const month = art.date!.slice(0, 7)
       if (!monthMap[month]) monthMap[month] = []
-      monthMap[month].push({ date: art.date!, title: art.title })
+      monthMap[month].push({ date: art.date!, title: art.title, slug: art.slug })
     }
 
     // sort months in descending order
@@ -324,7 +322,8 @@ async function generateMonthlyBlogSummary(
         for (const art of monthMap[month]) {
           // File name="YYYY-MM-DD(Title)" format
           const day = art.date.slice(0, 10)
-          mdx += `    <ZiaFile name="${day}(${art.title})" />\n`
+          const href = art.slug ? `./${art.slug}` : '';
+          mdx += `    <ZiaFile name="${day}(${art.title})" href="${href}" />\n`
         }
         mdx += `  </ZiaFolder>\n`
       }
