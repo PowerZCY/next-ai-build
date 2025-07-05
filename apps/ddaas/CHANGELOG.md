@@ -1,5 +1,23 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.2.0
+
+### Minor Changes
+
+- feat(base-ui): add useful icon
+  feat(third-ui): add useful fuma mdx component, siteX for email and site title
+  feat(ddaas): update mdx
+
+  closed #TP00-108
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.2.0
+  - @windrun-huaiin/third-ui@5.2.0
+  - @windrun-huaiin/lib@5.2.0
+  - @windrun-huaiin/shared-assets@4.1.2
+
 ## 5.1.2
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.1.0
+
+### Minor Changes
+
+- feat(base-ui): add useful icon
+  feat(third-ui): add useful fuma mdx component, siteX for email and site title
+  feat(ddaas): update mdx
+
+  closed #TP00-108
+
 ## 6.0.1
 
 ### Patch Changes
