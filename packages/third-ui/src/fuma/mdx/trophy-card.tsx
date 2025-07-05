@@ -1,9 +1,10 @@
 'use client';
 
+import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import React from 'react';
 
 export function TrophyCard({
-  icon,
+  icon = <icons.Star />,
   title,
   children,
 }: {

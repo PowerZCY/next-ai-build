@@ -471,35 +471,35 @@ date: 2025-05-26
 <Tabs groupId="file-system" items={["example", "source", "@keywords"]}>
   <Tab value="example">
     <Files>
-      <Folder name="这是默认展开的文件夹" defaultOpen>
-        <File name="这是普通文件.tsx" />
-        <File icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
-        <Folder name="这是置灰文件夹" defaultOpen className="opacity-50">
-          <File name="继承父目录的置灰文件1.tsx" />
-          <File name="继承父目录的置灰文件2.txt" />
-        </Folder>
-        <Folder name="这是默认关闭的文件夹">
-          <File name="Search.tsx" />
-        </Folder>
-      </Folder>
-      <Folder name="这是空文件夹" className="opacity-50" disabled/>
+      <ZiaFolder name="这是默认展开的文件夹" defaultOpen>
+        <ZiaFile name="这是普通文件.tsx" />
+        <ZiaFile icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
+        <ZiaFolder name="这是置灰文件夹" defaultOpen className="opacity-50">
+          <ZiaFile name="继承父目录的置灰文件1.tsx" />
+          <ZiaFile name="继承父目录的置灰文件2.txt" />
+        </ZiaFolder>
+        <ZiaFolder name="这是默认关闭的文件夹">
+          <ZiaFile name="Search.tsx" />
+        </ZiaFolder>
+      </ZiaFolder>
+      <ZiaFolder name="这是空文件夹" className="opacity-50" disabled/>
     </Files>
   </Tab>
 
   ```mdx title="文件层级示例" tab="source" 
   <Files>
-    <Folder name="这是默认展开的文件夹" defaultOpen>
-      <File name="这是普通文件.tsx" />
-      <File icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
-      <Folder name="这是置灰文件夹" defaultOpen className="opacity-50">
-        <File name="继承父目录的置灰文件1.tsx" />
-        <File name="继承父目录的置灰文件2.txt" />
-      </Folder>
-      <Folder name="这是默认关闭的文件夹">
-        <File name="Search.tsx" />
-      </Folder>
-    </Folder>
-    <Folder name="这是空文件夹" className="opacity-50" disabled/>
+    <ZiaFolder name="这是默认展开的文件夹" defaultOpen>
+      <ZiaFile name="这是普通文件.tsx" />
+      <ZiaFile icon={<FileLock2 />} name="这是锁定文件.txt" className="opacity-50"/>
+      <ZiaFolder name="这是置灰文件夹" defaultOpen className="opacity-50">
+        <ZiaFile name="继承父目录的置灰文件1.tsx" />
+        <ZiaFile name="继承父目录的置灰文件2.txt" />
+      </ZiaFolder>
+      <ZiaFolder name="这是默认关闭的文件夹">
+        <ZiaFile name="Search.tsx" />
+      </ZiaFolder>
+    </ZiaFolder>
+    <ZiaFolder name="这是空文件夹" className="opacity-50" disabled/>
   </Files>
   ```
 

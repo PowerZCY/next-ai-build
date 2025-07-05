@@ -7,6 +7,9 @@ import {
   ImageGrid,
   ZiaCard,
   GradientButton,
+  SiteX,
+  ZiaFile,
+  ZiaFolder,
 } from "@third-ui/fuma/mdx";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import { Callout } from "fumadocs-ui/components/callout";
@@ -95,6 +98,9 @@ const customUiComponents = {
   TrophyCard,
   ZiaCard,
   GradientButton,
+  SiteX,
+  ZiaFile,
+  ZiaFolder,
 };
 
 const typeTableGenerator = createTypeTableGenerator();

@@ -10,3 +10,5 @@ export * from './toc';
 export * from './toc-base';
 export * from './fuma-banner-suit';
 export * from './fuma-github-info';
+export * from './site-x';
+export * from './zia-file';

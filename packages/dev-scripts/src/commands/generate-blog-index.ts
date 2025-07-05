@@ -312,7 +312,7 @@ async function generateMonthlyBlogSummary(
     // generate content
     let mdx = `${frontmatter}\n\n\n## Overview\n<Files>\n`
     if (sortedMonths.length === 0) {
-      mdx += '  <File name="Comming Soon" className="opacity-50" disabled/>\n'
+      mdx += '  <ZiaFile name="Comming Soon" className="opacity-50" disabled/>\n'
     } else {
       for (const month of sortedMonths) {
         // Folder name format YYYY-MM(article count)
@@ -320,13 +320,13 @@ async function generateMonthlyBlogSummary(
         const folderTitle = `${month}(${count})`
         // default open the latest month
         const defaultOpen = month === sortedMonths[0] ? ' defaultOpen' : ''
-        mdx += `  <Folder name="${folderTitle}"${defaultOpen}>\n`
+        mdx += `  <ZiaFolder name="${folderTitle}"${defaultOpen}>\n`
         for (const art of monthMap[month]) {
           // File name="YYYY-MM-DD(Title)" format
           const day = art.date.slice(0, 10)
-          mdx += `    <File name="${day}(${art.title})" />\n`
+          mdx += `    <ZiaFile name="${day}(${art.title})" />\n`
         }
-        mdx += `  </Folder>\n`
+        mdx += `  </ZiaFolder>\n`
       }
     }
     mdx += '</Files>\n\n'

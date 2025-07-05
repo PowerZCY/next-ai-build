@@ -5,17 +5,43 @@ icon: Test
 date: 2025-06-23
 ---
 
-# MDX语法
+## MDX语法
 
 
+<Files>
+  <ZiaFile name="math.mdx" anotion="math" href="./mdx-math" />
+  <ZiaFile name="math.mdx" />
+  <ZiaFolder name="Mermaid" anotion="绘图" defaultOpen>
+    <ZiaFile name="mermaid.mdx" icon={<Pi />} anotion="mermaid" href="/" />
+  </ZiaFolder>
+  <ZiaFolder name="Mermaid"/>
+</Files>
 
 ## Banner头条
 
-<TrophyCard icon={<Fingerprint />} title="DDaaS: 所见即所得">
+<TrophyCard title="DDaaS: 所见即所得">
   这里是段落内容，可以有多行。
 
   支持自定义内容
 </TrophyCard>
+
+<Files>
+  <ZiaFile name="test.mdx" anotion="test" href="/" />
+  <ZiaFolder name="test" anotion="test" defaultOpen>
+    <ZiaFile name="test.mdx" anotion="test" href="/" />
+  </ZiaFolder>
+  <ZiaFolder name="xxxx"  anotion="" className="opacity-50" disabled/>
+  <ZiaFolder name="HHHHHH" anotion="" defaultOpen className="opacity-50" disabled>
+    <ZiaFile name="GGGGG" anotion="" href=""/>
+    <ZiaFile icon={<FileLock2 />} name="JJJJ" anotion="" href="" className="opacity-50"/>
+    
+  </ZiaFolder>
+  
+  
+  
+</Files>
+
+
 
 
 ### 1. ZCY
