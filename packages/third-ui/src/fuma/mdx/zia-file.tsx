@@ -7,6 +7,7 @@ import {
   CollapsibleTrigger,
 } from 'fumadocs-ui/components/ui/collapsible';
 import React from 'react';
+import Link from 'next/link';
 
 const itemVariants = 'flex flex-row items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-fd-accent hover:text-fd-accent-foreground [&_svg]:size-4';
 
@@ -36,13 +37,13 @@ export function ZiaFile({
   ...rest
 }: ZiaFileProps): React.ReactElement {
   const validHref = typeof href === 'string' && href.trim() !== '';
-  const Comp: React.ElementType = validHref ? 'a' : 'div';
+  const Comp: React.ElementType = validHref ? Link : 'div';
   const validAnotion = typeof anotion === 'string' && anotion.trim() !== '';
   return React.createElement(
     Comp,
     {
       className: cn(itemVariants,  className),
-      ...(validHref ? { href, target: '_blank', rel: 'noopener noreferrer' } : {}),
+      ...(validHref ? { href } : {}),
       ...rest,
     },
     <>
