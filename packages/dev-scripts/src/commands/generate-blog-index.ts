@@ -68,6 +68,16 @@ function updateFrontmatterDate(frontmatter: string): string {
   }
 }
 
+function getBlogPrefix(config: DevScriptsConfig): string {
+  if (config.blog?.prefix === undefined || config.blog?.prefix === null) {
+    return 'blog';
+  } else if (typeof config.blog?.prefix === 'string' && config.blog?.prefix.trim() === '') {
+    return '';
+  } else {
+    return String(config.blog.prefix).trim();
+  }
+}
+
 async function getAllBlogArticles(blogDir: string, cwd: string, logger: Logger): Promise<ProcessedArticle[]> {
   const articles: ProcessedArticle[] = []
   const blogPath = join(cwd, blogDir)
@@ -127,14 +137,7 @@ export async function generateBlogIndex(
     const metaFile = join(blogPath, config.blog.metaFile || 'meta.json')
     const iocFile = join(blogPath, `${config.blog.iocSlug || 'ioc'}.mdx`)
     const iocSlug = config.blog.iocSlug || 'ioc'
-    let blogPrefix: string;
-    if (config.blog.prefix === undefined || config.blog.prefix === null) {
-      blogPrefix = 'blog';
-    } else if (typeof config.blog.prefix === 'string' && config.blog.prefix.trim() === '') {
-      blogPrefix = '';
-    } else {
-      blogPrefix = String(config.blog.prefix).trim();
-    }
+    const blogPrefix = getBlogPrefix(config)
 
     let meta: MetaJson = { pages: [] }
     const metaContent = readJsonFile<MetaJson>(metaFile)
@@ -219,8 +222,8 @@ export async function generateBlogIndex(
       
       // Ensure there's a space before href if iconProp is present and not empty
       const finalIconProp = iconProp ? `${iconProp} ` : ''
-
-      const href = blogPrefix ? `./${blogPrefix}/${article.slug}` : `./${article.slug}`
+      // refer path is /locale/blog, this is blog root dir, so here is blog/X, then you'll get /locale/blog/X
+      const href = blogPrefix ? `${blogPrefix}/${article.slug}` : `${article.slug}`
       return `  <ZiaCard ${finalIconProp} href="${href}" title="${escapedTitle}">\n    ${cardContent}\n  </ZiaCard>\n`
     }
 
@@ -239,7 +242,7 @@ export async function generateBlogIndex(
     // add Monthly Summary block separately
     if (iocArticle) {
       mdxContent += `\n## Monthly Summary\n\n<Cards>\n`
-      const iocHref = blogPrefix ? `./${blogPrefix}/${iocSlug}` : `./${iocSlug}`
+      const iocHref = blogPrefix ? `${blogPrefix}/${iocSlug}` : `${iocSlug}`
       mdxContent += `  <ZiaCard href="${iocHref}" title="Overview">\n    ${getCurrentDateString()}\n  </ZiaCard>\n`
       mdxContent += `</Cards>\n`
     }
@@ -329,6 +332,7 @@ async function generateMonthlyBlogSummary(
         for (const art of monthMap[month]) {
           // File name="YYYY-MM-DD(Title)" format
           const day = art.date.slice(0, 10)
+          // refer path is /locale/blog/ioc, so here is ./X, then you'll get /locale/blog/X
           const href = art.slug ? `./${art.slug}` : '';
           mdx += `    <ZiaFile name="${day}(${art.title})" href="${href}" />\n`
         }

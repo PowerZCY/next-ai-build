@@ -2,7 +2,7 @@
 
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { cn } from '@lib/utils';
-import Link from 'fumadocs-core/link';
+import Link from 'next/link';
 import type { HTMLAttributes, ReactNode } from 'react';
 
 export type ZiaCardProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
@@ -15,23 +15,52 @@ export type ZiaCardProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
 };
 
 export function ZiaCard({ icon, title, description, ...props }: ZiaCardProps) {
-  const E = props.href ? Link : 'div';
+  const validHref = typeof props.href === 'string' && props.href.trim() !== '';
+  const validDescription = typeof description === 'string' && description?.trim() !== '';
 
+  if (validHref) {
+    return (
+      <Link
+        href={props.href!}
+        data-card
+        className={cn(
+          'block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors @max-lg:col-span-full',
+          'hover:bg-fd-accent/80',
+          props.className,
+        )}
+        {...props}
+      >
+        <div className="not-prose mb-2 w-fit rounded-md border bg-fd-muted p-1.5 text-fd-muted-foreground [&_svg]:size-4">
+          {icon ? icon : <icons.CircleSmall />}
+        </div>
+        <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-[2.5rem]">{title}</h3>
+        {validDescription ? (
+          <p className="!my-0 text-sm text-fd-muted-foreground">{description}</p>
+        ) : (
+          <p className="!my-0 text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
+        )}
+        {props.children ? (
+          <div className="text-sm text-fd-muted-foreground prose-no-margin">
+            {props.children}
+          </div>
+        ) : null}
+      </Link>
+    );
+  }
   return (
-    <E
-      {...props}
+    <div
       data-card
       className={cn(
         'block rounded-lg border bg-fd-card p-4 text-fd-card-foreground shadow-md transition-colors @max-lg:col-span-full',
-        props.href && 'hover:bg-fd-accent/80',
         props.className,
       )}
+      {...props}
     >
       <div className="not-prose mb-2 w-fit rounded-md border bg-fd-muted p-1.5 text-fd-muted-foreground [&_svg]:size-4">
         {icon ? icon : <icons.CircleSmall />}
       </div>
       <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-[2.5rem]">{title}</h3>
-      {description ? (
+      {validDescription ? (
         <p className="!my-0 text-sm text-fd-muted-foreground">{description}</p>
       ) : (
         <p className="!my-0 text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
@@ -41,6 +70,6 @@ export function ZiaCard({ icon, title, description, ...props }: ZiaCardProps) {
           {props.children}
         </div>
       ) : null}
-    </E>
+    </div>
   );
 }
