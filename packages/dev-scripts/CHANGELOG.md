@@ -1,5 +1,13 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.2.0
+
+### Minor Changes
+
+- fix(blog): improve blog prefix handling
+  - Refactor blog prefix assignment logic
+  - Ensure proper handling of undefined, null, and empty string cases
+
 ## 6.1.0
 
 ### Minor Changes

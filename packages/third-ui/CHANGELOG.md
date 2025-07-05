@@ -1,5 +1,15 @@
 # @windrun-huaiin/third-ui
 
+## 5.2.1
+
+### Patch Changes
+
+- fix(blog): improve blog prefix handling
+  - Refactor blog prefix assignment logic
+  - Ensure proper handling of undefined, null, and empty string cases
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.2.0
+
 ## 5.2.0
 
 ### Minor Changes
