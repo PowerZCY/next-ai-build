@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.2.2
+
+### Patch Changes
+
+- fix(href): next link href should be carful!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.2.0
+  - @windrun-huaiin/third-ui@5.3.0
+  - @windrun-huaiin/lib@5.2.0
+  - @windrun-huaiin/shared-assets@4.1.2
+
 ## 5.2.1
 
 ### Patch Changes

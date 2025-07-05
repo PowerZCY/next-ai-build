@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.3.0
+
+### Minor Changes
+
+- fix(href): next link href should be carful!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.2.0
+
 ## 5.2.1
 
 ### Patch Changes

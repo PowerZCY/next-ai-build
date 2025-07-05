@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.3.0
+
+### Minor Changes
+
+- fix(href): next link href should be carful!
+
 ## 6.2.0
 
 ### Minor Changes
