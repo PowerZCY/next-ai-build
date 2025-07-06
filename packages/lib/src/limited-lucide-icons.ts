@@ -35,6 +35,7 @@ export {
   Eye,
   ExternalLink,
   Facebook,
+  Shield,
   File,
   FileDown,
   FileInput,

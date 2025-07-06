@@ -27,6 +27,9 @@ import SubPIcon from './subp';
 import T3PIcon from './t3p';
 import HttpIcon from './http';
 import SchemeIcon from './scheme';
+import FAQIcon from './faq';
+import FAQBIcon from './faqb';
+import FAQSIcon from './faqs';
 
 // Built-in icon components mapped by display name - internal use only
 export const BUILTIN_ICON_COMPONENTS = {
@@ -58,4 +61,7 @@ export const BUILTIN_ICON_COMPONENTS = {
   T3P: T3PIcon,
   Http: HttpIcon,
   Scheme: SchemeIcon,
+  FAQ: FAQIcon,
+  FAQB: FAQBIcon,
+  FAQS: FAQSIcon,
 } as const;
