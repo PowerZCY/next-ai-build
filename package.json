@@ -51,8 +51,5 @@
     "patchedDependencies": {
       "fumadocs-ui@15.3.3": "patches/fumadocs-ui@15.3.3.patch"
     }
-  },
-  "dependencies": {
-    "lucide-react": "^0.525.0"
   }
 }
