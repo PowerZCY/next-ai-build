@@ -83,6 +83,56 @@
       }
     ]
   },
+  "pricePlan": {
+    "title": "Choose Your Plan",
+    "subtitle": "Get the best of Raphael AI with faster generation and commercial usage",
+    "billingSwitch": {
+      "options": [
+        { "key": "monthly", "name": "Monthly", "unit": "/month", "discountText": "", "subTitle": "Billed Monthly" },
+        { "key": "yearly", "name": "Yearly", "unit": "/month", "discountText": "Save {percent}%", "subTitle": "Billed Annually" }
+      ],
+      "defaultKey": "yearly"
+    },
+    "plans": [
+      {
+        "key": "free",
+        "title": "Hobby Version",
+        "showBillingSubTitle": false,
+        "features": [
+          { "description": "Access to all templates" },
+          { "description": "Unlimited editing and customization"},
+          { "description": "Download in multiple formats" },
+          { "description": "No watermarks" },
+          { "description": "No registration required" }
+        ],
+        "button": { "text": "Get started" }
+      },
+      {
+        "key": "premium",
+        "title": "Premium Version",
+        "showBillingSubTitle": true,
+        "features": [
+          { "description": "All features available", "tag": "Hobby Version" },
+          { "description": "UnLimited for Export/Import" },
+          { "description": "Limited 200 credits for AI-text", "tooltip": "1 credit = 1 AI conversation" }
+        ],
+        "button": { "text": "Upgrade to Premium" }
+      },
+      {
+        "key": "ultimate",
+        "title": "Ultimate Version",
+        "showBillingSubTitle": true,
+        "titleTags": ["Most Popular"],
+        "features": [
+          { "description": "All features available", "tag": "Premium Version" },
+          { "description": "Limited 500 credits AI-text", "tooltip": "1 credit = 1 AI conversation" },
+          { "description": "Early access to new features" },
+          { "description": "Team Support", "tooltip": "You can get our help with priority service support" }
+        ],
+        "button": { "text": "Upgrade to Ultimate" }
+      }
+    ]
+  },
   "features": {
     "title": "为什么选择",
     "eyesOn": "Reve Image",

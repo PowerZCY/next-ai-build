@@ -12,3 +12,4 @@ export * from './footer';
 export * from './go-to-top';
 export * from './loading';
 export * from './nprogress-bar';
+export * from './price-plan';
