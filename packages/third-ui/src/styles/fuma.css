@@ -135,5 +135,5 @@
 /* i18n language width */
 div[role="dialog"].rounded-lg.border.bg-fd-popover {
   min-width: 150px !important;
-  max-width: 150px !important;
+  /* max-width: 150px !important; */
 }
