@@ -1,6 +1,5 @@
 "use client"
 export * from './404-page';
-export * from './go-to-top';
 export * from './language-detector';
 export * from './language-switcher';
 
