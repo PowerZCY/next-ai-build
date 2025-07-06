@@ -1,5 +1,22 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.3.0
+
+### Minor Changes
+
+- feat(main): add price UI
+  fix(main): goToTop UI fix
+  fix(fuma): menu bar style fix
+  feat(icon): add lucide FAQ icon
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.0
+  - @windrun-huaiin/third-ui@5.4.0
+  - @windrun-huaiin/lib@5.3.0
+  - @windrun-huaiin/shared-assets@4.1.2
+
 ## 5.2.2
 
 ### Patch Changes

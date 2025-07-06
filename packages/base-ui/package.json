@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/base-ui",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Base UI components for windrun-huaiin projects",
   "type": "module",
   "exports": {

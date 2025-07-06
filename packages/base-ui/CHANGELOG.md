@@ -1,5 +1,19 @@
 # @windrun-huaiin/base-ui
 
+## 5.3.0
+
+### Minor Changes
+
+- feat(main): add price UI
+  fix(main): goToTop UI fix
+  fix(fuma): menu bar style fix
+  feat(icon): add lucide FAQ icon
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@5.3.0
+
 ## 5.2.0
 
 ### Minor Changes
