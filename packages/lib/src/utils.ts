@@ -35,3 +35,22 @@ export function formatTimestamp(timestamp: string, formatter: string) {
      return fail;
   }
 } 
+
+// Only allow pasting plain text, prohibit style content
+export function handlePastePlainText(e: React.ClipboardEvent<HTMLElement>) {
+  e.preventDefault();
+  const text = e.clipboardData.getData('text/plain');
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return;
+  // Delete the current selected content
+  selection.deleteFromDocument();
+  // Insert plain text
+  const textNode = document.createTextNode(text);
+  const range = selection.getRangeAt(0);
+  range.insertNode(textNode);
+  // Move the cursor to the inserted text
+  range.setStartAfter(textNode);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}

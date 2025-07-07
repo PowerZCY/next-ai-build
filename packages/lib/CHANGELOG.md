@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.3.1
+
+### Patch Changes
+
+- feat(util): add util function of COPY WITHOUT STYLE
+
 ## 5.3.0
 
 ### Minor Changes
