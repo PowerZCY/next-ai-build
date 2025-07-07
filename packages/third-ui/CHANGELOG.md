@@ -1,5 +1,15 @@
 # @windrun-huaiin/third-ui
 
+## 5.6.1
+
+### Patch Changes
+
+- fix(icon): add icon
+  fix(main): optimize MAIN UI style
+  fix(i18n): adaptor translation
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.6.0
 
 ### Minor Changes

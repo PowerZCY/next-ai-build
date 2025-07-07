@@ -1,8 +1,8 @@
-import { TocFooter } from '@third-ui/fuma/mdx/toc';
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
 import { ReactNode } from 'react';
+import { TocFooterWrapper } from '@third-ui/fuma/mdx';
 
-interface FumaPageParams {
+interface FumaPageParams {  
   /* 
    * The source of the mdx content
    */
@@ -51,7 +51,7 @@ export function createFumaPage({
 
     const path = githubBaseUrl ? `${mdxSourceDir}/${page.file.path}` : undefined;
     const tocFooterElement = (
-      <TocFooter
+      <TocFooterWrapper
         lastModified={page.data.date}
         showCopy={showCopy}
         editPath={path}
