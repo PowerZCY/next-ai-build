@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 export function CTA() {
   const t = useTranslations('cta');
   return (
-    <section id="cta" className="container mx-auto px-4 py-20">
+    <section id="cta" className="px-16 py-20 mx-16 md:mx-32">
       <div className="
         bg-gradient-to-r from-[#f7f8fa] via-[#e0c3fc] to-[#b2fefa]
         dark:bg-gradient-to-r dark:from-[#2d0b4e] dark:via-[#6a3fa0] dark:to-[#3a185a]

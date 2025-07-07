@@ -1,5 +1,21 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.4.0
+
+### Minor Changes
+
+- fix(icon): add icon
+  fix(main): optimize MAIN UI style
+  fix(i18n): adaptor translation
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+  - @windrun-huaiin/third-ui@5.6.0
+  - @windrun-huaiin/lib@5.5.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.3.1
 
 ### Patch Changes

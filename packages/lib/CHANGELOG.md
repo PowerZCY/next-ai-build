@@ -1,5 +1,13 @@
 # @windrun-huaiin/lib
 
+## 5.5.0
+
+### Minor Changes
+
+- fix(icon): add icon
+  fix(main): optimize MAIN UI style
+  fix(i18n): adaptor translation
+
 ## 5.4.0
 
 ### Minor Changes

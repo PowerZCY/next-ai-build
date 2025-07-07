@@ -7,12 +7,13 @@ import { type JSX } from 'react';
 
 interface ClerkUserProps {
   locale: string;
+  // default as true, ‘cause Clerk direct is not well, so just use model for sign-in/sign-up
   clerkAuthInModal?: boolean;
 }
 
 export function ClerkUser({ 
   locale, 
-  clerkAuthInModal = false 
+  clerkAuthInModal = true 
 }: ClerkUserProps): JSX.Element {
   const t = useTranslations('clerk');
   const t2 = useTranslations('footer');

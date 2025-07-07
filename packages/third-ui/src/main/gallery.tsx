@@ -35,7 +35,7 @@ export function Gallery() {
         {t('description')}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {galleryItems.map((prompt, index) => (
+        {galleryItems.map((_prompt, index) => (
           <div key={index} className="group relative overflow-hidden rounded-xl">
             <Image
               src={`/${index + 1}.webp`}

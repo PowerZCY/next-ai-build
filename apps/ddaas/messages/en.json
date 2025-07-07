@@ -136,21 +136,22 @@
   "features": {
     "title": "Why Choose",
     "eyesOn": "Reve Image",
+    "description": "Create stunning newspapers with our newspaper template website! Here's why you'll love it.",
     "items": [
       {
         "title": "High-Quality Output",
         "description": "Reve Image produces stunning, detailed images that rival professional artwork.",
-        "icon": "✨"
+        "iconKey": "Sparkles"
       },
       {
         "title": "20 Free Images Daily",
         "description": "Enjoy a generous daily allowance of 20 free images with your Reve Image account.",
-        "icon": "🎁"
+        "iconKey": "Gift"
       },
       {
         "title": "Intuitive Prompting",
         "description": "The advanced AI understands natural language, making it easy to describe your vision.",
-        "icon": "💬"
+        "iconKey": "MessageCircleMore"
       }
     ]
   },
@@ -202,6 +203,7 @@
   "seoContent": {
     "title": "Mastering AI Image Generation with",
     "eyesOn": "Reve Image",
+    "description": "Online & Free & Editable & Professional",
     "intro": "Reve Image represents the cutting edge of AI image generation technology, offering users the ability to transform text descriptions into stunning visual content. Whether you're a designer seeking inspiration, a marketer creating content, or an artist exploring new mediums, Reve Image provides the tools to bring your imagination to life.",
     "sections": [
       {
