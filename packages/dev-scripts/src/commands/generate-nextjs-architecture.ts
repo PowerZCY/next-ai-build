@@ -28,7 +28,7 @@ export async function generateNextjsArchitecture(
     // generate tree result to logs directory
     const treeJsonPath = join(logsDir, 'project_tree.json')
     logger.log(`Running tree command to generate ${treeJsonPath}`)
-    execSync(`tree -a -J -I '.next|node_modules|logs|dist|pnpm-lock.yaml|turbo|.turbo|public|.cursor|.DS_Store' > ${treeJsonPath}`)
+    execSync(`tree -a -J -I '.next|node_modules|logs|dist|pnpm-lock.yaml|turbo|.turbo|public|.cursor|.DS_Store|.git' > ${treeJsonPath}`)
 
     // read tree result
     const tree = readJsonFile<any[]>(treeJsonPath)

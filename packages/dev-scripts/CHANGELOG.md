@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.5.1
+
+### Patch Changes
+
+- fix(scripts): scan dir without above dirs
+  - **'.next|node_modules|logs|dist|pnpm-lock.yaml|turbo|.turbo|public|.cursor|.DS_Store|.git'**
+
 ## 6.5.0
 
 ### Minor Changes
