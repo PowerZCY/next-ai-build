@@ -77,6 +77,9 @@ pnpm generate-blog-index
     ],
     "blogDir": "src/mdx/blog",              // 博客MDX文件目录
     "logDir": "logs"                     // 日志输出目录
+  },
+  "architectureConfig": {
+    ".": "RootProject"
   }
 }
 ```

@@ -18,5 +18,8 @@
   "output": {
     "logDir": "scripts",
     "verbose": false
+  },
+  "architectureConfig": {
+    ".": "RootProject"
   }
 } 

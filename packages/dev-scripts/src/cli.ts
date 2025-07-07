@@ -7,6 +7,7 @@ import { cleanTranslations } from '@dev-scripts/commands/clean-translations'
 import { generateBlogIndex } from '@dev-scripts/commands/generate-blog-index'
 import { deepClean } from '@dev-scripts/commands/deep-clean'
 import { easyChangeset } from '@dev-scripts/commands/easy-changeset'
+import { generateNextjsArchitecture } from '@dev-scripts/commands/generate-nextjs-architecture'
 
 // get current working directory, ensure it works in Node.js environment
 const cwd = typeof process !== 'undefined' ? process.cwd() : '.'
@@ -131,6 +132,29 @@ program
   .action(async () => {
     try {
       const exitCode = await easyChangeset(cwd)
+      if (typeof process !== 'undefined') {
+        process.exit(exitCode)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      if (typeof process !== 'undefined') {
+        process.exit(1)
+      }
+    }
+  })
+
+program
+  .command('generate-nextjs-architecture')
+  .description('generate nextjs-architecture.mdx for project structure')
+  .option('-v, --verbose', 'show detailed logs', false)
+  .action(async (options) => {
+    try {
+      const config = loadConfig(cwd, {}, options.verbose)
+      if (options.verbose) {
+        config.output.verbose = true
+      }
+      validateConfig(config)
+      const exitCode = await generateNextjsArchitecture(config, cwd)
       if (typeof process !== 'undefined') {
         process.exit(exitCode)
       }
