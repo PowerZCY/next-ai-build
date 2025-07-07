@@ -18,5 +18,8 @@
   "output": {
     "logDir": "logs",
     "verbose": false
+  },
+  "architectureConfig": {
+    ".": "DDAAS项目"
   }
 }

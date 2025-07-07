@@ -14,7 +14,8 @@
     "generate-blog-index": "dev-scripts generate-blog-index -v",
     "check-translations": "dev-scripts check-translations -v",
     "clean-translations": "dev-scripts clean-translations -v",
-    "remove-translations": "dev-scripts clean-translations --remove -v"
+    "remove-translations": "dev-scripts clean-translations --remove -v",
+    "whoareyou": "dev-scripts generate-nextjs-architecture -v"
   },
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
