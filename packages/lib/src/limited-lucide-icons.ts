@@ -47,6 +47,7 @@ export {
   Folder,
   FolderOpen,
   Gift,
+  GitMerge,
   GitPullRequestArrow,
   Globe,
   GlobeLock,
