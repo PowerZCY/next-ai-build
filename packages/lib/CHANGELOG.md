@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.6.0
+
+### Minor Changes
+
+- refactor(mdx): fix llmcopy button, now can support multi-mdx-source
+
 ## 5.5.0
 
 ### Minor Changes

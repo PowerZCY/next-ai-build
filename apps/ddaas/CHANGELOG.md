@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.6.0
+
+### Minor Changes
+
+- refactor(mdx): fix llmcopy button, now can support multi-mdx-source
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+  - @windrun-huaiin/third-ui@5.8.0
+  - @windrun-huaiin/lib@5.6.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.5.0
 
 ### Minor Changes

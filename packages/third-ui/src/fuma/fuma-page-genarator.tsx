@@ -1,8 +1,13 @@
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
-import { ReactNode } from 'react';
+import { ReactNode, ReactElement, cloneElement } from 'react';
 import { TocFooterWrapper } from '@third-ui/fuma/mdx';
+import type { LLMCopyButtonProps, LLMCopyButton } from '@third-ui/fuma/mdx';
 
-interface FumaPageParams {  
+interface FumaPageParams {
+  /* 
+   * The source key of the mdx content, used to generate the edit path
+   */
+  sourceKey: string;
   /* 
    * The source of the mdx content
    */
@@ -20,9 +25,9 @@ interface FumaPageParams {
    */
   githubBaseUrl?: string;
   /* 
-   * The copy button component, if provided, will be rendered in the footer (should be a client component)
+   * The copy button component, must be LLMCopyButton
    */
-  copyButtonComponent?: ReactNode;
+  copyButtonComponent?: ReactElement<LLMCopyButtonProps, typeof LLMCopyButton>;
   /* 
    * The site icon component to use in NotFoundPage
    */
@@ -34,6 +39,7 @@ interface FumaPageParams {
 }
 
 export function createFumaPage({
+  sourceKey,
   mdxContentSource,
   getMDXComponents,
   mdxSourceDir,
@@ -53,7 +59,11 @@ export function createFumaPage({
     const tocFooterElement = (
       <TocFooterWrapper
         lastModified={page.data.date}
-        copyButtonComponent={copyButtonComponent}
+        copyButtonComponent={
+          copyButtonComponent
+            ? cloneElement(copyButtonComponent, { sourceKey })
+            : undefined
+        }
         editPath={path}
         githubBaseUrl={githubBaseUrl}
       />

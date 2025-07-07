@@ -9,7 +9,12 @@ import { Button } from '@base-ui/ui/button';
 
 const cache = new Map<string, string>();
 
-export function LLMCopyButton({ llmApiUrl }: { llmApiUrl?: string } = {}) {
+export interface LLMCopyButtonProps {
+  llmApiUrl?: string;
+  sourceKey?: string;
+}
+
+export function LLMCopyButton({ llmApiUrl, sourceKey }: LLMCopyButtonProps = {}) {
   const [isLoading, setLoading] = useState(false);
   const params = useParams();
   const locale = params.locale as string;
@@ -21,7 +26,10 @@ export function LLMCopyButton({ llmApiUrl }: { llmApiUrl?: string } = {}) {
     // Handle cases where slug might be undefined or empty
     const path = (slug && Array.isArray(slug)) ? slug.join('/') : '';
     const apiPrefix = llmApiUrl || '/api/llm-content';
-    const apiUrl = `${apiPrefix}?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
+    let apiUrl = `${apiPrefix}?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
+    if (sourceKey) {
+      apiUrl += `&sourceKey=${encodeURIComponent(sourceKey)}`;
+    }
     console.log('Fetching LLM content from:', apiUrl);
 
     let content: string;

@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.8.0
+
+### Minor Changes
+
+- refactor(mdx): fix llmcopy button, now can support multi-mdx-source
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.7.0
 
 ### Minor Changes
