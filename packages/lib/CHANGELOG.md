@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.3.2
+
+### Patch Changes
+
+- fix(icon): add icon
+
 ## 5.3.1
 
 ### Patch Changes
