@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.4.1
+
+### Patch Changes
+
+- fix(util): adsAlertDialog shou be exported
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.0
+
 ## 5.4.0
 
 ### Minor Changes
