@@ -24,18 +24,24 @@ export function LLMCopyButton({ llmApiUrl }: { llmApiUrl?: string } = {}) {
     const apiUrl = `${apiPrefix}?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
     console.log('Fetching LLM content from:', apiUrl);
 
+    let content: string;
     try {
-      const content: string =
-        cache.get(apiUrl) ?? (await fetch(apiUrl).then((res) => {
-          if (!res.ok) {
-            throw new Error(`Failed to fetch LLM content: ${res.status} ${res.statusText}`);
-          }
-          return res.text();
-        }));
-
-      cache.set(apiUrl, content);
+      if (cache.has(apiUrl)) {
+        content = cache.get(apiUrl)!;
+      } else {
+        const res = await fetch(apiUrl);
+        if (!res.ok) {
+          content = `Error: Failed to fetch LLM content: ${res.status} ${res.statusText}`;
+        } else {
+          content = await res.text();
+          // only success then store cache
+          cache.set(apiUrl, content); 
+        }
+      }
       await navigator.clipboard.writeText(content);
     } catch (error) {
+      const errMsg = `Error: ${error instanceof Error ? error.message : String(error)}`;
+      await navigator.clipboard.writeText(errMsg);
       console.error("Error fetching or copying LLM content:", error);
     } finally {
       setLoading(false);

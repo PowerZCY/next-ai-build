@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.7.0
+
+### Minor Changes
+
+- refactor(toc): fix copy button
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.6.1
 
 ### Patch Changes

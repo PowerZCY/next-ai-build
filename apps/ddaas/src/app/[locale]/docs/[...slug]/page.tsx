@@ -4,13 +4,14 @@ import { SiteIcon } from '@/lib/site-config';
 import { docsSource } from '@/lib/source';
 import { NotFoundPage } from '@base-ui/components';
 import { createFumaPage } from '@third-ui/fuma/server';
+import { LLMCopyButton } from '@third-ui/fuma/mdx/toc-base';
 
 const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   mdxContentSource: docsSource,
   getMDXComponents,
   mdxSourceDir: appConfig.mdxSourceDir.docs,
   githubBaseUrl: appConfig.githubBaseUrl,
-  showCopy: true,
+  copyButtonComponent: <LLMCopyButton />,
   siteIcon: <SiteIcon />,
   FallbackPage: NotFoundPage,
 });

@@ -20,9 +20,9 @@ interface FumaPageParams {
    */
   githubBaseUrl?: string;
   /* 
-   * Whether to show the copy button, default is true
+   * The copy button component, if provided, will be rendered in the footer (should be a client component)
    */
-  showCopy?: boolean;
+  copyButtonComponent?: ReactNode;
   /* 
    * The site icon component to use in NotFoundPage
    */
@@ -38,7 +38,7 @@ export function createFumaPage({
   getMDXComponents,
   mdxSourceDir,
   githubBaseUrl,
-  showCopy = true,
+  copyButtonComponent,
   siteIcon,
   FallbackPage,
 }: FumaPageParams) {
@@ -53,7 +53,7 @@ export function createFumaPage({
     const tocFooterElement = (
       <TocFooterWrapper
         lastModified={page.data.date}
-        showCopy={showCopy}
+        copyButtonComponent={copyButtonComponent}
         editPath={path}
         githubBaseUrl={githubBaseUrl}
       />

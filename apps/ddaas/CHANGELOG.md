@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.5.0
+
+### Minor Changes
+
+- refactor(toc): fix copy button
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+  - @windrun-huaiin/third-ui@5.7.0
+  - @windrun-huaiin/lib@5.5.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.4.0
 
 ### Minor Changes

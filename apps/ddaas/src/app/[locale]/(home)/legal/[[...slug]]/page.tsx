@@ -10,7 +10,6 @@ const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   getMDXComponents,
   mdxSourceDir: appConfig.mdxSourceDir.legal,
   githubBaseUrl: appConfig.githubBaseUrl,
-  showCopy: false,
   siteIcon: <SiteIcon />,
   FallbackPage: NotFoundPage,
 });

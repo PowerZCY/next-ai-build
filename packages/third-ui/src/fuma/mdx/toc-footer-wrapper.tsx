@@ -1,19 +1,20 @@
 'use client';
-import { EditOnGitHub, LastUpdatedDate, LLMCopyButton } from '@third-ui/fuma/mdx/toc-base';
+import { EditOnGitHub, LastUpdatedDate } from '@third-ui/fuma/mdx/toc-base';
+import React from 'react';
 
 interface TocFooterProps {
   lastModified: string | undefined;
   editPath?: string;
   githubBaseUrl?: string;
-  showCopy?: boolean;
+  copyButtonComponent?: React.ReactNode;
 }
 
-export function TocFooterWrapper({ lastModified, editPath, githubBaseUrl, showCopy }: TocFooterProps) {
+export function TocFooterWrapper({ lastModified, editPath, githubBaseUrl, copyButtonComponent }: TocFooterProps) {
   const showEdit = githubBaseUrl && editPath;
   return (
     <div className="flex flex-col gap-y-2 items-start m-4">
       <LastUpdatedDate date={lastModified} />
-      {showCopy && <LLMCopyButton />}
+      {copyButtonComponent}
       {showEdit && <EditOnGitHub url={`${githubBaseUrl}${editPath}`} />}
     </div>
   );
