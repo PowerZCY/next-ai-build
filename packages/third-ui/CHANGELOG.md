@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.8.1
+
+### Patch Changes
+
+- fix(UI): fix uniform link button, defalt is open new tab
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.8.0
 
 ### Minor Changes

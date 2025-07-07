@@ -2,7 +2,7 @@
 
 import { Button } from "@base-ui/ui/button";
 import { globalLucideIcons as icons } from "@base-ui/components/global-icon";
-import Link from "fumadocs-core/link";
+import Link from "next/link";
 import React from 'react';
 
 export function GradientButton({
@@ -10,11 +10,13 @@ export function GradientButton({
   icon,
   href,
   align = 'left',
+  openInNewTab = true,
 }: {
   title: React.ReactNode;
   icon?: React.ReactNode;
   href: string;
   align?: 'left' | 'center' | 'right';
+  openInNewTab?: boolean;
 }) {
   // set justify class according to alignment
   const getAlignmentClass = () => {
@@ -44,7 +46,11 @@ export function GradientButton({
           rounded-full
         "
       >
-        <Link href={href} target="_blank" rel="noopener noreferrer" className="no-underline hover:no-underline">
+        <Link
+          href={href}
+          className="no-underline hover:no-underline"
+          {...(openInNewTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
           <span>{title}</span>
           <span className="ml-1">
             {icon ? 

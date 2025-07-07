@@ -440,6 +440,7 @@
       "  title=\"${1}\"",
       "  href=\"${2}\"",
       "  align=\"left\"",
+      "  openInNewTab={false}",
       "/>",
       "",
       "${0}"
