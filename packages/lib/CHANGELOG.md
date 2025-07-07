@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.6.2
+
+### Patch Changes
+
+- fix(icon): add GitMerge icon
+
 ## 5.6.1
 
 ### Patch Changes
