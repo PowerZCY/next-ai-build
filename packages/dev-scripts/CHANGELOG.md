@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.4.1
+
+### Patch Changes
+
+- fix(icon): add icon
+
 ## 6.4.0
 
 ### Minor Changes

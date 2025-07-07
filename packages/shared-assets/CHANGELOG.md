@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.1.3
+
+### Patch Changes
+
+- fix(icon): add icon
+
 ## 4.1.2
 
 ### Patch Changes

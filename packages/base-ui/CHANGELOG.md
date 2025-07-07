@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 5.3.1
+
+### Patch Changes
+
+- fix(icon): add icon
+- Updated dependencies
+  - @windrun-huaiin/lib@5.4.0
+
 ## 5.3.0
 
 ### Minor Changes
