@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.6.1
+
+### Patch Changes
+
+- fix(mdx): add architecture generator scripts
+
 ## 5.6.0
 
 ### Minor Changes

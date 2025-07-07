@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.6.2
+
+### Patch Changes
+
+- fix(mdx): add architecture generator scripts
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+  - @windrun-huaiin/third-ui@5.8.1
+  - @windrun-huaiin/lib@5.6.1
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.6.1
 
 ### Patch Changes
