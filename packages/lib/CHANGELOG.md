@@ -1,5 +1,12 @@
 # @windrun-huaiin/lib
 
+## 5.6.4
+
+### Patch Changes
+
+- fix(scripts): blog generate index and ioc bug, should ignore !xxx
+  fix(scripts): enhance handle EMPTY folder
+
 ## 5.6.3
 
 ### Patch Changes
