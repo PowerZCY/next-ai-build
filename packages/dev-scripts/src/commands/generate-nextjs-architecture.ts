@@ -48,11 +48,15 @@ export async function generateNextjsArchitecture(
         // scan root directory name='ROOT'
         const displayName = (depth === 0 && node.name === '.') ? 'ROOT' : node.name
         if (node.type === 'directory') {
-          mdx += `${'  '.repeat(depth)}<ZiaFolder name="${displayName}" anotion="${anotion}" defaultOpen>\n`
-          if (node.contents && node.contents.length > 0) {
+          if (!node.contents || node.contents.length === 0) {
+            // handle empty folder
+            mdx += `${'  '.repeat(depth)}<ZiaFolder name="${displayName}" anotion="${anotion}" className="opacity-50" disabled/>\n`
+          } else {
+            // handle non-empty folder
+            mdx += `${'  '.repeat(depth)}<ZiaFolder name="${displayName}" anotion="${anotion}" defaultOpen>\n`
             mdx += renderTree(node.contents, depth + 1, nodePath)
+            mdx += `${'  '.repeat(depth)}</ZiaFolder>\n`
           }
-          mdx += `${'  '.repeat(depth)}</ZiaFolder>\n`
         } else if (node.type === 'file') {
           mdx += `${'  '.repeat(depth)}<ZiaFile name="${node.name}" anotion="${anotion}" href="" />\n`
         }
@@ -61,7 +65,7 @@ export async function generateNextjsArchitecture(
     }
 
     // generate frontmatter
-    const frontmatter = `---\ntitle: About Project Structure\ndescription: Show all source code directories and files\nicon: GitMerge\ndate: ${getCurrentDateString()}\n---\n\n## Quick Started\n\n`
+    const frontmatter = `---\ntitle: About Project Structure\ndescription: Show all source code directories and files\nicon: Gift\ndate: ${getCurrentDateString()}\n---\n\n## Quick Started\n\n`
     // generate mdx content
     const filesContent = renderTree(tree)
     const indentedFilesContent = filesContent.split('\n').map(line => line ? '  ' + line : '').join('\n')

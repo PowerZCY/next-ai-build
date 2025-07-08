@@ -147,19 +147,26 @@ export async function generateBlogIndex(
       logger.warn(`Could not read or parse ${metaFile}. No articles will be marked as featured.`)
     }
     
-    // ioc related processing
+    // 统一提取被隐藏的 slug
+    const hiddenSlugs = new Set(
+      meta.pages.filter(p => p.startsWith('!')).map(p => p.slice(1))
+    )
+    // ioc 相关处理
     const featuredSlugs = meta.pages
+      .filter(p => !p.startsWith('!'))
       .map(p => p.endsWith('.mdx') ? p.slice(0, -4) : p)
-      .filter(slug => slug !== 'index' && slug !== '...' && slug !== iocSlug && slug !== `!${iocSlug}`)
+      .filter(slug => slug !== 'index' && slug !== '...')
     logger.log(`Featured slugs (meta-config): ${featuredSlugs.join(', ')}`)
 
     const allArticles = await getAllBlogArticles(config.blog.mdxDir, cwd, logger)
     logger.log(`Found ${allArticles.length} all articles.`)
 
-    // ioc article processing separately
-    const iocArticle = allArticles.find(a => a.slug === iocSlug)
+    // 过滤所有被隐藏的 slug
+    const visibleArticles = allArticles.filter(a => !hiddenSlugs.has(a.slug))
 
-    const filteredArticles = allArticles.filter(a => a.slug !== iocSlug)
+    // ioc article 处理
+    const iocArticle = visibleArticles.find(a => a.slug === iocSlug)
+    const filteredArticles = visibleArticles.filter(a => a.slug !== iocSlug)
 
     if (filteredArticles.length === 0 && featuredSlugs.length === 0) {
       logger.warn("No articles found or featured. The generated index might be empty or minimal.")
@@ -255,7 +262,7 @@ export async function generateBlogIndex(
     logger.success(`Successfully generated ${indexFile}`)
 
     // generate monthly statistics
-    await generateMonthlyBlogSummary(config, allArticles, iocFile, iocSlug, logger)
+    await generateMonthlyBlogSummary(config, visibleArticles, iocFile, iocSlug, logger)
 
     logger.log('Blog index generation completed successfully!')
     logger.saveToFile('generate-blog.log', cwd)
