@@ -135,11 +135,6 @@ web_modules/
 # Test coverage (anywhere)
 **/coverage/
 
-# Changeset files (if using changesets for versioning)
-.changeset/
-!.changeset/config.json
-!.changeset/README.md
-
 # Temporary files
 tmp/
 temp/

@@ -224,4 +224,9 @@ git stash pop
 ```shell title="其他"
 # 生成一个可供发布的压缩包
 git archives
+
+# 模板文件只提交一次, 忽略后续变更
+git update-index --skip-worktree .changeset/d8-template.mdx
+# 查看哪些文件被设置为 skip-worktree
+git ls-files -v | grep "^S"
 ```
