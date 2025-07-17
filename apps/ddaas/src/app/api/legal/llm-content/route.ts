@@ -2,7 +2,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { legalSource } from '@/lib/source';
+import { legalSource } from '@/lib/source-legal';
 import { appConfig } from '@/lib/appConfig';
 import { LLMCopyHandler } from '@lib/llm-copy-handler';
 

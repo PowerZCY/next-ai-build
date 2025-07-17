@@ -1,7 +1,7 @@
 import { getMDXComponents } from '@/components/mdx-components';
 import { appConfig } from '@/lib/appConfig';
 import { SiteIcon } from '@/lib/site-config';
-import { legalSource } from '@/lib/source';
+import { legalSource } from '@/lib/source-legal';
 import { NotFoundPage } from '@base-ui/components';
 import { createFumaPage } from '@third-ui/fuma/server';
 

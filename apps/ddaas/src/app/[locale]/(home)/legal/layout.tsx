@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { legalSource } from '@/lib/source';
+import { legalSource } from '@/lib/source-legal';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 
 export default async function Layout({

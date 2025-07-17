@@ -1,5 +1,5 @@
 import { baseOptions } from '@/app/[locale]/layout.config';
-import { docsSource } from '@/lib/source';
+import { docsSource } from '@/lib/source-docs';
 import type { ReactNode } from 'react';
 // https://fumadocs.dev/docs/ui/layouts/notebook
 import { FumaGithubInfo } from '@third-ui/fuma/mdx';

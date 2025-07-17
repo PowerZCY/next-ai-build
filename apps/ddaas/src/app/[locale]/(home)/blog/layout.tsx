@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { blogSource } from '@/lib/source';
+import { blogSource } from '@/lib/source-blog';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 
 export default async function Layout({

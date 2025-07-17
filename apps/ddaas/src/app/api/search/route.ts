@@ -1,4 +1,4 @@
-import { docsSource } from '@/lib/source';
+import { docsSource } from '@/lib/source-docs';
 import { createI18nSearchAPI } from 'fumadocs-core/search/server';
 import { i18n } from '@/i18n';
  

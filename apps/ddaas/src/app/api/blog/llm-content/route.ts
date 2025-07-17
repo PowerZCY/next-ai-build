@@ -2,7 +2,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { blogSource } from '@/lib/source';
+import { blogSource } from '@/lib/source-blog';
 import { appConfig } from '@/lib/appConfig';
 import { LLMCopyHandler } from '@lib/llm-copy-handler';
 

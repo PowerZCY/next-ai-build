@@ -92,16 +92,16 @@ flowchart TD
 ### 自定义流程处理
 
 <TrophyCard title="结合上述流程, 从用户视角看, FumaDocs的扩展口" icon={<Fingerprint />}>
-  - `src/lib/source.ts` 路由+数据源+元数据处理, **内容如何被加载和路由**, 侧重于HTML的主干结构
+  - `src/lib/source-legal.ts` 路由+数据源+元数据处理, **内容如何被加载和路由**, 侧重于HTML的主干结构
   - `source.config.ts`插件链的配置扩展, **原始mdx内容如何被解析为React组件**, 侧重于基础内容
   - `src/components/mdx-components.tsx` React组件扩展, **组件如何被渲染**, 侧重于样式和交互
 </TrophyCard>
 
 
-<Tabs groupId="customization" items={["src/lib/source.ts", "source.config.ts", "src/components/mdx-components.tsx"]}>
-  <Tab value="src/lib/source.ts">
+<Tabs groupId="customization" items={["src/lib/source-legal.ts", "source.config.ts", "src/components/mdx-components.tsx"]}>
+  <Tab value="src/lib/source-legal.ts">
     <include cwd lang="ts" meta='title="自定义Schema"'>
-      ./src/lib/source.ts
+      ./src/lib/source-legal.ts
     </include>
   </Tab>
   <Tab value="source.config.ts">
