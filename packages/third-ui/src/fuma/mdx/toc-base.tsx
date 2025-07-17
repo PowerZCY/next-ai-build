@@ -25,7 +25,7 @@ export function LLMCopyButton({ llmApiUrl, sourceKey }: LLMCopyButtonProps = {})
 
     // Handle cases where slug might be undefined or empty
     const path = (slug && Array.isArray(slug)) ? slug.join('/') : '';
-    const apiPrefix = llmApiUrl || '/api/llm-content';
+    const apiPrefix = llmApiUrl || (sourceKey ? `/api/${sourceKey}/llm-content` : '/api/llm-content');
     let apiUrl = `${apiPrefix}?locale=${encodeURIComponent(locale)}&path=${encodeURIComponent(path)}`;
     if (sourceKey) {
       apiUrl += `&sourceKey=${encodeURIComponent(sourceKey)}`;

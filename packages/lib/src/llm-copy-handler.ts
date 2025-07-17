@@ -12,7 +12,7 @@ export type LLMCopyHandlerOptions = {
     getPage: (slug: string[], locale: string) => any | undefined;
   };
   // for example: "blog/2025/07/07/test"
-  requestedPath: string;
+  requestedPath?: string;
   locale: string;
 };
 
@@ -25,10 +25,7 @@ export async function LLMCopyHandler(options: LLMCopyHandlerOptions): Promise<{ 
   // log received parameters
   console.log(`[LLMCopy] Received, locale=${locale}, path=${requestedPath}`);
 
-  if (!requestedPath) {
-    return { error: 'Missing path query parameter', status: 400 };
-  }
-  const slug = requestedPath.split('/');
+  const slug = requestedPath?.split('/') || [];
 
   try {
     console.log('[LLMCopy] Attempting to call getPage()');

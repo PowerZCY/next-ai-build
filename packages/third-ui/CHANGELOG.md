@@ -1,5 +1,30 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.0
+
+### Minor Changes
+
+- feat(ddaas): update API routes and sources for LLM content
+
+  - Refactor API routes to use specific paths for blog, legal, and docs content
+  - Update source imports in relevant components
+  - Modify configuration to include new API route patterns
+  - Adjust date fields in blog MDX files
+
+  fix(lib): bugfix
+
+  - LLMCopyHandler bugfix #3316 when copy page INDEX
+
+  feat(third-ui): bugfix
+
+  - LLMCopyButton now optimize for different router in multi-mdx-source, such as api/docs/llm-content, api/blog/llm-content
+  - To avoid vercel deployment with Serverless Function 250M limitation, we recommand splitting different source router
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.8.1
 
 ### Patch Changes

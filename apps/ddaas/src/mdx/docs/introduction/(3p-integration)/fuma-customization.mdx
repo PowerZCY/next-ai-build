@@ -258,7 +258,7 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
 
 ### 问题描述
 
-* 在将包含 Fumadocs 的 Next.js 应用部署到 Vercel 后, 一个用于提取 MDX 页面内容的 API 路由 (`/api/llm-content`), 在本地开发时工作正常
+* 在将包含 Fumadocs 的 Next.js 应用部署到 Vercel 后, 一个用于提取 MDX 页面内容的 API 路由 (`/api/*/llm-content`), 在本地开发时工作正常
 * 但在 Vercel 的 Serverless Function 环境中持续抛出 `ENOENT: no such file or directory` 错误
 * 错误日志指示, 系统尝试打开类似 `/vercel/path0/src/mdx/docs/...` 的路径, 这是一个构建时的绝对路径, 在运行时无效
 
@@ -274,7 +274,7 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
 
 ### 1. Next.config.ts配置
 * 确保 MDX 文件被打包到 Vercel Serverless Function: 
-  * 修改 `next.config.ts`, 在顶层配置中添加 `outputFileTracingIncludes`, 明确指定将 `src/mdx/docs/**/*` 目录下的所有文件包含在 `/api/llm-content` 路由的部署包中
+  * 修改 `next.config.ts`, 在顶层配置中添加 `outputFileTracingIncludes`, 明确指定将 `src/mdx/docs/**/*` 目录下的所有文件包含在 `/api/*/llm-content` 路由的部署包中
 
 ### 2. getLLMText函数
 * 修改 `getLLMText` 函数 (`src/lib/get-llm-text.ts`): 
@@ -282,7 +282,7 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
   * 内部 `remark` 处理器使用简化的插件集 (`remark-frontmatter`, `remark-remove-frontmatter`, `remark-mdx`, `remark-gfm`), 仅处理传入的字符串内容
 
 ### 3. API 路由
-* 修改 API 路由 (`src/app/api/llm-content/route.ts`): 
+* 修改 API 路由 (`src/app/api/legal/llm-content/route.ts`): 
   * 调用 `docsSource.getPage(slug, locale)` 获取 `page` 对象, 并从中安全地提取 `title` 和 `description`
   * 从 `page.data._file.path` 获取 MDX 文件的相对路径
   * 使用 Node.js 的 `path.join(process.cwd(), 'src', 'mdx', 'docs', relativeMdxFilePath)` 构造在 Vercel 运行时环境中的正确绝对路径（`process.cwd()` 在 Vercel Serverless Function 中通常是 `/var/task`）
@@ -304,7 +304,7 @@ FumaDocs提供了几种基础布局, 这里补充一下导航菜单和按钮的�
   </Tab>
   <Tab value="route.ts">
     <include cwd lang="ts" meta='title="route.ts"'>
-      ./src/app/api/llm-content/route.ts
+      ./src/app/api/legal/llm-content/route.ts
     </include>
   </Tab>
 </Tabs>

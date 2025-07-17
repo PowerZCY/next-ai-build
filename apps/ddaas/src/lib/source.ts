@@ -26,9 +26,3 @@ export const legalSource = loader({
 
 export type Page = InferPageType<typeof docsSource>;
 export type Meta = InferMetaType<typeof docsSource>;
-
-export const mdxSourceMap = {
-  docs: docsSource,
-  blog: blogSource,
-  legal: legalSource
-}
