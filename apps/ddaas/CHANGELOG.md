@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.8.0
+
+### Minor Changes
+
+- fix(lib): llmCopy handler refactor, for it's heavy dependency node:fs/path
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+  - @windrun-huaiin/third-ui@5.9.3
+  - @windrun-huaiin/lib@5.7.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.7.0
 
 ### Minor Changes

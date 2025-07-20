@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.7.0
+
+### Minor Changes
+
+- fix(lib): llmCopy handler refactor, for it's heavy dependency node:fs/path
+
 ## 5.6.6
 
 ### Patch Changes

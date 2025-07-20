@@ -4,7 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { legalSource } from '@/lib/source-legal';
 import { appConfig } from '@/lib/appConfig';
-import { LLMCopyHandler } from '@lib/llm-copy-handler';
+import { LLMCopyHandler } from '@third-ui/fuma/server';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

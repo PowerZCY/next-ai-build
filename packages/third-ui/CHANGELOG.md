@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.3
+
+### Patch Changes
+
+- fix(lib): llmCopy handler refactor, for it's heavy dependency node:fs/path
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.9.2
 
 ### Patch Changes
