@@ -42,7 +42,7 @@ export function ImageZoom({
   zoomInProps,
   children,
   rmiz,
-  fallbackSrc = '/default.webp',
+  fallbackSrc = 'https://r2.d8ger.com/default.webp',
   ...props
 }: ImageZoomProps) {
   const [imgSrc, setImgSrc] = useState(getImageSrc(props.src));

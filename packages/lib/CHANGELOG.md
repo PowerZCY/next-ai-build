@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.6.6
+
+### Patch Changes
+
+- feat(lib): image CDN base url update
+
 ## 5.6.5
 
 ### Patch Changes

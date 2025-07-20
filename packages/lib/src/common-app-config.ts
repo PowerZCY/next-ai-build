@@ -80,7 +80,7 @@ export function createCommonAppConfig(options?: {
         enabled: process.env.NEXT_PUBLIC_STYLE_WATERMARK_ENABLED === 'true',
         text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "巽川·怀因"
       },
-      cdnBaseUrl: process.env.NEXT_PUBLIC_STYLE_CDN_BASE_URL || "https://raw.githubusercontent.com/caofanCPU/wind-run-1/main/public",
+      cdnBaseUrl: process.env.NEXT_PUBLIC_STYLE_CDN_BASE_URL || "https://r2.d8ger.com",
       placeHolder: {
         image: process.env.NEXT_PUBLIC_STYLE_PLACEHOLDER_IMAGE || "/default.webp"
       }
