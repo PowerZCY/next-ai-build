@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.1
+
+### Patch Changes
+
+- feat(third-ui): image CDN update, use online CDN
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.1
+
 ## 5.9.0
 
 ### Minor Changes
