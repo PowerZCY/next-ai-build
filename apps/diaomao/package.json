@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/diaomao",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -95,18 +95,23 @@
     "unist-util-visit": "^5.0.0"
   },
   "files": [
+    ".changeset",
     "src",
     "public",
+    ".gitignore",
     "messages",
+    ".env.local.txt",
     ".eslintrc.json",
     "components.json",
     "dev-scripts.config.json",
     "LICENSE",
     "next-env.d.ts",
-    "next.config.mjs",
+    "next.config.ts",
     "postcss.config.mjs",
     "tailwind.config.ts",
+    "source.config.ts",
     "tsconfig.json",
+    "tsconfig.node.json",
     "!**/scripts/**",
     "!**/*.test.{js,ts}",
     "!**/*.log"
