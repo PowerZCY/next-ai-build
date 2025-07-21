@@ -8,6 +8,7 @@ import { generateBlogIndex } from '@dev-scripts/commands/generate-blog-index'
 import { deepClean } from '@dev-scripts/commands/deep-clean'
 import { easyChangeset } from '@dev-scripts/commands/easy-changeset'
 import { generateNextjsArchitecture } from '@dev-scripts/commands/generate-nextjs-architecture'
+import { createDiaomaoApp } from './commands/create-diaomao-app';
 
 // get current working directory, ensure it works in Node.js environment
 const cwd = typeof process !== 'undefined' ? process.cwd() : '.'
@@ -158,6 +159,20 @@ program
       if (typeof process !== 'undefined') {
         process.exit(exitCode)
       }
+    } catch (error) {
+      console.error('Error:', error)
+      if (typeof process !== 'undefined') {
+        process.exit(1)
+      }
+    }
+  })
+
+program
+  .command('create-diaomao-app <project-name>')
+  .description('create a new diaomao app from template')
+  .action(async (projectName) => {
+    try {
+      await createDiaomaoApp(projectName)
     } catch (error) {
       console.error('Error:', error)
       if (typeof process !== 'undefined') {

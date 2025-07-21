@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.6.0
+
+### Minor Changes
+
+- feat(createApp): one command for standtard project init
+
 ## 6.5.3
 
 ### Patch Changes

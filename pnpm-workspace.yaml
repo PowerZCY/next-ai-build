@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - apps/ddaas
+  - apps/diaomao
 
 catalog:
   react: 19.1.0
