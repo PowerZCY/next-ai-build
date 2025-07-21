@@ -8,7 +8,7 @@ import { generateBlogIndex } from '@dev-scripts/commands/generate-blog-index'
 import { deepClean } from '@dev-scripts/commands/deep-clean'
 import { easyChangeset } from '@dev-scripts/commands/easy-changeset'
 import { generateNextjsArchitecture } from '@dev-scripts/commands/generate-nextjs-architecture'
-import { createDiaomaoApp } from './commands/create-diaomao-app';
+import { createDiaomaoApp } from '@dev-scripts/commands/create-diaomao-app';
 
 // get current working directory, ensure it works in Node.js environment
 const cwd = typeof process !== 'undefined' ? process.cwd() : '.'

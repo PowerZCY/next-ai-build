@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.6.1
+
+### Patch Changes
+
+- fix(createApp): for completely runnable project
+
 ## 6.6.0
 
 ### Minor Changes
