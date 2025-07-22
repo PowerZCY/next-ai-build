@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.5
+
+### Patch Changes
+
+- feat(mdx): GradientButton enhanced, support both link-button and click-button
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.3
+
 ## 5.9.4
 
 ### Patch Changes
