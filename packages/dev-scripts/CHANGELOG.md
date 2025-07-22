@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.7.0
+
+### Minor Changes
+
+- feat(createApp): support monorepo
+
 ## 6.6.1
 
 ### Patch Changes
