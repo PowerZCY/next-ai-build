@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.8.0
+
+### Minor Changes
+
+- rollback(dev-scripts): give up support monorepo for nextjs reason
+  fix(build): tsup config fix
+
 ## 6.7.0
 
 ### Minor Changes

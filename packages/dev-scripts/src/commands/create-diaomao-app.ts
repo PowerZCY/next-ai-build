@@ -1,4 +1,4 @@
-import { copy, readJson, writeJson, remove, ensureDir, pathExists, rename } from 'fs-extra';
+import { copy, readJson, writeJson, remove, ensureDir, pathExists, rename, writeFile } from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
 import os from 'os';
@@ -18,22 +18,11 @@ export async function createDiaomaoApp(targetDir: string) {
   const hasWorkspace = await pathExists(cwdWorkspaceYaml);
   
   let destDir: string;
-  let isMonorepo = false;
-  let skipInstallAndGit = false;
   
   if (hasPkgJson && hasWorkspace) {
     // monorepo scenario - create under apps/
-    console.log('Detected monorepo environment, creating project under apps/');
-    destDir = path.resolve(cwd, 'apps', targetDir);
-    isMonorepo = true;
-    skipInstallAndGit = true;
-    
-    // check if project already exists
-    if (await pathExists(destDir)) {
-      console.error(`Error: Project 'apps/${targetDir}' already exists in this monorepo!`);
-      console.error(`Please choose a different name or remove the existing project first.`);
-      process.exit(1);
-    }
+    console.error('Detected monorepo environment, NextJS DO NOT SUPPORT MONOREPO WELL!');
+    process.exit(1);
   } else if (hasPkgJson && !hasWorkspace) {
     // wrong directory - user might be inside an existing project
     console.error('Warning: You are in a directory that already contains package.json');
@@ -80,13 +69,13 @@ export async function createDiaomaoApp(targetDir: string) {
       console.log('Renamed .env.local.txt to .env.local');
     }
     
-    // remove .changeset folder in monorepo scenario
-    if (isMonorepo) {
-      const changesetDir = path.join(destDir, '.changeset');
-      if (await pathExists(changesetDir)) {
-        await remove(changesetDir);
-        console.log('Removed .changeset folder (managed by monorepo root)');
-      }
+    // handle .changeset folder if exists
+    const changesetDir = path.join(destDir, '.changeset');
+    if (await pathExists(changesetDir)) {
+      const templateFile = path.join(changesetDir, 'd8-template.mdx');
+      const changesetContent = `---\n"${path.basename(targetDir)}": major\n---\n\nfeat(init): app created by @windrun-huaiin/diaomao`;
+      await writeFile(templateFile, changesetContent, 'utf8');
+      console.log('Created changeset template file: d8-template.mdx');
     }
     
     // read and modify package.json
@@ -96,61 +85,29 @@ export async function createDiaomaoApp(targetDir: string) {
     pkg.version = "1.0.0";
     pkg.private = true;
     
-    if (isMonorepo) {
-      // for monorepo, replace @windrun-huaiin/* dependencies with workspace:^
-      if (pkg.dependencies) {
-        Object.keys(pkg.dependencies).forEach(key => {
-          if (key.startsWith('@windrun-huaiin/')) {
-            pkg.dependencies[key] = 'workspace:^';
-          }
-        });
+    // add pnpm configuration for standalone project
+    pkg.pnpm = {
+      "onlyBuiltDependencies": [
+        "@clerk/shared",
+        "@parcel/watcher",
+        "@tailwindcss/oxide",
+        "core-js",
+        "esbuild",
+        "sharp",
+        "unrs-resolver"
+      ],
+      "overrides": {
+        "@types/react": "19.1.2",
+        "@types/react-dom": "19.1.3"
+      },
+      "patchedDependencies": {
+        "fumadocs-ui@15.3.3": "patches/fumadocs-ui@15.3.3.patch"
       }
-      
-      if (pkg.devDependencies) {
-        Object.keys(pkg.devDependencies).forEach(key => {
-          if (key.startsWith('@windrun-huaiin/')) {
-            pkg.devDependencies[key] = 'workspace:^';
-          }
-        });
-      }
-      
-      // remove pnpm config for monorepo (managed by root)
-      delete pkg.pnpm;
-      
-      // remove monorepo-specific scripts for monorepo scenario
-      if (pkg.scripts) {
-        delete pkg.scripts['deep-clean'];
-        delete pkg.scripts['d8'];
-        delete pkg.scripts['easy-changeset'];
-        delete pkg.scripts['dj'];
-        delete pkg.scripts['djv'];
-        delete pkg.scripts['djvp'];
-      }
-    } else {
-      // add pnpm configuration for standalone project
-      pkg.pnpm = {
-        "onlyBuiltDependencies": [
-          "@clerk/shared",
-          "@parcel/watcher",
-          "@tailwindcss/oxide",
-          "core-js",
-          "esbuild",
-          "sharp",
-          "unrs-resolver"
-        ],
-        "overrides": {
-          "@types/react": "19.1.2",
-          "@types/react-dom": "19.1.3"
-        },
-        "patchedDependencies": {
-          "fumadocs-ui@15.3.3": "patches/fumadocs-ui@15.3.3.patch"
-        }
-      };
+    };
 
-      // remove standalone-specific scripts for non-monorepo scenario
-      if (pkg.scripts) {
-        delete pkg.scripts['djvp'];
-      }
+    // remove standalone-specific scripts for non-monorepo scenario
+    if (pkg.scripts) {
+      delete pkg.scripts['djvp'];
     }
     
     
@@ -159,8 +116,7 @@ export async function createDiaomaoApp(targetDir: string) {
     delete pkg.files;
     await writeJson(pkgPath, pkg, { spaces: 2 });
 
-    if (!skipInstallAndGit) {
-      console.log('Installing dependencies...');
+    console.log('Installing dependencies...');
       
       // auto install dependencies
       try {
@@ -184,24 +140,13 @@ export async function createDiaomaoApp(targetDir: string) {
       } catch (error) {
         console.warn('Failed to initialize Git repository. Please initialize manually.');
       }
-    } else {
-      console.log('Skipping dependency installation and Git initialization (managed by monorepo)');
-    }
 
     console.log(`\n✅ Project created: ${destDir}`);
     console.log(`\nNext steps:`);
     
-    if (isMonorepo) {
-      console.log(`  Config pnpm-workspace.yaml, add your packages: -apps/${targetDir} for your monorepo`);
-      console.log(`  Config .changeset/d8-template.mdx for CHANGELOG`);
-      console.log(`  # Run 'pnpm install' from monorepo root if needed`);
-      console.log(`  pnpm build`);
-      console.log(`  pnpm dev`);
-    } else {
-      console.log(`  cd ${targetDir}`);
-      console.log(`  pnpm build`);
-      console.log(`  pnpm dev`);
-    }
+    console.log(`  cd ${targetDir}`);
+    console.log(`  pnpm build`);
+    console.log(`  pnpm dev`);
     console.log(`  NOTE: please check .env.local file and set your own env!`);
   } catch (error) {
     console.error('Failed to create project:', error);

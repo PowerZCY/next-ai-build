@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.4
+
+### Patch Changes
+
+- rollback(dev-scripts): give up support monorepo for nextjs reason
+  fix(build): tsup config fix
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.2
+
 ## 5.9.3
 
 ### Patch Changes

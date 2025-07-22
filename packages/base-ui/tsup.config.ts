@@ -37,7 +37,9 @@ export default defineConfig({
   ],
   esbuildOptions: (options) => {
     options.alias = {
-      '@': './src'
+      '@': './src',
+      '@base-ui': './src',
+      '@lib': '../lib/src'
     };
   }
 }); 
