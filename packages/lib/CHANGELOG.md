@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.7.1
+
+### Patch Changes
+
+- feat(icon): add new icons
+
 ## 5.7.0
 
 ### Minor Changes
