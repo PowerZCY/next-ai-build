@@ -42,17 +42,6 @@ interface SplitButtonProps {
 
 type xButtonProps = SingleButtonProps | SplitButtonProps
 
-export const XButtonIcons = {
-  copy: <icons.Copy className="w-5 h-5 mr-1" />,
-  checkCheck: <icons.CheckCheck className="w-5 h-5 mr-1" />,
-  globe: <icons.Languages className="w-5 h-5 mr-1" />,
-  loader: <icons.Loader2 className="w-5 h-5 mr-1 animate-spin" />,
-  download: <icons.Download className="w-5 h-5 mr-1" />,
-  upload: <icons.ImageUp className="w-5 h-5 mr-1" />,
-  share: <icons.Share className="w-5 h-5 mr-1" />,
-  edit: <icons.Pencil className="w-5 h-5 mr-1" />,
-}
-
 export function XButton(props: xButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
