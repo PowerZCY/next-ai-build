@@ -2,17 +2,18 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { cn } from '@lib/utils';
 
 interface Section {
   title: string;
   content: string;
 }
 
-export function SeoContent() {
+export function SeoContent({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('seoContent');
 
   return (
-    <section id="seo" className="px-16 py-10 mx-16 md:mx-32">
+    <section id="seo" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h1>

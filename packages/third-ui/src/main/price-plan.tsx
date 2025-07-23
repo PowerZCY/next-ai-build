@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import clsx from 'clsx'
+import { cn } from '@lib/utils';
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon'
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,7 @@ export interface PricePlanProps {
   // default is $
   currency?: string
   pricePlanConfig: PricePlanAppConfig
+  sectionClassName?: string
 }
 
 // billing definition
@@ -29,7 +30,7 @@ export interface PricePlanAppConfig {
   minPlanFeaturesCount: number
 }
 
-export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
+export function PricePlan({ currency = '$', pricePlanConfig, sectionClassName }: PricePlanProps) {
   const t = useTranslations('pricePlan')
   const billingSwitch = t.raw('billingSwitch') as {
     options: Array<{
@@ -91,7 +92,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
             <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">{priceValue}</span>
           </div>
           <div className="flex items-center gap-2 min-h-[24px] mt-1">
-            <span className={clsx('text-xs text-gray-700 dark:text-gray-300 font-medium', plan.showBillingSubTitle === false && 'opacity-0 select-none')}>
+            <span className={cn('text-xs text-gray-700 dark:text-gray-300 font-medium', plan.showBillingSubTitle === false && 'opacity-0 select-none')}>
               {plan.showBillingSubTitle === false ? '' : billingSubTitle}
             </span>
           </div>
@@ -130,7 +131,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
               )}
             </>
           )}
-          <span className={clsx('text-xs text-gray-700 dark:text-gray-300 font-medium', plan.showBillingSubTitle === false && 'opacity-0 select-none')}>
+          <span className={cn('text-xs text-gray-700 dark:text-gray-300 font-medium', plan.showBillingSubTitle === false && 'opacity-0 select-none')}>
             {plan.showBillingSubTitle === false ? '' : billingSubTitle}
           </span>
         </div>
@@ -163,7 +164,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
   }
 
   return (
-    <section id="pricing" className="px-4 py-10 md:px-16 md:py-16 mx-auto max-w-7xl">
+    <section id="pricing" className={cn("px-4 py-10 md:px-16 md:py-16 mx-auto max-w-7xl scroll-mt-10", sectionClassName)}>
       {/* title and subtitle */}
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">
         {t('title')}
@@ -177,7 +178,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
         {/* Monthly area */}
         <div className="flex flex-row-reverse items-center gap-2 w-[180px] justify-end">
           <button
-            className={clsx(
+            className={cn(
               'min-w-[120px] px-6 py-2 rounded-full font-medium border transition text-lg',
               billingKey === 'monthly'
                 ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600'
@@ -195,7 +196,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
             const bOpt = billingOptions.find((opt: any) => opt.key === 'monthly');
             if (!(opt && bOpt && opt.discountText && bOpt.discount !== 0)) return <span className="min-w-[80px] px-2 py-1 text-xs rounded invisible"></span>;
             return (
-              <span className={clsx(
+              <span className={cn(
                 "min-w-[80px] px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap",
                 billingKey !== 'monthly' && 'invisible'
               )}>
@@ -210,7 +211,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
         {/* Yearly area */}
         <div className="flex items-center gap-2 w-[180px] justify-start">
           <button
-            className={clsx(
+            className={cn(
               'min-w-[120px] px-6 py-2 rounded-full font-medium border transition text-lg',
               billingKey === 'yearly'
                 ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600'
@@ -228,7 +229,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
             const bOpt = billingOptions.find((opt: any) => opt.key === 'yearly');
             if (!(opt && bOpt && opt.discountText && bOpt.discount !== 0)) return <span className="min-w-[80px] px-2 py-1 text-xs rounded invisible"></span>;
             return (
-              <span className={clsx(
+              <span className={cn(
                 "min-w-[80px] px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap",
                 billingKey !== 'yearly' && 'invisible'
               )}>
@@ -247,7 +248,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
         {plans.map((plan: any, _idx: number) => (
           <div
             key={plan.key}
-            className={clsx(
+            className={cn(
               'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-8 h-full shadow-sm dark:shadow-none',
               'hover:border-2 hover:border-purple-500',
               'focus-within:border-2 focus-within:border-purple-500'
@@ -313,7 +314,7 @@ export function PricePlan({ currency = '$', pricePlanConfig }: PricePlanProps) {
             <div className="flex-1" />
             {/* button */}
             <button
-              className={clsx(
+              className={cn(
                 'w-full py-2 mt-auto text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
                 plan.button?.disabled
                   ? 'bg-gray-400 cursor-not-allowed'

@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.10.0
+
+### Minor Changes
+
+- fix(main): section style support custom style
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.4
+
 ## 5.9.8
 
 ### Patch Changes

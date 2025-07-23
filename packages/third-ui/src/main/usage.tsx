@@ -1,9 +1,10 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { cn } from '@lib/utils';
 import { globalLucideIcons as icons, getGlobalIcon } from '@base-ui/components/global-icon'
 
-export function Usage() {
+export function Usage({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('usage');
   const steps = t.raw('steps') as Array<{
     title: string;
@@ -12,7 +13,7 @@ export function Usage() {
   }>;
 
   return (
-    <section id="usage" className="px-16 py-10 mx-16 md:mx-32">
+    <section id="usage" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>

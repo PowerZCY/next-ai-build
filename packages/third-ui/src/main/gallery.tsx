@@ -4,8 +4,9 @@ import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
 import { useTranslations } from 'next-intl'
 import Image from "next/image"
 import { GradientButton } from "@third-ui/fuma/mdx/gradient-button"
+import { cn } from '@lib/utils';
 
-export function Gallery() {
+export function Gallery({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('gallery');
   const galleryItems = t.raw('prompts') as string[];
 
@@ -27,7 +28,7 @@ export function Gallery() {
   };
 
   return (
-    <section id="gallery" className="container mx-auto px-4 py-20">
+    <section id="gallery" className={cn("container mx-auto px-4 py-20 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
         {t('titleL')} <span className="text-purple-500">{t('eyesOn')}</span> {t('titleR')}
       </h2>

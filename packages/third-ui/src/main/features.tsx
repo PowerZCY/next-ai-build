@@ -3,8 +3,9 @@
 import { getGlobalIcon } from '@base-ui/components/global-icon';
 import { useTranslations } from 'next-intl'
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { cn } from '@lib/utils';
 
-export function Features() {
+export function Features({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('features');
   
   // 直接从翻译文件获取特性列表
@@ -15,7 +16,7 @@ export function Features() {
   }>;
 
   return (
-    <section id="features" className="px-16 py-10 mx-16 md:mx-32">
+    <section id="features" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-18", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>

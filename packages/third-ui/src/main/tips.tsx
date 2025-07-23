@@ -1,13 +1,14 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { cn } from '@lib/utils';
 
 interface Tip {
   title: string;
   description: string;
 }
 
-export function Tips() {
+export function Tips({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('tips');
   const sections = t.raw('sections') as Tip[];
   
@@ -16,7 +17,7 @@ export function Tips() {
   const rightColumn = sections.slice(midPoint);
 
   return (
-    <section id="tips" className="px-16 py-10 mx-16 md:mx-32">
+    <section id="tips" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>

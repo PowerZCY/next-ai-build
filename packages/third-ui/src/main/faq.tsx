@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from 'next-intl';
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { cn } from '@lib/utils';
 
-export function FAQ() {
+export function FAQ({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('faq');
   const items = t.raw('items') as Array<{
     question: string;
@@ -21,7 +22,7 @@ export function FAQ() {
   };
 
   return (
-    <section id="faq" className="px-16 py-10 mx-16 md:mx-32">
+    <section id="faq" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
         {t('title')}
       </h2>
