@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.10.1
+
+### Patch Changes
+
+- feat(button): add splitTopBorder option to XButton
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.4
+
 ## 5.10.0
 
 ### Minor Changes

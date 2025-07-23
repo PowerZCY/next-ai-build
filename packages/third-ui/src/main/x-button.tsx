@@ -17,6 +17,7 @@ interface MenuItemConfig extends BaseButtonConfig {
     text: string
     color?: string
   }
+  splitTopBorder?: boolean
 }
 
 // single button config
@@ -166,6 +167,7 @@ export function XButton(props: xButtonProps) {
               }}
               disabled={item.disabled}
               className={`flex items-center w-full px-4 py-3 transition hover:bg-neutral-300 dark:hover:bg-neutral-600 text-left relative ${item.disabled ? disabledClass : ''}`}
+              style={item.splitTopBorder ? { borderTop: '1px solid #AC62FD' } : undefined}
             >
               <span className="flex items-center">
                 {item.icon}
