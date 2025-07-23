@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.9.8
+
+### Patch Changes
+
+- fix(button): XButton remove icons definition for all in globalIcons
+- Updated dependencies
+  - @windrun-huaiin/base-ui@5.3.4
+
 ## 5.9.7
 
 ### Patch Changes
