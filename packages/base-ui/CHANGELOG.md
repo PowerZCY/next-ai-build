@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 5.3.4
+
+### Patch Changes
+
+- feat(button): XButton support click-button and click-bitton groups
+- Updated dependencies
+  - @windrun-huaiin/lib@5.7.2
+
 ## 5.3.3
 
 ### Patch Changes

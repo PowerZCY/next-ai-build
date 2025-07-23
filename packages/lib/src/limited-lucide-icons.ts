@@ -69,6 +69,7 @@ export {
   MessageCircleCode,
   Keyboard,
   LandPlot,
+  Languages,
   Layout,
   LayoutTemplate,
   LibraryIcon,

@@ -11,15 +11,12 @@ export interface GradientButtonProps {
   align?: 'left' | 'center' | 'right';
   disabled?: boolean;
   className?: string;
-  
-  // 跳转模式
+  // for Link
   href?: string;
   openInNewTab?: boolean;
   
-  // 点击模式  
+  // for click
   onClick?: () => void | Promise<void>;
-  
-  // 加载状态配置
   loadingText?: React.ReactNode;
   preventDoubleClick?: boolean;
 }
@@ -33,10 +30,11 @@ export function GradientButton({
   href,
   openInNewTab = true,
   onClick,
-  loadingText = "Loading...",
+  loadingText,
   preventDoubleClick = true,
 }: GradientButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const actualLoadingText = loadingText || title?.toString().trim() || 'Loading...'
 
   // set justify class according to alignment
   const getAlignmentClass = () => {
@@ -50,7 +48,6 @@ export function GradientButton({
     }
   };
 
-  // 处理点击事件
   const handleClick = async (e: React.MouseEvent) => {
     if (disabled || isLoading) {
       e.preventDefault();
@@ -76,13 +73,11 @@ export function GradientButton({
     }
   };
 
-  // 按钮是否处于禁用状态
   const isDisabled = disabled || isLoading;
 
-  // 显示的标题内容
-  const displayTitle = isLoading ? loadingText : title;
+  const displayTitle = isLoading ? actualLoadingText : title;
 
-  // 显示的图标
+  // icon
   const displayIcon = isLoading ? (
     <icons.Loader2 className="h-4 w-4 text-white animate-spin" />
   ) : icon ? (
@@ -93,7 +88,12 @@ export function GradientButton({
     <icons.ArrowRight className="h-4 w-4 text-white" />
   );
 
-  const buttonContent = (
+  const buttonContent = onClick ? (
+    <>
+      <span>{displayIcon}</span>
+      <span className="ml-1">{displayTitle}</span>
+    </>
+  ) : (
     <>
       <span>{displayTitle}</span>
       <span className="ml-1">{displayIcon}</span>
@@ -116,7 +116,7 @@ export function GradientButton({
   return (
     <div className={`flex flex-col sm:flex-row gap-3 ${getAlignmentClass()}`}>
       {onClick ? (
-        // 点击模式
+        // for click
         <Button
           size="lg"
           className={buttonClassName}
@@ -126,7 +126,7 @@ export function GradientButton({
           {buttonContent}
         </Button>
       ) : (
-        // 跳转模式
+        // for Link
         <Button
           asChild
           size="lg"

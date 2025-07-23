@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 5.7.2
+
+### Patch Changes
+
+- feat(button): XButton support click-button and click-bitton groups
+
 ## 5.7.1
 
 ### Patch Changes

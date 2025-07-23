@@ -14,3 +14,4 @@ export * from './loading';
 export * from './nprogress-bar';
 export * from './price-plan';
 export * from './ads-alert-dialog';
+export * from './x-button'
