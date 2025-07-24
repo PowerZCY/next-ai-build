@@ -121,7 +121,7 @@ export const globalLucideIcons = {
 
 // Default fallback icon - centralized configuration
 // Use a safe fallback that we know exists in both Lucide and custom icons
-const DEFAULT_FALLBACK_ICON = 'BTC' as keyof typeof globalLucideIcons;
+const DEFAULT_FALLBACK_ICON = 'Sparkles' as keyof typeof globalLucideIcons;
 
 /**
  * use iconKey to load icon safely

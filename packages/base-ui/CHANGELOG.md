@@ -1,5 +1,14 @@
 # @windrun-huaiin/base-ui
 
+## 6.0.1
+
+### Patch Changes
+
+- feat(clerk): clerk now can show signup button optional in fuma header
+  feat(icon): defalt icon change to Sparkles
+- Updated dependencies
+  - @windrun-huaiin/lib@6.1.0
+
 ## 6.0.0
 
 ### Major Changes

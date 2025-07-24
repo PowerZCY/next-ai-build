@@ -24,7 +24,7 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
       // false就先排左边的菜单, true就先排右边的按钮
       secondary: true,
       // NicknameFilter 假设在其内部也使用了 useNickname
-      children: <ClerkUser locale={locale} clerkAuthInModal={appConfig.style.clerkAuthInModal} />
+      children: <ClerkUser locale={locale} clerkAuthInModal={appConfig.style.clerkAuthInModal} showSignUp={false}/>
     },
     // {
     //   type: 'custom',

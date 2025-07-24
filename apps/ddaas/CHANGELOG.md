@@ -1,5 +1,17 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.8.3
+
+### Patch Changes
+
+- feat(clerk): clerk now can show signup button optional in fuma header
+  feat(icon): defalt icon change to Sparkles
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.10.3
+  - @windrun-huaiin/lib@6.1.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.8.2
 
 ### Patch Changes

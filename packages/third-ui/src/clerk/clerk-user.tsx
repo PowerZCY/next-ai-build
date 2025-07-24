@@ -1,7 +1,7 @@
 'use client';
 
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useTranslations } from 'next-intl';
 import { type JSX } from 'react';
 
@@ -9,11 +9,13 @@ interface ClerkUserProps {
   locale: string;
   // default as true, ‘cause Clerk direct is not well, so just use model for sign-in/sign-up
   clerkAuthInModal?: boolean;
+  showSignUp?: boolean;
 }
 
 export function ClerkUser({ 
   locale, 
-  clerkAuthInModal = true 
+  clerkAuthInModal = true,
+  showSignUp = true
 }: ClerkUserProps): JSX.Element {
   const t = useTranslations('clerk');
   const t2 = useTranslations('footer');
@@ -29,6 +31,13 @@ export function ClerkUser({
               {t('signIn')}
             </button>
           </SignInButton>
+          {showSignUp && (
+            <SignUpButton mode={clerkAuthInModal ? 'modal' : 'redirect'}>
+              <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
+                {t('signUp')}
+              </button>
+            </SignUpButton>
+          )}
         </SignedOut>
         <SignedIn>
           <UserButton
