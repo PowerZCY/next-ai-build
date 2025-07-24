@@ -4,7 +4,6 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     utils: 'src/utils.ts',
-    'limited-lucide-icons': 'src/limited-lucide-icons.ts',
     'llm-utils': 'src/llm-utils.ts',
     'common-app-config': 'src/common-app-config.ts',
   },

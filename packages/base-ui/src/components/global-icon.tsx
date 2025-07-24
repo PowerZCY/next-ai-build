@@ -8,7 +8,7 @@
 import { BUILTIN_ICON_COMPONENTS } from '@base-ui/assets';
 import { themeIconColor, themeSvgIconSize } from '@base-ui/lib/theme-util';
 
-import * as limitedIconsModule from '@lib/limited-lucide-icons';
+import * as lucideIconsModule from 'lucide-react';
 import { type LucideProps } from 'lucide-react';
 import React from 'react';
 
@@ -22,13 +22,13 @@ type StyledLucideIconComponent = (props: LucideProps) => React.ReactElement;
 type IconComponent = StyledLucideIconComponent | React.ComponentType<LucideProps>;
 
 // Style Lucide icons with global color
-const tempStyledLimitedIcons: Partial<Record<keyof typeof limitedIconsModule, StyledLucideIconComponent>> = {};
+const tempStyledLimitedIcons: Partial<Record<keyof typeof lucideIconsModule, StyledLucideIconComponent>> = {};
 
-for (const iconNameKey in limitedIconsModule) {
-  if (Object.prototype.hasOwnProperty.call(limitedIconsModule, iconNameKey)) {
-    const iconName = iconNameKey as keyof typeof limitedIconsModule;
+for (const iconNameKey in lucideIconsModule) {
+  if (Object.prototype.hasOwnProperty.call(lucideIconsModule, iconNameKey)) {
+    const iconName = iconNameKey as keyof typeof lucideIconsModule;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const OriginalIconComponent = limitedIconsModule[iconName] as any; 
+    const OriginalIconComponent = lucideIconsModule[iconName] as any; 
 
     if (typeof OriginalIconComponent === 'function' || 
         (typeof OriginalIconComponent === 'object' && 
@@ -72,7 +72,7 @@ for (const iconNameKey in limitedIconsModule) {
 }
 
 const styledLimitedIconsPart = tempStyledLimitedIcons as {
-  [K in keyof typeof limitedIconsModule]: StyledLucideIconComponent;
+  [K in keyof typeof lucideIconsModule]: StyledLucideIconComponent;
 };
 
 // Wrap built-in SVG components with the same className handling logic
