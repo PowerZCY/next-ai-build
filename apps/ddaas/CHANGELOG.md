@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.8.2
+
+### Patch Changes
+
+- refactor(icon): icon now only exists in @windrun-huaiin/buse-ui, and just control dependenly!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.0
+  - @windrun-huaiin/third-ui@5.10.2
+  - @windrun-huaiin/lib@6.1.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.8.0
 
 ### Minor Changes

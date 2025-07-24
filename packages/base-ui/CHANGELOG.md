@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 6.0.0
+
+### Major Changes
+
+- refactor(icon): icon now only exists in @windrun-huaiin/buse-ui, and just control dependenly!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@6.1.0
+
 ## 5.3.4
 
 ### Patch Changes

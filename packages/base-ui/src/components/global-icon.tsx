@@ -8,7 +8,7 @@
 import { BUILTIN_ICON_COMPONENTS } from '@base-ui/assets';
 import { themeIconColor, themeSvgIconSize } from '@base-ui/lib/theme-util';
 
-import * as limitedIconsModule from '@lib/limited-lucide-icons';
+import * as limitedIconsModule from '@base-ui/components/limited-lucide-icons';
 import { type LucideProps } from 'lucide-react';
 import React from 'react';
 

@@ -1,5 +1,12 @@
 # @windrun-huaiin/third-ui
 
+## 5.10.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.0
+
 ## 5.10.1
 
 ### Patch Changes

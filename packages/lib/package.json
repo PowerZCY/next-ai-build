@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/lib",
-  "version": "5.7.2",
+  "version": "6.1.0",
   "description": "Common utilities and configuration",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -15,11 +15,6 @@
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.mjs",
       "require": "./dist/utils.js"
-    },
-    "./limited-lucide-icons": {
-      "types": "./dist/limited-lucide-icons.d.ts",
-      "import": "./dist/limited-lucide-icons.mjs",
-      "require": "./dist/limited-lucide-icons.js"
     },
     "./llm-utils": {
       "types": "./dist/llm-utils.d.ts",
@@ -55,13 +50,13 @@
     "remark-gfm": "^4.0.1",
     "remark-mdx": "^3.1.0",
     "remark-frontmatter": "^5.0.0",
-    "unist-util-visit": "^5.0.0",
-    "lucide-react": "^0.525.0"
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
     "tsup": "^8.3.5",
-    "@types/node": "^22.15.18"
+    "@types/node": "^22.15.18",
+    "@types/react": "19.1.2"
   },
   "peerDependencies": {
     "clsx": "^2.1.1",
