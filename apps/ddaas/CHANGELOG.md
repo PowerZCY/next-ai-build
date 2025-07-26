@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.13.1
+
+### Patch Changes
+
+- fix(main): hero style
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.11.4
+  - @windrun-huaiin/lib@6.1.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.13.0
 
 ### Minor Changes
