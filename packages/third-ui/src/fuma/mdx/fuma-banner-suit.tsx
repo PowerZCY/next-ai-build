@@ -1,8 +1,7 @@
 'use client'
 
-import { Banner } from './banner';
 import { useTranslations } from 'next-intl';
-import { cn } from '@lib/utils';
+import { Banner } from '@third-ui/fuma/mdx/banner';
 
 export function FumaBannerSuit({ showBanner }: { showBanner: boolean }) {
   const t = useTranslations('home');
