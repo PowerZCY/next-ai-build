@@ -42,9 +42,9 @@ export default async function Layout({
           enabled: true,
           mode: 'light-dark-system',
         }}
-        className={`dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25 ${showBanner ? 'has-banner' : 'no-banner'}`}
+        className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${showBanner ? 'pt-30 has-banner' : 'pt-15 no-banner'}`}
         >
-        <FumaBannerSuit showText={showBanner}/>
+        <FumaBannerSuit showBanner={showBanner}/>
         {children}
         <Footer />
         <GoToTop />

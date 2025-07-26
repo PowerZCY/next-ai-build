@@ -42,9 +42,9 @@ export default async function RootLayout({
           enabled: true,
           mode: 'light-dark-system',
         }}
-        className={`dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] pt-25 ${clerkPageBanner ? 'has-banner' : 'no-banner'}`}
+        className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${clerkPageBanner ? 'pt-30 has-banner' : 'pt-20 no-banner'}`}
         >
-        <FumaBannerSuit showText={clerkPageBanner}/>
+        <FumaBannerSuit showBanner={clerkPageBanner}/>
         {children}
       </HomeLayout>
     </ClerkProviderClient>

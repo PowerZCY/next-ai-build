@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.11.0
+
+### Minor Changes
+
+- feat(banner): take over banner suit all! No need more fumadocs-banner
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.10.3
 
 ### Patch Changes

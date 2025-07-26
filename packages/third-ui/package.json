@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/third-ui",
-  "version": "5.10.3",
+  "version": "5.11.0",
   "description": "Third-party integrated UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -58,6 +58,7 @@
     "fumadocs-mdx": "11.6.3",
     "fumadocs-typescript": "4.0.4",
     "fumadocs-ui": "15.3.3",
+    "class-variance-authority": "^0.7.1",
     "katex": "^0.16.22",
     "mermaid": "^11.6.0",
     "react-medium-image-zoom": "^5.2.14",

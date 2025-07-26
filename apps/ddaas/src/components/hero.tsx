@@ -10,7 +10,7 @@ export function Hero() {
   const t = useTranslations('hero');
 
   return (
-    <section className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center gap-12">
+    <section className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-12">
       <div className="flex-[1.6] space-y-6">
         <h1 className="text-4xl md:text-6xl font-bold leading-tight">
           {t('mainTitle')}<br />{" "}

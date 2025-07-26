@@ -1,16 +1,31 @@
 'use client'
 
-import { Banner } from 'fumadocs-ui/components/banner';
+import { Banner } from './banner';
 import { useTranslations } from 'next-intl';
+import { cn } from '@lib/utils';
 
-export function FumaBannerSuit({ showText }: { showText: boolean }) {
+export function FumaBannerSuit({ showBanner }: { showBanner: boolean }) {
   const t = useTranslations('home');
+  const heightValue = showBanner ? 3 : 0.5;
+  const height= `${heightValue}rem`;
   return (
-    showText ?
-      (<Banner variant="rainbow" changeLayout={true}>
-        <p className="text-xl">{t('banner')}</p>
-      </Banner>)
-      : (<Banner variant="normal" changeLayout={true} className="bg-white dark:bg-[rgb(10,10,10)]"/>)
+    <>
+      {/* 设置 header 的 top 位置为 Banner 的底部，避免间隙 */}
+      {showBanner ? (
+        <Banner variant="rainbow" changeLayout={true} height={heightValue}>
+          <p className="text-xl">{t('banner')}</p>
+        </Banner>
+      ) : (
+        <div
+          className="fixed top-0 left-0 w-screen z-[1001] m-0 rounded-none bg-neutral-100 dark:bg-neutral-900"
+          style={{
+            height: height,
+            minHeight: height,
+            maxHeight: height,
+          }}
+        />
+      )}
+    </>
   );
 }
 
