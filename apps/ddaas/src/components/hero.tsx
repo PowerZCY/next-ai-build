@@ -12,11 +12,11 @@ export function Hero() {
   return (
     <section className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-12">
       <div className="flex-[1.6] space-y-6">
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight">
           {t('mainTitle')}<br />{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{t('mainEyesOn')}</span>
         </h1>
-        <p className="text-lg md:text-2xl leading-tight text-gray-400">
+        <p className="text-lg text-gray-400 max-w-2xl">
           {t('description')}
         </p>
         <GradientButton
