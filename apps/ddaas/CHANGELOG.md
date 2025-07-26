@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.14.0
+
+### Minor Changes
+
+- feat(main): gallery support R2 public url
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.11.5
+  - @windrun-huaiin/lib@6.1.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.13.2
 
 ### Patch Changes

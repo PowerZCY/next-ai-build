@@ -13,6 +13,7 @@
     "description": "Transform your ideas into breathtaking visuals with Reve Image's AI-powered image generation. Unleash your creativity with the cutting-edge technology.",
     "button": "Get Started",
     "about": "Enjoy 20 free images daily with Reve Image",
+    "heroImageUrl": "https://r2.d8ger.com/Reve-Image/0.webp",
     "heroImageAlt": "Reve Image AI-generated artwork showcasing the power of the platform"
   },
   "usage": {
@@ -161,13 +162,32 @@
     "titleR": "Creations",
     "description": "Explore the incredible possibilities with Reve Image. Each image below was generated using the AI technology with the accompanying prompt.",
     "button": "Create Your Own Images",
+    "defaultImgUrl": "https://r2.d8ger.com/default.webp",
     "prompts": [
-      "A futuristic cityscape with flying vehicles and neon lights",
-      "A serene mountain landscape at sunset with a lake reflection",
-      "A magical forest with glowing plants and mystical creatures",
-      "An underwater scene with colorful coral reefs and exotic fish",
-      "A steampunk-inspired mechanical dragon with brass gears",
-      "A cosmic scene with planets, nebulae, and a spaceship"
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/1.webp",
+        "altMsg": "A futuristic cityscape with flying vehicles and neon lights"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/2.webp",
+        "altMsg": "A serene mountain landscape at sunset with a lake reflection"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/3.webp",
+        "altMsg": "A magical forest with glowing plants and mystical creatures"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/4.webp",
+        "altMsg": "An underwater scene with colorful coral reefs and exotic fish"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/5.webp",
+        "altMsg": "A steampunk-inspired mechanical dragon with brass gears"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/6.webp",
+        "altMsg": "A cosmic scene with planets, nebulae, and a spaceship"
+      }
     ]
   },
   "tips": {

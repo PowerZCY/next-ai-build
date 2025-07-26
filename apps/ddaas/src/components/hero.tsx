@@ -31,7 +31,7 @@ export function Hero() {
       <div className="flex-[1] relative flex justify-center md:justify-end">
         <div className="rounded-lg overflow-hidden shadow-purple-500/20 group">
           <Image
-            src="/0.webp"
+            src={t('heroImageUrl')}
             alt={t('heroImageAlt')}
             width={500}
             height={500}

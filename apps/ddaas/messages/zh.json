@@ -161,13 +161,32 @@
     "titleR": "作品展示",
     "description": "探索 Reve Image 带来的无限可能。以下每张图片都是使用 AI 技术根据相应提示生成。",
     "button": "创建您自己的图片",
+    "defaultImgUrl": "https://r2.d8ger.com/default.webp",
     "prompts": [
-      "A futuristic cityscape with flying vehicles and neon lights",
-      "A serene mountain landscape at sunset with a lake reflection",
-      "A magical forest with glowing plants and mystical creatures",
-      "An underwater scene with colorful coral reefs and exotic fish",
-      "A steampunk-inspired mechanical dragon with brass gears",
-      "A cosmic scene with planets, nebulae, and a spaceship"
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/1.webp",
+        "altMsg": "A futuristic cityscape with flying vehicles and neon lights"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/2.webp",
+        "altMsg": "A serene mountain landscape at sunset with a lake reflection"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/3.webp",
+        "altMsg": "A magical forest with glowing plants and mystical creatures"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/4.webp",
+        "altMsg": "An underwater scene with colorful coral reefs and exotic fish"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/5.webp",
+        "altMsg": "A steampunk-inspired mechanical dragon with brass gears"
+      },
+      {
+        "url": "https://r2.d8ger.com/Reve-Image/6.webp",
+        "altMsg": "A cosmic scene with planets, nebulae, and a spaceship"
+      }
     ]
   },
   "tips": {

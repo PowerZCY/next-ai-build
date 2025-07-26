@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.11.5
+
+### Patch Changes
+
+- feat(main): gallery support R2 public url
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.11.4
 
 ### Patch Changes
