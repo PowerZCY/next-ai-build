@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.11.2
+
+### Patch Changes
+
+- fix(hotfix): aipromt-textarea title view bug
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.11.1
 
 ### Patch Changes

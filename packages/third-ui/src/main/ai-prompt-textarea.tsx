@@ -188,12 +188,12 @@ export function AIPromptTextarea({
 
   // 渲染标题组件
   const renderTitle = () => {
-    if (title?.trim()) return null
+    if (!title?.trim()) return null
     
     return (
       <div className="space-y-1">
         {title && <span className="text-xl font-semibold text-foreground">{title}</span>}
-        {description?.trim() && <span className="text-sm text-gray-400 ml-1">{description}</span>}
+        {description?.trim() && <span className="text-sm text-gray-400 ml-2">{description}</span>}
       </div>
     )
   }

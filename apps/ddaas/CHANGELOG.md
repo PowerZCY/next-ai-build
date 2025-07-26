@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.11.0
+
+### Minor Changes
+
+- fix(hotfix): aipromt-textarea title view bug
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.11.2
+  - @windrun-huaiin/lib@6.1.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.10.0
 
 ### Minor Changes
