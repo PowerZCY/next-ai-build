@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { cn } from '@lib/utils'
 
 interface AIPromptTextareaProps {
   /**
@@ -142,6 +143,7 @@ export function AIPromptTextarea({
       adjustTextareaHeight()
     }, 0)
     return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, minHeight, maxHeight, autoScroll, extraScrollSpace])
 
   // handle input, limit max words
@@ -207,7 +209,13 @@ export function AIPromptTextarea({
       onPaste={handlePaste}
       placeholder={placeholder}
       disabled={disabled}
-      className={`w-full p-4 bg-transparent ${isEmbedded ? 'border-0' : 'border-2 border-border rounded-lg'} focus:outline-none focus:border-purple-400 hover:border-purple-500 transition-colors text-foreground placeholder-muted-foreground placeholder:text-base disabled:bg-muted disabled:cursor-not-allowed resize-none ${className}`}
+      className={cn(
+        'w-full p-4 bg-transparent transition-colors text-foreground placeholder-muted-foreground placeholder:text-base disabled:bg-muted disabled:cursor-not-allowed resize-none',
+        isEmbedded 
+          ? 'border-0 hover:border-2 hover:border-purple-500 focus:border-2 focus:border-purple-500' 
+          : 'border-2 border-border rounded-lg hover:border-purple-500 focus:border-purple-500',
+        className
+      )}
       style={{ minHeight: `${minHeight}px` }}
     />
   )
