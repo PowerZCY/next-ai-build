@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.11.4
+
+### Patch Changes
+
+- fix(hotfix): aipromt-textarea style bug
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.11.3
 
 ### Patch Changes

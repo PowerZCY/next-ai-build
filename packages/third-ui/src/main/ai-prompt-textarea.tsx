@@ -212,8 +212,8 @@ export function AIPromptTextarea({
       className={cn(
         'w-full p-4 bg-transparent transition-colors text-foreground placeholder-muted-foreground placeholder:text-base disabled:bg-muted disabled:cursor-not-allowed resize-none',
         isEmbedded 
-          ? 'border-0 hover:border-2 hover:border-purple-500 focus:border-2 focus:border-purple-500' 
-          : 'border-2 border-border rounded-lg hover:border-purple-500 focus:border-purple-500',
+          ? 'border-0 hover:border-2 hover:border-purple-500 focus:outline-none focus:border-2 focus:border-purple-500' 
+          : 'border-2 border-border rounded-lg hover:border-purple-500 focus:outline-none focus:border-purple-500',
         className
       )}
       style={{ minHeight: `${minHeight}px` }}
