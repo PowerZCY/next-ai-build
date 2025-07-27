@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 6.1.1
+
+### Patch Changes
+
+- fix(main): gallery imagedownload hotfix, use R2 worker to solve CORS issue
+
 ## 6.1.0
 
 ### Minor Changes

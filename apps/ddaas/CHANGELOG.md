@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.15.1
+
+### Patch Changes
+
+- fix(main): gallery imagedownload hotfix, use R2 worker to solve CORS issue
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.12.1
+  - @windrun-huaiin/lib@6.1.1
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.15.0
 
 ### Minor Changes

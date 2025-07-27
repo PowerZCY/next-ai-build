@@ -81,6 +81,7 @@ export function createCommonAppConfig(options?: {
         text: process.env.NEXT_PUBLIC_STYLE_WATERMARK_TEXT || "巽川·怀因"
       },
       cdnBaseUrl: process.env.NEXT_PUBLIC_STYLE_CDN_BASE_URL || "https://r2.d8ger.com",
+      cdnProxyUrl: process.env.NEXT_PUBLIC_STYLE_CDN_PROXY_URL || "https://r2-explorer-template.zcy777et.workers.dev/proxy",
       placeHolder: {
         image: process.env.NEXT_PUBLIC_STYLE_PLACEHOLDER_IMAGE || "/default.webp"
       }

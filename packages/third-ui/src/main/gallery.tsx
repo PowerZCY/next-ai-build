@@ -21,68 +21,69 @@ export function Gallery({ sectionClassName, button }: GalleryProps) {
   const galleryItems = t.raw('prompts') as GalleryItem[];
   const defaultImgUrl = t.raw('defaultImgUrl') as string;
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [downloadingItems, setDownloadingItems] = useState<Set<number>>(new Set());
+  const cdnProxyUrl = process.env.NEXT_PUBLIC_STYLE_CDN_PROXY_URL!;
 
   const handleDownload = async (item: GalleryItem, index: number) => {
+    // prevent duplicate clicks
+    if (downloadingItems.has(index)) {
+      return;
+    }
+
+    // set download status
+    setDownloadingItems(prev => new Set(prev).add(index));
+
     try {
-      // use fetch to force download, and DO NEED  CORS config in R2
-      const response = await fetch(item.url, {
-        method: 'GET',
-        // CORS mode declaration
-        mode: 'cors',
-      });
+      // use R2 proxy to download directly, no need to fetch
+      // convert original R2 URL to proxy URL
+      const originalUrl = new URL(item.url);
+      const filename = originalUrl.pathname.substring(1);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // build proxy download URL
+      const proxyUrl = `${cdnProxyUrl}/${encodeURIComponent(filename)}`;
       
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      // set extension based on the actual file type
-      const contentType = response.headers.get('content-type');
+      // extract file extension from URL
+      const urlExtension = item.url.split('.').pop()?.toLowerCase();
       let extension = '.webp';
-
-      if (contentType) {
-        switch (contentType) {
-          case 'image/jpeg':
-          case 'image/jpg':
-            extension = '.jpg';
-            break;
-          case 'image/png':
-            extension = '.png';
-            break;
-          case 'image/gif':
-            extension = '.gif';
-            break;
-          case 'image/webp':
-            extension = '.webp';
-            break;
-          case 'image/svg+xml':
-            extension = '.svg';
-            break;
-          default:
-            // if cannot determine, try to extract the extension from the URL
-            const urlExtension = item.url.split('.').pop()?.toLowerCase();
-            if (urlExtension && ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(urlExtension)) {
-              extension = `.${urlExtension}`;
-            }
-        }
+      if (urlExtension && ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(urlExtension)) {
+        extension = `.${urlExtension}`;
       }
       const downloadPrefix = t('downloadPrefix');
+      
+      // fetch file from proxy
+      const response = await fetch(proxyUrl);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      // convert to blob
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // create download link and trigger download
       const a = document.createElement('a');
-      a.href = url;
+      a.href = blobUrl;
       a.download = `${downloadPrefix}-${index + 1}${extension}`;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
       
-      // clean up
+      // clean up DOM elements and blob URL
       setTimeout(() => {
-        window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
       }, 100);
+      
     } catch (error) {
       console.error('Download failed:', error);
+    } finally {
+      // clear download status
+      setDownloadingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(index);
+        return newSet;
+      });
     }
   };
 
@@ -116,9 +117,19 @@ export function Gallery({ sectionClassName, button }: GalleryProps) {
             <div className="absolute inset-0 flex items-end justify-end p-4 opacity-0 group-hover:opacity-100 transition duration-300">
               <button
                 onClick={() => handleDownload(item, index)}
-                className="bg-black/50 hover:bg-black/70 p-2 rounded-full text-white/80 hover:text-white transition-all duration-300"
+                disabled={downloadingItems.has(index)}
+                className={cn(
+                  "p-2 rounded-full transition-all duration-300",
+                  downloadingItems.has(index)
+                    ? "bg-black/30 text-white/50"
+                    : "bg-black/50 hover:bg-black/70 text-white/80 hover:text-white"
+                )}
               >
-                <icons.Download className="h-5 w-5 text-white" />
+                {downloadingItems.has(index) ? (
+                  <icons.Loader2 className="h-5 w-5 text-white animate-spin" />
+                ) : (
+                  <icons.Download className="h-5 w-5 text-white" />
+                )}
               </button>
             </div>
           </div>
@@ -132,4 +143,3 @@ export function Gallery({ sectionClassName, button }: GalleryProps) {
     </section>
   )
 }
-

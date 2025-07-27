@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.12.1
+
+### Patch Changes
+
+- fix(main): gallery imagedownload hotfix, use R2 worker to solve CORS issue
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.12.0
 
 ### Minor Changes
