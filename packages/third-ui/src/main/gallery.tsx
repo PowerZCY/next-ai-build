@@ -1,18 +1,22 @@
 'use client'
 
 import { globalLucideIcons as icons } from "@base-ui/components/global-icon"
+import { cn } from '@lib/utils'
 import { useTranslations } from 'next-intl'
 import Image from "next/image"
-import { GradientButton } from "@third-ui/fuma/mdx/gradient-button"
-import { cn } from '@lib/utils';
-import { useState } from 'react';
+import { useState } from 'react'
 
 interface GalleryItem {
   url: string;
   altMsg: string;
 }
 
-export function Gallery({ sectionClassName }: { sectionClassName?: string }) {
+interface GalleryProps {
+  sectionClassName?: string;
+  button?: React.ReactNode;
+}
+
+export function Gallery({ sectionClassName, button }: GalleryProps) {
   const t = useTranslations('gallery');
   const galleryItems = t.raw('prompts') as GalleryItem[];
   const defaultImgUrl = t.raw('defaultImgUrl') as string;
@@ -20,16 +24,63 @@ export function Gallery({ sectionClassName }: { sectionClassName?: string }) {
 
   const handleDownload = async (item: GalleryItem, index: number) => {
     try {
-      const response = await fetch(item.url);
+      // use fetch to force download, and DO NEED  CORS config in R2
+      const response = await fetch(item.url, {
+        method: 'GET',
+        // CORS mode declaration
+        mode: 'cors',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
+
+      // set extension based on the actual file type
+      const contentType = response.headers.get('content-type');
+      let extension = '.webp';
+
+      if (contentType) {
+        switch (contentType) {
+          case 'image/jpeg':
+          case 'image/jpg':
+            extension = '.jpg';
+            break;
+          case 'image/png':
+            extension = '.png';
+            break;
+          case 'image/gif':
+            extension = '.gif';
+            break;
+          case 'image/webp':
+            extension = '.webp';
+            break;
+          case 'image/svg+xml':
+            extension = '.svg';
+            break;
+          default:
+            // if cannot determine, try to extract the extension from the URL
+            const urlExtension = item.url.split('.').pop()?.toLowerCase();
+            if (urlExtension && ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(urlExtension)) {
+              extension = `.${urlExtension}`;
+            }
+        }
+      }
+      const downloadPrefix = t('downloadPrefix');
       const a = document.createElement('a');
       a.href = url;
-      a.download = `reve-image-${index + 1}.webp`;
+      a.download = `${downloadPrefix}-${index + 1}${extension}`;
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      
+      // clean up
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
     } catch (error) {
       console.error('Download failed:', error);
     }
@@ -73,13 +124,11 @@ export function Gallery({ sectionClassName }: { sectionClassName?: string }) {
           </div>
         ))}
       </div>
-      <div className="text-center mt-12">
-        <GradientButton
-          title={t('button')}
-          href="https://preview.reve.art/"
-          align="center"
-        />
-      </div>
+      {button && (
+        <div className="text-center mt-12">
+          {button}
+        </div>
+      )}
     </section>
   )
 }

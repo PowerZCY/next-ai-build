@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.12.0
+
+### Minor Changes
+
+- fix(main): gallery imagedownload hotfix, button config
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.11.5
 
 ### Patch Changes

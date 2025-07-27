@@ -160,8 +160,13 @@
     "eyesOn": "画廊",
     "titleR": "作品展示",
     "description": "探索 Reve Image 带来的无限可能。以下每张图片都是使用 AI 技术根据相应提示生成。",
-    "button": "创建您自己的图片",
+    "button": {
+      "title": "创建您自己的图片",
+      "href": "https://preview.reve.art/",
+      "align": "center"
+    },
     "defaultImgUrl": "https://r2.d8ger.com/default.webp",
+    "downloadPrefix": "ddaas",
     "prompts": [
       {
         "url": "https://r2.d8ger.com/Reve-Image/1.webp",
