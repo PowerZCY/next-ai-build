@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.12.3
+
+### Patch Changes
+
+- feat(style): price-plan now use new UI
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.12.2
 
 ### Patch Changes
