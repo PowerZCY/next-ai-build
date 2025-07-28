@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { cn } from '@lib/utils';
+import { richText } from '@third-ui/main/rich-text-expert';
 
 interface Tip {
   title: string;
@@ -24,12 +25,16 @@ export function Tips({ sectionClassName }: { sectionClassName?: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 md:p-12 shadow-sm dark:shadow-none">
         {[leftColumn, rightColumn].map((column: Tip[], colIndex) => (
           <div key={colIndex} className="space-y-8">
-            {column.map((tip: Tip, tipIndex) => (
-              <div key={tipIndex} className="space-y-4">
-                <h3 className="text-2xl font-semibold">{tip.title}</h3>
-                <p className="">{tip.description}</p>
-              </div>
-            ))}
+            {column.map((tip: Tip, tipIndex) => {
+              // calculate the actual index in the original array
+              const actualIndex = colIndex === 0 ? tipIndex : tipIndex + midPoint;
+              return (
+                <div key={tipIndex} className="space-y-4">
+                  <h3 className="text-2xl font-semibold">{tip.title}</h3>
+                  <p className="">{richText(t, `sections.${actualIndex}.description`)}</p>
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

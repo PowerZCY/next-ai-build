@@ -1,0 +1,94 @@
+---
+title: NextJS翻译富文本支持
+description: Support paragraph in origin next-intl
+date: 2025-07-28
+---
+
+
+## 标签组合规则总结表
+
+### 当前可用标签
+- `<strong>` - 加粗(重要)
+- `<em>` - 斜体(强调)
+- `<u>` - 下划线
+- `<mark>` - 高亮
+- `<del>` - 删除线
+- `<sub>` - 下标
+- `<sup>` - 上标
+
+---
+
+## 二标签组合规则
+
+| 组合模式 | 语义 | 使用场景 | 示例 | 推荐度 |
+|---------|------|----------|------|--------|
+| `<strong><em>` | 重要+强调 | 核心概念、关键术语 | "**重要概念**" | ⭐⭐⭐⭐⭐ |
+| `<strong><u>` | 重要+下划线 | 关键步骤、重要链接 | "**关键步骤**" | ⭐⭐⭐⭐⭐ |
+| `<strong><mark>` | 重要+高亮 | 核心信息、重点提示 | "**核心信息**" | ⭐⭐⭐⭐⭐ |
+| `<em><u>` | 强调+下划线 | 注意事项、特殊说明 | "*注意事项*" | ⭐⭐⭐⭐ |
+| `<em><mark>` | 强调+高亮 | 重点提示、关键点 | "*重点提示*" | ⭐⭐⭐⭐ |
+| `<u><mark>` | 下划线+高亮 | 特殊标记、重要标识 | "特殊标记" | ⭐⭐⭐ |
+| `<strong><del>` | 重要+删除 | 已废弃的重要功能 | "**已废弃**" | ⭐⭐ |
+| `<em><del>` | 强调+删除 | 已废弃的强调内容 | "*已废弃*" | ⭐⭐ |
+| `<strong><sub>` | 重要+下标 | 化学公式、数学公式 | "H**₂**O" | ⭐⭐⭐ |
+| `<strong><sup>` | 重要+上标 | 数学公式、版本号 | "X**²**" | ⭐⭐⭐ |
+| `<em><sub>` | 强调+下标 | 化学元素、变量 | "H*₂*O" | ⭐⭐ |
+| `<em><sup>` | 强调+上标 | 数学符号、注释 | "X*²*" | ⭐⭐ |
+
+---
+
+## 三标签组合规则
+
+| 组合模式 | 语义 | 使用场景 | 示例 | 推荐度 |
+|---------|------|----------|------|--------|
+| `<strong><em><u>` | 重要+强调+下划线 | 极其重要的概念 | "**极其重要**" | ⭐⭐⭐⭐ |
+| `<strong><em><mark>` | 重要+强调+高亮 | 核心中的核心 | "**核心重点**" | ⭐⭐⭐⭐ |
+| `<strong><u><mark>` | 重要+下划线+高亮 | 关键标识信息 | "**关键标识**" | ⭐⭐⭐ |
+| `<em><u><mark>` | 强调+下划线+高亮 | 特殊强调内容 | "*特殊强调*" | ⭐⭐⭐ |
+| `<strong><em><sub>` | 重要+强调+下标 | 重要化学公式 | "H**₂**O" | ⭐⭐ |
+| `<strong><em><sup>` | 重要+强调+上标 | 重要数学公式 | "X**²**" | ⭐⭐ |
+| `<strong><u><sub>` | 重要+下划线+下标 | 重要变量标识 | "v**₀**" | ⭐⭐ |
+| `<strong><u><sup>` | 重要+下划线+上标 | 重要版本标识 | "v**²**" | ⭐⭐ |
+
+---
+
+## 使用建议
+
+### ✅ **推荐使用(4-5星)**
+- `<strong><em>` - 最常用的重要强调组合
+- `<strong><u>` - 重要步骤标识
+- `<strong><mark>` - 核心信息高亮
+- `<em><u>` - 注意事项标识
+
+### ⚠️ **谨慎使用(2-3星)**
+- 包含 `<del>` 的组合 - 语义特殊
+- 包含 `<sub>/<sup>` 的组合 - 特定场景
+- 三层组合 - 避免过度复杂
+
+### ❌ **避免使用**
+- 超过3层的嵌套
+- 语义冲突的组合(如 `<del><ins>`)
+- 重复标签(如 `<strong><strong>`)
+
+---
+
+## 实际应用示例
+
+```json
+{
+  "seoContent": {
+    "intro": "Reve Image represents the <strong><em>cutting edge</em></strong> of AI technology.",
+    "warning": "Please <strong><u>carefully</u></strong> read the instructions.",
+    "highlight": "This is <mark><strong>critical</strong></mark> information.",
+    "formula": "The chemical formula is H<strong><sub>2</sub></strong>O.",
+    "version": "Current version is v<strong><sup>2.0</sup></strong>.",
+    "deprecated": "This feature is <strong><del>deprecated</del></strong>."
+    "sections": [
+      {
+        "title": "Testing All HTML Tag Combinations",
+        "content": "This paragraph demonstrates all possible tag combinations. <strong><em>Important emphasized text</em></strong> shows the most common pattern. <strong><u>Important underlined text</u></strong> highlights key steps. <strong><mark>Important highlighted text</mark></strong> marks critical information. <em><u>Emphasized underlined text</u></em> draws attention to notes. <em><mark>Emphasized highlighted text</mark></em> emphasizes key points. <u><mark>Underlined highlighted text</mark></u> creates special markers. <strong><del>Important deleted text</del></strong> shows deprecated features. <em><del>Emphasized deleted text</del></em> indicates obsolete content. Chemical formulas like H<strong><sub>2</sub></strong>O use subscript. Mathematical expressions like X<strong><sup>2</sup></strong> use superscript. <em><sub>Emphasized subscript</sub></em> for variables. <em><sup>Emphasized superscript</sup></em> for annotations. Three-tag combinations: <strong><em><u>Important emphasized underlined</u></em></strong> for critical concepts. <strong><em><mark>Important emphasized highlighted</mark></em></strong> for core content. <strong><u><mark>Important underlined highlighted</mark></u></strong> for key identifiers. <em><u><mark>Emphasized underlined highlighted</mark></u></em> for special emphasis. Scientific notation: H<strong><em><sub>2</sub></em></strong>O and X<strong><em><sup>2</sup></em></strong>. Version identifiers: v<strong><u><sup>2.0</sup></u></strong> and v<strong><u><sub>0</sub></u></strong>. This comprehensive test covers all supported tag combinations."
+      }
+    ]
+  }
+}
+```

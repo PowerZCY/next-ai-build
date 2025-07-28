@@ -232,8 +232,12 @@
     "intro": "Reve Image represents the cutting edge of AI image generation technology, offering users the ability to transform text descriptions into stunning visual content. Whether you're a designer seeking inspiration, a marketer creating content, or an artist exploring new mediums, Reve Image provides the tools to bring your imagination to life.",
     "sections": [
       {
+        "title": "Testing All HTML Tag Combinations",
+        "content": "This paragraph demonstrates all possible tag combinations. <strong><em>Important emphasized text</em></strong> shows the most common pattern. <strong><u>Important underlined text</u></strong> highlights key steps. <strong><mark>Important highlighted text</mark></strong> marks critical information. <em><u>Emphasized underlined text</u></em> draws attention to notes. <em><mark>Emphasized highlighted text</mark></em> emphasizes key points. <u><mark>Underlined highlighted text</mark></u> creates special markers. <strong><del>Important deleted text</del></strong> shows deprecated features. <em><del>Emphasized deleted text</del></em> indicates obsolete content. Chemical formulas like H<strong><sub>2</sub></strong>O use subscript. Mathematical expressions like X<strong><sup>2</sup></strong> use superscript. <em><sub>Emphasized subscript</sub></em> for variables. <em><sup>Emphasized superscript</sup></em> for annotations. Three-tag combinations: <strong><em><u>Important emphasized underlined</u></em></strong> for critical concepts. <strong><em><mark>Important emphasized highlighted</mark></em></strong> for core content. <strong><u><mark>Important underlined highlighted</mark></u></strong> for key identifiers. <em><u><mark>Emphasized underlined highlighted</mark></u></em> for special emphasis. Scientific notation: H<strong><em><sub>2</sub></em></strong>O and X<strong><em><sup>2</sup></em></strong>. Version identifiers: v<strong><u><sup>2.0</sup></u></strong> and v<strong><u><sub>0</sub></u></strong>. This comprehensive test covers all supported tag combinations."
+      },
+      {
         "title": "Understanding How Reve Image Works",
-        "content": "When you enter a prompt, Reve Image analyzes the semantic meaning and generates corresponding imagery that matches your description. This process happens in seconds, allowing for rapid iteration and experimentation."
+        "content": "When you enter a prompt, <strong><u>Reve Image</u></strong> analyzes the semantic meaning and generates corresponding imagery that matches your description. This process happens in seconds, allowing for rapid iteration and experimentation."
       },
       {
         "title": "Crafting Effective Prompts for Reve Image",

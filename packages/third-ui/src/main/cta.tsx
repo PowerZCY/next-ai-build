@@ -3,6 +3,7 @@
 import { GradientButton } from "@third-ui/fuma/mdx/gradient-button";
 import { useTranslations } from 'next-intl';
 import { cn } from '@lib/utils';
+import { richText } from '@third-ui/main/rich-text-expert';
 
 export function CTA({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('cta');
@@ -18,7 +19,7 @@ export function CTA({ sectionClassName }: { sectionClassName?: string }) {
           {t('title')} <span className="text-purple-400">{t('eyesOn')}</span>?
         </h2>
         <p className="text-2xl mx-auto mb-8">
-          {t('description1')}
+          {richText(t, 'description1')}
           <br />
           <span className="text-purple-400">{t('description2')}</span>
         </p>

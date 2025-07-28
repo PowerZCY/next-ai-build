@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.12.2
+
+### Patch Changes
+
+- feat(style): i18n translation now support rich text by origin html tag
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.12.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.15.2
+
+### Patch Changes
+
+- feat(style): i18n translation now support rich text by origin html tag
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.12.2
+  - @windrun-huaiin/lib@6.1.1
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.15.1
 
 ### Patch Changes

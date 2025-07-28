@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { cn } from '@lib/utils';
 import { globalLucideIcons as icons, getGlobalIcon } from '@base-ui/components/global-icon'
+import { richText } from '@third-ui/main/rich-text-expert';
 
 export function Usage({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('usage');
@@ -18,7 +19,7 @@ export function Usage({ sectionClassName }: { sectionClassName?: string }) {
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>
       <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto whitespace-nowrap">
-        {t('description')}
+        {richText(t, 'description')}
       </p>
       <div className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 md:p-12 shadow-sm dark:shadow-none">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
@@ -33,7 +34,7 @@ export function Usage({ sectionClassName }: { sectionClassName?: string }) {
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
                     {`${idx + 1}. ${step.title}`}
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300">{step.description}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{richText(t, `steps.${idx}.description`)}</p>
                 </div>
               </div>
             )

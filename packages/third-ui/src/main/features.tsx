@@ -4,6 +4,7 @@ import { getGlobalIcon } from '@base-ui/components/global-icon';
 import { useTranslations } from 'next-intl'
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { cn } from '@lib/utils';
+import { richText } from '@third-ui/main/rich-text-expert';
 
 export function Features({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('features');
@@ -21,7 +22,7 @@ export function Features({ sectionClassName }: { sectionClassName?: string }) {
         {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
       </h2>
       <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto whitespace-nowrap">
-        {t('description')}
+        {richText(t, 'description')}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
         {featureItems.map((feature, index) => {
@@ -35,7 +36,7 @@ export function Features({ sectionClassName }: { sectionClassName?: string }) {
                 <Icon className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">{feature.title}</h3>
-              <p className="text-gray-700 dark:text-gray-300">{feature.description}</p>
+              <p className="text-gray-700 dark:text-gray-300">{richText(t, `items.${index}.description`)}</p>
             </div>
           )
         })}

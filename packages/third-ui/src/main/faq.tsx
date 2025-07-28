@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from 'next-intl';
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
 import { cn } from '@lib/utils';
+import { richText } from '@third-ui/main/rich-text-expert';
 
 export function FAQ({ sectionClassName }: { sectionClassName?: string }) {
   const t = useTranslations('faq');
@@ -27,7 +28,7 @@ export function FAQ({ sectionClassName }: { sectionClassName?: string }) {
         {t('title')}
       </h2>
       <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto">
-        {t('description')}
+        {richText(t, 'description')}
       </p>
       <div className="space-y-6">
         {items.map((item, idx) => {
@@ -48,7 +49,7 @@ export function FAQ({ sectionClassName }: { sectionClassName?: string }) {
               </button>
               {isOpen && (
                 <div className="mt-4 text-gray-700 dark:text-gray-300 text-base">
-                  {item.answer}
+                  {richText(t, `items.${idx}.answer`)}
                 </div>
               )}
             </div>

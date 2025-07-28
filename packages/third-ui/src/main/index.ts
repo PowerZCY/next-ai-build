@@ -16,3 +16,4 @@ export * from './price-plan';
 export * from './ads-alert-dialog';
 export * from './x-button'
 export * from './ai-prompt-textarea'
+export * from './rich-text-expert'
