@@ -149,18 +149,18 @@ export function PricePlan({ currency = '$', pricePlanConfig, sectionClassName }:
       top: Math.max(8, y),
       zIndex: 9999,
       maxWidth: 200,
-      background: '#222',
-      color: '#fff',
-      borderRadius: 10,
-      padding: '16px',
-      boxShadow: '0 4px 24px 0 rgba(0,0,0,0.25)',
-      fontSize: 15,
-      lineHeight: 1.6,
+      transform: 'translateY(-50%)',
       pointerEvents: 'none',
       whiteSpace: 'pre-line',
-      transform: 'translateY(-50%)',
     }
-    return <div style={style}>{content}</div>
+    return (
+      <div 
+        style={style}
+        className="bg-gray-700 dark:bg-gray-200 text-gray-100 dark:text-gray-800 text-xs leading-relaxed px-3 py-2 rounded-lg shadow-lg border border-gray-300 dark:border-gray-600 backdrop-blur-sm"
+      >
+        {content}
+      </div>
+    )
   }
 
   return (
