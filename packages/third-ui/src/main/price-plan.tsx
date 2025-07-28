@@ -174,65 +174,45 @@ export function PricePlan({ currency = '$', pricePlanConfig, sectionClassName }:
       </p>
 
       {/* billing switch button */}
-      <div className="flex justify-center items-center gap-8 mb-12">
-        {/* Monthly area */}
-        <div className="flex flex-row-reverse items-center gap-2 w-[180px] justify-end">
-          <button
-            className={cn(
-              'min-w-[120px] px-6 py-2 rounded-full font-medium border transition text-lg',
-              billingKey === 'monthly'
-                ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600'
-                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-purple-400',
-              'mr-4'
-            )}
-            onClick={() => setBillingKey('monthly')}
-            type="button"
-          >
-            {(billingSwitch.options.find((opt: any) => opt.key === 'monthly')?.name) || 'Monthly'}
-          </button>
-          {/* tag (from right to left), invisible when not selected */}
-          {(() => {
-            const opt = billingSwitch.options.find((opt: any) => opt.key === 'monthly');
-            const bOpt = billingOptions.find((opt: any) => opt.key === 'monthly');
-            if (!(opt && bOpt && opt.discountText && bOpt.discount !== 0)) return <span className="min-w-[80px] px-2 py-1 text-xs rounded invisible"></span>;
-            return (
-              <span className={cn(
-                "min-w-[80px] px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap",
-                billingKey !== 'monthly' && 'invisible'
-              )}>
-                {opt.discountText.replace(
-                  '{percent}',
-                  String(Math.round(Math.abs(bOpt.discount) * 100))
-                )}
-              </span>
-            );
-          })()}
+      <div className="flex flex-col items-center">
+        {/* Binary toggle buttons */}
+        <div className="flex items-center relative mb-3">
+          <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1">
+            <button
+              className={cn(
+                'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
+                billingKey === 'monthly'
+                  ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+                  : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full'
+              )}
+              onClick={() => setBillingKey('monthly')}
+              type="button"
+            >
+              {(billingSwitch.options.find((opt: any) => opt.key === 'monthly')?.name) || 'Monthly'}
+            </button>
+            <button
+              className={cn(
+                'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
+                billingKey === 'yearly'
+                  ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+                  : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full'
+              )}
+              onClick={() => setBillingKey('yearly')}
+              type="button"
+            >
+              {(billingSwitch.options.find((opt: any) => opt.key === 'yearly')?.name) || 'Yearly'}
+            </button>
+          </div>
         </div>
-        {/* Yearly area */}
-        <div className="flex items-center gap-2 w-[180px] justify-start">
-          <button
-            className={cn(
-              'min-w-[120px] px-6 py-2 rounded-full font-medium border transition text-lg',
-              billingKey === 'yearly'
-                ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600'
-                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-purple-400',
-              'ml-4'
-            )}
-            onClick={() => setBillingKey('yearly')}
-            type="button"
-          >
-            {(billingSwitch.options.find((opt: any) => opt.key === 'yearly')?.name) || 'Yearly'}
-          </button>
-          {/* tag (from left to right), invisible when not selected */}
+        
+        {/* Discount info - fixed position between buttons and cards */}
+        <div className="h-8 flex items-center justify-center mb-3">
           {(() => {
-            const opt = billingSwitch.options.find((opt: any) => opt.key === 'yearly');
-            const bOpt = billingOptions.find((opt: any) => opt.key === 'yearly');
-            if (!(opt && bOpt && opt.discountText && bOpt.discount !== 0)) return <span className="min-w-[80px] px-2 py-1 text-xs rounded invisible"></span>;
+            const opt = billingSwitch.options.find((opt: any) => opt.key === billingKey);
+            const bOpt = billingOptions.find((opt: any) => opt.key === billingKey);
+            if (!(opt && bOpt && opt.discountText && bOpt.discount !== 0)) return null;
             return (
-              <span className={cn(
-                "min-w-[80px] px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap",
-                billingKey !== 'yearly' && 'invisible'
-              )}>
+              <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
                 {opt.discountText.replace(
                   '{percent}',
                   String(Math.round(Math.abs(bOpt.discount) * 100))
