@@ -96,14 +96,14 @@ export function createRobotsHandler(baseUrl: string) {
  * Create sitemap.xml handler function
  * @param baseUrl - The base URL of the website
  * @param locales - Supported locales array
- * @param mdxSourceDir - MDX source directory path
+ * @param mdxSourceDir - MDX source directory path, default is empty
  * @param openMdxSEOSiteMap - Whether to include MDX content in sitemap, default is true
  * @returns Sitemap handler function
  */
 export function createSitemapHandler(
   baseUrl: string,
   locales: string[],
-  mdxSourceDir: string,
+  mdxSourceDir: string = '',
   openMdxSEOSiteMap: boolean = true
 ) {
   // force static generation

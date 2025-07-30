@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.13.2
+
+### Patch Changes
+
+- fix(sitemap): SEO generate exception hotfix
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.13.1
 
 ### Patch Changes
