@@ -31,31 +31,42 @@ export function generateSitemap(
   mdxSourceDir: string,
   openMdxSEOSiteMap: boolean = true
 ): MetadataRoute.Sitemap {
-  // 1. read all blog mdx file names
-  const blogDir = path.join(process.cwd(), mdxSourceDir);
-  const blogFiles = fs.readdirSync(blogDir).filter(f => f.endsWith('.mdx'));
-
   // 2. handle index.mdx (blog start page) and other slugs
   const blogRoutes: MetadataRoute.Sitemap = [];
 
-  for (const locale of locales) {
-    for (const f of blogFiles) {
-      if (f === 'index.mdx') {
-        blogRoutes.push({
-          url: `${baseUrl}/${locale}/blog`,
-          lastModified: new Date(),
-          changeFrequency: 'daily',
-          priority: 1.0
-        });
-      } else {
-        const slug = f.replace(/\.mdx$/, '');
-        blogRoutes.push({
-          url: `${baseUrl}/${locale}/blog/${slug}`,
-          lastModified: new Date(),
-          changeFrequency: f === 'ioc.mdx' ? 'daily' : 'monthly',
-          priority: 0.8
-        });
+  // 1. read all blog mdx file names with error handling
+  if (mdxSourceDir && mdxSourceDir.trim() !== '') {
+    const blogDir = path.join(process.cwd(), mdxSourceDir);
+    
+    // Check if directory exists and is readable
+    try {
+      if (fs.existsSync(blogDir) && fs.statSync(blogDir).isDirectory()) {
+        const blogFiles = fs.readdirSync(blogDir).filter(f => f.endsWith('.mdx'));
+
+        for (const locale of locales) {
+          for (const f of blogFiles) {
+            if (f === 'index.mdx') {
+              blogRoutes.push({
+                url: `${baseUrl}/${locale}/blog`,
+                lastModified: new Date(),
+                changeFrequency: 'daily',
+                priority: 1.0
+              });
+            } else {
+              const slug = f.replace(/\.mdx$/, '');
+              blogRoutes.push({
+                url: `${baseUrl}/${locale}/blog/${slug}`,
+                lastModified: new Date(),
+                changeFrequency: f === 'ioc.mdx' ? 'daily' : 'monthly',
+                priority: 0.8
+              });
+            }
+          }
+        }
       }
+    } catch (error) {
+      // Handle edge cases like race conditions, permission changes, or filesystem errors
+      console.warn(`Warning: Could not read MDX directory "${mdxSourceDir}":`, error);
     }
   }
 
