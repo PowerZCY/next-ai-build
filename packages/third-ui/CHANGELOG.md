@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.13.0
+
+### Minor Changes
+
+- fix(app): SEO config hotfix
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.12.4
 
 ### Patch Changes

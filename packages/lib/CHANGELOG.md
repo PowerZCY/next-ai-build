@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 6.2.0
+
+### Minor Changes
+
+- fix(app): SEO config hotfix
+
 ## 6.1.2
 
 ### Patch Changes

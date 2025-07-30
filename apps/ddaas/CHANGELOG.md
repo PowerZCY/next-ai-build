@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.17.0
+
+### Minor Changes
+
+- fix(app): SEO config hotfix
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.13.0
+  - @windrun-huaiin/lib@6.2.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.16.0
 
 ### Minor Changes

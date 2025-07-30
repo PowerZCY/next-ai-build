@@ -5,5 +5,4 @@ export default createSitemapHandler(
   appConfig.baseUrl,
   appConfig.i18n.locales as string[],
   appConfig.mdxSourceDir.blog,
-  appConfig.style.openMdxSEOSiteMap
 );

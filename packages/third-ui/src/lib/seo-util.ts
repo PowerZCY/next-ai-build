@@ -22,14 +22,14 @@ export function generateRobots(baseUrl: string): MetadataRoute.Robots {
  * @param baseUrl - The base URL of the website
  * @param locales - Supported locales array
  * @param mdxSourceDir - MDX source directory path
- * @param openMdxSEOSiteMap - Whether to include MDX content in sitemap
+ * @param openMdxSEOSiteMap - Whether to include MDX content in sitemap, default is true
  * @returns Sitemap entries
  */
 export function generateSitemap(
   baseUrl: string,
   locales: string[],
   mdxSourceDir: string,
-  openMdxSEOSiteMap: boolean = false
+  openMdxSEOSiteMap: boolean = true
 ): MetadataRoute.Sitemap {
   // 1. read all blog mdx file names
   const blogDir = path.join(process.cwd(), mdxSourceDir);
@@ -86,14 +86,14 @@ export function createRobotsHandler(baseUrl: string) {
  * @param baseUrl - The base URL of the website
  * @param locales - Supported locales array
  * @param mdxSourceDir - MDX source directory path
- * @param openMdxSEOSiteMap - Whether to include MDX content in sitemap
+ * @param openMdxSEOSiteMap - Whether to include MDX content in sitemap, default is true
  * @returns Sitemap handler function
  */
 export function createSitemapHandler(
   baseUrl: string,
   locales: string[],
   mdxSourceDir: string,
-  openMdxSEOSiteMap: boolean = false
+  openMdxSEOSiteMap: boolean = true
 ) {
   // force static generation
   const sitemapHandler = function sitemap(): MetadataRoute.Sitemap {
