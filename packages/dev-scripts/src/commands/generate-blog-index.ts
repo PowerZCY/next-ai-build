@@ -255,7 +255,7 @@ export async function generateBlogIndex(
     }
 
     if (featuredArticles.length === 0 && pastArticles.length === 0 && !iocArticle) {
-      mdxContent += "No blog posts found yet. Stay tuned!\n"
+      mdxContent += "## Ooops\nNo blog posts found yet. Stay tuned!\n"
     }
 
     writeFileSync(indexFile, mdxContent)

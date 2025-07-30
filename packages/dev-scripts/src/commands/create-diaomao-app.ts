@@ -147,6 +147,7 @@ export async function createDiaomaoApp(targetDir: string) {
     console.log(`  cd ${targetDir}`);
     console.log(`  pnpm build`);
     console.log(`  pnpm dev`);
+    console.log(`  NOTE: if you want to update @windrun-huaiin packages, please run pnpm windrun`);
     console.log(`  NOTE: please check .env.local file and set your own env!`);
   } catch (error) {
     console.error('Failed to create project:', error);

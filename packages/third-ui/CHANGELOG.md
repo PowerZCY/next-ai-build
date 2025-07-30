@@ -1,5 +1,20 @@
 # @windrun-huaiin/third-ui
 
+## 5.12.4
+
+### Patch Changes
+
+- feat(app): enhance SEO and localization support
+
+  - Added hero image URL to the Chinese messages
+  - Refactored robots and sitemap generation using new handlers
+  - Updated blog index and ioc articles' dates
+  - Introduced SEO utility functions for better metadata handling
+  - Improved app configuration for localization support
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.12.3
 
 ### Patch Changes

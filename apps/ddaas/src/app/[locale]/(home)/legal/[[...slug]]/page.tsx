@@ -14,6 +14,7 @@ const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   githubBaseUrl: appConfig.githubBaseUrl,
   siteIcon: <SiteIcon />,
   FallbackPage: NotFoundPage,
+  supportedLocales: appConfig.i18n.locales as string[],
 });
 
 export default Page;

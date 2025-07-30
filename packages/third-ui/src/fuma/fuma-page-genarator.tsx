@@ -35,7 +35,11 @@ interface FumaPageParams {
   /* 
    * The fallback page component to use when the page is not found
    */
-  FallbackPage: React.ComponentType<{ siteIcon: ReactNode }>; 
+  FallbackPage: React.ComponentType<{ siteIcon: ReactNode }>;
+  /* 
+   * Supported locales for generating alternates metadata, defaults to ['en']
+   */
+  supportedLocales?: string[];
 }
 
 export function createFumaPage({
@@ -47,6 +51,7 @@ export function createFumaPage({
   copyButtonComponent,
   siteIcon,
   FallbackPage,
+  supportedLocales = ['en'],
 }: FumaPageParams) {
   const Page = async function Page({ params }: { params: Promise<{ locale: string; slug?: string[] }> }) {
     const { slug, locale } = await params;
@@ -92,17 +97,39 @@ export function createFumaPage({
   }
 
   async function generateMetadata(props: { params: Promise<{ slug?: string[]; locale?: string }> }) {
-    const params = await props.params;
-    const page = mdxContentSource.getPage(params.slug, params.locale);
+    const { slug, locale } = await props.params;
+    const page = mdxContentSource.getPage(slug, locale);
     if (!page) {
       return {
         title: '404 - Page Not Found',
         description: 'This page could not be found.',
       };
     }
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
+    const baseRoute = mdxSourceDir.replace('src/mdx/', '');
+    // build the current page path
+    const currentPath = slug ? slug.join('/') : '';
+    const currentUrl = `${baseUrl}/${locale}/${baseRoute}${currentPath ? `/${currentPath}` : ''}`;
+
+    // generate the seo language map
+    const seoLanguageMap: Record<string, string> = {};
+
+    console.log('supportedLocales', supportedLocales);
+    
+    supportedLocales.forEach(loc => {
+      seoLanguageMap[loc] = `${baseUrl}/${loc}/${baseRoute}${currentPath ? `/${currentPath}` : ''}`;
+    });
+
+    console.log('seoLanguageMap', seoLanguageMap);
+
     return {
+      metadataBase: new URL(baseUrl),
       title: page.data.title,
       description: page.data.description,
+      alternates: {
+        canonical: currentUrl,
+        languages: seoLanguageMap
+      },
     };
   }
 

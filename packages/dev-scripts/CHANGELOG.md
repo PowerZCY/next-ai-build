@@ -1,5 +1,17 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.8.1
+
+### Patch Changes
+
+- feat(app): enhance SEO and localization support
+
+  - Added hero image URL to the Chinese messages
+  - Refactored robots and sitemap generation using new handlers
+  - Updated blog index and ioc articles' dates
+  - Introduced SEO utility functions for better metadata handling
+  - Improved app configuration for localization support
+
 ## 6.8.0
 
 ### Minor Changes

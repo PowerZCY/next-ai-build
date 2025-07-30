@@ -1,12 +1,4 @@
 import { appConfig } from "@/lib/appConfig";
-import type { MetadataRoute } from "next";
+import { createRobotsHandler } from "@third-ui/lib/server";
 
-export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-    },
-    sitemap: `${appConfig.baseUrl}/sitemap.xml`,
-  };
-}
+export default createRobotsHandler(appConfig.baseUrl);

@@ -1,5 +1,25 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.16.0
+
+### Minor Changes
+
+- feat(app): enhance SEO and localization support
+
+  - Added hero image URL to the Chinese messages
+  - Refactored robots and sitemap generation using new handlers
+  - Updated blog index and ioc articles' dates
+  - Introduced SEO utility functions for better metadata handling
+  - Improved app configuration for localization support
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+  - @windrun-huaiin/third-ui@5.12.4
+  - @windrun-huaiin/lib@6.1.2
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.15.2
 
 ### Patch Changes

@@ -73,6 +73,7 @@ export function createCommonAppConfig(options?: {
       icon: {
         uniformColor: process.env.NEXT_PUBLIC_STYLE_ICON_COLOR || "text-purple-500"
       },
+      openMdxSEOSiteMap: process.env.NEXT_PUBLIC_STYLE_OPEN_MDX_SEO_SITE_MAP === 'true',
       showBanner: process.env.NEXT_PUBLIC_STYLE_SHOW_BANNER === 'true',
       clerkAuthInModal: process.env.NEXT_PUBLIC_STYLE_CLERK_AUTH_IN_MODAL === 'true',
       clerkPageBanner: process.env.NEXT_PUBLIC_STYLE_CLERK_PAGE_BANNER === 'true',

@@ -1,12 +1,12 @@
 import { createCommonAppConfig, createI18nHelpers, LOCALE_PRESETS } from "@lib/common-app-config";
 
-// 创建应用配置
+// create app config
 export const appConfig = {
   ...createCommonAppConfig(LOCALE_PRESETS.EN_ZH),
 };
 
-// 导出国际化辅助函数
+// export i18n helpers
 export const { isSupportedLocale, getValidLocale, generatedLocales } = createI18nHelpers(appConfig.i18n);
 
-// 便捷常量直接从 shortcuts 导出
+// export shortcuts
 export const { iconColor, watermark, showBanner, clerkPageBanner, clerkAuthInModal, placeHolderImage } = appConfig.shortcuts;
