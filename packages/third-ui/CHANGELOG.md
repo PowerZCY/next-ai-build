@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.13.3
+
+### Patch Changes
+
+- fix(log): SEO generate log removed
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.1
+
 ## 5.13.2
 
 ### Patch Changes

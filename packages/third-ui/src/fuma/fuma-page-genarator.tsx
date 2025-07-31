@@ -114,13 +114,10 @@ export function createFumaPage({
     // generate the seo language map
     const seoLanguageMap: Record<string, string> = {};
 
-    console.log('supportedLocales', supportedLocales);
     
     supportedLocales.forEach(loc => {
       seoLanguageMap[loc] = `${baseUrl}/${loc}/${baseRoute}${currentPath ? `/${currentPath}` : ''}`;
     });
-
-    console.log('seoLanguageMap', seoLanguageMap);
 
     return {
       metadataBase: new URL(baseUrl),
