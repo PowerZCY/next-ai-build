@@ -80,6 +80,7 @@ export {
   Mail,
   MessageCircleMore,
   MessageCircleCode,
+  Music4,
   MoreHorizontal,
   MousePointerClick,
   NotepadText,
