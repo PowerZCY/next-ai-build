@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 6.0.2
+
+### Patch Changes
+
+- feat(icon): add music4 icon
+- Updated dependencies
+  - @windrun-huaiin/lib@6.2.0
+
 ## 6.0.1
 
 ### Patch Changes
