@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.14.1
+
+### Patch Changes
+
+- feat(mermaid): add zoom shortcuts to mermaid preview dialog
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.3
+
 ## 5.14.0
 
 ### Minor Changes

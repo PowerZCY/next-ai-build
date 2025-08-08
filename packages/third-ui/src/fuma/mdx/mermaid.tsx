@@ -1,7 +1,7 @@
 'use client';
 
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-// 注意：不使用外部对话框库，避免第三方应用构建时的 React 上下文冲突
+// Attention: do not use external dialog library, avoid react context conflict when building third-party applications
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
@@ -68,22 +68,24 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
   // helpers for preview zoom
   const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
   const resetTransform = useCallback(() => {
-    setScale(1);
+    setScale(4); // 400%
     setTranslate({ x: 0, y: 0 });
   }, []);
 
   const zoomBy = useCallback((delta: number) => {
-    // 基于中心缩放：保持缩放中心在画布中点，不引入位移
-    setScale((prev) => clamp(prev + delta, 0.25, 6));
+    // zoom by center: keep the zoom center at the center of the canvas, without introducing displacement
+    setScale((prev) => clamp(prev + delta, 0.25, 10));
   }, []);
 
   const onWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    // Cmd/Ctrl + 滚轮缩放（围绕中心点），否则上下平移
+    // Cmd/Ctrl + wheel zoom (around the center point), otherwise up and down panning
     if (e.metaKey || e.ctrlKey) {
       e.preventDefault();
+      e.stopPropagation();
       const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setScale((prev) => clamp(prev + delta, 0.25, 6));
+      setScale((prev) => clamp(prev + delta, 0.25, 10));
     } else {
+      e.stopPropagation();
       setTranslate((prev) => ({ x: prev.x, y: prev.y - e.deltaY }));
     }
   }, []);
@@ -106,6 +108,62 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
     isPanningRef.current = false;
     (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
   }, []);
+
+  // prevent browser-level zoom (touchpad pinch/shortcut) from taking effect when the dialog is open
+  useEffect(() => {
+    if (!open) return;
+    // 初次打开时，默认放大到 400%
+    resetTransform();
+    const onGlobalWheel = (ev: WheelEvent) => {
+      if (ev.ctrlKey || ev.metaKey) {
+        ev.preventDefault();
+      }
+    };
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (!(ev.ctrlKey || ev.metaKey)) return;
+      const k = ev.key;
+      if (k === '=' || k === '+') {
+        ev.preventDefault();
+        setScale((prev) => clamp(prev + 0.2, 0.25, 10));
+      } else if (k === '-') {
+        ev.preventDefault();
+        setScale((prev) => clamp(prev - 0.2, 0.25, 10));
+      } else if (k === '0') {
+        ev.preventDefault();
+        resetTransform();
+      }
+    };
+    window.addEventListener('wheel', onGlobalWheel, { passive: false, capture: true });
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => {
+      window.removeEventListener('wheel', onGlobalWheel, true);
+      window.removeEventListener('keydown', onKeyDown, true);
+    };
+  }, [open, resetTransform]);
+
+  // Lock background scroll when dialog is open
+  useEffect(() => {
+    if (!open) return;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousLeft = document.body.style.left;
+    const previousRight = document.body.style.right;
+    const previousWidth = document.body.style.width;
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.left = previousLeft;
+      document.body.style.right = previousRight;
+      document.body.style.width = previousWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
  
   return (
     <div>
@@ -137,7 +195,12 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
           aria-label={typeof title === 'string' ? title : 'Mermaid Preview'}
           className="fixed inset-0 z-[9999] flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-black/60" onClick={() => { setOpen(false); resetTransform(); }} />
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => { setOpen(false); resetTransform(); }}
+            onWheel={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onTouchMove={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          />
           <div className="relative z-[1] max-w-[95vw] w-[95vw] h-[88vh] p-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-2xl overflow-hidden">
             {/* Top bar */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">
@@ -149,7 +212,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 <button
                   aria-label="Zoom out"
                   className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px]"
-                  onClick={() => zoomBy(-0.2)}
+                  onClick={() => zoomBy(-0.5)}
                 >
                   －
                 </button>
@@ -157,9 +220,39 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 <button
                   aria-label="Zoom in"
                   className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px]"
-                  onClick={() => zoomBy(0.2)}
+                  onClick={() => zoomBy(0.5)}
                 >
                   ＋
+                </button>
+                {/* quick zoom shortcuts */}
+                <div className="mx-1 h-4 w-px bg-neutral-300 dark:bg-neutral-700" />
+                <button
+                  aria-label="Zoom 100%"
+                  className="inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  onClick={() => setScale(1)}
+                >
+                  X1
+                </button>
+                <button
+                  aria-label="Zoom 200%"
+                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  onClick={() => setScale(2)}
+                >
+                  X2
+                </button>
+                <button
+                  aria-label="Zoom 300%"
+                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  onClick={() => setScale(3)}
+                >
+                  X3
+                </button>
+                <button
+                  aria-label="Zoom 1000%"
+                  className="ml-1 inline-flex h-6 min-w-10 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  onClick={() => setScale(10)}
+                >
+                  X10
                 </button>
                 <button
                   aria-label="Reset"
@@ -180,7 +273,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
 
             {/* Canvas */}
             <div
-              className="relative h-[calc(88vh-40px)] w-full overflow-hidden bg-white dark:bg-neutral-900"
+              className="relative h-[calc(88vh-40px)] w-full overflow-hidden bg-white dark:bg-neutral-900 touch-none overscroll-contain"
               onWheel={onWheel}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
