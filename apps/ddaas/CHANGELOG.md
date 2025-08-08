@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.17.1
+
+### Patch Changes
+
+- feat(mdx): clerk-toc serial number fixed
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.2
+  - @windrun-huaiin/third-ui@5.13.4
+  - @windrun-huaiin/lib@6.2.0
+  - @windrun-huaiin/shared-assets@4.1.3
+
 ## 5.17.0
 
 ### Minor Changes
