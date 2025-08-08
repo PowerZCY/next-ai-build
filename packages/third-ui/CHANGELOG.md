@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.14.2
+
+### Patch Changes
+
+- feat(mermaid): support two-finger pan on touchpad to mermaid preview dialog
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.3
+
 ## 5.14.1
 
 ### Patch Changes

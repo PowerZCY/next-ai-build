@@ -85,8 +85,10 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
       const delta = e.deltaY > 0 ? -0.1 : 0.1;
       setScale((prev) => clamp(prev + delta, 0.25, 10));
     } else {
+      // two-finger pan on touchpad: support both horizontal (deltaX) and vertical (deltaY)
+      e.preventDefault();
       e.stopPropagation();
-      setTranslate((prev) => ({ x: prev.x, y: prev.y - e.deltaY }));
+      setTranslate((prev) => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
     }
   }, []);
 
