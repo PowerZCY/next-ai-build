@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 5.17.2
+
+### Patch Changes
+
+- test(package): just update version
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.3
+  - @windrun-huaiin/third-ui@5.13.6
+  - @windrun-huaiin/lib@6.2.1
+  - @windrun-huaiin/shared-assets@4.1.4
+
 ## 5.17.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/ddaas-website",
-  "version": "5.17.1",
+  "version": "5.17.2",
   "private": true,
   "scripts": {
     "postinstall": "fumadocs-mdx",

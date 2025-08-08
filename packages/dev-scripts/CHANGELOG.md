@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.8.2
+
+### Patch Changes
+
+- test(package): just update version
+
 ## 6.8.1
 
 ### Patch Changes

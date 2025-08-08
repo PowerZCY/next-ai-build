@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 6.2.1
+
+### Patch Changes
+
+- test(package): just update version
+
 ## 6.2.0
 
 ### Minor Changes

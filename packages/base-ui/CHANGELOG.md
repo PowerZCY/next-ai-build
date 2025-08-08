@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 6.0.3
+
+### Patch Changes
+
+- test(package): just update version
+- Updated dependencies
+  - @windrun-huaiin/lib@6.2.1
+
 ## 6.0.2
 
 ### Patch Changes

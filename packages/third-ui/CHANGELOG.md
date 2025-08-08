@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.13.6
+
+### Patch Changes
+
+- test(package): just update version
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.3
+
 ## 5.13.5
 
 ### Patch Changes

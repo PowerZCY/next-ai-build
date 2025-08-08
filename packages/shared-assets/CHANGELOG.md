@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.1.4
+
+### Patch Changes
+
+- test(package): just update version
+
 ## 4.1.3
 
 ### Patch Changes
