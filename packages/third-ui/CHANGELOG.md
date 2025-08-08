@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 5.13.5
+
+### Patch Changes
+
+- feat(mdx): add mermaid preview dialog
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.2
+
 ## 5.13.4
 
 ### Patch Changes
