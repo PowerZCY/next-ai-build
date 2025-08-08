@@ -1,11 +1,7 @@
 'use client';
 
 import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTitle,
-} from '@base-ui/ui/alert-dialog';
+// 注意：不使用外部对话框库，避免第三方应用构建时的 React 上下文冲突
 import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
@@ -133,11 +129,16 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
         </div>
       )}
 
-      {/* Preview Dialog */}
-      {enablePreview && (
-        <AlertDialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetTransform(); }}>
-          <AlertDialogContent className="z-50 max-w-[95vw] w-[95vw] h-[88vh] p-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <AlertDialogTitle className="sr-only">{title ?? 'Mermaid Preview'}</AlertDialogTitle>
+      {/* Preview Dialog (custom minimal dialog) */}
+      {enablePreview && open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={typeof title === 'string' ? title : 'Mermaid Preview'}
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+        >
+          <div className="absolute inset-0 bg-black/60" onClick={() => { setOpen(false); resetTransform(); }} />
+          <div className="relative z-[1] max-w-[95vw] w-[95vw] h-[88vh] p-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-2xl overflow-hidden">
             {/* Top bar */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
@@ -170,7 +171,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 <button
                   aria-label="Close"
                   className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600"
-                  onClick={() => setOpen(false)}
+                  onClick={() => { setOpen(false); resetTransform(); }}
                 >
                   <icons.X className="h-3.5 w-3.5" />
                 </button>
@@ -199,8 +200,8 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 Drag to pan, hold Cmd/Ctrl + scroll to zoom
               </div>
             </div>
-          </AlertDialogContent>
-        </AlertDialog>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 5.14.0
+
+### Minor Changes
+
+- hotfix(mermaid): fix mermaid preview dialog, caused by react context conflict
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@6.0.3
+
 ## 5.13.6
 
 ### Patch Changes
