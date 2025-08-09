@@ -36,9 +36,6 @@ export default defineConfig({
     'clsx',
     'tailwind-merge',
     'nprogress',
-    // IMPORTANT: External client components from server bundles
-    '@third-ui/fuma/mdx',
-    '@third-ui/main'
   ],
   esbuildOptions: (options) => {
     options.alias = {
