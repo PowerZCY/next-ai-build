@@ -14,11 +14,10 @@ export default defineConfig({
     };
   },
   dts: true,
-  splitting: false,
+  splitting: true,
   sourcemap: true,
   clean: true,
   publicDir: './src/styles',
-  platform: 'neutral',
   external: [
     // React/Next
     /^react$/,

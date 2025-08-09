@@ -17,7 +17,8 @@ export default defineConfig({
     };
   },
   dts: true,
-  splitting: false,
+  // Use code splitting to reduce the size of the bundle
+  splitting: true,
   sourcemap: true,
   clean: true,
   publicDir: './src/styles',
@@ -35,7 +36,7 @@ export default defineConfig({
     'tailwindcss',
     'clsx',
     'tailwind-merge',
-    'nprogress',
+    'nprogress'
   ],
   esbuildOptions: (options) => {
     options.alias = {
@@ -89,4 +90,4 @@ export default defineConfig({
       },
     },
   ],
-}); 
+});
