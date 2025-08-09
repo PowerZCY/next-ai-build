@@ -1,5 +1,22 @@
 # @windrun-huaiin/base-ui
 
+## 7.0.0
+
+### Major Changes
+
+- chore(refactor): components are split into server and client, for better performance and SEO
+
+  - Clerk, change the import path to `@windrun-huaiin/third-ui/clerk/server`
+  - Fuma, change the import path to `@windrun-huaiin/third-ui/fuma/server`
+  - Main, change the import path to `@windrun-huaiin/third-ui/main/server`
+  - Base UI, change the import path to `@windrun-huaiin/base-ui/components/server`
+  - and layout、page, change function to async function, and add locale parameter
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@6.2.1
+
 ## 6.0.3
 
 ### Patch Changes
