@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
-import { FAQInteractive } from './faq-interactive';
+import { FAQInteractive } from '@third-ui/main';
 
 interface FAQData {
   title: string;

@@ -8,3 +8,6 @@ export * from './ads-alert-dialog';
 export * from './x-button'
 export * from './ai-prompt-textarea'
 export * from './rich-text-expert'
+export * from './faq-interactive'
+export * from './price-plan-interactive'
+export * from './gallery-interactive'

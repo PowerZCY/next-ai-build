@@ -1,4 +1,4 @@
-import { GoogleAnalyticsClient } from './google-analytics-client';
+import { GoogleAnalyticsClient } from '@base-ui/components/script';
 
 export function GoogleAnalyticsScript() {
   // Only load in production environment

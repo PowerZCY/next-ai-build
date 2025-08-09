@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@lib/utils'
 import Image from "next/image"
-import { GalleryInteractive } from './gallery-interactive';
+import { GalleryInteractive } from '@third-ui/main';
 
 interface GalleryItem {
   id: string;

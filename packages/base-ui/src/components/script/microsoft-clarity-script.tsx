@@ -1,4 +1,4 @@
-import { MicrosoftClarityClient } from './microsoft-clarity-client';
+import { MicrosoftClarityClient } from '@base-ui/components/script';
 
 export function MicrosoftClarityScript() {
   // Only load in production environment

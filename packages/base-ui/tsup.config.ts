@@ -5,6 +5,7 @@ export default defineConfig({
     'src/ui/index.ts',
     'src/components/index.ts',
     'src/components/server.ts',
+    'src/components/script/index.ts',
   ],
   format: ['cjs', 'esm'],
   outExtension: ({ format }) => {

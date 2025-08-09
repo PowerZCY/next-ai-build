@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@lib/utils';
 import { getTranslations } from 'next-intl/server';
-import { PricePlanInteractive } from './price-plan-interactive';
+import { PricePlanInteractive } from '@third-ui/main';
 
 export interface PricePlanProps {
   locale: string
