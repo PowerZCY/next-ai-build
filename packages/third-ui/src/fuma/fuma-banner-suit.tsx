@@ -5,11 +5,12 @@ export async function FumaBannerSuit({ locale, showBanner }: { locale: string, s
   const t = await getTranslations({ locale, namespace: 'home' });
   const heightValue = showBanner ? 3 : 0.5;
   const height= `${heightValue}rem`;
+  const bannerText = t('banner');
   return (
     <>
       {showBanner ? (
         <Banner variant="rainbow" changeLayout={true} height={heightValue}>
-          <p className="text-xl">{t('banner')}</p>
+          <p className="text-xl">{bannerText}</p>
         </Banner>
       ) : (
         <div

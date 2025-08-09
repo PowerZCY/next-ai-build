@@ -1,5 +1,16 @@
 # @windrun-huaiin/third-ui
 
+## 6.1.0
+
+### Minor Changes
+
+- hotfix(banner): Server Component import Client Component, it's OK, but DO give Serialization Data, NOT INCLUDE FUNCTION
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@7.0.0
+
 ## 6.0.0
 
 ### Major Changes
