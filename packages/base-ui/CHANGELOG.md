@@ -1,5 +1,20 @@
 # @windrun-huaiin/base-ui
 
+## 7.1.0
+
+### Minor Changes
+
+- fix(build): add plugin to preserve 'use client' and 'use server' directives
+
+  - Implemented a new esbuild plugin to ensure 'use client' and 'use server' directives are preserved at the top of TypeScript/JavaScript files.
+  - Updated configuration for both base-ui and third-ui packages.
+  - Added error handling for file processing.
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@6.2.1
+
 ## 7.0.0
 
 ### Major Changes
