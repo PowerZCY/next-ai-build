@@ -1,4 +1,5 @@
 'use client';
+
 import { EditOnGitHub, LastUpdatedDate } from '@third-ui/fuma/mdx/toc-base';
 import React from 'react';
 

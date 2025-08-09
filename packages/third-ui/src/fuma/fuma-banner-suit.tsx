@@ -1,15 +1,12 @@
-'use client'
-
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Banner } from '@third-ui/fuma/mdx/banner';
 
-export function FumaBannerSuit({ showBanner }: { showBanner: boolean }) {
-  const t = useTranslations('home');
+export async function FumaBannerSuit({ locale, showBanner }: { locale: string, showBanner: boolean }) {
+  const t = await getTranslations({ locale, namespace: 'home' });
   const heightValue = showBanner ? 3 : 0.5;
   const height= `${heightValue}rem`;
   return (
     <>
-      {/* 设置 header 的 top 位置为 Banner 的底部，避免间隙 */}
       {showBanner ? (
         <Banner variant="rainbow" changeLayout={true} height={heightValue}>
           <p className="text-xl">{t('banner')}</p>

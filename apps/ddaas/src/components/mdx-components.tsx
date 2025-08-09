@@ -7,10 +7,10 @@ import {
   ImageGrid,
   ZiaCard,
   GradientButton,
-  SiteX,
   ZiaFile,
   ZiaFolder,
 } from "@third-ui/fuma/mdx";
+import { SiteX } from "@third-ui/fuma/server";
 import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
 import { Callout } from "fumadocs-ui/components/callout";
 import { File, Folder, Files } from "fumadocs-ui/components/files";

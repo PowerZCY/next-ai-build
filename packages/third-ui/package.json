@@ -11,10 +11,20 @@
       "import": "./dist/clerk/index.mjs",
       "require": "./dist/clerk/index.js"
     },
+    "./clerk/server": {
+      "types": "./dist/clerk/server.d.ts",
+      "import": "./dist/clerk/server.mjs",
+      "require": "./dist/clerk/server.js"
+    },
     "./main": {
       "types": "./dist/main/index.d.ts",
       "import": "./dist/main/index.mjs",
       "require": "./dist/main/index.js"
+    },
+    "./main/server": {
+      "types": "./dist/main/server.d.ts",
+      "import": "./dist/main/server.mjs",
+      "require": "./dist/main/server.js"
     },
     "./fuma/server": {
       "types": "./dist/fuma/server.d.ts",

@@ -3,7 +3,9 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: [
     'src/clerk/index.ts',
+    'src/clerk/server.ts',
     'src/main/index.ts',
+    'src/main/server.ts',
     'src/fuma/server.ts',
     'src/fuma/mdx/index.ts',
     'src/lib/server.ts'

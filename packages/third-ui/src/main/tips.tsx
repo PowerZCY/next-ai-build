@@ -1,40 +1,66 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server';
 import { cn } from '@lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
 
-interface Tip {
+interface TipSection {
+  id: string;
   title: string;
   description: string;
 }
 
-export function Tips({ sectionClassName }: { sectionClassName?: string }) {
-  const t = useTranslations('tips');
-  const sections = t.raw('sections') as Tip[];
+interface TipsData {
+  title: string;
+  eyesOn: string;
+  leftColumn: TipSection[];
+  rightColumn: TipSection[];
+}
+
+export async function Tips({ 
+  locale, 
+  sectionClassName 
+}: { 
+  locale: string;
+  sectionClassName?: string;
+}) {
+  const t = await getTranslations({ locale, namespace: 'tips' });
   
-  const midPoint = Math.ceil(sections.length / 2);
-  const leftColumn = sections.slice(0, midPoint);
-  const rightColumn = sections.slice(midPoint);
+  // Process translation data
+  const sections = t.raw('sections') as Array<{
+    title: string;
+    description: string;
+  }>;
+  
+  const processedSections = sections.map((section, index) => ({
+    id: `tip-section-${index}`,
+    title: section.title,
+    description: richText(t, `sections.${index}.description`)
+  }));
+  
+  const midPoint = Math.ceil(processedSections.length / 2);
+  const leftColumn = processedSections.slice(0, midPoint);
+  const rightColumn = processedSections.slice(midPoint);
+  
+  const data: TipsData = {
+    title: t('title'),
+    eyesOn: t('eyesOn'),
+    leftColumn,
+    rightColumn
+  };
 
   return (
     <section id="tips" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
-        {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
+        {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 md:p-12 shadow-sm dark:shadow-none">
-        {[leftColumn, rightColumn].map((column: Tip[], colIndex) => (
+        {[data.leftColumn, data.rightColumn].map((column: TipSection[], colIndex) => (
           <div key={colIndex} className="space-y-8">
-            {column.map((tip: Tip, tipIndex) => {
-              // calculate the actual index in the original array
-              const actualIndex = colIndex === 0 ? tipIndex : tipIndex + midPoint;
-              return (
-                <div key={tipIndex} className="space-y-4">
-                  <h3 className="text-2xl font-semibold">{tip.title}</h3>
-                  <p className="">{richText(t, `sections.${actualIndex}.description`)}</p>
-                </div>
-              );
-            })}
+            {column.map((tip: TipSection) => (
+              <div key={tip.id} data-tip-id={tip.id} className="space-y-4">
+                <h3 className="text-2xl font-semibold">{tip.title}</h3>
+                <p className="">{tip.description}</p>
+              </div>
+            ))}
           </div>
         ))}
       </div>

@@ -30,7 +30,7 @@ export function ClerkProviderClient({
     localization: currentLocalization,
   };
 
-  // 只有传入参数非空时才拼接 URL 并添加对应的属性
+  // Only add URL when the parameter is not empty
   if (signInUrl) {
     clerkProviderProps.signInUrl = `/${locale}${signInUrl}`;
   }

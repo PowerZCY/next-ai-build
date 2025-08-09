@@ -1,49 +1,32 @@
-'use client';
+import { getTranslations } from 'next-intl/server';
+import { ClerkOrganizationClient } from './clerk-organization-client';
 
-import { OrganizationSwitcher } from '@clerk/nextjs';
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon'; 
 interface ClerkOrganizationProps {
   className?: string;
   locale: string;
 }
 
-export default function ClerkOrganization({
+interface ClerkOrganizationData {
+  homepage: string;
+  terms: string;
+  privacy: string;
+  locale: string;
+  className: string;
+}
+
+export async function ClerkOrganization({
   locale,
   className = '',
 }: ClerkOrganizationProps) {
-  return (
-    <div className={` ms-3 me-2 flex items-center h-10 rounded-full border shadow-lg ${className}`}>
-      <div className="flex items-center gap-x-4 w-full min-w-40">
-        <OrganizationSwitcher
-          appearance={{
-            elements: {
-              organizationSwitcherTrigger:
-                "w-40 h-10 border !rounded-full bg-transparent flex items-center justify-between box-border",
-              organizationSwitcherTriggerIcon: "",
-              userButtonAvatarBox: "w-8 h-8 border rounded-full",
-            },
-          }}
-        >
-          <OrganizationSwitcher.OrganizationProfilePage
-            label="Homepage"
-            url="/"
-            labelIcon={<icons.D8 />}
-          />
-          <OrganizationSwitcher.OrganizationProfilePage 
-            labelIcon={<icons.ReceiptText />}
-            label="服务"
-            url={`/${locale}/legal/terms`}
-          >
-          </OrganizationSwitcher.OrganizationProfilePage>
+  const t = await getTranslations({ locale, namespace: 'footer' });
+  
+  const data: ClerkOrganizationData = {
+    homepage: 'Homepage',
+    terms: t('terms'),
+    privacy: t('privacy'),
+    locale,
+    className
+  };
 
-          <OrganizationSwitcher.OrganizationProfilePage
-            labelIcon={<icons.ShieldUser />}
-            label="隐私"
-            url={`/${locale}/legal/privacy`}
-          >
-          </OrganizationSwitcher.OrganizationProfilePage> 
-        </OrganizationSwitcher>
-      </div>
-    </div>
-  );
+  return <ClerkOrganizationClient data={data} />;
 } 

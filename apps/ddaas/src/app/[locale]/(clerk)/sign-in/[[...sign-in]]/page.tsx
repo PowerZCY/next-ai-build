@@ -9,6 +9,6 @@
 
 'use client';
 
-import { createSignInPage } from '@third-ui/clerk';
+import { createSignInPage } from '@third-ui/clerk/server';
 
 export default createSignInPage();

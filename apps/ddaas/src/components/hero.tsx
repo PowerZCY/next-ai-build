@@ -1,13 +1,11 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client'
-
 import Image from "next/image"
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { globalLucideIcons as icons} from '@base-ui/components/global-icon'
 import { GradientButton } from "@third-ui/fuma/mdx"
 
-export function Hero() {
-  const t = useTranslations('hero');
+export async function Hero({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'hero' });
 
   return (
     <section className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-12">

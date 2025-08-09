@@ -1,40 +1,72 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server';
 import { cn } from '@lib/utils';
 import { globalLucideIcons as icons, getGlobalIcon } from '@base-ui/components/global-icon'
 import { richText } from '@third-ui/main/rich-text-expert';
 
-export function Usage({ sectionClassName }: { sectionClassName?: string }) {
-  const t = useTranslations('usage');
+interface UsageData {
+  title: string;
+  eyesOn: string;
+  description: string;
+  steps: Array<{
+    id: string;
+    title: string;
+    description: string;
+    iconKey: keyof typeof icons;
+    stepNumber: number;
+  }>;
+}
+
+export async function Usage({ 
+  locale, 
+  sectionClassName 
+}: { 
+  locale: string;
+  sectionClassName?: string;
+}) {
+  const t = await getTranslations({ locale, namespace: 'usage' });
+  
+  // Process translation data
   const steps = t.raw('steps') as Array<{
     title: string;
     description: string;
     iconKey: keyof typeof icons;
   }>;
+  
+  const data: UsageData = {
+    title: t('title'),
+    eyesOn: t('eyesOn'),
+    description: richText(t, 'description'),
+    steps: steps.map((step, index) => ({
+      id: `usage-step-${index}`,
+      title: step.title,
+      description: richText(t, `steps.${index}.description`),
+      iconKey: step.iconKey,
+      stepNumber: index + 1
+    }))
+  };
 
   return (
     <section id="usage" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-        {t('title')} <span className="text-purple-500">{t('eyesOn')}</span>
+        {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
       <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto whitespace-nowrap">
-        {richText(t, 'description')}
+        {data.description}
       </p>
       <div className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 md:p-12 shadow-sm dark:shadow-none">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
-          {steps.map((step, idx) => {
+          {data.steps.map((step) => {
             const Icon = getGlobalIcon(step.iconKey);
             return (
-              <div key={idx} className="flex items-start">
+              <div key={step.id} data-usage-step={step.id} className="flex items-start">
                 <div className="flex-shrink-0 mr-4">
                   <Icon className="w-8 h-8 text-purple-500" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
-                    {`${idx + 1}. ${step.title}`}
+                    {`${step.stepNumber}. ${step.title}`}
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300">{richText(t, `steps.${idx}.description`)}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{step.description}</p>
                 </div>
               </div>
             )

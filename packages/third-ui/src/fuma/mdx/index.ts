@@ -7,8 +7,6 @@ export * from './image-grid';
 export * from './zia-card';
 export * from './gradient-button';
 export * from './toc-base';
-export * from './fuma-banner-suit';
 export * from './fuma-github-info';
-export * from './site-x';
 export * from './zia-file';
 export * from './toc-footer-wrapper';

@@ -1,16 +1,15 @@
-'use client';
-
+import { getTranslations } from 'next-intl/server';
 import { cn } from '@lib/utils';
 import type { HTMLAttributes } from 'react';
-import { useTranslations } from 'next-intl';
 
 export type SiteXProps = Omit<HTMLAttributes<HTMLSpanElement>, 'type'> & {
+  locale: string;
   type: 'site' | 'email';
   namespace?: string;
   tKey?: string;
 };
 
-export function SiteX({ type, namespace, tKey, className, ...props }: SiteXProps) {
+export async function SiteX({ locale, type, namespace, tKey, className, ...props }: SiteXProps) {
   // 默认命名空间和key
   let ns = namespace;
   let key = tKey;
@@ -20,7 +19,7 @@ export function SiteX({ type, namespace, tKey, className, ...props }: SiteXProps
   if (!key) {
     key = type === 'site' ? 'title' : 'email';
   }
-  const t = useTranslations(ns);
+  const t = await getTranslations({ locale, namespace: ns });
   const text = t(key, { defaultValue: type === 'site' ? 'Site----' : '----@example.com' });
 
   if (type === 'site') {

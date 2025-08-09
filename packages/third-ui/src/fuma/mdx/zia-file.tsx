@@ -11,7 +11,6 @@ import Link from 'next/link';
 
 const itemVariants = 'flex flex-row items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-fd-accent hover:text-fd-accent-foreground [&_svg]:size-4';
 
-// 注解样式：色彩突出且主题适配
 const anotionClass = 'ms-2 px-2 py-0.5 rounded text-xs font-semibold bg-fd-accent/80 text-fd-accent-foreground dark:bg-white/20 dark:text-white';
 
 export interface ZiaFileProps extends HTMLAttributes<HTMLDivElement> {

@@ -53,7 +53,6 @@ export function Banner({
   const [open, setOpen] = useState(true);
   const globalKey = id ? `nd-banner-${id}` : null;
   const bannerHeight = `${height}rem`;
-  const headerStartHeight = `${height + 5.5}rem`;
 
   useEffect(() => {
     if (globalKey) setOpen(localStorage.getItem(globalKey) !== 'true');

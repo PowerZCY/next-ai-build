@@ -1,7 +1,8 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
-import { Footer, GoToTop } from '@third-ui/main';
+import { GoToTop } from '@third-ui/main';
+import { Footer } from '@third-ui/main/server';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@third-ui/fuma/mdx';
+import { FumaBannerSuit } from '@third-ui/fuma/server';
 import type { ReactNode } from 'react';
 import { showBanner } from '@/lib/appConfig';
 import { ClerkProviderClient } from '@third-ui/clerk';
@@ -44,9 +45,9 @@ export default async function Layout({
         }}
         className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${showBanner ? 'pt-30 has-banner' : 'pt-15 no-banner'}`}
         >
-        <FumaBannerSuit showBanner={showBanner}/>
+        <FumaBannerSuit locale={locale} showBanner={showBanner}/>
         {children}
-        <Footer />
+        <Footer locale={locale}  />
         <GoToTop />
       </HomeLayout>
     </ClerkProviderClient>
