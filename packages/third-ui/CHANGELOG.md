@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 6.2.1
+
+### Patch Changes
+
+- fix(build): RSC and RCC build issue!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@7.1.1
+
 ## 6.2.0
 
 ### Minor Changes
