@@ -10,7 +10,7 @@ export default defineConfig({
     'src/fuma/mdx/index.ts',
     'src/lib/server.ts'
   ],
-  format: ['cjs', 'esm'],
+  format: ['esm', 'cjs'],
   outExtension: ({ format }) => {
     return {
       js: format === 'esm' ? '.mjs' : '.js'
@@ -38,6 +38,9 @@ export default defineConfig({
     'tailwind-merge',
     'nprogress'
   ],
+  // fix CommonJS and ESM compatibility issues
+  shims: true, // add necessary shims
+  cjsInterop: true, // enable CJS interoperability
   esbuildOptions: (options) => {
     options.alias = {
       '@': './src',
@@ -50,6 +53,9 @@ export default defineConfig({
     options.banner = {
       js: '/* eslint-disable */',
     };
+    
+    // fix React import issue
+    options.mainFields = ['module', 'main'];
   },
   esbuildPlugins: [
     {

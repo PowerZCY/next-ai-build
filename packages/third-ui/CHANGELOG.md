@@ -1,5 +1,13 @@
 # @windrun-huaiin/third-ui
 
+## 6.3.1
+
+### Patch Changes
+
+- test(build): RSC and RCC build issue! tsup config splitting should be TRUE
+- Updated dependencies
+  - @windrun-huaiin/base-ui@7.2.0
+
 ## 6.3.0
 
 ### Minor Changes
