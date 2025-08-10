@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 8.0.0
+
+### Major Changes
+
+- chore(build): Common components package now only use Source Code, not dist files!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@7.0.0
+
 ## 7.2.0
 
 ### Minor Changes

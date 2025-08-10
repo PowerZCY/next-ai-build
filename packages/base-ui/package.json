@@ -1,31 +1,15 @@
 {
   "name": "@windrun-huaiin/base-ui",
-  "version": "7.2.0",
+  "version": "8.0.0",
   "description": "Base UI components for windrun-huaiin projects",
   "type": "module",
   "exports": {
-    "./ui": {
-      "types": "./dist/ui/index.d.ts",
-      "import": "./dist/ui/index.mjs",
-      "require": "./dist/ui/index.js"
-    },
-    "./components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.mjs",
-      "require": "./dist/components/index.js"
-    },
-    "./components/script": {
-      "types": "./dist/components/script/index.d.ts",
-      "import": "./dist/components/script/index.mjs",
-      "require": "./dist/components/script/index.js"
-    },
-    "./components/server": {
-      "types": "./dist/components/server.d.ts",
-      "import": "./dist/components/server.mjs",
-      "require": "./dist/components/server.js"
-    },
-    "./src/*": "./src/*",
-    "./styles/base-ui.css": "./dist/base-ui.css"
+    "./ui": "./src/ui/index.ts",
+    "./components": "./src/components/index.ts",
+    "./components/script": "./src/components/script/index.ts",
+    "./components/server": "./src/components/server.ts",
+    "./styles/base-ui.css": "./src/styles/base-ui.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -35,12 +19,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "build:css": "postcss src/styles/base-ui.css -o dist/base-ui.css",
-    "build": "tsup && pnpm build:css",
-    "build:prod": "tsup && pnpm build:css",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit"
+    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "echo 'No dist to clean'",
+    "dev": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.13",
@@ -63,7 +45,6 @@
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "tsup": "^8.3.5",
     "@types/node": "catalog:",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.3"

@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 6.0.2
+
+### Patch Changes
+
+- chore(build): Common components package now only use Source Code, not dist files!
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.0.0
+  - @windrun-huaiin/third-ui@7.0.0
+  - @windrun-huaiin/lib@7.0.0
+  - @windrun-huaiin/shared-assets@4.1.4
+
 ## 6.0.1
 
 ### Patch Changes

@@ -1,32 +1,13 @@
 {
   "name": "@windrun-huaiin/lib",
-  "version": "6.2.1",
+  "version": "7.0.0",
   "description": "Common utilities and configuration",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils.d.ts",
-      "import": "./dist/utils.mjs",
-      "require": "./dist/utils.js"
-    },
-    "./llm-utils": {
-      "types": "./dist/llm-utils.d.ts",
-      "import": "./dist/llm-utils.mjs",
-      "require": "./dist/llm-utils.js"
-    },
-    "./common-app-config": {
-      "types": "./dist/common-app-config.d.ts",
-      "import": "./dist/common-app-config.mjs",
-      "require": "./dist/common-app-config.js"
-    },
-    "./src/*": "./src/*"
+    ".": "./src/index.ts",
+    "./utils": "./src/utils.ts",
+    "./llm-utils": "./src/llm-utils.ts",
+    "./common-app-config": "./src/common-app-config.ts",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -36,13 +17,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup",
-    "build:prod": "tsup",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
-    "prepublishOnly": "pnpm build"
+    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "echo 'No dist to clean'",
+    "dev": "tsc --noEmit --watch",
+    "lint": "eslint src"
   },
   "dependencies": {
     "date-fns": "2.30.0",
@@ -54,7 +33,6 @@
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "tsup": "^8.3.5",
     "@types/node": "^22.15.18",
     "@types/react": "19.1.2"
   },

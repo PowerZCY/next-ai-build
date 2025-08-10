@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 7.0.0
+
+### Major Changes
+
+- chore(build): Common components package now only use Source Code, not dist files!
+
 ## 6.2.1
 
 ### Patch Changes

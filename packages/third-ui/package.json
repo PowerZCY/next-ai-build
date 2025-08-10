@@ -1,55 +1,20 @@
 {
   "name": "@windrun-huaiin/third-ui",
-  "version": "6.3.1",
+  "version": "7.0.0",
   "description": "Third-party integrated UI components for windrun-huaiin projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    "./clerk": {
-      "types": "./dist/clerk/index.d.ts",
-      "react-server": "./dist/clerk/index.mjs",
-      "import": "./dist/clerk/index.mjs",
-      "require": "./dist/clerk/index.js"
-    },
-    "./clerk/server": {
-      "types": "./dist/clerk/server.d.ts",
-      "react-server": "./dist/clerk/server.mjs",
-      "import": "./dist/clerk/server.mjs",
-      "require": "./dist/clerk/server.js"
-    },
-    "./main": {
-      "types": "./dist/main/index.d.ts",
-      "react-server": "./dist/main/index.mjs",
-      "import": "./dist/main/index.mjs",
-      "require": "./dist/main/index.js"
-    },
-    "./main/server": {
-      "types": "./dist/main/server.d.ts",
-      "react-server": "./dist/main/server.mjs",
-      "import": "./dist/main/server.mjs",
-      "require": "./dist/main/server.js"
-    },
-    "./fuma/server": {
-      "types": "./dist/fuma/server.d.ts",
-      "react-server": "./dist/fuma/server.mjs",
-      "import": "./dist/fuma/server.mjs",
-      "require": "./dist/fuma/server.js"
-    },
-    "./fuma/mdx": {
-      "types": "./dist/fuma/mdx/index.d.ts",
-      "react-server": "./dist/fuma/mdx/index.mjs",
-      "import": "./dist/fuma/mdx/index.mjs",
-      "require": "./dist/fuma/mdx/index.js"
-    },
-    "./lib/server": {
-      "types": "./dist/lib/server.d.ts",
-      "react-server": "./dist/lib/server.mjs",
-      "import": "./dist/lib/server.mjs",
-      "require": "./dist/lib/server.js"
-    },
-    "./styles/third-ui.css": "./dist/third-ui.css",
-    "./src/*": "./src/*"
+    "./clerk": "./src/clerk/index.ts",
+    "./clerk/server": "./src/clerk/server.ts",
+    "./main": "./src/main/index.ts",
+    "./main/server": "./src/main/server.ts",
+    "./fuma/server": "./src/fuma/server.ts",
+    "./fuma/mdx": "./src/fuma/mdx/index.ts",
+    "./lib/server": "./src/lib/server.ts",
+    "./styles/third-ui.css": "./src/styles/third-ui.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -59,12 +24,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "build:css": "postcss src/styles/third-ui.css -o dist/third-ui.css",
-    "build": "tsup && pnpm build:css",
-    "build:prod": "tsup && pnpm build:css",
-    "dev": "tsup --watch",
-    "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit"
+    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "echo 'No dist to clean'",
+    "dev": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
@@ -94,7 +57,6 @@
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "tsup": "^8.3.5",
     "@types/mdx": "^2.0.13",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.3",
