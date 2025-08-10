@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.9.0
+
+### Minor Changes
+
+- chore(build): use rollup to build pkg!
+
 ## 6.8.2
 
 ### Patch Changes

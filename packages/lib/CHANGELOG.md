@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 7.1.0
+
+### Minor Changes
+
+- chore(build): use rollup to build pkg!
+
 ## 7.0.0
 
 ### Major Changes

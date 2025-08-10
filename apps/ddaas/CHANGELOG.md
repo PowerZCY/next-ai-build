@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 6.1.0
+
+### Minor Changes
+
+- chore(build): use rollup to build pkg!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.0
+  - @windrun-huaiin/third-ui@7.1.0
+  - @windrun-huaiin/lib@7.1.0
+  - @windrun-huaiin/shared-assets@4.2.0
+
 ## 6.0.2
 
 ### Patch Changes

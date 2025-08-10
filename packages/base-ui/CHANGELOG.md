@@ -1,5 +1,16 @@
 # @windrun-huaiin/base-ui
 
+## 8.1.0
+
+### Minor Changes
+
+- chore(build): use rollup to build pkg!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/lib@7.1.0
+
 ## 8.0.0
 
 ### Major Changes

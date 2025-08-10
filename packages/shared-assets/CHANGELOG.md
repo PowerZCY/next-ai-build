@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.2.0
+
+### Minor Changes
+
+- chore(build): use rollup to build pkg!
+
 ## 4.1.4
 
 ### Patch Changes
