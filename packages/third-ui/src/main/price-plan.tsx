@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { cn } from '@lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 import { getTranslations } from 'next-intl/server';
 import { PricePlanInteractive } from '@third-ui/main';
 

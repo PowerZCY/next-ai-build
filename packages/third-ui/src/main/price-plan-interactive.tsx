@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 
 // Import interfaces from the main component
 interface BillingOption {

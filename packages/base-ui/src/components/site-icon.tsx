@@ -1,5 +1,5 @@
 import { type LucideProps } from 'lucide-react';
-import { cn } from '@lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 import { globalLucideIcons } from '@base-ui/components/global-icon';
 import { themeIconColor } from '@base-ui/lib/theme-util';
 

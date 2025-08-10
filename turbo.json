@@ -51,15 +51,15 @@
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/lib#build": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/base-ui#build": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/third-ui#build": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": [
         "NODE_ENV",
         "CLERK_SECRET_KEY",
@@ -72,15 +72,15 @@
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/lib#build:prod": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/base-ui#build:prod": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/third-ui#build:prod": {
-      "outputs": [],
+      "outputs": ["dist/**"],
       "env": [
         "NODE_ENV",
         "CLERK_SECRET_KEY",

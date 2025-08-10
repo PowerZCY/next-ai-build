@@ -2,8 +2,8 @@
 
 import { cva } from 'class-variance-authority';
 import { type HTMLAttributes, useEffect, useState } from 'react';
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-import { cn } from '@lib/utils';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { cn } from '@windrun-huaiin/lib/utils';
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center rounded-md p-2 text-sm font-medium transition-colors duration-100 disabled:pointer-events-none disabled:opacity-50',

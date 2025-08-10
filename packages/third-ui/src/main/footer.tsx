@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import Link from "next/link";
 
 interface FooterData {

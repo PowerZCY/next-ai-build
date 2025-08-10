@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { cn } from '@lib/utils'
+import { cn } from '@windrun-huaiin/lib/utils'
 import Image from "next/image"
 import { GalleryInteractive } from '@third-ui/main';
 

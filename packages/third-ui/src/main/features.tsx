@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
-import { getGlobalIcon } from '@base-ui/components/global-icon';
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-import { cn } from '@lib/utils';
+import { getGlobalIcon } from '@windrun-huaiin/base-ui/components/server';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
 
 interface FeaturesData {

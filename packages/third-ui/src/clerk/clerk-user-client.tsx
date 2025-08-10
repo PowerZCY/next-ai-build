@@ -1,6 +1,6 @@
 'use client';
 
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 interface ClerkUserData {

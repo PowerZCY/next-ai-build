@@ -1,7 +1,7 @@
 'use client';
 
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
-import { cn } from '@lib/utils';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { cn } from '@windrun-huaiin/lib/utils';
 import Link from 'next/link';
 import type { HTMLAttributes, ReactNode } from 'react';
 

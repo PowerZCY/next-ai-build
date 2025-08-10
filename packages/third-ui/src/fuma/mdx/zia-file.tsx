@@ -1,6 +1,6 @@
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon'; 
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server'; 
 import { type HTMLAttributes, type ReactNode, useState } from 'react';
-import { cn } from '@lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 import {
   Collapsible,
   CollapsibleContent,

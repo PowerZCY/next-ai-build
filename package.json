@@ -30,10 +30,17 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
     "@windrun-huaiin/dev-scripts": "workspace:*",
     "glob": "^10.4.5",
     "postcss": "catalog:",
     "postcss-cli": "^11.0.1",
+    "rollup": "^4.46.2",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-preserve-directives": "^0.4.0",
+    "tslib": "^2.8.1",
     "turbo": "^2.5.4"
   },
   "pnpm": {

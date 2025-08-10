@@ -2,7 +2,7 @@
 
 import fs from 'node:fs';
 import nodePath from 'node:path';
-import { getLLMText } from '@lib/llm-utils';
+import { getLLMText } from '@windrun-huaiin/lib/llm-utils';
 
 export type LLMCopyHandlerOptions = {
   // for example: "src/mdx/blog"

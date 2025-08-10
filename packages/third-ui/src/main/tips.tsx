@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { cn } from '@lib/utils';
+import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
 
 interface TipSection {

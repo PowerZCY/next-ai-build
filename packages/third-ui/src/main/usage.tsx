@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
-import { cn } from '@lib/utils';
-import { globalLucideIcons as icons, getGlobalIcon } from '@base-ui/components/global-icon'
+import { cn } from '@windrun-huaiin/lib/utils';
+import { globalLucideIcons as icons, getGlobalIcon } from '@windrun-huaiin/base-ui/components/server'
 import { richText } from '@third-ui/main/rich-text-expert';
 
 interface UsageData {

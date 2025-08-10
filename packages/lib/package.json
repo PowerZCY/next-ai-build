@@ -2,11 +2,30 @@
   "name": "@windrun-huaiin/lib",
   "version": "7.0.0",
   "description": "Common utilities and configuration",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./utils": "./src/utils.ts",
-    "./llm-utils": "./src/llm-utils.ts",
-    "./common-app-config": "./src/common-app-config.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.js"
+    },
+    "./llm-utils": {
+      "types": "./dist/llm-utils.d.ts",
+      "import": "./dist/llm-utils.mjs",
+      "require": "./dist/llm-utils.js"
+    },
+    "./common-app-config": {
+      "types": "./dist/common-app-config.d.ts",
+      "import": "./dist/common-app-config.mjs",
+      "require": "./dist/common-app-config.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -17,10 +36,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
+    "build": "rollup -c rollup.config.mjs",
+    "build:prod": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs --watch",
+    "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
-    "clean": "echo 'No dist to clean'",
-    "dev": "tsc --noEmit --watch",
     "lint": "eslint src"
   },
   "dependencies": {

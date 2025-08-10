@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, ReactNode } from 'react'
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon'
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server'
 
 // base button config
 interface BaseButtonConfig {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { globalLucideIcons as icons } from '@base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 
 interface FumaGithubInfoProps {
   owner: string;

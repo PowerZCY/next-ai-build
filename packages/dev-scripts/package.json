@@ -7,9 +7,10 @@
     "dev-scripts": "./bin/dev-scripts"
   },
   "scripts": {
-    "build": "tsup",
-    "build:prod": "tsup",
-    "dev": "tsup --watch",
+    "build": "rollup -c rollup.config.mjs",
+    "build:prod": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs --watch",
+    "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
@@ -21,7 +22,6 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/fs-extra": "^11.0.4",
-    "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
   "peerDependencies": {

@@ -4,10 +4,26 @@
   "description": "Base UI components for windrun-huaiin projects",
   "type": "module",
   "exports": {
-    "./ui": "./src/ui/index.ts",
-    "./components": "./src/components/index.ts",
-    "./components/script": "./src/components/script/index.ts",
-    "./components/server": "./src/components/server.ts",
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "import": "./dist/ui/index.mjs",
+      "require": "./dist/ui/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js"
+    },
+    "./components/script": {
+      "types": "./dist/components/script/index.d.ts",
+      "import": "./dist/components/script/index.mjs",
+      "require": "./dist/components/script/index.js"
+    },
+    "./components/server": {
+      "types": "./dist/components/server.d.ts",
+      "import": "./dist/components/server.mjs",
+      "require": "./dist/components/server.js"
+    },
     "./styles/base-ui.css": "./src/styles/base-ui.css",
     "./package.json": "./package.json"
   },
@@ -19,10 +35,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
-    "type-check": "tsc --noEmit",
-    "clean": "echo 'No dist to clean'",
-    "dev": "tsc --noEmit --watch"
+    "build": "rollup -c rollup.config.mjs",
+    "build:prod": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.13",

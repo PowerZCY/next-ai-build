@@ -6,13 +6,41 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    "./clerk": "./src/clerk/index.ts",
-    "./clerk/server": "./src/clerk/server.ts",
-    "./main": "./src/main/index.ts",
-    "./main/server": "./src/main/server.ts",
-    "./fuma/server": "./src/fuma/server.ts",
-    "./fuma/mdx": "./src/fuma/mdx/index.ts",
-    "./lib/server": "./src/lib/server.ts",
+    "./clerk": {
+      "types": "./dist/clerk/index.d.ts",
+      "import": "./dist/clerk/index.mjs",
+      "require": "./dist/clerk/index.js"
+    },
+    "./clerk/server": {
+      "types": "./dist/clerk/server.d.ts",
+      "import": "./dist/clerk/server.mjs",
+      "require": "./dist/clerk/server.js"
+    },
+    "./main": {
+      "types": "./dist/main/index.d.ts",
+      "import": "./dist/main/index.mjs",
+      "require": "./dist/main/index.js"
+    },
+    "./main/server": {
+      "types": "./dist/main/server.d.ts",
+      "import": "./dist/main/server.mjs",
+      "require": "./dist/main/server.js"
+    },
+    "./fuma/server": {
+      "types": "./dist/fuma/server.d.ts",
+      "import": "./dist/fuma/server.mjs",
+      "require": "./dist/fuma/server.js"
+    },
+    "./fuma/mdx": {
+      "types": "./dist/fuma/mdx/index.d.ts",
+      "import": "./dist/fuma/mdx/index.mjs",
+      "require": "./dist/fuma/mdx/index.js"
+    },
+    "./lib/server": {
+      "types": "./dist/lib/server.d.ts",
+      "import": "./dist/lib/server.mjs",
+      "require": "./dist/lib/server.js"
+    },
     "./styles/third-ui.css": "./src/styles/third-ui.css",
     "./package.json": "./package.json"
   },
@@ -24,15 +52,17 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "echo '📦 No build needed - shipping TypeScript source!' && tsc --noEmit",
-    "type-check": "tsc --noEmit",
-    "clean": "echo 'No dist to clean'",
-    "dev": "tsc --noEmit --watch"
+    "build": "rollup -c rollup.config.mjs",
+    "build:prod": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/localizations": "^3.16.0",
     "@clerk/types": "^4.59.0",
     "@clerk/nextjs": "^6.19.4",
+    "@windrun-huaiin/lib": "workspace:^",
     "@windrun-huaiin/base-ui": "workspace:^",
     "fumadocs-core": "15.3.3",
     "fumadocs-mdx": "11.6.3",

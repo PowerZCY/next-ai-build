@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from "@base-ui/ui/button";
-import { globalLucideIcons as icons } from "@base-ui/components/global-icon";
+import { Button } from "@windrun-huaiin/base-ui/ui";
+import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui/components/server";
 import Link from "next/link";
 import React, { useState } from 'react';
 
