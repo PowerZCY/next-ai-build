@@ -43,10 +43,19 @@ const baseConfig = {
   ]
 };
 
+const onwarn = (warning, warn) => {
+  // 忽略不需要的警告
+  if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+    return;
+  }
+  warn(warning);
+};
+
 export default defineConfig([
   // ESM build
   {
     ...baseConfig,
+    onwarn,
     input: entries,
     output: {
       dir: 'dist',
@@ -60,6 +69,7 @@ export default defineConfig([
   // CJS build
   {
     ...baseConfig,
+    onwarn,
     input: entries,
     output: {
       dir: 'dist',

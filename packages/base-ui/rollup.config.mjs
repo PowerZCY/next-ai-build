@@ -13,6 +13,13 @@ const entries = [
 ];
 
 const createConfig = (format) => ({
+  onwarn(warning, warn) {
+    // 忽略 'use client' 和 'use server' 指令的警告
+    if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+      return;
+    }
+    warn(warning);
+  },
   input: entries,
   external: [
     'react',
