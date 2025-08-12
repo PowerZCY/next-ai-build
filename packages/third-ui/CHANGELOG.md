@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.1.2
+
+### Patch Changes
+
+- fix(mdx): mdx page text
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.1
+  - @windrun-huaiin/lib@7.1.1
+
 ## 7.1.1
 
 ### Patch Changes

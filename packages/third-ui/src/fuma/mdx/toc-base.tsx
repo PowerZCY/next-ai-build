@@ -97,7 +97,7 @@ export function LastUpdatedDate({ date }: { date: string | undefined }) {
   return (
     <div className="flex items-center gap-x-2 text-stone-600 dark:text-stone-400 text-sm">
       <icons.LastUpdated/>
-      Lastest on {date ? date : "Ages ago"}
+      Latest on {date ? date : "Ages ago"}
     </div>
   );
 }
