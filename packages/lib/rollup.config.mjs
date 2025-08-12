@@ -4,6 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
+// Define export point
 const entries = [
   'src/index.ts',
   'src/utils.ts',
@@ -44,7 +45,7 @@ const baseConfig = {
 };
 
 const onwarn = (warning, warn) => {
-  // 忽略不需要的警告
+  // ignore warnings
   if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
     return;
   }

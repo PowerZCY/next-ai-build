@@ -116,7 +116,7 @@ export function XButton(props: xButtonProps) {
   // Split button
   const { mainButton, menuItems, loadingText, menuWidth = 'w-40', className = '', mainButtonClassName = '', dropdownButtonClassName = '' } = props
   const isMainDisabled = mainButton.disabled || isLoading
-  // loadingText 优先级：props.loadingText > mainButton.text > 'Loading...'
+  // loadingText prioty：props.loadingText > mainButton.text > 'Loading...'
   const actualLoadingText = loadingText || mainButton.text?.trim() || 'Loading...'
 
   return (

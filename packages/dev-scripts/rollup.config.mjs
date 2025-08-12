@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 
+// Define export point
 const entries = [
   'src/cli.ts',
   'src/index.ts'
@@ -39,7 +40,7 @@ const baseConfig = {
 };
 
 const onwarn = (warning, warn) => {
-  // 忽略不需要的警告
+  // ignore warnings
   if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
     return;
   }

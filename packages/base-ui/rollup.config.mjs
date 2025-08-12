@@ -5,6 +5,7 @@ import typescript from '@rollup/plugin-typescript';
 import { preserveDirectives } from 'rollup-plugin-preserve-directives';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
+// Define export point
 const entries = [
   'src/ui/index.ts',
   'src/components/index.ts',
@@ -14,7 +15,7 @@ const entries = [
 
 const createConfig = (format) => ({
   onwarn(warning, warn) {
-    // 忽略 'use client' 和 'use server' 指令的警告
+    // ignore 'use client' and 'use server' directive's warnings in build
     if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
       return;
     }
