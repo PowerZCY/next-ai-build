@@ -6,6 +6,13 @@ import type { MermaidConfig } from 'mermaid';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
+function sanitizeFilename(name: string) {
+  return name
+    .replace(/[\/:*?"<>|]/g, '_')
+    .replace(/\s+/g, '_')
+    .slice(0, 120);
+}
+
 interface MermaidProps {
   chart: string;
   title?: string;
@@ -111,6 +118,20 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
     (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
   }, []);
 
+  const handleDownload = useCallback(() => {
+    if (!svg) return;
+    const fileName = `${sanitizeFilename(title ?? 'mermaid')}.svg`;
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, [svg, title]);
+
   // prevent browser-level zoom (touchpad pinch/shortcut) from taking effect when the dialog is open
   useEffect(() => {
     if (!open) return;
@@ -213,7 +234,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
               <div className="flex items-center gap-0.5">
                 <button
                   aria-label="Zoom out"
-                  className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px]"
+                  className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => zoomBy(-0.5)}
                 >
                   －
@@ -221,7 +242,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 <span className="mx-0.5 text-[12px] w-12 text-center select-none">{Math.round(scale * 100)}%</span>
                 <button
                   aria-label="Zoom in"
-                  className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px]"
+                  className="flex h-6 w-6 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 text-[13px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => zoomBy(0.5)}
                 >
                   ＋
@@ -230,42 +251,49 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
                 <div className="mx-1 h-4 w-px bg-neutral-300 dark:bg-neutral-700" />
                 <button
                   aria-label="Zoom 100%"
-                  className="inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  className="inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => setScale(1)}
                 >
                   X1
                 </button>
                 <button
                   aria-label="Zoom 200%"
-                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => setScale(2)}
                 >
                   X2
                 </button>
                 <button
                   aria-label="Zoom 300%"
-                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  className="ml-1 inline-flex h-6 min-w-8 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => setScale(3)}
                 >
                   X3
                 </button>
                 <button
                   aria-label="Zoom 1000%"
-                  className="ml-1 inline-flex h-6 min-w-10 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px]"
+                  className="ml-1 inline-flex h-6 min-w-10 items-center justify-center rounded border border-neutral-300 dark:border-neutral-600 px-1.5 text-[12px] transition-colors hover:bg-neutral-100 active:bg-neutral-200 hover:border-neutral-400 active:border-neutral-500 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 dark:hover:border-neutral-500 dark:active:border-neutral-400"
                   onClick={() => setScale(10)}
                 >
                   X10
                 </button>
                 <button
                   aria-label="Reset"
-                  className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600"
+                  className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600 transition-colors hover:bg-purple-50 active:bg-purple-100 dark:hover:bg-purple-500/20 dark:active:bg-purple-500/30"
                   onClick={resetTransform}
                 >
                   <icons.RefreshCcw className="h-3.5 w-3.5" />
                 </button>
                 <button
+                  aria-label="Download SVG"
+                  className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600 transition-colors hover:bg-purple-50 active:bg-purple-100 dark:hover:bg-purple-500/20 dark:active:bg-purple-500/30"
+                  onClick={handleDownload}
+                >
+                  <icons.Download className="h-3.5 w-3.5" />
+                </button>
+                <button
                   aria-label="Close"
-                  className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600"
+                  className="ml-1 flex h-6 w-6 items-center justify-center rounded text-purple-500 hover:text-purple-600 transition-colors hover:bg-purple-50 active:bg-purple-100 dark:hover:bg-purple-500/20 dark:active:bg-purple-500/30"
                   onClick={() => { setOpen(false); resetTransform(); }}
                 >
                   <icons.X className="h-3.5 w-3.5" />
