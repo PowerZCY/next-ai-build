@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.9.1
+
+### Patch Changes
+
+- feat(mdx): mermaid now support download SVG!
+
 ## 6.9.0
 
 ### Minor Changes

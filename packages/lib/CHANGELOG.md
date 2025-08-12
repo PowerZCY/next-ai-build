@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 7.1.1
+
+### Patch Changes
+
+- feat(mdx): mermaid now support download SVG!
+
 ## 7.1.0
 
 ### Minor Changes
