@@ -16,6 +16,16 @@
       "import": "./dist/clerk/server.mjs",
       "require": "./dist/clerk/server.js"
     },
+    "./fingerprint": {
+      "types": "./dist/clerk/fingerprint/index.d.ts",
+      "import": "./dist/clerk/fingerprint/index.mjs",
+      "require": "./dist/clerk/fingerprint/index.js"
+    },
+    "./fingerprint/server": {
+      "types": "./dist/clerk/fingerprint/server.d.ts",
+      "import": "./dist/clerk/fingerprint/server.mjs",
+      "require": "./dist/clerk/fingerprint/server.js"
+    },
     "./main": {
       "types": "./dist/main/index.d.ts",
       "import": "./dist/main/index.mjs",
@@ -62,6 +72,7 @@
     "@clerk/localizations": "^3.16.0",
     "@clerk/types": "^4.59.0",
     "@clerk/nextjs": "^6.19.4",
+    "@fingerprintjs/fingerprintjs": "^4.5.1",
     "@windrun-huaiin/lib": "workspace:^",
     "@windrun-huaiin/base-ui": "workspace:^",
     "fumadocs-core": "15.3.3",

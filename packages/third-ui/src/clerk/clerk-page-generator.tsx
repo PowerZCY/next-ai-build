@@ -9,6 +9,7 @@
 
 import { SignIn, SignUp, Waitlist } from '@clerk/nextjs';
 
+// Legacy page generators (for backward compatibility)
 export function createSignInPage() {
   return function SignInPage() {
     return (
@@ -37,4 +38,7 @@ export function createWaitlistPage() {
       </div>
     );
   };
-} 
+}
+
+// Note: Fingerprint-aware page generators moved to client-side only
+// Use the fingerprint components directly in your client-side code 
