@@ -6,6 +6,8 @@
 export interface AnonymousUser {
   userId: string;
   fingerprintId: string;
+  clerkUserId: string,
+  email: string,
   status: string;
   createdAt: string;
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { 
   getOrGenerateFingerprintId, 
-  getFingerprintId, 
   setFingerprintId,
   createFingerprintHeaders
 } from './fingerprint-client';
@@ -33,14 +32,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
     if (typeof window === 'undefined') return null;
 
     try {
-      // 优先检查现有ID
-      const existingId = getFingerprintId();
-      if (existingId) {
-        setFingerprintIdState(existingId);
-        return existingId;
-      }
-
-      // 生成新的fingerprint ID
+      // 优先检查现有ID, 没有就生成新的fingerprint ID
       const currentFingerprintId = await getOrGenerateFingerprintId();
       setFingerprintIdState(currentFingerprintId);
       return currentFingerprintId;

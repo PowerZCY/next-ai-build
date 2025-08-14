@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.2.1
+
+### Patch Changes
+
+- fix(fingerprint): init components v1.0
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.1
+  - @windrun-huaiin/lib@7.1.1
+
 ## 7.2.0
 
 ### Minor Changes

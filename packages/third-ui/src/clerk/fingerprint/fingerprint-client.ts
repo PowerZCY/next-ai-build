@@ -9,9 +9,7 @@ import {
   FINGERPRINT_COOKIE_NAME, 
   isValidFingerprintId 
 } from './fingerprint-shared';
-
-// Dynamic import to avoid SSR issues
-let FingerprintJS: any = null;
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 /**
  * 生成基于真实浏览器特征的fingerprint ID
@@ -38,12 +36,6 @@ export async function generateFingerprintId(): Promise<string> {
   }
 
   try {
-    // 等待FingerprintJS加载完成
-    if (!FingerprintJS) {
-      const module = await import('@fingerprintjs/fingerprintjs');
-      FingerprintJS = module.default;
-    }
-
     // 使用FingerprintJS生成基于浏览器特征的指纹
     const fp = await FingerprintJS.load();
     const result = await fp.get();
@@ -138,7 +130,7 @@ export async function getOrGenerateFingerprintId(): Promise<string> {
 export async function createFingerprintHeaders(): Promise<Record<string, string>> {
   const fingerprintId = await getOrGenerateFingerprintId();
   return {
-    'x-fingerprint-id': fingerprintId,
+    FINGERPRINT_HEADER_NAME : fingerprintId,
   };
 }
 

@@ -4,7 +4,7 @@
  */
 
 // Fingerprint ID的存储键和header名
-export const FINGERPRINT_STORAGE_KEY = 'diaomao_fingerprint_id';
+export const FINGERPRINT_STORAGE_KEY = 'x_fingerprint_id';
 export const FINGERPRINT_HEADER_NAME = 'x-fingerprint-id';
 export const FINGERPRINT_COOKIE_NAME = 'fingerprint_id';
 
