@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 6.1.2
+
+### Patch Changes
+
+- fix(fingerprint): init components, add showcase link
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/third-ui@7.3.0
+  - @windrun-huaiin/lib@7.1.2
+  - @windrun-huaiin/shared-assets@4.2.1
+
 ## 6.1.1
 
 ### Patch Changes

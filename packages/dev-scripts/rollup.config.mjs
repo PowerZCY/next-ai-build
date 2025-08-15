@@ -34,7 +34,8 @@ const baseConfig = {
       declarationDir: 'dist',
       rootDir: 'src',
       exclude: ['**/*.test.ts'],
-      module: 'esnext'
+      module: 'esnext',
+      sourceMap: false
     })
   ]
 };

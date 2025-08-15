@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 6.10.0
+
+### Minor Changes
+
+- fix(fingerprint): init components, add showcase link
+
 ## 6.9.1
 
 ### Patch Changes

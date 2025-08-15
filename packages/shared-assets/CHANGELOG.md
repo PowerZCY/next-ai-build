@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 4.2.1
+
+### Patch Changes
+
+- fix(fingerprint): init components, add showcase link
+
 ## 4.2.0
 
 ### Minor Changes

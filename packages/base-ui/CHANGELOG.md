@@ -1,5 +1,13 @@
 # @windrun-huaiin/base-ui
 
+## 8.1.2
+
+### Patch Changes
+
+- fix(fingerprint): init components, add showcase link
+- Updated dependencies
+  - @windrun-huaiin/lib@7.1.2
+
 ## 8.1.1
 
 ### Patch Changes

@@ -24,6 +24,18 @@ const createConfig = (format) => ({
     if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
       return;
     }
+    // ignore circular dependency warnings from third-party libraries
+    if (warning.code === 'CIRCULAR_DEPENDENCY' && warning.message.includes('node_modules')) {
+      return;
+    }
+    // ignore mixing named and default exports warnings from third-party libraries
+    if (warning.code === 'MIXED_EXPORTS' && (
+      warning.message.includes('fingerprintjs') || 
+      warning.message.includes('d3-array') ||
+      warning.message.includes('node_modules')
+    )) {
+      return;
+    }
     warn(warning);
   },
   input: entries,

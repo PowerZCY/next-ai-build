@@ -198,3 +198,16 @@ packages/shared-assets/public/
 ---
 
 > 🎉 **就是这么简单！** 专注于添加资源和使用，其他的交给我们处理。 
+
+
+
+## Showcase
+
+- [Free Trivia Game](https://freetrivia.info/)
+- [Music Poster](https://musicposter.org/en)
+- [Image Narration](https://imagenarration.com/en)
+- [Describe Yourself](https://describeyourself.org/en)
+- [Newspaper Template](https://newspaper-template.org/en)
+- [breathing exercise](https://breathingexercise.net/en)
+- [ai directory list](https://aidirectorylist.com/en)
+- [reve image directory](https://reveimage.directory/en)

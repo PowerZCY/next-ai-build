@@ -54,4 +54,3 @@ export function SignInWithFingerprint() {
   return <SignIn unsafeMetadata={unsafeMetadata} />;
 }
 
-export default SignInWithFingerprint;

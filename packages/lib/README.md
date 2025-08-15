@@ -78,3 +78,15 @@ pnpm typecheck
 ```bash
 pnpm publish
 ``` 
+
+
+## Showcase
+
+- [Free Trivia Game](https://freetrivia.info/)
+- [Music Poster](https://musicposter.org/en)
+- [Image Narration](https://imagenarration.com/en)
+- [Describe Yourself](https://describeyourself.org/en)
+- [Newspaper Template](https://newspaper-template.org/en)
+- [breathing exercise](https://breathingexercise.net/en)
+- [ai directory list](https://aidirectorylist.com/en)
+- [reve image directory](https://reveimage.directory/en)

@@ -1,5 +1,11 @@
 # @windrun-huaiin/lib
 
+## 7.1.2
+
+### Patch Changes
+
+- fix(fingerprint): init components, add showcase link
+
 ## 7.1.1
 
 ### Patch Changes
