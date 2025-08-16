@@ -277,6 +277,20 @@ export function MoneyPriceInteractive({
     
     updatePriceDisplay(billingType);
     updateDiscountInfo(billingType);
+
+    data.plans.map((plan: any) => (
+      <div key={plan.key} data-button-placeholder={plan.key}>
+        <MoneyPriceButton
+          planKey={plan.key}
+          userContext={userContext}
+          billingType={billingType}
+          onLogin={handleLogin}
+          onUpgrade={handleUpgrade}
+          texts={data.buttonTexts}
+          isProcessing={isProcessing}
+        />
+      </div>
+    ))
     
     return () => {
       if (monthlyButton) {
@@ -317,23 +331,5 @@ export function MoneyPriceInteractive({
     );
   };
 
-  // 直接渲染按钮
-  return (
-    <>
-      {data.plans.map((plan: any) => (
-        <div key={plan.key} data-button-placeholder={plan.key}>
-          <MoneyPriceButton
-            planKey={plan.key}
-            userContext={userContext}
-            billingType={billingType}
-            onLogin={handleLogin}
-            onUpgrade={handleUpgrade}
-            texts={data.buttonTexts}
-            isProcessing={isProcessing}
-          />
-        </div>
-      ))}
-      <Tooltip {...tooltip} />
-    </>
-  );
+  return <Tooltip {...tooltip} />
 }
