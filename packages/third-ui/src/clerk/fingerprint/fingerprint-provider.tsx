@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useFingerprint } from './use-fingerprint';
+import { globalLucideIcons } from '@base-ui/components/global-icon';
 import type { 
   FingerprintContextType, 
   FingerprintProviderProps 
@@ -78,10 +79,34 @@ export function FingerprintStatus() {
   } = useFingerprintContext();
 
   const [isOpen, setIsOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setIsOpen(false);
+    }
+  };
+
+  // ESC键关闭弹框
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -104,17 +129,20 @@ export function FingerprintStatus() {
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
         }}
       >
-        <span style={{
-          fontSize: '24px',
-          color: 'white',
-          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          transition: 'transform 0.3s ease',
-        }}>▼</span>
+        <globalLucideIcons.BTC 
+          size={24}
+          style={{
+            color: 'white',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease',
+          }}
+        />
       </button>
 
       {isOpen && (
         <>
           <div
+            onClick={handleBackdropClick}
             style={{
               position: 'fixed',
               top: 0,
@@ -126,6 +154,7 @@ export function FingerprintStatus() {
             }}
           />
           <div
+            ref={modalRef}
             style={{
               position: 'fixed',
               top: '70px',
@@ -135,7 +164,7 @@ export function FingerprintStatus() {
               borderRadius: '5px',
               fontSize: '12px',
               fontFamily: 'monospace',
-              maxWidth: '300px',
+              maxWidth: '500px',
               zIndex: 9999,
               border: '1px solid #ccc',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
@@ -158,18 +187,22 @@ export function FingerprintStatus() {
                 <strong>Credits:</strong> {xCredit.balanceFree} Free + {xCredit.balancePaid} Paid = {xCredit.totalBalance} Total
               </div>
             )}
-            {xSubscription && (
-              <div>
-                <strong>user_id:</strong> {xSubscription.userId} <br/>
-                <strong>pay_subscription_id:</strong> {xSubscription.paySubscriptionId} <br/>
-                <strong>price_id:</strong> {xSubscription.priceId || 'None'} <br/>
-                <strong>price_name:</strong> {xSubscription.priceName || 'None'} <br/>
-                <strong>status:</strong> {xSubscription.status || 'Free'} <br/>
-                <strong>credits_allocated:</strong> {xSubscription.creditsAllocated || ''} <br/>
-                <strong>sub_period_start:</strong> {xSubscription.subPeriodStart || ''} <br/>
-                <strong>sub_period_end:</strong> {xSubscription.subPeriodEnd || ''} <br/>
-              </div>
-            )}
+            <div>
+              {xSubscription ? (
+                <>
+                  <strong>user_id:</strong> {xSubscription.userId} <br/>
+                  <strong>pay_subscription_id:</strong> {xSubscription.paySubscriptionId} <br/>
+                  <strong>price_id:</strong> {xSubscription.priceId || 'None'} <br/>
+                  <strong>price_name:</strong> {xSubscription.priceName || 'None'} <br/>
+                  <strong>status:</strong> {xSubscription.status || 'Free'} <br/>
+                  <strong>credits_allocated:</strong> {xSubscription.creditsAllocated || ''} <br/>
+                  <strong>sub_period_start:</strong> {xSubscription.subPeriodStart || ''} <br/>
+                  <strong>sub_period_end:</strong> {xSubscription.subPeriodEnd || ''} <br/>
+                </>
+              ) : (
+                <strong>No Subscription, Default as Hobby Plan</strong>
+              )}
+            </div>
           </div>
         </>
       )}

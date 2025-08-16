@@ -20,7 +20,7 @@ export interface UserContext {
 }
 
 // 支付供应商类型
-export type PaymentProvider = 'stripe' | 'alipay' | 'wechat' | 'paypal';
+export type PaymentProvider = 'stripe' | 'apple' | 'paypal' | 'wechat' | 'alipay'  ;
 
 // 价格计划
 export interface EnhancePricePlan {

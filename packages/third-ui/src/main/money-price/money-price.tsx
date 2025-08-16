@@ -2,7 +2,7 @@
 import { GradientButton } from '@third-ui/fuma/mdx';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { getTranslations } from 'next-intl/server';
-import { getActiveProviderConfig } from './money-price-config';
+import { getActiveProviderConfig } from './money-price-config-util';
 import { MoneyPriceInteractive } from './money-price-interactive';
 import type { MoneyPriceData, MoneyPriceProps } from './money-price-types';
 

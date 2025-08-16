@@ -97,7 +97,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
     } finally {
       setIsLoading(false);
     }
-  }, [fingerprintId]);
+  }, [fingerprintId, config.apiEndpoint]);
 
   /**
    * 刷新用户数据

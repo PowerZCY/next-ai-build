@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MoneyPriceButton } from './money-price-button';
-import { getActiveProviderConfig, getProductPricing } from './money-price-config';
+import { getActiveProviderConfig, getProductPricing } from './money-price-config-util';
 import {
   UserState,
   type MoneyPriceInteractiveProps,
@@ -218,12 +218,23 @@ export function MoneyPriceInteractive({
     }
   };
   
+  // 使用 useRef 存储 root 实例，避免重复创建
+  const rootsRef = React.useRef<Map<string, any>>(new Map());
+
   // 动态替换按钮
   useEffect(() => {
     data.plans.forEach((plan: any) => {
       const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`);
       if (placeholder) {
-        const root = createRoot(placeholder);
+        let root = rootsRef.current.get(plan.key);
+        
+        // 如果还没有创建 root，则创建一个
+        if (!root) {
+          root = createRoot(placeholder);
+          rootsRef.current.set(plan.key, root);
+        }
+        
+        // 渲染按钮
         root.render(
           <MoneyPriceButton
             planKey={plan.key}
@@ -237,7 +248,21 @@ export function MoneyPriceInteractive({
         );
       }
     });
-  }, [userContext, billingType, isProcessing]);
+  }, [userContext, billingType, isProcessing, data.plans, data.buttonTexts, handleLogin, handleUpgrade]);
+  
+  // 组件卸载时清理
+  useEffect(() => {
+    return () => {
+      rootsRef.current.forEach((root) => {
+        try {
+          root.unmount();
+        } catch (e) {
+          // 忽略卸载错误
+        }
+      });
+      rootsRef.current.clear();
+    };
+  }, []);
   
   // 处理月付/年付切换和 tooltip 功能
   useEffect(() => {
