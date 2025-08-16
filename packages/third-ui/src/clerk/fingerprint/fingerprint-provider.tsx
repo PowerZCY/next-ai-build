@@ -91,7 +91,6 @@ export function FingerprintStatus() {
     }
   };
 
-  // ESC键关闭弹框
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -107,6 +106,13 @@ export function FingerprintStatus() {
       document.removeEventListener('keydown', handleEscKey);
     };
   }, [isOpen]);
+
+  // 确保 xUser 更新后才渲染内容
+  useEffect(() => {
+    if (xUser && !xUser.fingerprintId) {
+      console.warn('xUser.fingerprintId is missing:', xUser);
+    }
+  }, [xUser]);
 
   return (
     <>
@@ -177,7 +183,8 @@ export function FingerprintStatus() {
             {error && <div style={{ color: 'red' }}><strong>Error:</strong> {error}</div>}
             {xUser && (
               <div>
-                <strong>user_id:</strong> {xUser.userId} <br/>
+                <strong>user_id:</strong> {xUser.userId || 'None'} <br/>
+                <strong>fingerprintId:</strong> {xUser.fingerprintId || 'None'} <br/>
                 <strong>clerk_user_id:</strong> {xUser.clerkUserId || 'None'} <br/>
                 <strong>email:</strong> {xUser.email || 'None'} <br/>
               </div>
@@ -191,7 +198,7 @@ export function FingerprintStatus() {
               {xSubscription ? (
                 <>
                   <strong>user_id:</strong> {xSubscription.userId} <br/>
-                  <strong>pay_subscription_id:</strong> {xSubscription.paySubscriptionId} <br/>
+                  <strong>pay_subscription_id:</strong> {xSubscription.paySubscriptionId || 'None'} <br/>
                   <strong>price_id:</strong> {xSubscription.priceId || 'None'} <br/>
                   <strong>price_name:</strong> {xSubscription.priceName || 'None'} <br/>
                   <strong>status:</strong> {xSubscription.status || 'Free'} <br/>

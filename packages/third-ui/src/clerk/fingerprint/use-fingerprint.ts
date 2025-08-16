@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  getOrGenerateFingerprintId, 
-  setFingerprintId,
-  createFingerprintHeaders
+import { useCallback, useEffect, useState } from 'react';
+import {
+  createFingerprintHeaders,
+  getOrGenerateFingerprintId
 } from './fingerprint-client';
-import type { 
-  XUser, 
-  XCredit, 
+import type {
+  FingerprintConfig,
+  UseFingerprintResult,
+  XCredit,
   XSubscription,
-  UseFingerprintResult, 
-  FingerprintConfig 
+  XUser
 } from './types';
 
 /**
@@ -63,11 +62,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    */
   const initializeAnonymousUser = useCallback(async () => {
     if (!fingerprintId) {
-      console.warn('Cannot initialize user: Fingerprint ID is missing', {
-        fingerprintId,
-        isLoading,
-        isInitialized,
-      });
+      console.warn('Cannot initialize user: Fingerprint ID is missing', { fingerprintId, isLoading, isInitialized });
       setError('Cannot initialize user: Missing fingerprint ID');
       return;
     }
@@ -76,6 +71,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       setIsLoading(true);
       setError(null);
 
+      console.log('Initializing anonymous user with fingerprintId:', fingerprintId);
       const fingerprintHeaders = await createFingerprintHeaders();
       const response = await fetch(config.apiEndpoint, {
         method: 'POST',
@@ -83,9 +79,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
           'Content-Type': 'application/json',
           ...fingerprintHeaders,
         },
-        body: JSON.stringify({
-          fingerprintId: fingerprintId,
-        }),
+        body: JSON.stringify({ fingerprintId }),
       });
 
       if (!response.ok) {
@@ -94,17 +88,18 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       }
 
       const data = await response.json();
-      
+      console.log('API response in initializeAnonymousUser:', data);
+
       if (data.success) {
-        setXUser(data.xUser);
-        setXCredit(data.xCredit);
-        setXSubscription(data.xSubscription);
+        const updatedXUser = data.xUser || { userId: '', fingerprintId, clerkUserId: '', email: '', status: '', createdAt: '' };
+        console.log('Setting xUser:', updatedXUser);
+        setXUser(updatedXUser);
+        setXCredit(data.xCredit || null);
+        setXSubscription(data.xSubscription || null);
         setIsInitialized(true);
-        
-        // 确保fingerprint ID同步
-        if (data.user.fingerprintId !== fingerprintId) {
-          setFingerprintId(data.user.fingerprintId);
-          setFingerprintIdState(data.user.fingerprintId);
+
+        if (data.xUser?.fingerprintId && data.xUser.fingerprintId !== fingerprintId) {
+          setFingerprintIdState(data.xUser.fingerprintId);
         }
       } else {
         throw new Error(data.error || 'Unknown error occurred');
@@ -122,11 +117,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    */
   const refreshUserData = useCallback(async () => {
     if (!fingerprintId) {
-      console.warn('Cannot refresh user data: Fingerprint ID is missing', {
-        fingerprintId,
-        isLoading,
-        isInitialized,
-      });
+      console.warn('Cannot refresh user data: Fingerprint ID is missing', { fingerprintId, isLoading, isInitialized });
       setError('Cannot refresh user data: Missing fingerprint ID');
       return;
     }
@@ -150,11 +141,11 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       }
 
       const data = await response.json();
-      
       if (data.success) {
-        setXUser(data.xUser);
-        setXCredit(data.xCredit);
-        setXSubscription(data.xSubscription);
+        const updatedXUser = data.xUser || { userId: '', fingerprintId, clerkUserId: '', email: '', status: '', createdAt: '' };
+        setXUser(updatedXUser);
+        setXCredit(data.xCredit || null);
+        setXSubscription(data.xSubscription || null);
       }
     } catch (err) {
       console.error('Failed to refresh user data:', err);
@@ -167,11 +158,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    */
   const checkExistingUser = useCallback(async () => {
     if (!fingerprintId) {
-      console.warn('Cannot check existing user: Fingerprint ID is missing', {
-        fingerprintId,
-        isLoading,
-        isInitialized,
-      });
+      console.warn('Cannot check existing user: Fingerprint ID is missing', { fingerprintId, isLoading, isInitialized });
       return;
     }
 
@@ -185,9 +172,10 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setXUser(data.xUser);
-          setXCredit(data.xCredit);
-          setXSubscription(data.xSubscription);
+          const updatedXUser = data.xUser || { userId: '', fingerprintId, clerkUserId: '', email: '', status: '', createdAt: '' };
+          setXUser(updatedXUser);
+          setXCredit(data.xCredit || null);
+          setXSubscription(data.xSubscription || null);
           setIsInitialized(true);
         }
       }
@@ -214,14 +202,12 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
   // 第二阶段：有指纹ID后检查现有用户
   useEffect(() => {
     if (!fingerprintId || isInitialized || isLoading) return;
-
     checkExistingUser();
   }, [fingerprintId, isInitialized, isLoading, checkExistingUser]);
 
   // 第三阶段：如果没有现有用户且自动初始化开启，则创建新用户
   useEffect(() => {
     if (!fingerprintId || isInitialized || isLoading || error || config.autoInitialize === false) return;
-
     initializeAnonymousUser();
   }, [fingerprintId, isInitialized, isLoading, error, initializeAnonymousUser, config.autoInitialize]);
 

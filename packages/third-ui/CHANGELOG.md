@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.3.8
+
+### Patch Changes
+
+- fix(fingerprint): runtime error fix
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.3.7
 
 ### Patch Changes
