@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.3.2
+
+### Patch Changes
+
+- fix(context): refactor context data structure
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.3.1
 
 ### Patch Changes

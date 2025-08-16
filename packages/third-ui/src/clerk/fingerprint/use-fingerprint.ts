@@ -7,9 +7,9 @@ import {
   createFingerprintHeaders
 } from './fingerprint-client';
 import type { 
-  AnonymousUser, 
-  Credits, 
-  Subscription,
+  XUser, 
+  XCredit, 
+  XSubscription,
   UseFingerprintResult, 
   FingerprintConfig 
 } from './types';
@@ -20,9 +20,9 @@ import type {
  */
 export function useFingerprint(config: FingerprintConfig): UseFingerprintResult {
   const [fingerprintId, setFingerprintIdState] = useState<string | null>(null);
-  const [anonymousUser, setAnonymousUser] = useState<AnonymousUser | null>(null);
-  const [credits, setCredits] = useState<Credits | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [xUser, setXUser] = useState<XUser | null>(null);
+  const [xCredit, setXCredit] = useState<XCredit | null>(null);
+  const [xSubscription, setXSubscription] = useState<XSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,9 +78,9 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       const data = await response.json();
       
       if (data.success) {
-        setAnonymousUser(data.user);
-        setCredits(data.credits);
-        setSubscription(data.subscription);
+        setXUser(data.xUser);
+        setXCredit(data.xCredit);
+        setXSubscription(data.xSubscription);
         setIsInitialized(true);
         
         // 确保fingerprint ID同步
@@ -126,9 +126,9 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       const data = await response.json();
       
       if (data.success) {
-        setAnonymousUser(data.user);
-        setCredits(data.credits);
-        setSubscription(data.subscription);
+        setXUser(data.xUser);
+        setXCredit(data.xCredit);
+        setXSubscription(data.xSubscription);
       }
     } catch (err) {
       console.error('Failed to refresh user data:', err);
@@ -152,9 +152,9 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setAnonymousUser(data.user);
-          setCredits(data.credits);
-          setSubscription(data.subscription);
+          setXUser(data.xUser);
+          setXCredit(data.xCredit);
+          setXSubscription(data.xSubscription);
           setIsInitialized(true);
         }
       }
@@ -192,9 +192,9 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
 
   return {
     fingerprintId,
-    anonymousUser,
-    credits,
-    subscription,
+    xUser,
+    xCredit,
+    xSubscription,
     isLoading,
     isInitialized,
     error,

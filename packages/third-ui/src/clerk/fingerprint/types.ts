@@ -3,7 +3,7 @@
  * 指纹识别系统的类型定义
  */
 
-export interface AnonymousUser {
+export interface XUser {
   userId: string;
   fingerprintId: string;
   clerkUserId: string,
@@ -12,13 +12,13 @@ export interface AnonymousUser {
   createdAt: string;
 }
 
-export interface Credits {
+export interface XCredit {
   balanceFree: number;
   balancePaid: number;
   totalBalance: number;
 }
 
-export interface Subscription {
+export interface XSubscription {
   id: bigint
   userId: string
   paySubscriptionId: string | null
@@ -41,9 +41,9 @@ export interface FingerprintConfig {
 
 export interface UseFingerprintResult {
   fingerprintId: string | null;
-  anonymousUser: AnonymousUser | null;
-  credits: Credits | null;
-  subscription: Subscription | null;
+  xUser: XUser | null;
+  xCredit: XCredit | null;
+  xSubscription: XSubscription | null;
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;

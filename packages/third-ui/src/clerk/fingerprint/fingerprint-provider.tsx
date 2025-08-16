@@ -69,9 +69,9 @@ export function withFingerprint<P extends object>(
 export function FingerprintStatus() {
   const { 
     fingerprintId, 
-    anonymousUser, 
-    credits, 
-    subscription,
+    xUser, 
+    xCredit, 
+    xSubscription,
     isLoading, 
     isInitialized, 
     error 
@@ -146,28 +146,28 @@ export function FingerprintStatus() {
             <div><strong>Loading:</strong> {isLoading ? 'Yes' : 'No'}</div>
             <div><strong>Initialized:</strong> {isInitialized ? 'Yes' : 'No'}</div>
             {error && <div style={{ color: 'red' }}><strong>Error:</strong> {error}</div>}
-            {anonymousUser && (
+            {xUser && (
               <div>
-                <strong>user_id:</strong> {anonymousUser.userId} <br/>
-                <strong>clerk_user_id:</strong> {anonymousUser.clerkUserId || 'None'} <br/>
-                <strong>email:</strong> {anonymousUser.email || 'None'} <br/>
+                <strong>user_id:</strong> {xUser.userId} <br/>
+                <strong>clerk_user_id:</strong> {xUser.clerkUserId || 'None'} <br/>
+                <strong>email:</strong> {xUser.email || 'None'} <br/>
               </div>
             )}
-            {credits && (
+            {xCredit && (
               <div>
-                <strong>Credits:</strong> {credits.balanceFree} Free + {credits.balancePaid} Paid = {credits.totalBalance} Total
+                <strong>Credits:</strong> {xCredit.balanceFree} Free + {xCredit.balancePaid} Paid = {xCredit.totalBalance} Total
               </div>
             )}
-            {subscription && (
+            {xSubscription && (
               <div>
-                <strong>user_id:</strong> {subscription.userId} <br/>
-                <strong>pay_subscription_id:</strong> {subscription.paySubscriptionId} <br/>
-                <strong>price_id:</strong> {subscription.priceId || 'None'} <br/>
-                <strong>price_name:</strong> {subscription.priceName || 'None'} <br/>
-                <strong>status:</strong> {subscription.status || 'Free'} <br/>
-                <strong>credits_allocated:</strong> {subscription.creditsAllocated || ''} <br/>
-                <strong>sub_period_start:</strong> {subscription.subPeriodStart || ''} <br/>
-                <strong>sub_period_end:</strong> {subscription.subPeriodEnd || ''} <br/>
+                <strong>user_id:</strong> {xSubscription.userId} <br/>
+                <strong>pay_subscription_id:</strong> {xSubscription.paySubscriptionId} <br/>
+                <strong>price_id:</strong> {xSubscription.priceId || 'None'} <br/>
+                <strong>price_name:</strong> {xSubscription.priceName || 'None'} <br/>
+                <strong>status:</strong> {xSubscription.status || 'Free'} <br/>
+                <strong>credits_allocated:</strong> {xSubscription.creditsAllocated || ''} <br/>
+                <strong>sub_period_start:</strong> {xSubscription.subPeriodStart || ''} <br/>
+                <strong>sub_period_end:</strong> {xSubscription.subPeriodEnd || ''} <br/>
               </div>
             )}
           </div>
