@@ -71,6 +71,7 @@ export function FingerprintStatus() {
     fingerprintId, 
     anonymousUser, 
     credits, 
+    subscription,
     isLoading, 
     isInitialized, 
     error 
@@ -148,13 +149,25 @@ export function FingerprintStatus() {
             {anonymousUser && (
               <div>
                 <strong>user_id:</strong> {anonymousUser.userId} <br/>
-                <strong>clerk_user_id:</strong> {anonymousUser.clerkUserId} <br/>
-                <strong>email:</strong> {anonymousUser.email || 'None'} <br/> {/* Fixed email field */}
+                <strong>clerk_user_id:</strong> {anonymousUser.clerkUserId || 'None'} <br/>
+                <strong>email:</strong> {anonymousUser.email || 'None'} <br/>
               </div>
             )}
             {credits && (
               <div>
                 <strong>Credits:</strong> {credits.balanceFree} Free + {credits.balancePaid} Paid = {credits.totalBalance} Total
+              </div>
+            )}
+            {subscription && (
+              <div>
+                <strong>user_id:</strong> {subscription.userId} <br/>
+                <strong>pay_subscription_id:</strong> {subscription.paySubscriptionId} <br/>
+                <strong>price_id:</strong> {subscription.priceId || 'None'} <br/>
+                <strong>price_name:</strong> {subscription.priceName || 'None'} <br/>
+                <strong>status:</strong> {subscription.status || 'Free'} <br/>
+                <strong>credits_allocated:</strong> {subscription.creditsAllocated || ''} <br/>
+                <strong>sub_period_start:</strong> {subscription.subPeriodStart || ''} <br/>
+                <strong>sub_period_end:</strong> {subscription.subPeriodEnd || ''} <br/>
               </div>
             )}
           </div>

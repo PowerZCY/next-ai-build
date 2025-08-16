@@ -18,6 +18,18 @@ export interface Credits {
   totalBalance: number;
 }
 
+export interface Subscription {
+  id: bigint
+  userId: string
+  paySubscriptionId: string | null
+  priceId: string | null
+  priceName: string | null
+  status: string
+  creditsAllocated: number
+  subPeriodStart: string
+  subPeriodEnd: string
+}
+
 export interface FingerprintConfig {
   /** API endpoint for anonymous user initialization */
   apiEndpoint: string;
@@ -31,6 +43,7 @@ export interface UseFingerprintResult {
   fingerprintId: string | null;
   anonymousUser: AnonymousUser | null;
   credits: Credits | null;
+  subscription: Subscription | null;
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;

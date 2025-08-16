@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.3.1
+
+### Patch Changes
+
+- fix(fingerprint): add subscription info in context
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.3.0
 
 ### Minor Changes

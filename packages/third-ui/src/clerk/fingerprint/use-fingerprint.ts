@@ -9,6 +9,7 @@ import {
 import type { 
   AnonymousUser, 
   Credits, 
+  Subscription,
   UseFingerprintResult, 
   FingerprintConfig 
 } from './types';
@@ -21,6 +22,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
   const [fingerprintId, setFingerprintIdState] = useState<string | null>(null);
   const [anonymousUser, setAnonymousUser] = useState<AnonymousUser | null>(null);
   const [credits, setCredits] = useState<Credits | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +80,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       if (data.success) {
         setAnonymousUser(data.user);
         setCredits(data.credits);
+        setSubscription(data.subscription);
         setIsInitialized(true);
         
         // 确保fingerprint ID同步
@@ -125,6 +128,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       if (data.success) {
         setAnonymousUser(data.user);
         setCredits(data.credits);
+        setSubscription(data.subscription);
       }
     } catch (err) {
       console.error('Failed to refresh user data:', err);
@@ -150,6 +154,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
         if (data.success) {
           setAnonymousUser(data.user);
           setCredits(data.credits);
+          setSubscription(data.subscription);
           setIsInitialized(true);
         }
       }
@@ -189,6 +194,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
     fingerprintId,
     anonymousUser,
     credits,
+    subscription,
     isLoading,
     isInitialized,
     error,
