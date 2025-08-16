@@ -19,6 +19,21 @@ import type {
  * Accepts configuration to customize API endpoint and behavior
  */
 export function useFingerprint(config: FingerprintConfig): UseFingerprintResult {
+  // 服务端渲染检查
+  if (typeof window === 'undefined') {
+    return {
+      fingerprintId: null,
+      xUser: null,
+      xCredit: null,
+      xSubscription: null,
+      isLoading: false,
+      isInitialized: false,
+      error: 'Server-side rendering is not supported',
+      initializeAnonymousUser: async () => {},
+      refreshUserData: async () => {},
+    };
+  }
+
   const [fingerprintId, setFingerprintIdState] = useState<string | null>(null);
   const [xUser, setXUser] = useState<XUser | null>(null);
   const [xCredit, setXCredit] = useState<XCredit | null>(null);
@@ -31,11 +46,9 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    * 第一阶段：初始化fingerprint ID
    */
   const initializeFingerprintId = useCallback(async () => {
-    if (typeof window === 'undefined') return null;
-
     try {
-      // 优先检查现有ID, 没有就生成新的fingerprint ID
       const currentFingerprintId = await getOrGenerateFingerprintId();
+      console.log('Initialized fingerprintId:', currentFingerprintId);
       setFingerprintIdState(currentFingerprintId);
       return currentFingerprintId;
     } catch (error) {
@@ -50,7 +63,12 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    */
   const initializeAnonymousUser = useCallback(async () => {
     if (!fingerprintId) {
-      console.warn('Cannot initialize user without fingerprint ID');
+      console.warn('Cannot initialize user: Fingerprint ID is missing', {
+        fingerprintId,
+        isLoading,
+        isInitialized,
+      });
+      setError('Cannot initialize user: Missing fingerprint ID');
       return;
     }
 
@@ -103,7 +121,15 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    * 刷新用户数据
    */
   const refreshUserData = useCallback(async () => {
-    if (!fingerprintId) return;
+    if (!fingerprintId) {
+      console.warn('Cannot refresh user data: Fingerprint ID is missing', {
+        fingerprintId,
+        isLoading,
+        isInitialized,
+      });
+      setError('Cannot refresh user data: Missing fingerprint ID');
+      return;
+    }
 
     try {
       setError(null);
@@ -140,7 +166,14 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
    * 检查现有用户数据（仅在有fingerprint ID时执行）
    */
   const checkExistingUser = useCallback(async () => {
-    if (!fingerprintId) return;
+    if (!fingerprintId) {
+      console.warn('Cannot check existing user: Fingerprint ID is missing', {
+        fingerprintId,
+        isLoading,
+        isInitialized,
+      });
+      return;
+    }
 
     try {
       const fingerprintHeaders = await createFingerprintHeaders();
@@ -165,11 +198,14 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
 
   // 第一阶段：页面加载完成后生成指纹ID
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
     const initFingerprint = async () => {
-      await initializeFingerprintId();
-      setIsLoading(false); // 第一阶段完成，结束加载状态
+      setIsLoading(true);
+      const currentFingerprintId = await initializeFingerprintId();
+      if (currentFingerprintId) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     };
 
     initFingerprint();
@@ -177,15 +213,14 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
 
   // 第二阶段：有指纹ID后检查现有用户
   useEffect(() => {
-    if (!fingerprintId || isInitialized) return;
+    if (!fingerprintId || isInitialized || isLoading) return;
 
     checkExistingUser();
-  }, [fingerprintId, isInitialized, checkExistingUser]);
+  }, [fingerprintId, isInitialized, isLoading, checkExistingUser]);
 
   // 第三阶段：如果没有现有用户且自动初始化开启，则创建新用户
   useEffect(() => {
-    if (!fingerprintId || isInitialized || isLoading || error) return;
-    if (config.autoInitialize === false) return;
+    if (!fingerprintId || isInitialized || isLoading || error || config.autoInitialize === false) return;
 
     initializeAnonymousUser();
   }, [fingerprintId, isInitialized, isLoading, error, initializeAnonymousUser, config.autoInitialize]);
@@ -202,5 +237,3 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
     refreshUserData,
   };
 }
-
-// createFingerprintFetch moved to fingerprint.ts

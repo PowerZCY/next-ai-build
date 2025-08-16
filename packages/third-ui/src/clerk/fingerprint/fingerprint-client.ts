@@ -4,79 +4,28 @@
  * 只能在浏览器环境中使用
  */
 
-import { 
-  FINGERPRINT_STORAGE_KEY, 
-  FINGERPRINT_COOKIE_NAME, 
-  isValidFingerprintId 
-} from './fingerprint-shared';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { FINGERPRINT_STORAGE_KEY, FINGERPRINT_COOKIE_NAME, isValidFingerprintId } from './fingerprint-shared';
 
 /**
- * 生成基于真实浏览器特征的fingerprint ID
- * 使用FingerprintJS收集浏览器特征并生成唯一标识
- * 只能在客户端使用
+ * 检查浏览器存储（localStorage 和 cookie）中的指纹 ID
+ * 返回有效的 ID 或 null
  */
-export async function generateFingerprintId(): Promise<string> {
-  if (typeof window === 'undefined') {
-    throw new Error('generateFingerprintId can only be used in browser environment');
-  }
-
-  // 首先检查现有ID
-  const existingId = getFingerprintId();
-  if (existingId && isValidFingerprintId(existingId)) {
-    return existingId;
-  }
-
-  // 检查cookie
-  const cookieId = getCookieValue(FINGERPRINT_COOKIE_NAME);
-  if (cookieId && isValidFingerprintId(cookieId)) {
-    // 同步到localStorage
-    localStorage.setItem(FINGERPRINT_STORAGE_KEY, cookieId);
-    return cookieId;
-  }
-
-  try {
-    // 使用FingerprintJS生成基于浏览器特征的指纹
-    const fp = await FingerprintJS.load();
-    const result = await fp.get();
-    const fingerprintId = `fp_${result.visitorId}`;
-
-    // 存储到localStorage和cookie
-    localStorage.setItem(FINGERPRINT_STORAGE_KEY, fingerprintId);
-    setCookie(FINGERPRINT_COOKIE_NAME, fingerprintId, 365); // 365天过期
-
-    return fingerprintId;
-  } catch (error) {
-    console.warn('Failed to generate fingerprint with FingerprintJS:', error);
-    // 降级方案：生成时间戳+随机数
-    const fallbackId = `fp_fallback_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-    
-    localStorage.setItem(FINGERPRINT_STORAGE_KEY, fallbackId);
-    setCookie(FINGERPRINT_COOKIE_NAME, fallbackId, 365);
-    
-    return fallbackId;
-  }
-}
-
-/**
- * 获取当前的fingerprint ID
- * 只能在客户端使用
- */
-export function getFingerprintId(): string | null {
+function checkStoredFingerprintId(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  // 首先检查localStorage
+  // 优先检查 localStorage
   const localStorageId = localStorage.getItem(FINGERPRINT_STORAGE_KEY);
-  if (localStorageId) {
+  if (localStorageId && isValidFingerprintId(localStorageId)) {
     return localStorageId;
   }
 
-  // 检查cookie
+  // 检查 cookie
   const cookieId = getCookieValue(FINGERPRINT_COOKIE_NAME);
-  if (cookieId) {
-    // 同步到localStorage
+  if (cookieId && isValidFingerprintId(cookieId)) {
+    // 同步到 localStorage
     localStorage.setItem(FINGERPRINT_STORAGE_KEY, cookieId);
     return cookieId;
   }
@@ -85,12 +34,62 @@ export function getFingerprintId(): string | null {
 }
 
 /**
+ * 生成基于真实浏览器特征的fingerprint ID
+ * 使用 FingerprintJS 收集浏览器特征并生成唯一标识
+ */
+export async function generateFingerprintId(): Promise<string> {
+  if (typeof window === 'undefined') {
+    throw new Error('generateFingerprintId can only be used in browser environment');
+  }
+
+  // 检查现有 ID
+  const existingId = checkStoredFingerprintId();
+  if (existingId) {
+    console.log('Using existing fingerprint ID:', existingId);
+    return existingId;
+  }
+
+  try {
+    // 使用 FingerprintJS 生成指纹
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    const fingerprintId = `fp_${result.visitorId}`;
+
+    // 存储到 localStorage 和 cookie
+    localStorage.setItem(FINGERPRINT_STORAGE_KEY, fingerprintId);
+    setCookie(FINGERPRINT_COOKIE_NAME, fingerprintId, 365);
+
+    console.log('Generated new fingerprint ID:', fingerprintId);
+    return fingerprintId;
+  } catch (error) {
+    console.warn('Failed to generate fingerprint with FingerprintJS:', error);
+    // 降级方案：生成基于时间戳和随机数的 ID
+    const fallbackId = `fp_fallback_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    localStorage.setItem(FINGERPRINT_STORAGE_KEY, fallbackId);
+    setCookie(FINGERPRINT_COOKIE_NAME, fallbackId, 365);
+
+    console.log('Generated fallback fingerprint ID:', fallbackId);
+    return fallbackId;
+  }
+}
+
+/**
+ * 获取当前的fingerprint ID
+ */
+export function getFingerprintId(): string | null {
+  return checkStoredFingerprintId();
+}
+
+/**
  * 设置fingerprint ID到存储
- * 只能在客户端使用
  */
 export function setFingerprintId(fingerprintId: string): void {
   if (typeof window === 'undefined') {
     throw new Error('setFingerprintId can only be used in browser environment');
+  }
+
+  if (!isValidFingerprintId(fingerprintId)) {
+    throw new Error('Invalid fingerprint ID');
   }
 
   localStorage.setItem(FINGERPRINT_STORAGE_KEY, fingerprintId);
@@ -99,7 +98,6 @@ export function setFingerprintId(fingerprintId: string): void {
 
 /**
  * 清除fingerprint ID
- * 只能在客户端使用
  */
 export function clearFingerprintId(): void {
   if (typeof window === 'undefined') {
@@ -113,30 +111,29 @@ export function clearFingerprintId(): void {
 /**
  * 获取或生成fingerprint ID
  * 如果不存在则自动生成新的
- * 只能在客户端使用
  */
 export async function getOrGenerateFingerprintId(): Promise<string> {
-  const existingId = getFingerprintId();
+  const existingId = checkStoredFingerprintId();
   if (existingId) {
+    console.log('Retrieved existing fingerprint ID:', existingId);
     return existingId;
   }
+
   return await generateFingerprintId();
 }
 
 /**
  * 创建包含fingerprint ID的fetch headers
- * 只能在客户端使用
  */
 export async function createFingerprintHeaders(): Promise<Record<string, string>> {
   const fingerprintId = await getOrGenerateFingerprintId();
   return {
-    FINGERPRINT_HEADER_NAME : fingerprintId,
+    FINGERPRINT_HEADER_NAME: fingerprintId,
   };
 }
 
 /**
  * Hook for generating fingerprint headers
- * 只能在客户端使用
  */
 export function useFingerprintHeaders(): () => Promise<Record<string, string>> {
   return createFingerprintHeaders;
@@ -144,7 +141,6 @@ export function useFingerprintHeaders(): () => Promise<Record<string, string>> {
 
 /**
  * Create a fetch wrapper that automatically includes fingerprint headers
- * 只能在客户端使用
  */
 export function createFingerprintFetch() {
   return async (url: string | URL | Request, init?: RequestInit) => {
