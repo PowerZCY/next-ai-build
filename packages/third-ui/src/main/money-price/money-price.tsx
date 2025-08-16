@@ -4,7 +4,6 @@ import { getTranslations } from 'next-intl/server';
 import { getActiveProviderConfig } from './money-price-config-util';
 import { MoneyPriceInteractive } from './money-price-interactive';
 import type { MoneyPriceProps, MoneyPriceData } from './money-price-types';
-import { GradientButton } from '@third-ui/fuma/mdx';
 
 export async function MoneyPrice({ 
   locale, 
@@ -264,12 +263,7 @@ export async function MoneyPrice({
             <div className="flex-1" />
             
             <div data-button-placeholder={plan.key}>
-              <GradientButton
-                title={data.buttonTexts.getStarted}
-                disabled={true}
-                align="center"
-                className="w-full"
-              />
+              {/* Button will be injected by client-side component */}
             </div>
           </div>
         ))}

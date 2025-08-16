@@ -191,6 +191,9 @@ export function MoneyPriceInteractive({
     }
   }, []);
 
+  // State for button portals
+  const [buttonPortals, setButtonPortals] = useState<React.ReactElement[]>([]);
+
   // 处理月付/年付切换和 tooltip 功能
   useEffect(() => {
     const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLButtonElement;
@@ -257,26 +260,6 @@ export function MoneyPriceInteractive({
         }
       });
     });
-    
-    // Inject buttons into placeholders using createPortal
-    data.plans.forEach((plan: any) => {
-      const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`) as HTMLElement;
-      if (placeholder) {
-        console.log('MoneyPriceButton', `[data-button-placeholder="${plan.key}"]`)
-        createPortal(
-          <MoneyPriceButton
-            planKey={plan.key}
-            userContext={userContext}
-            billingType={billingType}
-            onLogin={handleLogin}
-            onUpgrade={handleUpgrade}
-            texts={data.buttonTexts}
-            isProcessing={isProcessing}
-          />,
-          placeholder
-        );
-      }
-    });
 
     // Initial updates
     updatePriceDisplay(billingType);
@@ -298,6 +281,35 @@ export function MoneyPriceInteractive({
       });
     };
   }, [data, billingType, updatePriceDisplay, updateButtonStyles, updateDiscountInfo, userContext, handleLogin, handleUpgrade, isProcessing]);
+
+  // Create button portals after component mounts
+  useEffect(() => {
+    const portals: React.ReactElement[] = [];
+    
+    data.plans.forEach((plan: any) => {
+      const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`) as HTMLElement;
+      if (placeholder) {
+        console.log('Creating portal for', `[data-button-placeholder="${plan.key}"]`);
+        portals.push(
+          createPortal(
+            <MoneyPriceButton
+              key={plan.key}
+              planKey={plan.key}
+              userContext={userContext}
+              billingType={billingType}
+              onLogin={handleLogin}
+              onUpgrade={handleUpgrade}
+              texts={data.buttonTexts}
+              isProcessing={isProcessing}
+            />,
+            placeholder
+          )
+        );
+      }
+    });
+    
+    setButtonPortals(portals);
+  }, [data.plans, userContext, billingType, handleLogin, handleUpgrade, data.buttonTexts, isProcessing]);
 
   // Tooltip 组件
   const Tooltip = ({ show, content, x, y }: typeof tooltip) => {
@@ -322,5 +334,10 @@ export function MoneyPriceInteractive({
     );
   };
 
-  return <Tooltip {...tooltip} />;
+  return (
+    <>
+      <Tooltip {...tooltip} />
+      {buttonPortals}
+    </>
+  );
 }

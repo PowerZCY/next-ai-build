@@ -1,8 +1,8 @@
 'use client';
 
-import { GradientButton } from '@windrun-huaiin/third-ui/fuma/mdx';
-import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { cn } from '@windrun-huaiin/lib/utils';
 import { UserState, type MoneyPriceButtonProps } from './money-price-types';
+import React, { useState } from 'react';
 
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -18,6 +18,7 @@ export function MoneyPriceButton({
   isProcessing = false
 }: MoneyPriceButtonProps) {
   const { isAuthenticated, subscriptionStatus } = userContext;
+  const [isLoading, setIsLoading] = useState(false);
   
   // 决定按钮显示和行为
   const getButtonConfig = () => {
@@ -28,8 +29,7 @@ export function MoneyPriceButton({
         text: texts[textKey as keyof typeof texts] || texts.getStarted,
         onClick: onLogin,
         disabled: false,
-        hidden: false,
-        icon: <icons.ArrowRight />
+        hidden: false
       };
     }
     
@@ -40,8 +40,7 @@ export function MoneyPriceButton({
           return { 
             text: texts.currentPlan, 
             disabled: true, 
-            hidden: false,
-            icon: <icons.GlobeLock />
+            hidden: false
           };
         }
         const getFreeUserText = planKey === 'pro' ? texts.getPro : texts.getUltra;
@@ -49,8 +48,7 @@ export function MoneyPriceButton({
           text: getFreeUserText,
           onClick: () => onUpgrade(planKey, billingType),
           disabled: false,
-          hidden: false,
-          icon: <icons.ArrowRight />
+          hidden: false
         };
         
       case UserState.ProUser:
@@ -59,16 +57,14 @@ export function MoneyPriceButton({
           return { 
             text: texts.currentPlan, 
             disabled: true, 
-            hidden: false,
-            icon: <icons.GlobeLock />
+            hidden: false
           };
         }
         return {
           text: texts.upgrade,
           onClick: () => onUpgrade('ultra', billingType),
           disabled: false,
-          hidden: false,
-          icon: <icons.ArrowRight />
+          hidden: false
         };
         
       case UserState.UltraUser:
@@ -76,8 +72,7 @@ export function MoneyPriceButton({
         return { 
           text: texts.currentPlan, 
           disabled: true, 
-          hidden: false,
-          icon: <icons.GlobeLock />
+          hidden: false
         };
         
       default:
@@ -88,17 +83,46 @@ export function MoneyPriceButton({
   const config = getButtonConfig();
   
   if (config.hidden) return null;
+
+  const handleClick = async (e: React.MouseEvent) => {
+    if (config.disabled || isLoading || isProcessing) {
+      e.preventDefault();
+      return;
+    }
+
+    if (config.onClick) {
+      e.preventDefault();
+      setIsLoading(true);
+      
+      try {
+        const result = config.onClick();
+        // Handle both sync and async functions
+        await Promise.resolve(result);
+      } catch (error) {
+        console.error('MoneyPriceButton onClick error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const isDisabled = config.disabled || isLoading || isProcessing;
+  const displayText = isLoading ? 'Processing...' : config.text;
   
   return (
-    <GradientButton
-      title={config.text}
-      icon={config.icon}
-      onClick={config.onClick}
-      disabled={config.disabled || isProcessing}
-      align="center"
-      className="w-full"
-      preventDoubleClick={true}
-      loadingText="Processing..."
-    />
+    <button
+      className={cn(
+        'w-full py-2 mt-auto text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
+        isDisabled
+          ? 'bg-gray-400 cursor-not-allowed'
+          : 'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
+      )}
+      disabled={isDisabled}
+      onClick={handleClick}
+      type="button"
+      data-plan-button={planKey}
+    >
+      {displayText}
+    </button>
   );
 }
