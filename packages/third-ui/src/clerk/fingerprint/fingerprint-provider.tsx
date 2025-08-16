@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useFingerprint } from './use-fingerprint';
-import { globalLucideIcons } from '@base-ui/components/global-icon';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import type { 
   FingerprintContextType, 
   FingerprintProviderProps 
@@ -129,7 +129,7 @@ export function FingerprintStatus() {
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
         }}
       >
-        <globalLucideIcons.BTC 
+        <icons.BTC 
           size={24}
           style={{
             color: 'white',
