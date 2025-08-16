@@ -1,6 +1,6 @@
 'use client';
 
-import { GradientButton } from '@third-ui/fuma/mdx';
+import { GradientButton } from '@windrun-huaiin/third-ui/fuma/mdx';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { UserState, type MoneyPriceButtonProps } from './money-price-types';
 

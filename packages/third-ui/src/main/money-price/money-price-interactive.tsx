@@ -262,6 +262,7 @@ export function MoneyPriceInteractive({
     data.plans.forEach((plan: any) => {
       const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`) as HTMLElement;
       if (placeholder) {
+        console.log('MoneyPriceButton', `[data-button-placeholder="${plan.key}"]`)
         createPortal(
           <MoneyPriceButton
             planKey={plan.key}
