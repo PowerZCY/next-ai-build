@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GradientButton } from '@third-ui/fuma/mdx';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { getTranslations } from 'next-intl/server';
 import { getActiveProviderConfig } from './money-price-config-util';
 import { MoneyPriceInteractive } from './money-price-interactive';
-import type { MoneyPriceData, MoneyPriceProps } from './money-price-types';
+import type { MoneyPriceProps, MoneyPriceData } from './money-price-types';
 
 export async function MoneyPrice({ 
   locale, 
@@ -39,23 +38,19 @@ export async function MoneyPrice({
     currency: config.display.currency
   };
 
-  // 获取激活的支付供应商配置
   const providerConfig = getActiveProviderConfig(config);
   const minPlanFeaturesCount = config.display.minFeaturesCount;
-  
-  // 使用默认计费类型进行静态渲染
+
   const defaultBilling = data.billingSwitch.defaultKey;
   const defaultBillingDisplay = data.billingSwitch.options.find(
     (opt: any) => opt.key === defaultBilling
   ) || data.billingSwitch.options[0];
 
-  // 计算特性数量
   const maxFeaturesCount = Math.max(
     ...data.plans.map((plan: any) => plan.features?.length || 0),
     minPlanFeaturesCount || 0
   );
 
-  // 处理卡片高度对齐
   const getFeatureRows = (plan: any) => {
     const features = plan.features || [];
     const filled = [...features];
@@ -63,7 +58,6 @@ export async function MoneyPrice({
     return filled;
   };
 
-  // 静态价格渲染逻辑
   function renderPrice(plan: any, billingKey = data.billingSwitch.defaultKey) {
     const productConfig = providerConfig.products[plan.key as 'free' | 'pro' | 'ultra'];
     const pricing = productConfig.plans[billingKey as 'monthly' | 'yearly'];
@@ -72,7 +66,6 @@ export async function MoneyPrice({
     ) || defaultBillingDisplay;
     const billingSubTitle = currentBillingDisplay?.subTitle || '';
     
-    // 免费计划
     if (pricing.amount === 0) {
       return (
         <div className="flex flex-col items-start w-full" data-price-container={plan.key}>
@@ -92,7 +85,6 @@ export async function MoneyPrice({
       );
     }
     
-    // 付费计划
     const hasDiscount = pricing.discountPercent && pricing.discountPercent > 0;
     const unit = currentBillingDisplay.unit || '';
     let discountText = '';
@@ -140,7 +132,6 @@ export async function MoneyPrice({
 
   return (
     <section id="money-pricing" className={cn("px-4 py-10 md:px-16 md:py-16 mx-auto max-w-7xl scroll-mt-10", sectionClassName)}>
-      {/* 标题和副标题 */}
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">
         {data.title}
       </h2>
@@ -148,7 +139,6 @@ export async function MoneyPrice({
         {data.subtitle}
       </p>
 
-      {/* 计费切换按钮 */}
       <div className="flex flex-col items-center">
         <div className="flex items-center relative mb-3">
           <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
@@ -179,12 +169,10 @@ export async function MoneyPrice({
           </div>
         </div>
         
-        {/* 折扣信息 - 默认计费的静态渲染 */}
         <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
           {(() => {
             const opt = data.billingSwitch.options.find((opt: any) => opt.key === data.billingSwitch.defaultKey);
             
-            // 检查默认计费类型是否有折扣
             let hasDiscount = false;
             let discountPercent = 0;
             
@@ -211,7 +199,6 @@ export async function MoneyPrice({
         </div>
       </div>
 
-      {/* 价格卡片区域 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {data.plans.map((plan: any, _idx: number) => (
           <div
@@ -224,7 +211,6 @@ export async function MoneyPrice({
             )}
             style={{ minHeight: maxFeaturesCount*100 }}
           >
-            {/* 标题和标签 */}
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{plan.title}</span>
               {plan.titleTags && plan.titleTags.map((tag: string, i: number) => (
@@ -234,14 +220,11 @@ export async function MoneyPrice({
               ))}
             </div>
             
-            {/* 价格和单位/折扣 */}
             {renderPrice(plan)}
             
-            {/* 特性列表 */}
             <ul className="flex-1 mb-6 mt-4">
               {getFeatureRows(plan).map((feature: any, i: number) => (
                 <li key={i} className="flex items-center gap-2 mb-2 min-h-[28px]" data-feature-item={`${plan.key}-${i}`}>
-                  {/* 图标 */}
                   {feature ? (
                     <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 mr-1">
                       {feature.icon ? <span>{feature.icon}</span> : <span className="font-bold">✓</span>}
@@ -249,13 +232,11 @@ export async function MoneyPrice({
                   ) : (
                     <span className="inline-flex items-center justify-center w-5 h-5 rounded-full mr-1">&nbsp;</span>
                   )}
-                  {/* 标签 */}
                   {feature && feature.tag && (
                     <span className="px-1 py-0.5 text-[6px] rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 font-semibold align-middle">
                       {feature.tag}
                     </span>
                   )}
-                  {/* 描述 + 提示 */}
                   {feature ? (
                     <span className="relative group cursor-pointer text-sm text-gray-800 dark:text-gray-200">
                       {feature.description}
@@ -279,23 +260,15 @@ export async function MoneyPrice({
               ))}
             </ul>
             
-            {/* 占位符，确保卡片高度一致 */}
             <div className="flex-1" />
             
-            {/* 按钮占位，客户端会替换 */}
-            <div data-button-placeholder={plan.key}>
-              <GradientButton
-                title={data.buttonTexts.getStarted}
-                disabled={true}
-                align="center"
-                className="w-full"
-              />
+            <div data-button-placeholder={plan.key} className="w-full">
+              {/* MoneyPriceInteractive will render the button here */}
             </div>
           </div>
         ))}
       </div>
       
-      {/* 客户端增强组件 */}
       <MoneyPriceInteractive 
         data={data}
         config={config}

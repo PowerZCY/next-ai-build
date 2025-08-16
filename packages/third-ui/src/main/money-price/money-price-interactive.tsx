@@ -4,8 +4,7 @@ import { useClerk } from '@clerk/nextjs';
 import { useFingerprintContextSafe } from '@third-ui/clerk/fingerprint';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { MoneyPriceButton } from './money-price-button';
 import { getActiveProviderConfig, getProductPricing } from './money-price-config-util';
 import {
@@ -33,9 +32,9 @@ export function MoneyPriceInteractive({
     x: number;
     y: number;
   }>({ show: false, content: '', x: 0, y: 0 });
-  
+
   // 确定用户状态
-  const getUserState = (): UserState => {
+  const getUserState = useCallback((): UserState => {
     if (!fingerprintContext) return UserState.Anonymous;
     const { xUser, xSubscription } = fingerprintContext;
     
@@ -44,27 +43,27 @@ export function MoneyPriceInteractive({
     if (xSubscription.priceName?.includes('Pro')) return UserState.ProUser;
     if (xSubscription.priceName?.includes('Ultra')) return UserState.UltraUser;
     return UserState.FreeUser;
-  };
-  
-  const userContext: UserContext = {
+  }, [fingerprintContext]);
+
+  // 优化 userContext 使用 useMemo
+  const userContext = useMemo<UserContext>(() => ({
     isAuthenticated: !!fingerprintContext?.xUser?.clerkUserId,
     subscriptionStatus: getUserState(),
     subscriptionType: fingerprintContext?.xSubscription?.priceId?.includes('yearly') ? 'yearly' : 'monthly',
     subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
-  };
-  
+  }), [fingerprintContext, getUserState]);
+
   // 处理登录
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
     if (signInPath) {
       router.push(signInPath);
     } else {
       redirectToSignIn();
     }
-  };
-  
+  }, [signInPath, redirectToSignIn, router]);
+
   // 处理升级
-  const handleUpgrade = async (plan: string, billingType: string) => {
-    // 如果没有配置 API 端点，跳转到首页
+  const handleUpgrade = useCallback(async (plan: string, billingType: string) => {
     if (!upgradeApiEndpoint) {
       router.push('/');
       return;
@@ -72,7 +71,6 @@ export function MoneyPriceInteractive({
     
     setIsProcessing(true);
     try {
-      // 获取价格配置
       const pricing = getProductPricing(
         plan as 'free' | 'pro' | 'ultra',
         billingType as 'monthly' | 'yearly',
@@ -80,7 +78,6 @@ export function MoneyPriceInteractive({
         config
       );
       
-      // 调用 API 创建支付会话
       const response = await fetch(upgradeApiEndpoint, {
         method: 'POST',
         headers: {
@@ -97,7 +94,6 @@ export function MoneyPriceInteractive({
       const result = await response.json();
       
       if (result.success && result.checkoutUrl) {
-        // 跳转到支付页面
         window.location.href = result.checkoutUrl;
       } else {
         console.error('Failed to create checkout session:', result.error);
@@ -107,17 +103,16 @@ export function MoneyPriceInteractive({
     } finally {
       setIsProcessing(false);
     }
-  };
-  
+  }, [upgradeApiEndpoint, config, router]);
+
   // 更新价格显示
-  const updatePriceDisplay = (newBillingType: string) => {
+  const updatePriceDisplay = useCallback((newBillingType: string) => {
     const providerConfig = getActiveProviderConfig(config);
     
     data.plans.forEach((plan: any) => {
       const productConfig = providerConfig.products[plan.key as 'free' | 'pro' | 'ultra'];
       const pricing = productConfig.plans[newBillingType as 'monthly' | 'yearly'];
       
-      // 更新价格值
       const priceValueElement = document.querySelector(`[data-price-value="${plan.key}"]`) as HTMLElement;
       if (priceValueElement) {
         if (pricing.amount === 0) {
@@ -127,14 +122,12 @@ export function MoneyPriceInteractive({
         }
       }
       
-      // 更新单位
       const priceUnitElement = document.querySelector(`[data-price-unit="${plan.key}"]`) as HTMLElement;
       if (priceUnitElement) {
         const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
         priceUnitElement.textContent = billingOption?.unit || '/month';
       }
       
-      // 更新原价和折扣
       const priceOriginalElement = document.querySelector(`[data-price-original="${plan.key}"]`) as HTMLElement;
       const priceDiscountElement = document.querySelector(`[data-price-discount="${plan.key}"]`) as HTMLElement;
       
@@ -158,17 +151,16 @@ export function MoneyPriceInteractive({
         if (priceDiscountElement) priceDiscountElement.style.display = 'none';
       }
       
-      // 更新副标题
       const priceSubtitleElement = document.querySelector(`[data-price-subtitle="${plan.key}"]`) as HTMLElement;
       if (priceSubtitleElement && plan.showBillingSubTitle !== false) {
         const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
         priceSubtitleElement.textContent = billingOption?.subTitle || '';
       }
     });
-  };
-  
+  }, [config, data]);
+
   // 更新按钮样式
-  const updateButtonStyles = (newBillingType: string) => {
+  const updateButtonStyles = useCallback((newBillingType: string) => {
     const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLButtonElement;
     const yearlyButton = document.querySelector('[data-billing-button="yearly"]') as HTMLButtonElement;
     
@@ -184,17 +176,16 @@ export function MoneyPriceInteractive({
         yearlyButton.className = cn('min-w-[120px] px-6 py-2 font-medium transition text-lg relative', activeClasses);
       }
     }
-  };
-  
+  }, []);
+
   // 更新折扣信息
-  const updateDiscountInfo = (newBillingType: string) => {
+  const updateDiscountInfo = useCallback((newBillingType: string) => {
     const discountInfoElement = document.querySelector('[data-discount-info]') as HTMLElement;
     if (!discountInfoElement) return;
     
     const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
     const providerConfig = getActiveProviderConfig(config);
     
-    // 检查是否有折扣
     let hasDiscount = false;
     let discountPercent = 0;
     
@@ -207,7 +198,6 @@ export function MoneyPriceInteractive({
       }
     });
     
-    // 清空内容
     discountInfoElement.innerHTML = '';
     
     if (hasDiscount && billingOption?.discountText) {
@@ -216,54 +206,8 @@ export function MoneyPriceInteractive({
       discountBadge.textContent = billingOption.discountText.replace('{percent}', String(discountPercent));
       discountInfoElement.appendChild(discountBadge);
     }
-  };
-  
-  // 使用 useRef 存储 root 实例，避免重复创建
-  const rootsRef = React.useRef<Map<string, any>>(new Map());
+  }, [config, data]);
 
-  // 动态替换按钮
-  useEffect(() => {
-    data.plans.forEach((plan: any) => {
-      const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`);
-      if (placeholder) {
-        let root = rootsRef.current.get(plan.key);
-        
-        // 如果还没有创建 root，则创建一个
-        if (!root) {
-          root = createRoot(placeholder);
-          rootsRef.current.set(plan.key, root);
-        }
-        
-        // 渲染按钮
-        root.render(
-          <MoneyPriceButton
-            planKey={plan.key}
-            userContext={userContext}
-            billingType={billingType}
-            onLogin={handleLogin}
-            onUpgrade={handleUpgrade}
-            texts={data.buttonTexts}
-            isProcessing={isProcessing}
-          />
-        );
-      }
-    });
-  }, [userContext, billingType, isProcessing, data.plans, data.buttonTexts, handleLogin, handleUpgrade]);
-  
-  // 组件卸载时清理
-  useEffect(() => {
-    return () => {
-      rootsRef.current.forEach((root) => {
-        try {
-          root.unmount();
-        } catch (e) {
-          // 忽略卸载错误
-        }
-      });
-      rootsRef.current.clear();
-    };
-  }, []);
-  
   // 处理月付/年付切换和 tooltip 功能
   useEffect(() => {
     const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLButtonElement;
@@ -290,7 +234,6 @@ export function MoneyPriceInteractive({
       yearlyButton.addEventListener('click', handleYearlyClick);
     }
     
-    // 添加 tooltip 功能
     const tooltipHandlers: Array<{
       element: HTMLElement;
       handlers: {
@@ -332,11 +275,9 @@ export function MoneyPriceInteractive({
       });
     });
     
-    // 初始化价格显示
     updatePriceDisplay(billingType);
     updateDiscountInfo(billingType);
     
-    // 清理
     return () => {
       if (monthlyButton) {
         monthlyButton.removeEventListener('click', handleMonthlyClick);
@@ -345,15 +286,14 @@ export function MoneyPriceInteractive({
         yearlyButton.removeEventListener('click', handleYearlyClick);
       }
       
-      // 清理 tooltip 事件监听器
       tooltipHandlers.forEach(({ element, handlers }) => {
         element.removeEventListener('mouseenter', handlers.mouseenter);
         element.removeEventListener('mousemove', handlers.mousemove);
         element.removeEventListener('mouseleave', handlers.mouseleave);
       });
     };
-  }, [data]);
-  
+  }, [data, billingType, updatePriceDisplay, updateButtonStyles, updateDiscountInfo]);
+
   // Tooltip 组件
   const Tooltip = ({ show, content, x, y }: typeof tooltip) => {
     if (!show) return null;
@@ -376,6 +316,24 @@ export function MoneyPriceInteractive({
       </div>
     );
   };
-  
-  return <Tooltip {...tooltip} />;
+
+  // 直接渲染按钮，确保宽度占满
+  return (
+    <>
+      {data.plans.map((plan: any) => (
+        <div key={plan.key} data-button-placeholder={plan.key}>
+          <MoneyPriceButton
+            planKey={plan.key}
+            userContext={userContext}
+            billingType={billingType}
+            onLogin={handleLogin}
+            onUpgrade={handleUpgrade}
+            texts={data.buttonTexts}
+            isProcessing={isProcessing}
+          />
+        </div>
+      ))}
+      <Tooltip {...tooltip} />
+    </>
+  );
 }
