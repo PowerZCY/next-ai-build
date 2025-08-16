@@ -317,7 +317,7 @@ export function MoneyPriceInteractive({
     );
   };
 
-  // 直接渲染按钮，确保宽度占满
+  // 直接渲染按钮
   return (
     <>
       {data.plans.map((plan: any) => (

@@ -89,7 +89,6 @@ export function MoneyPriceButton({
   
   if (config.hidden) return null;
   
-  // 使用 GradientButton 组件
   return (
     <GradientButton
       title={config.text}
