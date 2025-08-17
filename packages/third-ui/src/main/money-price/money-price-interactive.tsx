@@ -94,10 +94,10 @@ export function MoneyPriceInteractive({
       
       const result = await response.json();
       
-      if (result.success && result.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
+      if (result.success && result.data?.sessionUrl) {
+        window.location.href = result.data.sessionUrl;
       } else {
-        console.error('Failed to create checkout session:', result.error);
+        console.error('Failed to create checkout session:', result.error || 'Unknown error');
       }
     } catch (error) {
       console.error('Error during upgrade:', error);

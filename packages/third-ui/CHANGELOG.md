@@ -1,5 +1,17 @@
 # @windrun-huaiin/third-ui
 
+## 7.4.0
+
+### Minor Changes
+
+- fix(price): price button jump to stripe
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.3.14
 
 ### Patch Changes
