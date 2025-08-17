@@ -1,7 +1,7 @@
 ---
 title: 订阅系统AI详细设计
 description: 积分、用户、订单、支付系统打通, 产研方案一体化
-date: 2025-08-08
+date: 2025-08-18
 ---
 
 ## 概述
@@ -32,7 +32,7 @@ flowchart TB
     subgraph P1["NO.1: 规划与需求确认"]
         direction TB
         T1A["需求分析与优化: 产品方案, 优化用户场景/数据模型, 定义MVP范围"]:::task
-        T1B["技术栈选型: 技术方案，确认后端(Node.js/Prisma), 前端(React), 数据库(PostgreSQL), 集成(Stripe/Clerk/Fingerprint/Redis)"]:::task
+        T1B["技术栈选型: 技术方案, 确认后端(Node.js/Prisma), 前端(React), 数据库(PostgreSQL), 集成(Stripe/Clerk/Fingerprint/Redis)"]:::task
         T1C["风险评估: GDPR合规, 安全审计, 性能瓶颈评估"]:::task
         T1D["团队分工: 分配前后端/测试角色, 设定里程碑"]:::task
         T1A --> T1B & T1C
@@ -119,7 +119,7 @@ flowchart TB
         direction TB
         T8A["通用组件: 积分订阅系统中模块化复用（如用户管理、积分系统）"]:::task
         T8B["提取公共UI组件: 将通用组件沉淀到@windrun-huaiin工具包中"]:::task
-        T8C["模板化升级: 创建脚本命令，支持第三方应用一键接入与升级积分订阅系统"]:::task
+        T8C["模板化升级: 创建脚本命令, 支持第三方应用一键接入与升级积分订阅系统"]:::task
         T8A --> T8B & T8C
     end
     P8:::phase
@@ -272,11 +272,11 @@ flowchart TB
 
 #### 2.2.1 用户注册与识别
 - **匿名用户**: 通过Fingerprint(基于设备的标识符)识别, 防止滥用(例如, 过度使用免费积分)。
-- **注册用户**: 用户可通过电子邮件和密码注册, 或使用SSO(例如Google、Apple)。注册用户分配唯一的`user_id`。
+- **注册用户**: 用户可通过电子邮件和密码注册, 或使用SSO(例如Google、Apple)。注册用户分配唯一的`clerk_user_id`。
 - **场景**: 
   - 新用户访问平台, 系统分配Fingerprint ID。
   - 用户无需注册即可使用有限的免费积分。
-  - 要访问付费功能, 用户必须注册或登录, 将Fingerprint ID关联到`user_id`。
+  - 要访问付费功能, 用户必须注册或登录, 将Fingerprint ID关联到`clerk_user_id`。
 
 #### 2.2.2 订阅管理
 - **订阅计划**: 用户可选择多种计划(例如, 基础版、专业版、企业版), 具有不同的积分分配和定价。
@@ -328,7 +328,7 @@ flowchart TB
 | `fingerprint_id`    | String       | 匿名用户的Fingerprint标识符            |
 | `clerk_user_id`     | String       | Clerk用户ID, 注册用户必填, 匿名用户为空 |
 | `email`             | String       | 用户电子邮件(注册用户必填, 匿名用户为空) |
-| `status`            | Enum         | 状态:  anonymous、registered、frozen、deleted等             |
+| `status`            | Enum         | 状态:  anonymous、registered、frozen、*deleted*等             |
 | `created_at`        | Timestamp    | 账户创建时间戳                        |
 | `updated_at`        | Timestamp    | 最后更新时间戳                        |
 
@@ -338,7 +338,6 @@ flowchart TB
 | 列名                | 类型         | 描述                                    |
 |---------------------|--------------|----------------------------------------|
 | `id`                | BigInt       | 主键                                   |
-| `subscription_id`   | UUID         | 订阅ID, 唯一订阅ID                      |
 | `user_id`           | UUID         | 外键, 引用`Users`表                     |
 | `pay_subscription_id` | String   | 交易厂商订阅ID (sub_xxx)                |
 | `price_id`          | String       | 交易厂商价格ID (price_xxx)               |
@@ -347,6 +346,7 @@ flowchart TB
 | `credits_allocated` | Integer      | 每个计费周期分配的积分                 |
 | `sub_period_start`  | Timestamp    | 订阅周期开始时间戳                    |
 | `sub_period_end`    | Timestamp    | 订阅周期结束时间戳                    |
+| `deleted`        | Enum    | 删除：0否、1是, 默认0                      | 
 | `created_at`        | Timestamp    | 记录创建时间戳                        |
 | `updated_at`        | Timestamp    | 最后更新时间戳                        |
 
@@ -395,6 +395,7 @@ flowchart TB
 | `paid_at`           | Timestamp    | 支付时间戳                            |
 | `paid_email`        | String       | 支付邮箱                            |
 | `paid_detail`       | String       | 支付详情(例如, 订阅、一次性购买)     |
+| `deleted`        | Enum    | 删除：0否、1是, 默认0                      | 
 | `pay_created_at`        | Timestamp    | 交易创建时间戳                        |
 | `pay_updated_at`        | Timestamp    | 交易最后更新时间戳                        |
 
@@ -410,6 +411,7 @@ flowchart TB
 | `credit_type`       | Enum         | 积分类型: free、paid                    |
 | `operation_type`    | Enum         | 操作类型: consume、recharge、freeze、unfreeze                |
 | `credits_used`      | Integer      | 消耗的积分数量                        |
+| `deleted`        | Enum    | 删除：0否、1是, 默认0                      | 
 | `created_at`        | Timestamp    | 使用时间戳                            |
 
 #### 用户备份表 (UserBackup)
@@ -424,12 +426,13 @@ flowchart TB
 | `email`             | String       | 用户邮箱                               |
 | `status`            | String       | 用户状态                               |
 | `backup_data`       | JSON         | 完整的用户数据备份(包括积分、订阅等) |
+| `deleted`        | Enum    | 删除：0否、1是, 默认0                      | 
 | `deleted_at`        | Timestamp    | 删除时间戳                            |
 | `created_at`        | Timestamp    | 备份创建时间戳                        |
 
 ### 3.2. 索引
-- **用户表**: 主键 (`id`), `user_id` 唯一索引, `fingerprint_id` 唯一索引, `clerk_user_id` 唯一索引, `email` 索引。
-- **订阅表**: 主键 (`id`), `subscription_id` 唯一索引, `user_id` 索引。
+- **用户表**: 主键 (`id`), `user_id` 唯一索引, `fingerprint_id` 索引, `clerk_user_id` 唯一索引, `email` 索引。
+- **订阅表**: 主键 (`id`), `user_id` 索引。
 - **积分表**: 主键 (`id`), `user_id` 索引。
 - **交易表**: 主键 (`id`), `user_id`、`pay_session_id`、`pay_invoice_id` 索引。
 - **积分使用表**: 主键 (`id`), `user_id`索引。
@@ -529,7 +532,6 @@ classDiagram
 
     class Subscriptions {
         number id PK
-        string subscription_id FK
         string user_id
         string pay_subscription_id
         string price_id
@@ -538,6 +540,7 @@ classDiagram
         int credits_allocated
         string sub_period_start
         string sub_period_end
+        <<enumeration>> deleted
         string created_at
         string updated_at
     }
@@ -580,6 +583,7 @@ classDiagram
         string paid_at
         string paid_email
         string paid_detail
+        <<enumeration>> deleted
         string pay_created_at
         string pay_updated_at
     }
@@ -592,6 +596,7 @@ classDiagram
         <<enumeration>> credit_type
         <<enumeration>> operation_type
         int credits_used
+        <<enumeration>> deleted
         string created_at
     }
 
@@ -603,6 +608,7 @@ classDiagram
         string email
         string status
         string backup_data
+        <<enumeration>> deleted
         string deleted_at
         string created_at
     }
@@ -969,62 +975,500 @@ stateDiagram-v2
 ### 4.5. Clerk用户认证流程
 
 #### 4.5.1 匿名用户初始化
-1. **前端处理**: 
+1. **前端处理**：
    - 用户访问平台时, 前端生成Fingerprint ID。
-   - 调用Clerk创建匿名会话, 获取`clerk_user_id`。
-   - 向后端发送初始化请求, 包含`fingerprint_id`和`clerk_user_id`。
-2. **后端处理**: 
+   - 向后端发送初始化请求, 包含`fingerprint_id`, `clerk_user_id`为空。
+2. **后端处理**：
    - 查询Redis缓存, 检查是否已有用户记录。
    - 缓存未命中时, 查询数据库`Users`表。
    - 用户不存在时, 创建新的匿名用户记录。
    - 分配50个免费积分, 创建`Credits`和`Credit_Usage`记录。
    - 将用户信息缓存到Redis, TTL设置为24小时。
-3. **返回结果**: 
+3. **返回结果**：
    - 返回用户信息和积分余额给前端。
    - 前端显示平台界面和积分余额。
 
 #### 4.5.2 用户注册/登录
-1. **Clerk认证**: 
+1. **Clerk认证**：
    - 用户通过Clerk界面完成注册或登录。
-   - Clerk验证用户信息, 返回`clerk_user_id`和`email`。
-   - 前端将认证结果发送给后端。
-2. **后端处理**: 
+   - 通过`SignUp`组件传递`unsafeMetadata`, 传递`fingerprint_id`以及数据库里的`user_id`(最核心的匹配数据)
+   - Clerk验证用户信息, 异步webhook回调API, 发送`UserCreated`事件, 返回`clerk_user_id`和`email`, 以及`unsafeMetadata`：`user_id`和`fingerprint_id`
+2. **后端异步处理**：
    - 查询Redis缓存, 检查用户状态。
-   - **匿名用户升级**: 更新`Users`表, 设置`email`和`clerk_user_id`, 状态改为`registered`。
-   - **新注册用户**: 创建完整的用户记录, 包括积分初始化。
+   - **匿名用户升级**：根据`user_id`查找记录, 更新`Users`表, 设置`email`和`clerk_user_id`, 状态改为`registered`。
+   - **新注册用户**：创建完整的用户记录, 包括积分初始化。
    - 更新Redis缓存, 包含新的用户信息。
-3. **数据一致性**: 
-   - 确保`fingerprint_id`和`clerk_user_id`的关联关系正确。
+3. **数据一致性**：
+   - 通过`user_id`传递来确保`fingerprint_id`和`clerk_user_id`的关联关系正确。
    - 维护用户从匿名到注册的完整数据连续性。
 
 #### 4.5.3 用户注销
-1. **Clerk注销**: 
+1. **Clerk注销**：
    - 用户通过Clerk完成注销操作。
-   - 前端向后端发送注销请求。
-2. **数据备份**: 
+   - Clerk异步webhook回调API, 发送`UserDeleted`事件, 返回`clerk_user_id`。
+2. **数据备份**：
    - 将用户数据备份到`UserBackup`表。
    - 硬删除`Users`及关联表记录。
-3. **缓存清理**: 
+3. **缓存清理**：
    - 删除Redis中所有相关的用户缓存。
    - 包括`fingerprint_id`、`email`、`user_id`相关的缓存。
-4. **状态重置**: 
+4. **状态重置**：
    - 用户重新访问时, 重新开始匿名用户流程。
 
 #### 4.5.4 Redis缓存策略
-1. **缓存键设计**: 
-   - `fingerprint_id:user_info`: 用户身份信息
-   - `email:user_info`: 邮箱关联的用户信息
-   - `clerk_user_id:user_info`: Clerk用户关联信息
-   - `user_id:credits`: 用户积分余额
-   - `user_id:session`: 用户会话状态
-2. **缓存更新策略**: 
+1. **缓存键设计**：
+   - `fingerprint_id:user_info`：用户身份信息
+   - `user_id:user_info`：用户身份信息
+   - `email:user_info`：邮箱关联的用户信息
+   - `clerk_user_id:user_info`：Clerk用户关联信息
+   - `user_id:credits`：用户积分余额
+   - `user_id:session`：用户会话状态
+2. **缓存更新策略**：
    - 用户信息变更时主动更新缓存。
    - 积分操作时更新积分缓存。
    - 用户注销时清理所有相关缓存。
-3. **缓存一致性**: 
+3. **缓存一致性**：
    - 采用Cache-Aside模式, 先更新数据库再更新缓存。
    - 缓存失效时从数据库重新加载。
    - 监控缓存命中率和响应时间。
+
+### 4.6 Clerk Webhook回调
+
+#### 4.6.1 API端点
+
+```
+POST /api/webhook/clerk/user
+```
+
+#### 4.6.2 环境配置
+
+在`.env.local`文件中添加以下环境变量：
+
+```bash
+# Clerk Webhook签名密钥
+CLERK_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxx
+```
+
+#### 4.6.3 Clerk控制台配置
+
+1. 登录 [Clerk Dashboard](https://dashboard.clerk.com/)
+2. 选择你的应用
+3. 进入 **Webhooks** 页面
+4. 点击 **Add Endpoint**
+5. 配置如下：
+   - **Endpoint URL**: `https://yourdomain.com/api/webhook/clerk/user`
+   - **Events**: 选择以下事件
+     - `user.created`
+     - `user.deleted`
+6. 保存后复制 **Signing Secret** 到环境变量中
+
+#### 4.6.4 本地开发配置
+
+由于webhook需要公网访问，本地开发时需要使用隧道工具：
+
+* 使用 ngrok
+
+1. 安装ngrok：`npm install -g ngrok`
+2. 启动开发服务器：`npm run dev`
+3. 在另一个终端运行：`ngrok http 3000`
+4. 使用ngrok提供的公网URL配置Clerk webhook
+
+* 使用 Vercel
+
+部署到Vercel后，直接使用生产URL配置webhook。
+
+#### 4.6.5 数据流程
+
+* 匿名用户注册流程
+
+1. 匿名用户访问网站 → 生成fingerprint_id
+2. 用户决定注册 → 通过Clerk SignUp组件传递user_id和fingerprint_id
+3. Clerk验证用户信息 → 异步发送UserCreated webhook
+4. 系统接收webhook → 查找匿名用户记录 → 升级为注册用户
+
+* 直接注册流程
+
+1. 新用户直接注册 → Clerk发送UserCreated webhook
+2. 系统创建新用户记录 → 初始化50积分 → 记录积分操作
+
+* 用户注销流程
+
+1. 用户删除账户 → Clerk发送UserDeleted webhook
+2. 系统备份用户数据 → 硬删除所有相关记录 → 清理缓存
+
+#### 4.6.6 签名验证
+
+API使用svix库验证Clerk webhook签名：
+
+```javascript
+const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+const event = wh.verify(rawBody, headers);
+```
+
+#### 4.6.7 正常处理和容错处理
+
+* UserCreated事件数据结构
+
+```json
+{
+  "data": {
+    "email_addresses": ["xxx@gmail.com", "yyy@gmail.com"],
+    "unsafe_metadata": {
+      "user_id": "本系统的用户ID",
+      "fingerprint_id": "浏览器指纹ID"
+    }
+    "id": "user_2g7np7Hrk0SN6kj5EDMLDaKNL0S"
+  },
+  "event_attributes": {
+    "http_request": {
+      "client_ip": "192.168.1.100",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    }
+  },
+  "instance_id": "ins_2g7np7Hrk0SN6kj5EDMLDaKNL0S",
+  "object": "event",
+  "timestamp": 1716883200,
+  "type": "user.created"
+}
+```
+
+* UserDeleted事件数据结构
+
+```json
+{
+  "data": {
+    "deleted": true,
+    "id": "user_29wBMCtzATuFJut8jO2VNTVekS4",
+    "object": "user"
+  },
+  "event_attributes": {
+    "http_request": {
+      "client_ip": "0.0.0.0",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    }
+  },
+  "object": "event",
+  "timestamp": 1661861640000,
+  "type": "user.deleted"
+}
+```
+
+* webhook处理完成后会返回：
+
+```json
+{
+  "received": true
+}
+```
+
+* 异常情况
+  
+- 缺少必要的headers → 返回400错误
+- 签名验证失败 → 返回400错误
+- 系统处理异常 → 返回500错误，记录错误日志
+
+#### 4.6.8 安全考虑
+
+1. **环境变量**：webhook signing secret必须存储为环境变量
+2. **签名验证**：所有webhook请求都必须通过签名验证
+3. **错误处理**：适当的错误处理避免敏感信息泄露
+4. **日志记录**：记录关键操作用于审计和调试
+
+#### 4.6.9 监控和日志
+
+系统会记录以下日志：
+- webhook事件类型和处理状态
+- 用户创建/删除操作结果
+- 积分操作记录
+- 错误和异常信息
+
+### 4.7 Fingerprint匿名机制详细设计
+
+#### 4.7.1 匿名用户首次访问时序图
+
+<Mermaid
+title="匿名用户首次访问时序图"
+chart={`
+sequenceDiagram
+    participant Browser as 浏览器
+    participant Middleware as middleware.ts
+    participant FP_Lib as fingerprint.ts
+    participant Hook as useFingerprint.ts
+    participant Provider as FingerprintProvider.tsx
+    participant API as /api/user/anonymous/init
+    participant UserService as userService
+    participant CreditService as creditService
+    participant DB as 数据库
+
+    Note over Browser,DB: 🚀 用户首次访问网站
+
+    Browser->>Middleware: 1. 请求页面 (GET /)
+    Middleware->>FP_Lib: 2. extractFingerprintId(headers, cookies)
+    FP_Lib-->>Middleware: 3. return null (首次访问无fingerprint)
+    Note over Middleware: 4. 跳过fingerprint处理<br/>(非API路由请求)
+    Middleware-->>Browser: 5. 返回页面HTML (包含React应用)
+
+    Note over Browser,DB: 📱 客户端React应用启动和Fingerprint初始化
+
+    Browser->>Provider: 6. <FingerprintProvider> 组件挂载
+    Provider->>Hook: 7. useFingerprint() hook初始化
+    Hook->>FP_Lib: 8. initializeFingerprintId()
+    FP_Lib->>FP_Lib: 9. 检查localStorage/cookie
+    Note over FP_Lib: localStorage: null<br/>cookie: null
+    FP_Lib->>FP_Lib: 10. 尝试使用FingerprintJS收集浏览器特征
+    
+    alt FingerprintJS成功
+        FP_Lib->>FP_Lib: 生成真实指纹: fp_abc123def456
+    else FingerprintJS失败(降级)
+        FP_Lib->>FP_Lib: 生成降级ID: fp_fallback_1692345678901_x7k9m2n4p
+    end
+    
+    FP_Lib->>FP_Lib: 11. 存储到localStorage和cookie
+    FP_Lib-->>Hook: 12. return fingerprintId
+    Hook-->>Provider: 13. 设置状态: fingerprintId = "fp_xxx"
+
+    Note over Browser,DB: 🔄 自动初始化匿名用户
+
+    Provider->>Provider: 14. useEffect检测到fingerprintId
+    Provider->>Hook: 15. 触发 initializeAnonymousUser()
+    Hook->>Hook: 16. 设置 isLoading = true
+    Hook->>API: 17. POST /api/user/anonymous/init<br/>Headers: X-Fingerprint-Id: fp_xxx<br/>Body: {fingerprintId: "fp_xxx"}
+
+    Note over API,DB: 🏗️ 服务端处理匿名用户创建<br/>Middleware再次处理指纹ID
+
+    API->>Middleware: 18. API请求经过middleware处理
+    Middleware->>FP_Lib: 19. extractFingerprintId(headers, cookies)
+    FP_Lib-->>Middleware: 20. return "fp_xxx" (从X-Fingerprint-Id header)
+    Middleware->>API: 21. 继续处理API请求
+    
+    API->>FP_Lib: 22. extractFingerprintId(headers, cookies, body)
+    FP_Lib-->>API: 23. return "fp_xxx"
+    API->>FP_Lib: 24. isValidFingerprintId("fp_xxx")
+    
+    alt 有效的FingerprintJS ID
+        FP_Lib-->>API: return true (fp_abc123def456)
+    else 有效的降级ID  
+        FP_Lib-->>API: return true (fp_fallback_1692345678901_x7k9m2n4p)
+    else 服务端环境降级（理论情况）
+        Note over FP_Lib: ⚠️ 在当前架构下不会发生<br/>因为指纹生成只在客户端执行
+        FP_Lib-->>API: return true
+    end
+    API->>UserService: 27. findByFingerprintId("fp_xxx")
+    UserService->>DB: 28. SELECT * FROM users WHERE fingerprint_id = 'fp_xxx'
+    DB-->>UserService: 29. return null (用户不存在)
+    UserService-->>API: 30. return null
+
+    Note over API,DB: 📝 创建新匿名用户
+
+    API->>UserService: 31. createUser({fingerprintId: "fp_xxx", status: "anonymous"})
+    UserService->>DB: 32. INSERT INTO users (user_id, fingerprint_id, status)
+    DB-->>UserService: 33. return 新用户记录 {userId: "uuid", ...}
+    UserService-->>API: 34. return newUser
+
+    Note over API,DB: 🪙 初始化积分系统
+
+    API->>CreditService: 35. initializeCredits(userId, 50, 0)
+    CreditService->>DB: 36. INSERT INTO credits (user_id, balance_free: 50, ...)
+    DB-->>CreditService: 37. return credits记录
+    CreditService-->>API: 38. return credits
+
+    API->>CreditService: 39. recordCreditOperation({userId, feature: "anonymous_user_init", ...})
+    CreditService->>DB: 40. INSERT INTO credit_usage (operation_type: "recharge", ...)
+    DB-->>CreditService: 41. return usage记录
+    CreditService-->>API: 42. return success
+
+    Note over API,DB: ✅ 返回初始化结果
+
+    API-->>Hook: 43. return {success: true, user: {...}, credits: {...}, isNewUser: true}
+
+    Hook->>Hook: 44. 更新状态:<br/>- anonymousUser = user<br/>- credits = credits<br/>- isInitialized = true<br/>- isLoading = false
+    Hook-->>Provider: 45. 状态更新完成
+    Provider-->>Browser: 46. 触发组件重新渲染
+
+    Note over Browser,DB: 🎉 用户界面更新
+
+    Browser->>Browser: 47. 显示用户状态:<br/>- Fingerprint ID: fp_xxx<br/>- 匿名用户<br/>- 免费积分: 50
+`}/>
+
+
+#### 4.7.2 匿名用户首次访问流程图
+
+<Mermaid
+title="匿名用户首次访问流程图"
+chart={`
+flowchart TD
+    Start([用户访问网站]) --> CheckBrowser{浏览器环境?}
+    
+    CheckBrowser -->|否| ServerSide[服务端渲染]
+    CheckBrowser -->|是| InitFP[初始化Fingerprint]
+    
+    ServerSide --> Middleware[middleware.ts处理]
+    Middleware --> ExtractFP[提取fingerprint ID]
+    ExtractFP --> FPExists{fingerprint存在?}
+    FPExists -->|否| SkipFP[跳过fingerprint处理]
+    FPExists -->|是| SetHeader[设置响应header]
+    SkipFP --> ReturnHTML[返回HTML页面]
+    SetHeader --> ReturnHTML
+    
+    InitFP --> CheckStorage{检查本地存储}
+    CheckStorage -->|localStorage有| UseExisting[使用现有fingerprint]
+    CheckStorage -->|cookie有| UseExisting
+    CheckStorage -->|都没有| Generate[生成新fingerprint ID]
+    
+    Generate --> GenerateID["生成: fp_ + 32位随机字符"]
+    GenerateID --> SaveStorage[保存到localStorage和cookie]
+    SaveStorage --> FPReady[fingerprint ID就绪]
+    UseExisting --> FPReady
+    
+    ReturnHTML --> ReactInit[React应用初始化]
+    ReactInit --> ProviderMount[FingerprintProvider挂载]
+    ProviderMount --> HookInit[useFingerprint初始化]
+    HookInit --> FPReady
+    
+    FPReady --> AutoInit{autoInitialize?}
+    AutoInit -->|否| WaitManual[等待手动调用]
+    AutoInit -->|是| CheckUser[检查用户是否已存在]
+    
+    CheckUser --> CallAPI["调用 GET /api/user/anonymous/init"]
+    CallAPI --> UserExists{用户存在?}
+    UserExists -->|是| LoadUser[加载现有用户数据]
+    UserExists -->|否| CreateUser[创建新匿名用户]
+    
+    LoadUser --> UpdateState[更新React状态]
+    
+    CreateUser --> ValidateFP[验证fingerprint格式]
+    ValidateFP --> Invalid{有效?}
+    Invalid -->|否| ErrorState[错误状态]
+    Invalid -->|是| CreateUserRecord[创建用户记录]
+    
+    CreateUserRecord --> DBInsert["数据库插入:\nusers表 (user_id, fingerprint_id, status)"]
+    DBInsert --> InitCredits[初始化积分]
+    InitCredits --> CreditInsert["数据库插入:\ncredits表 (balance_free: 50)"]
+    CreditInsert --> RecordUsage[记录积分操作]
+    RecordUsage --> UsageInsert["数据库插入:\ncredit_usage表 (recharge, free)"]
+    UsageInsert --> Success[创建成功]
+    
+    Success --> UpdateState
+    UpdateState --> RenderUI[渲染用户界面]
+    RenderUI --> ShowStatus["显示:\n- Fingerprint ID\n- 匿名用户状态\n- 50免费积分"]
+    
+    WaitManual --> ManualTrigger[手动调用initializeAnonymousUser]
+    ManualTrigger --> CheckUser
+    
+    ErrorState --> ShowError[显示错误信息]
+    
+    style Start fill:#e1f5fe
+    style FPReady fill:#f3e5f5
+    style Success fill:#e8f5e8
+    style ShowStatus fill:#fff3e0
+    style ErrorState fill:#ffebee
+`}/>
+
+#### 4.7.3 核心交互图
+
+<Mermaid
+title="核心交互图"
+chart={`
+flowchart TD
+    subgraph 浏览器环境
+        浏览器
+        localStorage[localStorage]
+        Cookie[Cookie]
+    end
+    
+    subgraph Next.js中间件层
+        middleware.ts
+    end
+    
+    subgraph React客户端
+        React组件
+        FingerprintProvider.tsx
+        useFingerprint.ts
+    end
+    
+    subgraph 工具库
+        fingerprint.ts
+    end
+    
+    subgraph API层
+        subgraph "/api/user/anonymous/init/route.ts"
+            InitAPI["/api/user/anonymous/init/route.ts"]
+        end
+    end
+    
+    subgraph 服务层
+        userService.ts
+        creditService.ts
+        creditUsageService.ts
+    end
+    
+    subgraph 数据库
+        users表[(users表)]
+        credits表[(credits表)]
+        credit_usage表[(credit_usage表)]
+    end
+    
+    浏览器 --> middleware.ts
+    middleware.ts --> React组件
+    React组件 --> FingerprintProvider.tsx
+    FingerprintProvider.tsx --> useFingerprint.ts
+    useFingerprint.ts --> fingerprint.ts
+    useFingerprint.ts --> InitAPI
+    
+    fingerprint.ts --> localStorage
+    fingerprint.ts --> Cookie
+    
+    InitAPI --> userService.ts
+    InitAPI --> creditService.ts
+    InitAPI --> creditUsageService.ts
+    
+    userService.ts --> users表
+    creditService.ts --> credits表
+    creditUsageService.ts --> credit_usage表
+    
+    style 浏览器 fill:#e3f2fd
+    style React组件 fill:#f3e5f5
+    style InitAPI fill:#e8f5e8
+    style users表 fill:#fff3e0
+`}/>
+
+#### 4.7.4 关键代码执行顺序
+
+1. **浏览器访问** (`/` 路径)
+2. **middleware.ts:21** - `handleFingerprintId()` 尝试提取fingerprint
+3. **fingerprint.ts:131** - `extractFingerprintId()` 检查headers/cookies, 如果没有就是null
+4. **React渲染** - 页面组件开始渲染
+5. **FingerprintProvider.tsx:45** - Provider组件挂载
+6. **useFingerprint.ts:140** - Hook初始化，调用`checkExistingUser()`
+7. **fingerprint.ts:47** - `getOrGenerateFingerprintId()` 生成新ID
+8. **fingerprint.ts:21** - `generateFingerprintId()` 创建唯一ID
+9. **useFingerprint.ts:164** - 自动调用`initializeAnonymousUser()`
+10. **route.ts:17** - API接收POST请求初始化用户
+11. **userService.ts:17** - 创建新用户记录
+12. **creditService.ts:14** - 初始化50免费积分
+13. **creditUsageService.ts:40** - 记录积分充值操作
+14. **useFingerprint.ts:113** - 更新React状态
+15. **界面渲染** - 显示匿名用户状态和积分信息
+
+#### 4.7.5 数据流程总结
+
+1. **首次访问**：
+   - 生成fingerprint ID
+   - 调用 `/api/user/anonymous/init` 创建匿名用户
+   - 分配50免费积分
+
+2. **再次访问**：
+   - 从localStorage/cookie获取fingerprint ID
+   - 调用 `/api/user/anonymous/init` 获取现有用户数据
+
+3. **用户注册**：
+   - Clerk webhook接收用户创建事件
+   - 根据传递的user_id升级匿名用户为注册用户
+
+4. **用户注销**：
+   - Clerk webhook接收用户删除事件
+   - 备份并删除用户数据
+   - 用户重新成为匿名状态
 
 ---
 
@@ -1080,12 +1524,17 @@ flowchart TB
       O --> M4_OUT((→ 完)):::entry
     end
 
-    %% 模块5: 注册引导
+    %% 模块5：注册引导（新增Clerk注册流程）
     subgraph M5[注册引导]
       direction LR
       M5_IN((← 积分不足)):::entry
       M5_IN --> U{用户注册?}:::core
-      U -->|是| V[提交注册信息]:::core --> W[更新 Users 表]:::core --> M4_IN
+      U -->|是| V1[前端: SignUp 组件传递 user_id/fingerprint_id 到 Clerk]:::core
+      V1 --> V2[Clerk 验证用户信息]:::core
+      V2 --> V3[异步 Webhook: UserCreated 事件返回 clerk_user_id/email/unsafeMetadata]:::core
+      V3 --> V4[后端: 查询 Redis, 匹配 user_id]:::core
+      V4 --> V5[更新 Users 表: 设置 email/clerk_user_id, 状态为 registered]:::core
+      V5 --> V6[更新 Redis 缓存]:::core --> M4_IN
       U -->|否| M3_IN
     end
 
@@ -1446,15 +1895,15 @@ sequenceDiagram
 
     U->>F: 点击注册/登录
     F->>C: 打开Clerk注册界面
-    U->>C: 填写邮箱/密码
+    U->>C: 填写邮箱/密码, 携带user_id匹配信息
     C->>C: 验证用户信息
-    C-->>F: 注册/登录成功
+    C-->>F: 注册成功
     Note over C: 返回clerk_user_id和email
     
-    F->>B: 用户注册/登录完成通知
-    Note over B: 包含clerk_user_id, email, fingerprint_id
+    F->>B: 用户注册, 异步webhook回调
+    Note over B: 包含user_id, clerk_user_id, email, fingerprint_id
     
-    B->>R: 查询缓存: fingerprint_id
+    B->>R: 查询缓存: user_id或fingerprint_id
     R-->>B: 返回用户信息
     
     alt 匿名用户升级为注册用户
@@ -1545,8 +1994,8 @@ sequenceDiagram
     F->>C: 调用Clerk注销
     C-->>F: 注销成功
     
-    F->>B: 用户注销请求
-    Note over B: 包含user_id和fingerprint_id
+    F->>B: 异步webhook回调, 用户注销请求
+    Note over B: clerk_user_id
     
     B->>DB: 备份用户数据到UserBackup表
     DB-->>B: 备份成功
