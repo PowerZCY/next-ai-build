@@ -139,6 +139,7 @@ export async function MoneyPrice({
         {data.subtitle}
       </p>
 
+      {/* billing switch button */}
       <div className="flex flex-col items-center">
         <div className="flex items-center relative mb-3">
           <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
@@ -169,6 +170,7 @@ export async function MoneyPrice({
           </div>
         </div>
         
+        {/* Discount info - static for default billing */}
         <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
           {(() => {
             const opt = data.billingSwitch.options.find((opt: any) => opt.key === data.billingSwitch.defaultKey);
@@ -199,13 +201,15 @@ export async function MoneyPrice({
         </div>
       </div>
 
+      {/* price card area */}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {data.plans.map((plan: any, _idx: number) => (
           <div
             key={plan.key}
             data-price-plan={plan.key}
             className={cn(
-              'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-8 w-full h-full shadow-sm dark:shadow-none', // 添加 w-full
+              'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-8 h-full shadow-sm dark:shadow-none',
               'hover:border-2 hover:border-purple-500',
               'focus-within:border-2 focus-within:border-purple-500'
             )}
