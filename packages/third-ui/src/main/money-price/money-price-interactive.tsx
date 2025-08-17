@@ -21,7 +21,7 @@ export function MoneyPriceInteractive({
   signInPath
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
-  const { redirectToSignIn } = useClerk();
+  const { redirectToSignIn, user } = useClerk();
   const router = useRouter();
   const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(
     data.billingSwitch.defaultKey as 'monthly' | 'yearly'
@@ -47,12 +47,18 @@ export function MoneyPriceInteractive({
   }, [fingerprintContext]);
 
   // 优化 userContext 使用 useMemo
-  const userContext = useMemo<UserContext>(() => ({
-    isAuthenticated: !!fingerprintContext?.xUser?.clerkUserId,
-    subscriptionStatus: getUserState(),
-    subscriptionType: fingerprintContext?.xSubscription?.priceId?.includes('yearly') ? 'yearly' : 'monthly',
-    subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
-  }), [fingerprintContext, getUserState]);
+  const userContext = useMemo<UserContext>(() => {
+    // 使用 Clerk 的 user 对象判断登录状态
+    const isAuth = !!user?.id;
+    const userState = getUserState();
+    
+    return {
+      isAuthenticated: isAuth,
+      subscriptionStatus: isAuth ? userState : UserState.Anonymous,
+      subscriptionType: fingerprintContext?.xSubscription?.priceId?.includes('yearly') ? 'yearly' : 'monthly',
+      subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
+    };
+  }, [user, fingerprintContext, getUserState]);
 
   // 处理登录
   const handleLogin = useCallback(() => {
@@ -91,6 +97,26 @@ export function MoneyPriceInteractive({
           provider: config.activeProvider
         })
       });
+      
+      // 检查是否是重定向或非JSON响应
+      if (response.redirected || response.status === 302 || response.status === 301) {
+        // 如果是重定向，直接跳转到重定向URL（通常是登录页面）
+        window.location.href = response.url;
+        return;
+      }
+      
+      // 检查Content-Type是否为JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // 如果不是JSON响应，可能是HTML登录页面，提示用户重新登录
+        console.error('Received non-JSON response, user may need to login');
+        if (signInPath) {
+          window.location.href = signInPath;
+        } else {
+          redirectToSignIn();
+        }
+        return;
+      }
       
       const result = await response.json();
       
