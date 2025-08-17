@@ -113,7 +113,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
   }, [fingerprintId, config.apiEndpoint]);
 
   /**
-   * 刷新用户数据
+   * 刷新用户数据 - 使用POST请求（后端支持upsert逻辑）
    */
   const refreshUserData = useCallback(async () => {
     if (!fingerprintId) {
@@ -126,18 +126,18 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       setError(null);
 
       const fingerprintHeaders = await createFingerprintHeaders();
-      const response = await fetch(`${config.apiEndpoint}?fingerprintId=${fingerprintId}`, {
-        method: 'GET',
-        headers: fingerprintHeaders,
+      const response = await fetch(config.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...fingerprintHeaders,
+        },
+        body: JSON.stringify({ fingerprintId }),
       });
 
       if (!response.ok) {
-        if (response.status === 404) {
-          // 用户不存在，需要重新初始化
-          await initializeAnonymousUser();
-          return;
-        }
-        throw new Error('Failed to fetch user data');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to refresh user data');
       }
 
       const data = await response.json();
@@ -151,37 +151,6 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
       console.error('Failed to refresh user data:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
-  }, [fingerprintId, initializeAnonymousUser, config.apiEndpoint]);
-
-  /**
-   * 检查现有用户数据（仅在有fingerprint ID时执行）
-   */
-  const checkExistingUser = useCallback(async () => {
-    if (!fingerprintId) {
-      console.warn('Cannot check existing user: Fingerprint ID is missing', { fingerprintId, isLoading, isInitialized });
-      return;
-    }
-
-    try {
-      const fingerprintHeaders = await createFingerprintHeaders();
-      const response = await fetch(`${config.apiEndpoint}?fingerprintId=${fingerprintId}`, {
-        method: 'GET',
-        headers: fingerprintHeaders,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          const updatedXUser = data.xUser || { userId: '', fingerprintId, clerkUserId: '', email: '', status: '', createdAt: '' };
-          setXUser(updatedXUser);
-          setXCredit(data.xCredit || null);
-          setXSubscription(data.xSubscription || null);
-          setIsInitialized(true);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to check existing user:', err);
-    }
   }, [fingerprintId, config.apiEndpoint]);
 
   // 第一阶段：页面加载完成后生成指纹ID
@@ -189,25 +158,17 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
     const initFingerprint = async () => {
       setIsLoading(true);
       const currentFingerprintId = await initializeFingerprintId();
-      if (currentFingerprintId) {
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     };
 
     initFingerprint();
   }, [initializeFingerprintId]);
 
-  // 第二阶段：有指纹ID后检查现有用户
-  useEffect(() => {
-    if (!fingerprintId || isInitialized || isLoading) return;
-    checkExistingUser();
-  }, [fingerprintId, isInitialized, isLoading, checkExistingUser]);
-
-  // 第三阶段：如果没有现有用户且自动初始化开启，则创建新用户
+  // 第二阶段：有指纹ID后直接初始化用户（后端支持upsert逻辑）
   useEffect(() => {
     if (!fingerprintId || isInitialized || isLoading || error || config.autoInitialize === false) return;
+    
+    // 直接使用 POST 请求，后端会处理查询-不存在则创建的逻辑
     initializeAnonymousUser();
   }, [fingerprintId, isInitialized, isLoading, error, initializeAnonymousUser, config.autoInitialize]);
 

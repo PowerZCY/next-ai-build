@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.4.2
+
+### Patch Changes
+
+- optimize(fingerprint): reduce api
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.4.1
 
 ### Patch Changes
