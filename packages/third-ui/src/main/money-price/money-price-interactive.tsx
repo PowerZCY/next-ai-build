@@ -40,11 +40,30 @@ export function MoneyPriceInteractive({
     const { xUser, xSubscription } = fingerprintContext;
     
     if (!xUser?.clerkUserId) return UserState.Anonymous;
-    if (!xSubscription?.status || xSubscription.status === 'free') return UserState.FreeUser;
-    if (xSubscription.priceName?.includes('Pro')) return UserState.ProUser;
-    if (xSubscription.priceName?.includes('Ultra')) return UserState.UltraUser;
+    if (!xSubscription?.status || xSubscription.status !== 'active') return UserState.FreeUser;
+    
+    // 通过 priceId 精确匹配订阅计划
+    const userPriceId = xSubscription.priceId;
+    if (!userPriceId) return UserState.FreeUser;
+    
+    const providerConfig = getActiveProviderConfig(config);
+    
+    // 检查是否为 Pro 计划 (月付或年付)
+    const proMonthly = providerConfig.products.pro.plans.monthly.priceId;
+    const proYearly = providerConfig.products.pro.plans.yearly.priceId;
+    if (userPriceId === proMonthly || userPriceId === proYearly) {
+      return UserState.ProUser;
+    }
+    
+    // 检查是否为 Ultra 计划 (月付或年付)
+    const ultraMonthly = providerConfig.products.ultra.plans.monthly.priceId;
+    const ultraYearly = providerConfig.products.ultra.plans.yearly.priceId;
+    if (userPriceId === ultraMonthly || userPriceId === ultraYearly) {
+      return UserState.UltraUser;
+    }
+    
     return UserState.FreeUser;
-  }, [fingerprintContext]);
+  }, [fingerprintContext, config]);
 
   // 优化 userContext 使用 useMemo
   const userContext = useMemo<UserContext>(() => {
