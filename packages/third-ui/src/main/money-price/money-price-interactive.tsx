@@ -23,9 +23,18 @@ export function MoneyPriceInteractive({
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, user } = useClerk();
   const router = useRouter();
-  const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(
-    data.billingSwitch.defaultKey as 'monthly' | 'yearly'
-  );
+  
+  // 根据用户订阅状态确定初始 billing type
+  const getInitialBillingType = useCallback((): 'monthly' | 'yearly' => {
+    // 如果用户有活跃订阅，使用订阅的计费周期
+    if (fingerprintContext?.xSubscription?.status === 'active' && fingerprintContext.xSubscription.priceId) {
+      return fingerprintContext.xSubscription.priceId.includes('yearly') ? 'yearly' : 'monthly';
+    }
+    // 否则使用默认值
+    return data.billingSwitch.defaultKey as 'monthly' | 'yearly';
+  }, [fingerprintContext, data.billingSwitch.defaultKey]);
+  
+  const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(getInitialBillingType());
   const [isProcessing, setIsProcessing] = useState(false);
   const [tooltip, setTooltip] = useState<{
     show: boolean;
@@ -238,6 +247,20 @@ export function MoneyPriceInteractive({
 
   // State for button portals
   const [buttonPortals, setButtonPortals] = useState<React.ReactElement[]>([]);
+
+  // 当 fingerprint context 变化时，更新 billing type 以匹配用户的订阅状态
+  useEffect(() => {
+    const newBillingType = getInitialBillingType();
+    if (newBillingType !== billingType) {
+      setBillingType(newBillingType);
+      // 延迟执行以确保 DOM 已渲染
+      setTimeout(() => {
+        updatePriceDisplay(newBillingType);
+        updateButtonStyles(newBillingType);
+        updateDiscountInfo(newBillingType);
+      }, 0);
+    }
+  }, [fingerprintContext, getInitialBillingType, billingType, updatePriceDisplay, updateButtonStyles, updateDiscountInfo]);
 
   // 处理月付/年付切换和 tooltip 功能
   useEffect(() => {
