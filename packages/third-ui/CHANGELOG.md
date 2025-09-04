@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 7.6.1
+
+### Patch Changes
+
+- fix(price): Enhanced upgrade subscription error message
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.6.0
 
 ### Minor Changes

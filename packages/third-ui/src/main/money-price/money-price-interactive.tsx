@@ -161,6 +161,26 @@ export function MoneyPriceInteractive({
       
       const result = await response.json();
       
+      // 处理HTTP错误状态码
+      if (!response.ok) {
+        const errorMessage = result.error || `Request failed with status ${response.status}`;
+        console.error('Upgrade request failed:', errorMessage);
+        
+        // 根据状态码决定处理方式
+        if (response.status === 401 || response.status === 403) {
+          // 鉴权失败，重定向到登录页
+          if (signInPath) {
+            window.location.href = signInPath;
+          } else {
+            redirectToSignIn();
+          }
+        } else {
+          // 其他错误（如500等），显示错误提示
+          alert(`Operation failed: ${errorMessage}`);
+        }
+        return;
+      }
+      
       if (result.success && result.data?.sessionUrl) {
         window.location.href = result.data.sessionUrl;
       } else {
