@@ -24,17 +24,30 @@ export function MoneyPriceInteractive({
   const { redirectToSignIn, user } = useClerk();
   const router = useRouter();
   
-  // 根据用户订阅状态确定初始 billing type
-  const getInitialBillingType = useCallback((): 'monthly' | 'yearly' => {
-    // 如果用户有活跃订阅，使用订阅的计费周期
+  const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(() => {
+    // 懒初始化：只在组件首次渲染时计算一次
+    // 如果用户有活跃订阅，通过 priceId 精确匹配计费周期
     if (fingerprintContext?.xSubscription?.status === 'active' && fingerprintContext.xSubscription.priceId) {
-      return fingerprintContext.xSubscription.priceId.includes('yearly') ? 'yearly' : 'monthly';
+      const userPriceId = fingerprintContext.xSubscription.priceId;
+      const providerConfig = getActiveProviderConfig(config);
+      
+      // 检查所有年付计划的 priceId
+      const yearlyPriceIds = [
+        providerConfig.products.free.plans.yearly.priceId,
+        providerConfig.products.pro.plans.yearly.priceId,
+        providerConfig.products.ultra.plans.yearly.priceId
+      ];
+      
+      // 如果匹配到年付计划，返回 yearly，否则返回 monthly
+      if (yearlyPriceIds.includes(userPriceId)) {
+        return 'yearly';
+      } else {
+        return 'monthly';
+      }
     }
     // 否则使用默认值
     return data.billingSwitch.defaultKey as 'monthly' | 'yearly';
-  }, [fingerprintContext, data.billingSwitch.defaultKey]);
-  
-  const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(getInitialBillingType());
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   const [tooltip, setTooltip] = useState<{
     show: boolean;
