@@ -248,20 +248,6 @@ export function MoneyPriceInteractive({
   // State for button portals
   const [buttonPortals, setButtonPortals] = useState<React.ReactElement[]>([]);
 
-  // 当 fingerprint context 变化时，更新 billing type 以匹配用户的订阅状态
-  useEffect(() => {
-    const newBillingType = getInitialBillingType();
-    if (newBillingType !== billingType) {
-      setBillingType(newBillingType);
-      // 延迟执行以确保 DOM 已渲染
-      setTimeout(() => {
-        updatePriceDisplay(newBillingType);
-        updateButtonStyles(newBillingType);
-        updateDiscountInfo(newBillingType);
-      }, 0);
-    }
-  }, [fingerprintContext, getInitialBillingType, billingType, updatePriceDisplay, updateButtonStyles, updateDiscountInfo]);
-
   // 处理月付/年付切换和 tooltip 功能
   useEffect(() => {
     const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLButtonElement;
