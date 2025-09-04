@@ -1,5 +1,17 @@
 # @windrun-huaiin/third-ui
 
+## 7.6.0
+
+### Minor Changes
+
+- fix(price): Enhanced billing type initialization based on user subscription status
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@8.1.2
+  - @windrun-huaiin/lib@7.1.2
+
 ## 7.5.3
 
 ### Patch Changes

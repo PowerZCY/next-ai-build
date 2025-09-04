@@ -328,11 +328,6 @@ export function MoneyPriceInteractive({
       });
     });
 
-    // Initial updates
-    updatePriceDisplay(billingType);
-    updateDiscountInfo(billingType);
-    updateButtonStyles(billingType);
-
     return () => {
       if (monthlyButton) {
         monthlyButton.removeEventListener('click', handleMonthlyClick);
@@ -347,7 +342,31 @@ export function MoneyPriceInteractive({
         element.removeEventListener('mouseleave', handlers.mouseleave);
       });
     };
-  }, [data, billingType, updatePriceDisplay, updateButtonStyles, updateDiscountInfo, userContext, handleLogin, handleUpgrade, isProcessing]);
+  }, [data, updatePriceDisplay, updateButtonStyles, updateDiscountInfo, userContext, handleLogin, handleUpgrade, isProcessing]);
+
+  // 单独的 effect 用于初始更新，只在组件挂载时执行一次
+  useEffect(() => {
+    // 直接在这里重新计算，避免闭包问题
+    const initialBillingType = (() => {
+      if (fingerprintContext?.xSubscription?.status === 'active' && fingerprintContext.xSubscription.priceId) {
+        const userPriceId = fingerprintContext.xSubscription.priceId;
+        const providerConfig = getActiveProviderConfig(config);
+        
+        const yearlyPriceIds = [
+          providerConfig.products.free.plans.yearly.priceId,
+          providerConfig.products.pro.plans.yearly.priceId,
+          providerConfig.products.ultra.plans.yearly.priceId
+        ];
+        
+        return yearlyPriceIds.includes(userPriceId) ? 'yearly' : 'monthly';
+      }
+      return data.billingSwitch.defaultKey as 'monthly' | 'yearly';
+    })();
+    
+    updatePriceDisplay(initialBillingType);
+    updateDiscountInfo(initialBillingType);
+    updateButtonStyles(initialBillingType);
+  }, []); // 空依赖数组，只执行一次
 
   // Create button portals after component mounts
   useEffect(() => {
