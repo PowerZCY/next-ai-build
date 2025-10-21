@@ -84,6 +84,88 @@
       }
     ]
   },
+  "moneyPrice": {
+    "title": "Choose Your Plan",
+    "subtitle": "Select the best plan for your needs",
+    "billingSwitch": {
+      "options": [
+        { 
+          "key": "monthly", 
+          "name": "Monthly", 
+          "unit": "/month", 
+          "discountText": "", 
+          "subTitle": "Billed Monthly" 
+        },
+        { 
+          "key": "yearly", 
+          "name": "Yearly", 
+          "unit": "/month", 
+          "discountText": "Save {percent}%", 
+          "subTitle": "Billed Annually" 
+        }
+      ],
+      "defaultKey": "yearly"
+    },
+    "plans": [
+      {
+        "key": "free",
+        "title": "Hobby",
+        "showBillingSubTitle": false,
+        "features": [
+          { "description": "Basic features" },
+          { "description": "Community support" },
+          { "description": "Limited usage" },
+          { "description": "No credit card required" }
+        ]
+      },
+      {
+        "key": "pro",
+        "title": "Pro",
+        "showBillingSubTitle": true,
+        "features": [
+          { 
+            "description": "All Free features", 
+            "tag": "Free" 
+          },
+          { "description": "Priority support" },
+          { 
+            "description": "100 credits/month", 
+            "tooltip": "1 credit = 1 AI generation" 
+          },
+          { "description": "Advanced analytics" }
+        ]
+      },
+      {
+        "key": "ultra",
+        "title": "Ultra",
+        "showBillingSubTitle": true,
+        "titleTags": ["Most Popular"],
+        "features": [
+          { 
+            "description": "All Pro features", 
+            "tag": "Pro" 
+          },
+          { 
+            "description": "250 credits/month", 
+            "tooltip": "1 credit = 1 AI generation" 
+          },
+          { "description": "Early access to new features" },
+          { 
+            "description": "Dedicated support", 
+            "tooltip": "24/7 priority support with dedicated account manager" 
+          },
+          { "description": "Custom integrations" }
+        ]
+      }
+    ],
+    "buttonTexts": {
+      "getStarted": "Get Started",
+      "getPro": "Get Pro",
+      "getUltra": "Get Ultra",
+      "currentPlan": "Current Plan",
+      "upgrade": "Upgrade"
+    }
+  },
   "pricePlan": {
     "title": "Choose Your Plan",
     "subtitle": "Get the best of Raphael AI with faster generation and commercial usage",

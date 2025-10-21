@@ -1,15 +1,19 @@
 
-import { Hero } from "@/components/hero"
-import { Gallery, Usage, Features, Tips, FAQ, SeoContent, CTA, PricePlan } from "@third-ui/main/server"
-import { pricePlanConfig } from "@/lib/price-config"
-import { GradientButton } from "@third-ui/fuma/mdx/gradient-button"
-import { getTranslations } from "next-intl/server"
+import { Hero } from "@/components/hero";
+import { moneyPriceConfig } from '@/lib/money-price-config';
+import { FingerprintStatus } from "@third-ui/clerk/fingerprint";
+import { GradientButton } from "@third-ui/fuma/mdx/gradient-button";
+import { CTA, FAQ, Features, Gallery, MoneyPrice, SeoContent, Tips, Usage } from "@third-ui/main/server";
+import { getTranslations } from "next-intl/server";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const isDev = process.env.NODE_ENV !== 'production';
+  const forceShow = process.env.SHOW_FINGERPRINT_STATUS === 'true'
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'gallery' });
   return (
     <>
+      { (forceShow || isDev) && <FingerprintStatus />}
       <Hero locale={locale}/>
       <Gallery
         locale={locale}
@@ -25,7 +29,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Features locale={locale} />
       <Tips locale={locale} />
       <FAQ locale={locale} />
-      <PricePlan locale={locale} pricePlanConfig={pricePlanConfig} currency="￥" />
+      <MoneyPrice locale={locale} config={moneyPriceConfig} upgradeApiEndpoint="/api/subscriptions/create"/>
       <SeoContent locale={locale} />
       <CTA locale={locale} />
     </>

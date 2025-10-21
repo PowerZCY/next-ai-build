@@ -58,12 +58,15 @@
     "remark-math": "^6.0.0",
     "remark-mdx": "^3.1.0",
     "shiki": "^3.4.2",
+    "stripe": "^18.4.0",
+    "svix": "^1.71.0",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@windrun-huaiin/dev-scripts": "workspace:*",
+    "@prisma/client": "6.15.0",
     "@tailwindcss/cli": "^4.1.11",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/hast": "^3.0.4",
@@ -79,6 +82,7 @@
     "fast-glob": "^3.3.3",
     "nprogress": "^0.2.0",
     "postcss": "^8.5.3",
+    "prisma": "^6.15.0",
     "remark-frontmatter": "^5.0.0",
     "tailwindcss": "^4.1.7",
     "ts-node": "^10.9.2",

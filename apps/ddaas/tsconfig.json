@@ -26,6 +26,7 @@
     "paths": {
       "@/*": [ "./src/*" ],
       ".source/*": ["./.source/*"],
+      "@/db/*": [ "./src/services/database/*" ],
       "@third-ui/*": ["../../packages/third-ui/src/*"],
       "@base-ui/*": ["../../packages/base-ui/src/*"],
       "@lib/*": ["../../packages/lib/src/*"]
