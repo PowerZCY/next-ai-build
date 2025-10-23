@@ -6,11 +6,11 @@
 };
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userService, creditService, creditUsageService, User, Credit, Subscription} from '@/services/database';
+import { userService, creditService, creditUsageService, User, Credit, Subscription } from '@/services/database';
 import { subscriptionService } from '@/services/database/subscription.service';
 import { UserStatus, CreditType, OperationType } from '@/services/database';
-import { extractFingerprintFromNextRequest } from '@windrun-huaiin/third-ui/fingerprint/server';
-import { XUser, XCredit, XSubscription } from '@windrun-huaiin/third-ui/fingerprint';
+import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';
+import { XUser, XCredit, XSubscription } from '@third-ui/clerk/fingerprint';
 
 // 免费积分配置
 const FREE_CREDITS_AMOUNT = 50;
@@ -57,7 +57,11 @@ function createCreditsInfo(credit: Credit): XCredit {
 }
 
 /** 创建订阅信息对象 */
-function createSubscriptionInfo(subscription: Subscription): XSubscription {
+function createSubscriptionInfo(subscription: Subscription | null): XSubscription | null {
+  if (!subscription) {
+    return null;
+  }
+
   return {
     id: subscription.id,
     userId: subscription.userId || '',
@@ -67,7 +71,7 @@ function createSubscriptionInfo(subscription: Subscription): XSubscription {
     status: subscription.status || '',
     creditsAllocated: subscription.creditsAllocated,
     subPeriodStart: subscription.subPeriodStart?.toISOString() || '',
-    subPeriodEnd: subscription.subPeriodEnd?.toISOString() || '' 
+    subPeriodEnd: subscription.subPeriodEnd?.toISOString() || ''
   };
 }
 
@@ -86,7 +90,7 @@ function createSuccessResponse(
     success: true,
     xUser: createUserInfo(user),
     xCredit: credit ? createCreditsInfo(credit) : null,
-    xSubscription: subscription ? createSubscriptionInfo(subscription) : null,
+    xSubscription: createSubscriptionInfo(subscription),
     isNewUser,
     ...options,
   };
@@ -165,6 +169,7 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
     const existingUserResult = await getUserByFingerprintId(fingerprintId);
     
     if (existingUserResult) {
+      checkMock(existingUserResult);
       return NextResponse.json(existingUserResult);
     }
 
@@ -213,4 +218,60 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
  */
 export async function POST(request: NextRequest) {
   return handleFingerprintRequest(request, { createIfNotExists: true });
+}
+
+function checkMock(existingUserResult: XUserResponse) {
+  const mockEnabled = process.env.MONEY_PRICE_MOCK_USER_ENABLED === 'true';
+  const mockType = Number(process.env.MONEY_PRICE_MOCK_USER_TYPE ?? NaN);
+
+  if (mockEnabled && Number.isInteger(mockType) && mockType >= 0 && mockType <= 4) {
+    const ensureSubscription = () => {
+      if (!existingUserResult.xSubscription) {
+        const now = new Date();
+        existingUserResult.xSubscription = {
+          id: BigInt(99999),
+          userId: existingUserResult.xUser.userId,
+          paySubscriptionId: 'MOCK-PAY-SUB-ID',
+          priceId: '',
+          priceName: 'MOCK-TEST',
+          status: 'active',
+          creditsAllocated: 0,
+          subPeriodStart: now.toISOString(),
+          subPeriodEnd: now.toISOString()
+        };
+      }
+      return existingUserResult.xSubscription;
+    };
+
+    switch (mockType) {
+      case 0: {
+        const subscription = ensureSubscription();
+        subscription.status = '';
+        subscription.priceId = '';
+        break;
+      }
+      case 1: {
+        const subscription = ensureSubscription();
+        subscription.priceId = process.env.STRIPE_PRO_MONTHLY_PRICE_ID || subscription.priceId;
+        break;
+      }
+      case 2: {
+        const subscription = ensureSubscription();
+        subscription.priceId = process.env.STRIPE_ULTRA_MONTHLY_PRICE_ID || subscription.priceId;
+        break;
+      }
+      case 3: {
+        const subscription = ensureSubscription();
+        subscription.priceId = process.env.STRIPE_PRO_YEARLY_PRICE_ID || subscription.priceId;
+        break;
+      }
+      case 4: {
+        const subscription = ensureSubscription();
+        subscription.priceId = process.env.STRIPE_ULTRA_YEARLY_PRICE_ID || subscription.priceId;
+        break;
+      }
+      default:
+        break;
+    }
+  }
 }
