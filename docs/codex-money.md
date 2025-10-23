@@ -151,13 +151,134 @@ flowchart LR
 - **subscriptionType 字段未使用**：目前 `userContext.subscriptionType` 始终通过 priceId 文本包含判断，尚未被消费；若未来直接使用，需改为基于配置映射。
 - **Portal 依赖 DOM 查询**：按钮挂载依赖 `data-button-placeholder` 查询，不容易在 SSR 或骨架加载场景下做细粒度控制。
 
-## 6. 改进与 OneTime 扩展思路
-- **受控状态改造**：将计费切换改为标准 React 组件，直接使用 state 与 props 控制按钮样式、价格展示；服务端可以渲染所有选项，客户端通过状态驱动显示。
-- **抽象计费枚举**：在 `MoneyPriceTypes` 定义统一 `BillingCycle` 类型（如 `'monthly' | 'yearly' | 'onetime'`），让 `ProductConfig.plans` 基于映射存储，避免硬编码键。
-- **配置向下兼容**：扩展 `apps/ddaas/src/lib/money-price-config.ts` 为每个产品添加 `onetime`，并调整 `getProductPricing` 接口支持任意 key。
-- **按钮文案与翻译更新**：在翻译文件中加入 `OneTime` 文案及 `billingSwitch.options` 第三个 entry，确保服务端渲染时即可展示。
-- **交互与校验**：升级逻辑需兼容 OneTime，一方面确认是否仍走 checkout API，另一方面决定用户在已有订阅时能否购买一次性方案。
-- **工具提示重构**：将 tooltip 渲染为受控组件（如 `useState` + `onMouseEnter` 直接传递 props），削减对 DOM 的显式操作。
+## 6. OneTime 扩展设计与实现方案
+
+### 6.1 核心设计目标
+**OneTime 即付模式特点**：
+- 显示积分包价格卡片，与订阅卡片共用 UI 结构，通过翻译配置差异化文案
+- 后端 API 根据价格 ID 自动识别计费类型，前端调用接口保持一致
+- 按钮逻辑简化：匿名用户显示登录引导，登录用户统一显示购买按钮
+- 积分包购买与订阅状态独立，任何用户都可购买积分补充
+
+### 6.2 架构重构核心原则
+
+#### 6.2.1 移除硬编码约束
+**问题识别**：现有代码多处硬编码 `'monthly' | 'yearly'` 枚举，阻碍 OneTime 扩展：
+- UI 过滤逻辑强制排除非标准计费类型
+- 类型定义限制计费周期选择范围
+- 默认值回退逻辑忽略新增计费类型
+- 价格检测机制无法处理积分包产品
+
+**重构方案**：
+- 类型系统从硬编码枚举改为动态字符串类型
+- UI 逻辑从固定过滤改为配置驱动过滤
+- 数据结构支持任意计费类型的动态扩展
+
+#### 6.2.2 配置与产品概念分离
+**设计思想**：将订阅产品与积分包产品在配置层面清晰分离，避免概念混淆：
+
+```
+PaymentProviderConfig {
+  subscriptionProducts: {     // 订阅模式产品
+    free/pro/ultra: {
+      plans: { monthly, yearly }
+    }
+  },
+  creditPackProducts: {       // 积分包产品
+    small/medium/large: {
+      priceId, amount, credits
+    }
+  }
+}
+```
+
+**映射策略**：UI 层面保持三卡片结构（free/pro/ultra），底层通过映射关系连接：
+- onetime + free → small 积分包
+- onetime + pro → medium 积分包
+- onetime + ultra → large 积分包
+
+#### 6.2.3 翻译结构重组
+**分离原则**：subscription 和 credits 计划在翻译文件中独立配置：
+
+```json
+{
+  "moneyPrice": {
+    "subscription": {
+      "plans": [/* 订阅计划配置 */]
+    },
+    "credits": {
+      "plans": [/* 积分包计划配置 */]
+    }
+  }
+}
+```
+
+**动态选择逻辑**：服务端组件根据 `enabledBillingTypes` 参数智能选择显示哪套翻译配置。
+
+### 6.3 核心技术实现
+
+#### 6.3.1 类型系统重构
+- `money-price-types.ts`：从硬编码联合类型改为动态字符串类型
+- 新增 `enabledBillingTypes` 和 `mode` 属性支持灵活配置
+- 产品配置结构支持任意计费类型的 Record 结构
+
+#### 6.3.2 服务端数据流重构
+- `money-price.tsx`：实现动态计划选择逻辑，根据计费类型配置选择对应翻译
+- 优先级：混合模式优先显示订阅，回退显示积分包
+- 向后兼容：未配置时保持现有行为
+
+#### 6.3.3 客户端交互重构
+- `money-price-interactive.tsx`：移除硬编码过滤，改为配置驱动
+- 动态价格检测：同时支持订阅产品和积分包产品的价格 ID 匹配
+- 兼容性处理：访问配置时使用 fallback 逻辑确保稳定性
+
+#### 6.3.4 按钮逻辑分离
+- `money-price-button.tsx`：新增 OneTime 特定按钮逻辑
+- 订阅模式：基于用户订阅状态决定按钮显示
+- OneTime 模式：简化逻辑，登录用户统一显示购买按钮
+
+#### 6.3.5 配置工具函数统一
+- `money-price-config-util.ts`：统一 `getProductPricing` 函数逻辑
+- 自动识别计费类型并从对应产品配置中获取价格信息
+- 支持 onetime 到积分包的自动映射
+
+### 6.4 组件使用模式
+
+#### 6.4.1 场景化配置
+```typescript
+// 纯订阅模式
+<MoneyPrice enabledBillingTypes={['monthly', 'yearly']} />
+
+// 纯积分包模式
+<MoneyPrice enabledBillingTypes={['onetime']} />
+
+// 混合模式
+<MoneyPrice enabledBillingTypes={['monthly', 'yearly', 'onetime']} />
+```
+
+#### 6.4.2 向后兼容
+- 不传 `enabledBillingTypes` 时保持现有的 monthly/yearly 行为
+- 现有翻译配置继续有效，新增配置可选渐进迁移
+
+### 6.5 实施成果与验证
+
+#### 6.5.1 核心问题解决
+- ✅ 移除所有硬编码计费类型约束
+- ✅ 实现配置驱动的动态计费类型支持
+- ✅ 分离订阅与积分包配置概念，提升可读性
+- ✅ 统一配置访问逻辑，避免重复实现
+
+#### 6.5.2 扩展性提升
+- 支持任意新计费类型的快速添加
+- 翻译配置结构化，易于维护和本地化
+- 组件使用灵活，适配不同业务场景需求
+
+### 6.6 设计价值与影响
+**架构价值**：从硬编码枚举架构升级为配置驱动架构，显著提升了系统的扩展性和维护性。
+
+**业务价值**：OneTime 模式为用户提供灵活的积分购买方式，与订阅模式形成互补，满足不同用户的付费偏好。
+
+**技术债务清理**：在实现新功能的同时，系统性地解决了现有代码中的硬编码问题，提升了整体代码质量。
 
 ## 7. 总结
 Money Price 方案在宏观上延续了“服务端骨架 + 客户端增强”的模式，利用配置与类型体系支撑多语言、多支付供应商与多产品层级。当前的主要问题集中在客户端交互层：对 DOM 的直接操控和初始状态推断不够稳健。后续针对 OneTime 扩展以及现有 bug 修复，最好先完成状态与渲染逻辑的受控化改造，从而确保新的计费类型和用户态逻辑能够平滑嵌入。

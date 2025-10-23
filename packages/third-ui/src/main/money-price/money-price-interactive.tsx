@@ -19,7 +19,7 @@ import {
   type UserContext
 } from './money-price-types';
 
-type BillingType = 'monthly' | 'yearly';
+type BillingType = string;
 
 interface BillingOption {
   key: string;
@@ -29,13 +29,15 @@ interface BillingOption {
   subTitle?: string;
 }
 
-const PLAN_KEYS: Array<'free' | 'pro' | 'ultra'> = ['free', 'pro', 'ultra'];
+const PLAN_KEYS: Array<'F1' | 'P2' | 'U3'> = ['F1', 'P2', 'U3'];
 
 export function MoneyPriceInteractive({
   data,
   config,
   upgradeApiEndpoint,
-  signInPath
+  signInPath,
+  enabledBillingTypes,
+  mode
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, user } = useClerk();
@@ -44,9 +46,15 @@ export function MoneyPriceInteractive({
   const providerConfig = useMemo(() => getActiveProviderConfig(config), [config]);
   const billingOptions = useMemo(() => {
     const options = data.billingSwitch.options as BillingOption[];
-    const filtered = options.filter(option => option.key === 'monthly' || option.key === 'yearly');
-    return filtered.length > 0 ? filtered : options;
-  }, [data.billingSwitch.options]);
+
+    // 如果配置了 enabledBillingTypes，只显示配置的类型
+    if (enabledBillingTypes?.length) {
+      return options.filter(option => enabledBillingTypes.includes(option.key));
+    }
+
+    // 否则显示所有配置的选项
+    return options;
+  }, [data.billingSwitch.options, enabledBillingTypes]);
   const billingOptionMap = useMemo(() => {
     return billingOptions.reduce<Record<string, BillingOption>>((acc, option) => {
       acc[option.key] = option;
@@ -54,24 +62,44 @@ export function MoneyPriceInteractive({
     }, {});
   }, [billingOptions]);
   const defaultBilling = useMemo<BillingType>(() => {
-    const key = data.billingSwitch.defaultKey;
-    if (key === 'monthly' || key === 'yearly') {
-      return key;
+    const defaultKey = data.billingSwitch.defaultKey;
+
+    // 如果默认值在可用选项中，使用默认值
+    if (billingOptions.some(opt => opt.key === defaultKey)) {
+      return defaultKey;
     }
-    const fallback = billingOptions[0]?.key;
-    return fallback === 'yearly' ? 'yearly' : 'monthly';
+
+    // 否则使用第一个可用选项
+    return billingOptions[0]?.key || 'monthly';
   }, [data.billingSwitch.defaultKey, billingOptions]);
 
   const priceIdsByCycle = useMemo(() => {
-    const monthly: string[] = [];
-    const yearly: string[] = [];
-    PLAN_KEYS.forEach(planKey => {
-      const product = providerConfig.products[planKey];
-      monthly.push(product.plans.monthly.priceId);
-      yearly.push(product.plans.yearly.priceId);
+    const priceIds: Record<string, string[]> = {};
+
+    // 为每个可用的计费类型创建价格ID数组
+    billingOptions.forEach(option => {
+      priceIds[option.key] = [];
+
+      if (option.key === 'onetime') {
+        // 处理积分包产品
+        const creditPacks = providerConfig.creditPackProducts || {};
+        Object.values(creditPacks).forEach((pack: any) => {
+          priceIds[option.key].push(pack.priceId);
+        });
+      } else {
+        // 处理订阅产品
+        const products = providerConfig.subscriptionProducts || providerConfig.products || {};
+        PLAN_KEYS.forEach(planKey => {
+          const product = (products as any)[planKey];
+          if (product && product.plans && product.plans[option.key]) {
+            priceIds[option.key].push(product.plans[option.key].priceId);
+          }
+        });
+      }
     });
-    return { monthly, yearly };
-  }, [providerConfig]);
+
+    return priceIds;
+  }, [providerConfig, billingOptions]);
 
   const isClerkAuthenticated = !!user?.id;
 
@@ -80,8 +108,13 @@ export function MoneyPriceInteractive({
     if (fingerprintContext?.xSubscription?.status !== 'active') return null;
     const priceId = fingerprintContext.xSubscription?.priceId;
     if (!priceId) return null;
-    if (priceIdsByCycle.yearly.includes(priceId)) return 'yearly';
-    if (priceIdsByCycle.monthly.includes(priceId)) return 'monthly';
+
+    // 动态检测匹配的计费类型
+    for (const [cycle, priceIds] of Object.entries(priceIdsByCycle)) {
+      if (priceIds.includes(priceId)) {
+        return cycle;
+      }
+    }
     return null;
   }, [fingerprintContext, priceIdsByCycle, isClerkAuthenticated]);
 
@@ -122,13 +155,18 @@ export function MoneyPriceInteractive({
     const userPriceId = xSubscription.priceId;
     if (!userPriceId) return UserState.FreeUser;
 
-    const proPlans = providerConfig.products.pro.plans;
-    if (userPriceId === proPlans.monthly.priceId || userPriceId === proPlans.yearly.priceId) {
+    // 获取订阅产品配置
+    const products = providerConfig.subscriptionProducts || providerConfig.products || {};
+
+    const proPlans = (products as any).P2?.plans || {};
+    const proIds = Object.values(proPlans).map((plan: any) => plan.priceId);
+    if (proIds.includes(userPriceId)) {
       return UserState.ProUser;
     }
 
-    const ultraPlans = providerConfig.products.ultra.plans;
-    if (userPriceId === ultraPlans.monthly.priceId || userPriceId === ultraPlans.yearly.priceId) {
+    const ultraPlans = (products as any).U3?.plans || {};
+    const ultraIds = Object.values(ultraPlans).map((plan: any) => plan.priceId);
+    if (ultraIds.includes(userPriceId)) {
       return UserState.UltraUser;
     }
 
@@ -165,7 +203,7 @@ export function MoneyPriceInteractive({
     setIsProcessing(true);
     try {
       const pricing = getProductPricing(
-        plan as 'free' | 'pro' | 'ultra',
+        plan as 'F1' | 'P2' | 'U3',
         billing as BillingType,
         config.activeProvider,
         config
@@ -230,10 +268,18 @@ export function MoneyPriceInteractive({
     }
   }, [upgradeApiEndpoint, config, router, signInPath, redirectToSignIn]);
 
+  // 根据当前计费类型动态选择要显示的 plans
+  const currentPlans = useMemo(() => {
+    if (billingType === 'onetime') {
+      return data.creditsPlans || [];
+    }
+    return data.subscriptionPlans || [];
+  }, [billingType, data.subscriptionPlans, data.creditsPlans]);
+
   const maxFeaturesCount = useMemo(() => {
-    const featureCounts = data.plans.map(plan => plan.features?.length || 0);
+    const featureCounts = currentPlans.map(plan => plan.features?.length || 0);
     return Math.max(config.display.minFeaturesCount || 0, ...featureCounts);
-  }, [data.plans, config.display.minFeaturesCount]);
+  }, [currentPlans, config.display.minFeaturesCount]);
 
   const getFeatureRows = useCallback((plan: any) => {
     const features = plan.features || [];
@@ -242,7 +288,7 @@ export function MoneyPriceInteractive({
     return filled;
   }, [maxFeaturesCount]);
 
-  const getPricingForPlan = useCallback((planKey: 'free' | 'pro' | 'ultra') => {
+  const getPricingForPlan = useCallback((planKey: 'F1' | 'P2' | 'U3') => {
     return getProductPricing(
       planKey,
       billingType,
@@ -255,11 +301,19 @@ export function MoneyPriceInteractive({
   const discountBadgeText = useMemo(() => {
     if (!selectedBillingOption?.discountText) return null;
 
+    // 对于 onetime 模式，直接显示 discountText，不依赖 discountPercent
+    if (billingType === 'onetime') {
+      return selectedBillingOption.discountText;
+    }
+
+    // 对于订阅模式，查找 discountPercent 并替换
     let discountPercent: number | null = null;
+    const products = providerConfig.subscriptionProducts || providerConfig.products || {};
+
     PLAN_KEYS.forEach(planKey => {
-      const pricing = providerConfig.products[planKey].plans[billingType];
-      if (pricing.discountPercent) {
-        discountPercent = pricing.discountPercent;
+      const product = (products as any)[planKey];
+      if (product?.plans?.[billingType]?.discountPercent) {
+        discountPercent = product.plans[billingType].discountPercent;
       }
     });
 
@@ -345,8 +399,8 @@ export function MoneyPriceInteractive({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-        {data.plans.map((plan: any) => {
-          const planKey = plan.key as 'free' | 'pro' | 'ultra';
+        {currentPlans.map((plan: any) => {
+          const planKey = plan.key as 'F1' | 'P2' | 'U3';
           if (!PLAN_KEYS.includes(planKey)) {
             console.warn(`Unknown plan key "${plan.key}" detected in pricing plans`);
             return null;
@@ -354,7 +408,6 @@ export function MoneyPriceInteractive({
           const pricing = getPricingForPlan(planKey);
 
           const showBillingSubtitle = plan.showBillingSubTitle !== false;
-          const billingSubtitle = showBillingSubtitle ? selectedBillingOption?.subTitle || '' : '';
           const hasDiscount = !!pricing.discountPercent && !!pricing.originalAmount;
 
           return (
@@ -401,15 +454,36 @@ export function MoneyPriceInteractive({
                       )}
                     </>
                   )}
-                  <span
+                  <div
                     className={cn(
-                      'text-xs text-gray-700 dark:text-gray-300 font-medium',
+                      'flex items-center gap-2',
                       !showBillingSubtitle && 'opacity-0 select-none'
                     )}
                     data-price-subtitle={planKey}
                   >
-                    {billingSubtitle}
-                  </span>
+                    {showBillingSubtitle && billingType === 'onetime' ? (
+                      // OneTime 模式下的特殊处理：普通文本 + 带样式的产品副标题
+                      <>
+                        {selectedBillingOption?.subTitle && (
+                          <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                            {selectedBillingOption.subTitle}
+                          </span>
+                        )}
+                        {plan.subtitle && (
+                          <span className="px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle">
+                            +{plan.subtitle}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      // 其他模式下保持原逻辑
+                      showBillingSubtitle && (
+                        <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                          {selectedBillingOption?.subTitle || ''}
+                        </span>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
 

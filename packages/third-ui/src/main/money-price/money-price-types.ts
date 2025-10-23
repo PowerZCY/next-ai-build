@@ -15,7 +15,7 @@ export enum UserState {
 export interface UserContext {
   isAuthenticated: boolean;
   subscriptionStatus: UserState;
-  subscriptionType?: 'monthly' | 'yearly';
+  subscriptionType?: string;
   subscriptionEndDate?: string;
 }
 
@@ -32,24 +32,40 @@ export interface EnhancePricePlan {
   credits?: number;
 }
 
-// 产品配置
-export interface ProductConfig {
+// 订阅产品配置
+export interface SubscriptionProductConfig {
   key: string;
-  name: string;
-  plans: {
-    monthly: EnhancePricePlan;
-    yearly: EnhancePricePlan;
-  };
+  plans: Record<string, EnhancePricePlan>;
+}
+
+// 积分包产品配置
+export interface CreditPackProductConfig {
+  key: string;
+  priceId: string;
+  amount: number;
+  currency: string;
+  credits: number;
 }
 
 // 支付供应商配置
 export interface PaymentProviderConfig {
   provider: PaymentProvider;
   enabled: boolean;
-  products: {
-    free: ProductConfig;
-    pro: ProductConfig;
-    ultra: ProductConfig;
+  subscriptionProducts?: {
+    F1: SubscriptionProductConfig;
+    P2: SubscriptionProductConfig;
+    U3: SubscriptionProductConfig;
+  };
+  creditPackProducts?: {
+    F1: CreditPackProductConfig;
+    P2: CreditPackProductConfig;
+    U3: CreditPackProductConfig;
+  };
+  // 兼容旧结构
+  products?: {
+    F1: SubscriptionProductConfig;
+    P2: SubscriptionProductConfig;
+    U3: SubscriptionProductConfig;
   };
 }
 
@@ -74,6 +90,8 @@ export interface MoneyPriceProps {
   upgradeApiEndpoint?: string;
   signInPath?: string;
   sectionClassName?: string;
+  enabledBillingTypes?: string[];
+  mode?: 'subscription' | 'onetime' | 'mixed';
 }
 
 // 交互组件属性
@@ -82,16 +100,19 @@ export interface MoneyPriceInteractiveProps {
   config: MoneyPriceConfig;
   upgradeApiEndpoint?: string;
   signInPath?: string;
+  enabledBillingTypes?: string[];
+  mode?: 'subscription' | 'onetime' | 'mixed';
 }
 
 // 按钮组件属性
 export interface MoneyPriceButtonProps {
-  planKey: 'free' | 'pro' | 'ultra';
+  planKey: 'F1' | 'P2' | 'U3';
   userContext: UserContext;
-  billingType: 'monthly' | 'yearly';
+  billingType: string;
   onLogin: () => void;
   onUpgrade: (plan: string, billingType: string) => void | Promise<void>;
   texts: {
+    buyCredits: string;
     getStarted: string;
     getPro: string;
     getUltra: string;
@@ -115,7 +136,7 @@ export interface MoneyPriceData {
     }>;
     defaultKey: string;
   };
-  plans: Array<{
+  subscriptionPlans: Array<{
     key: string;
     title: string;
     showBillingSubTitle?: boolean;
@@ -127,7 +148,21 @@ export interface MoneyPriceData {
       tooltip?: string;
     }>;
   }>;
+  creditsPlans: Array<{
+    key: string;
+    title: string;
+    subtitle?: string;
+    showBillingSubTitle?: boolean;
+    titleTags?: string[];
+    features?: Array<{
+      description: string;
+      icon?: string;
+      tag?: string;
+      tooltip?: string;
+    }>;
+  }>;
   buttonTexts: {
+    buyCredits: string;
     getStarted: string;
     getPro: string;
     getUltra: string;

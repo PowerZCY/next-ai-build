@@ -3,19 +3,50 @@ import { getTranslations } from 'next-intl/server';
 import { MoneyPriceInteractive } from './money-price-interactive';
 import type { MoneyPriceProps, MoneyPriceData } from './money-price-types';
 
-export async function MoneyPrice({ 
-  locale, 
+export async function MoneyPrice({
+  locale,
   config,
   upgradeApiEndpoint,
   signInPath,
-  sectionClassName
+  sectionClassName,
+  enabledBillingTypes,
+  mode
 }: MoneyPriceProps) {
   const t = await getTranslations({ locale, namespace: 'moneyPrice' });
   
+  // 获取完整的 billingSwitch 配置，然后根据 enabledBillingTypes 过滤
+  const getBillingSwitch = () => {
+    const allOptions = t.raw('billingSwitch.options') as Array<{
+      key: string;
+      name: string;
+      unit: string;
+      discountText: string;
+      subTitle?: string;
+    }>;
+
+    // 如果指定了 enabledBillingTypes，则过滤选项
+    if (enabledBillingTypes?.length) {
+      const filteredOptions = allOptions.filter(option =>
+        enabledBillingTypes.includes(option.key)
+      );
+
+      return {
+        options: filteredOptions,
+        defaultKey: t('billingSwitch.defaultKey')
+      };
+    }
+
+    // 否则返回所有选项
+    return {
+      options: allOptions,
+      defaultKey: t('billingSwitch.defaultKey')
+    };
+  };
+
   const data: MoneyPriceData = {
     title: t('title'),
     subtitle: t('subtitle'),
-    billingSwitch: t.raw('billingSwitch') as {
+    billingSwitch: getBillingSwitch() as {
       options: Array<{
         key: string;
         name: string;
@@ -25,7 +56,8 @@ export async function MoneyPrice({
       }>;
       defaultKey: string;
     },
-    plans: t.raw('plans') as Array<any>,
+    subscriptionPlans: t.raw('subscription.plans') as Array<any>,
+    creditsPlans: t.raw('credits.plans') as Array<any>,
     buttonTexts: t.raw('buttonTexts') as {
       getStarted: string;
       getPro: string;
@@ -44,11 +76,13 @@ export async function MoneyPrice({
       <p className="text-center text-gray-600 dark:text-gray-400 mb-8 text-base md:text-lg mx-auto">
         {data.subtitle}
       </p>
-      <MoneyPriceInteractive 
+      <MoneyPriceInteractive
         data={data}
         config={config}
         upgradeApiEndpoint={upgradeApiEndpoint}
         signInPath={signInPath}
+        enabledBillingTypes={enabledBillingTypes}
+        mode={mode}
       />
     </section>
   );

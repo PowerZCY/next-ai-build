@@ -26,7 +26,8 @@ export type {
   PaymentProvider,
   PaymentProviderConfig,
   EnhancePricePlan,
-  ProductConfig,
+  SubscriptionProductConfig,
+  CreditPackProductConfig,
   UserContext
 } from './money-price/money-price-types';
 

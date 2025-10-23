@@ -85,85 +85,137 @@
     ]
   },
   "moneyPrice": {
-    "title": "Choose Your Plan",
-    "subtitle": "Select the best plan for your needs",
+    "title": "选择套餐",
+    "subtitle": "根据你的需要选择最合适的套餐",
     "billingSwitch": {
       "options": [
-        { 
-          "key": "monthly", 
-          "name": "Monthly", 
-          "unit": "/month", 
-          "discountText": "", 
-          "subTitle": "Billed Monthly" 
+        {
+          "key": "monthly",
+          "name": "包月",
+          "unit": "/月",
+          "discountText": "",
+          "subTitle": "按月付费"
         },
-        { 
-          "key": "yearly", 
-          "name": "Yearly", 
-          "unit": "/month", 
-          "discountText": "Save {percent}%", 
-          "subTitle": "Billed Annually" 
+        {
+          "key": "yearly",
+          "name": "包年",
+          "unit": "/月",
+          "discountText": "节省 {percent}%",
+          "subTitle": "按年付费"
+        },
+        {
+          "key": "onetime",
+          "name": "一次性",
+          "unit": "积分包",
+          "discountText": "积分包",
+          "subTitle": "单次付费"
         }
       ],
       "defaultKey": "yearly"
     },
-    "plans": [
-      {
-        "key": "free",
-        "title": "Hobby",
-        "showBillingSubTitle": false,
-        "features": [
-          { "description": "Basic features" },
-          { "description": "Community support" },
-          { "description": "Limited usage" },
-          { "description": "No credit card required" }
-        ]
-      },
-      {
-        "key": "pro",
-        "title": "Pro",
-        "showBillingSubTitle": true,
-        "features": [
-          { 
-            "description": "All Free features", 
-            "tag": "Free" 
-          },
-          { "description": "Priority support" },
-          { 
-            "description": "100 credits/month", 
-            "tooltip": "1 credit = 1 AI generation" 
-          },
-          { "description": "Advanced analytics" }
-        ]
-      },
-      {
-        "key": "ultra",
-        "title": "Ultra",
-        "showBillingSubTitle": true,
-        "titleTags": ["Most Popular"],
-        "features": [
-          { 
-            "description": "All Pro features", 
-            "tag": "Pro" 
-          },
-          { 
-            "description": "250 credits/month", 
-            "tooltip": "1 credit = 1 AI generation" 
-          },
-          { "description": "Early access to new features" },
-          { 
-            "description": "Dedicated support", 
-            "tooltip": "24/7 priority support with dedicated account manager" 
-          },
-          { "description": "Custom integrations" }
-        ]
-      }
-    ],
+    "subscription": {
+      "plans": [
+        {
+          "key": "F1",
+          "title": "体验版",
+          "showBillingSubTitle": false,
+          "features": [
+            { "description": "基础功能" },
+            { "description": "社区支持" },
+            { "description": "有限使用" },
+            { "description": "无需信用卡" }
+          ]
+        },
+        {
+          "key": "P2",
+          "title": "专业版",
+          "showBillingSubTitle": true,
+          "features": [
+            {
+              "description": "所有免费功能",
+              "tag": "体验版"
+            },
+            { "description": "优先支持" },
+            {
+              "description": "每月100积分",
+              "tooltip": "1积分 = 1次AI生成"
+            },
+            { "description": "高级分析" }
+          ]
+        },
+        {
+          "key": "U3",
+          "title": "旗舰版",
+          "showBillingSubTitle": true,
+          "titleTags": ["最受欢迎"],
+          "features": [
+            {
+              "description": "所有专业版功能",
+              "tag": "专业版"
+            },
+            {
+              "description": "每月250积分",
+              "tooltip": "1积分 = 1次AI生成"
+            },
+            { "description": "抢先体验新功能" },
+            {
+              "description": "专属客服",
+              "tooltip": "7x24小时优先支持及专属客户经理"
+            },
+            { "description": "定制集成" }
+          ]
+        }
+      ]
+    },
+    "credits": {
+      "plans": [
+        {
+          "key": "F1",
+          "title": "入门包",
+          "subtitle": "200积分",
+          "showBillingSubTitle": false,
+          "features": [
+            { "description": "200次AI生成" },
+            { "description": "适合尝鲜使用" },
+            { "description": "永不过期" },
+            { "description": "立即生效" }
+          ]
+        },
+        {
+          "key": "P2",
+          "title": "热门包",
+          "subtitle": "500积分",
+          "showBillingSubTitle": false,
+          "titleTags": ["优先推荐"],
+          "features": [
+            { "description": "500次AI生成" },
+            { "description": "适合日常使用" },
+            { "description": "永不过期" },
+            { "description": "立即生效" },
+            { "description": "支持批量生成" }
+          ]
+        },
+        {
+          "key": "U3",
+          "title": "超值包",
+          "subtitle": "1000积分",
+          "showBillingSubTitle": false,
+          "features": [
+            { "description": "1000次AI生成" },
+            { "description": "适合重度用户" },
+            { "description": "永不过期" },
+            { "description": "立即生效" }
+          ]
+        }
+      ]
+    },
     "buttonTexts": {
-      "getStarted": "Get Started",
-      "getPro": "Get Pro",
-      "getUltra": "Get Ultra",
-      "currentPlan": "Current Plan",
-      "upgrade": "Upgrade"
+      "buyCredits": "购买积分",
+      "getStarted": "立即开始",
+      "getPro": "购买专业版",
+      "getUltra": "购买旗舰版",
+      "currentPlan": "当前计划",
+      "upgrade": "升级"
     }
   },
   "pricePlan": {

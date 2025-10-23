@@ -4,9 +4,6 @@ import { cn } from '@windrun-huaiin/lib/utils';
 import { UserState, type MoneyPriceButtonProps } from './money-price-types';
 import React, { useState } from 'react';
 
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 export function MoneyPriceButton({
   planKey,
@@ -23,30 +20,63 @@ export function MoneyPriceButton({
   const planTier = planKey;
   const planBilling = billingType;
 
-  const getPlanRank = (tier: 'free' | 'pro' | 'ultra', billing: 'monthly' | 'yearly') => {
-    if (tier === 'free') return 0;
-    if (tier === 'pro') return billing === 'monthly' ? 1 : 3;
-    if (tier === 'ultra') return billing === 'monthly' ? 2 : 4;
+  const getPlanRank = (tier: 'F1' | 'P2' | 'U3', billing: string) => {
+    if (tier === 'F1') return 0;
+    if (tier === 'P2') return billing === 'monthly' ? 1 : 3;
+    if (tier === 'U3') return billing === 'monthly' ? 2 : 4;
     return 0;
   };
 
-  // 决定按钮显示和行为
-  const getButtonConfig = () => {
-    // 匿名用户
+  // OneTime 模式的按钮配置
+  const getOnetimeButtonConfig = () => {
+    // 匿名用户：所有卡片都显示登录按钮
     if (!isAuthenticated) {
-      const textKey = planKey === 'free' ? 'getStarted' : `get${capitalize(planKey)}`;
       return {
-        text: texts[textKey as keyof typeof texts] || texts.getStarted,
+        text: texts.getStarted,
         onClick: onLogin,
         disabled: false,
         hidden: false
       };
     }
-    
+
+    // 登录用户：OneTime 模式下所有卡片都显示购买积分按钮
+    return {
+      text: texts.buyCredits || texts.upgrade,
+      onClick: () => onUpgrade(planKey, billingType),
+      disabled: false,
+      hidden: false
+    };
+  };
+
+  // 订阅模式的按钮配置
+  const getSubscriptionButtonConfig = () => {
+    // 匿名用户
+    if (!isAuthenticated) {
+      const getButtonText = () => {
+        switch (planKey) {
+          case 'F1':
+            return texts.getStarted;
+          case 'P2':
+            return texts.getPro;
+          case 'U3':
+            return texts.getUltra;
+          default:
+            return texts.getStarted;
+        }
+      };
+
+      return {
+        text: getButtonText(),
+        onClick: onLogin,
+        disabled: false,
+        hidden: false
+      };
+    }
+
     // 已登录用户
     switch (subscriptionStatus) {
       case UserState.FreeUser: {
-        if (planTier === 'free') {
+        if (planTier === 'F1') {
           return {
             text: texts.currentPlan,
             disabled: true,
@@ -63,15 +93,15 @@ export function MoneyPriceButton({
 
       case UserState.ProUser: {
         // 不允许降级到 Free
-        if (planTier === 'free') {
+        if (planTier === 'F1') {
           return { hidden: true };
         }
 
         const currentBilling = subscriptionBilling === 'yearly' ? 'yearly' : 'monthly';
-        const currentRank = getPlanRank('pro', currentBilling);
+        const currentRank = getPlanRank('P2', currentBilling);
 
-        if (planTier === 'pro') {
-          const targetRank = getPlanRank('pro', planBilling);
+        if (planTier === 'P2') {
+          const targetRank = getPlanRank('P2', planBilling);
 
           if (planBilling === currentBilling) {
             return {
@@ -84,7 +114,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('pro', planBilling),
+              onClick: () => onUpgrade('P2', planBilling),
               disabled: false,
               hidden: false
             };
@@ -93,12 +123,12 @@ export function MoneyPriceButton({
           return { hidden: true };
         }
 
-        if (planTier === 'ultra') {
-          const targetRank = getPlanRank('ultra', planBilling);
+        if (planTier === 'U3') {
+          const targetRank = getPlanRank('U3', planBilling);
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('ultra', planBilling),
+              onClick: () => onUpgrade('U3', planBilling),
               disabled: false,
               hidden: false
             };
@@ -112,18 +142,18 @@ export function MoneyPriceButton({
 
       case UserState.UltraUser: {
         const currentBilling = subscriptionBilling === 'yearly' ? 'yearly' : 'monthly';
-        const currentRank = getPlanRank('ultra', currentBilling);
+        const currentRank = getPlanRank('U3', currentBilling);
 
-        if (planTier === 'free') {
+        if (planTier === 'F1') {
           return { hidden: true };
         }
 
-        if (planTier === 'pro') {
-          const targetRank = getPlanRank('pro', planBilling);
+        if (planTier === 'P2') {
+          const targetRank = getPlanRank('P2', planBilling);
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('pro', planBilling),
+              onClick: () => onUpgrade('P2', planBilling),
               disabled: false,
               hidden: false
             };
@@ -131,8 +161,8 @@ export function MoneyPriceButton({
           return { hidden: true };
         }
 
-        if (planTier === 'ultra') {
-          const targetRank = getPlanRank('ultra', planBilling);
+        if (planTier === 'U3') {
+          const targetRank = getPlanRank('U3', planBilling);
 
           if (planBilling === currentBilling) {
             return {
@@ -145,7 +175,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('ultra', planBilling),
+              onClick: () => onUpgrade('U3', planBilling),
               disabled: false,
               hidden: false
             };
@@ -159,7 +189,15 @@ export function MoneyPriceButton({
         return { text: '', disabled: true, hidden: true };
     }
   };
-  
+
+  // 主要的按钮配置函数
+  const getButtonConfig = () => {
+    if (billingType === 'onetime') {
+      return getOnetimeButtonConfig();
+    }
+    return getSubscriptionButtonConfig();
+  };
+
   const config = getButtonConfig();
   
   if (config.hidden) return null;
