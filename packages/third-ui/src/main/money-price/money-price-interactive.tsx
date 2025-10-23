@@ -4,8 +4,13 @@ import { useClerk } from '@clerk/nextjs';
 import { useFingerprintContextSafe } from '@third-ui/clerk/fingerprint';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { MoneyPriceButton } from './money-price-button';
 import { getActiveProviderConfig, getProductPricing } from './money-price-config-util';
 import {
@@ -13,6 +18,18 @@ import {
   type MoneyPriceInteractiveProps,
   type UserContext
 } from './money-price-types';
+
+type BillingType = 'monthly' | 'yearly';
+
+interface BillingOption {
+  key: string;
+  name: string;
+  unit: string;
+  discountText: string;
+  subTitle?: string;
+}
+
+const PLAN_KEYS: Array<'free' | 'pro' | 'ultra'> = ['free', 'pro', 'ultra'];
 
 export function MoneyPriceInteractive({
   data,
@@ -23,31 +40,70 @@ export function MoneyPriceInteractive({
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, user } = useClerk();
   const router = useRouter();
-  
-  const [billingType, setBillingType] = useState<'monthly' | 'yearly'>(() => {
-    // 懒初始化：只在组件首次渲染时计算一次
-    // 如果用户有活跃订阅，通过 priceId 精确匹配计费周期
-    if (fingerprintContext?.xSubscription?.status === 'active' && fingerprintContext.xSubscription.priceId) {
-      const userPriceId = fingerprintContext.xSubscription.priceId;
-      const providerConfig = getActiveProviderConfig(config);
-      
-      // 检查所有年付计划的 priceId
-      const yearlyPriceIds = [
-        providerConfig.products.free.plans.yearly.priceId,
-        providerConfig.products.pro.plans.yearly.priceId,
-        providerConfig.products.ultra.plans.yearly.priceId
-      ];
-      
-      // 如果匹配到年付计划，返回 yearly，否则返回 monthly
-      if (yearlyPriceIds.includes(userPriceId)) {
-        return 'yearly';
-      } else {
-        return 'monthly';
-      }
+
+  const providerConfig = useMemo(() => getActiveProviderConfig(config), [config]);
+  const billingOptions = useMemo(() => {
+    const options = data.billingSwitch.options as BillingOption[];
+    const filtered = options.filter(option => option.key === 'monthly' || option.key === 'yearly');
+    return filtered.length > 0 ? filtered : options;
+  }, [data.billingSwitch.options]);
+  const billingOptionMap = useMemo(() => {
+    return billingOptions.reduce<Record<string, BillingOption>>((acc, option) => {
+      acc[option.key] = option;
+      return acc;
+    }, {});
+  }, [billingOptions]);
+  const defaultBilling = useMemo<BillingType>(() => {
+    const key = data.billingSwitch.defaultKey;
+    if (key === 'monthly' || key === 'yearly') {
+      return key;
     }
-    // 否则使用默认值
-    return data.billingSwitch.defaultKey as 'monthly' | 'yearly';
-  });
+    const fallback = billingOptions[0]?.key;
+    return fallback === 'yearly' ? 'yearly' : 'monthly';
+  }, [data.billingSwitch.defaultKey, billingOptions]);
+
+  const priceIdsByCycle = useMemo(() => {
+    const monthly: string[] = [];
+    const yearly: string[] = [];
+    PLAN_KEYS.forEach(planKey => {
+      const product = providerConfig.products[planKey];
+      monthly.push(product.plans.monthly.priceId);
+      yearly.push(product.plans.yearly.priceId);
+    });
+    return { monthly, yearly };
+  }, [providerConfig]);
+
+  const isClerkAuthenticated = !!user?.id;
+
+  const detectBillingType = useCallback((): BillingType | null => {
+    if (!isClerkAuthenticated) return null;
+    if (fingerprintContext?.xSubscription?.status !== 'active') return null;
+    const priceId = fingerprintContext.xSubscription?.priceId;
+    if (!priceId) return null;
+    if (priceIdsByCycle.yearly.includes(priceId)) return 'yearly';
+    if (priceIdsByCycle.monthly.includes(priceId)) return 'monthly';
+    return null;
+  }, [fingerprintContext, priceIdsByCycle, isClerkAuthenticated]);
+
+  const [billingType, setBillingType] = useState<BillingType>(defaultBilling);
+  const contextSignatureRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const priceId = fingerprintContext?.xSubscription?.priceId ?? '';
+    const signature = `${isClerkAuthenticated ? '1' : '0'}:${priceId}`;
+    if (contextSignatureRef.current !== signature) {
+      contextSignatureRef.current = signature;
+      const detected = detectBillingType();
+      const nextBilling = detected ?? defaultBilling;
+      setBillingType(prev => (prev === nextBilling ? prev : nextBilling));
+    }
+  }, [
+    detectBillingType,
+    fingerprintContext?.xSubscription?.priceId,
+    defaultBilling,
+    isClerkAuthenticated
+  ]);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [tooltip, setTooltip] = useState<{
     show: boolean;
@@ -56,52 +112,42 @@ export function MoneyPriceInteractive({
     y: number;
   }>({ show: false, content: '', x: 0, y: 0 });
 
-  // 确定用户状态
   const getUserState = useCallback((): UserState => {
     if (!fingerprintContext) return UserState.Anonymous;
     const { xUser, xSubscription } = fingerprintContext;
-    
+
     if (!xUser?.clerkUserId) return UserState.Anonymous;
     if (!xSubscription?.status || xSubscription.status !== 'active') return UserState.FreeUser;
-    
-    // 通过 priceId 精确匹配订阅计划
+
     const userPriceId = xSubscription.priceId;
     if (!userPriceId) return UserState.FreeUser;
-    
-    const providerConfig = getActiveProviderConfig(config);
-    
-    // 检查是否为 Pro 计划 (月付或年付)
-    const proMonthly = providerConfig.products.pro.plans.monthly.priceId;
-    const proYearly = providerConfig.products.pro.plans.yearly.priceId;
-    if (userPriceId === proMonthly || userPriceId === proYearly) {
+
+    const proPlans = providerConfig.products.pro.plans;
+    if (userPriceId === proPlans.monthly.priceId || userPriceId === proPlans.yearly.priceId) {
       return UserState.ProUser;
     }
-    
-    // 检查是否为 Ultra 计划 (月付或年付)
-    const ultraMonthly = providerConfig.products.ultra.plans.monthly.priceId;
-    const ultraYearly = providerConfig.products.ultra.plans.yearly.priceId;
-    if (userPriceId === ultraMonthly || userPriceId === ultraYearly) {
+
+    const ultraPlans = providerConfig.products.ultra.plans;
+    if (userPriceId === ultraPlans.monthly.priceId || userPriceId === ultraPlans.yearly.priceId) {
       return UserState.UltraUser;
     }
-    
-    return UserState.FreeUser;
-  }, [fingerprintContext, config]);
 
-  // 优化 userContext 使用 useMemo
+    return UserState.FreeUser;
+  }, [fingerprintContext, providerConfig]);
+
   const userContext = useMemo<UserContext>(() => {
-    // 使用 Clerk 的 user 对象判断登录状态
-    const isAuth = !!user?.id;
+    const isAuth = isClerkAuthenticated;
     const userState = getUserState();
-    
+    const detectedType = detectBillingType();
+
     return {
       isAuthenticated: isAuth,
       subscriptionStatus: isAuth ? userState : UserState.Anonymous,
-      subscriptionType: fingerprintContext?.xSubscription?.priceId?.includes('yearly') ? 'yearly' : 'monthly',
+      subscriptionType: detectedType ?? undefined,
       subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
     };
-  }, [user, fingerprintContext, getUserState]);
+  }, [user, getUserState, detectBillingType, fingerprintContext]);
 
-  // 处理登录
   const handleLogin = useCallback(() => {
     if (signInPath) {
       router.push(signInPath);
@@ -110,22 +156,21 @@ export function MoneyPriceInteractive({
     }
   }, [signInPath, redirectToSignIn, router]);
 
-  // 处理升级
-  const handleUpgrade = useCallback(async (plan: string, billingType: string) => {
+  const handleUpgrade = useCallback(async (plan: string, billing: string) => {
     if (!upgradeApiEndpoint) {
       router.push('/');
       return;
     }
-    
+
     setIsProcessing(true);
     try {
       const pricing = getProductPricing(
         plan as 'free' | 'pro' | 'ultra',
-        billingType as 'monthly' | 'yearly',
+        billing as BillingType,
         config.activeProvider,
         config
       );
-      
+
       const response = await fetch(upgradeApiEndpoint, {
         method: 'POST',
         headers: {
@@ -133,23 +178,19 @@ export function MoneyPriceInteractive({
         },
         body: JSON.stringify({
           priceId: pricing.priceId,
-          plan: plan,
-          billingType: billingType,
+          plan,
+          billingType: billing,
           provider: config.activeProvider
         })
       });
-      
-      // 检查是否是重定向或非JSON响应
+
       if (response.redirected || response.status === 302 || response.status === 301) {
-        // 如果是重定向，直接跳转到重定向URL（通常是登录页面）
         window.location.href = response.url;
         return;
       }
-      
-      // 检查Content-Type是否为JSON
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        // 如果不是JSON响应，可能是HTML登录页面，提示用户重新登录
         console.error('Received non-JSON response, user may need to login');
         if (signInPath) {
           window.location.href = signInPath;
@@ -158,29 +199,25 @@ export function MoneyPriceInteractive({
         }
         return;
       }
-      
+
       const result = await response.json();
-      
-      // 处理HTTP错误状态码
+
       if (!response.ok) {
         const errorMessage = result.error || `Request failed with status ${response.status}`;
         console.error('Upgrade request failed:', errorMessage);
-        
-        // 根据状态码决定处理方式
+
         if (response.status === 401 || response.status === 403) {
-          // 鉴权失败，重定向到登录页
           if (signInPath) {
             window.location.href = signInPath;
           } else {
             redirectToSignIn();
           }
         } else {
-          // 其他错误（如500等），显示错误提示
           alert(`Operation failed: ${errorMessage}`);
         }
         return;
       }
-      
+
       if (result.success && result.data?.sessionUrl) {
         window.location.href = result.data.sessionUrl;
       } else {
@@ -191,233 +228,62 @@ export function MoneyPriceInteractive({
     } finally {
       setIsProcessing(false);
     }
-  }, [upgradeApiEndpoint, config, router]);
+  }, [upgradeApiEndpoint, config, router, signInPath, redirectToSignIn]);
 
-  // 更新价格显示
-  const updatePriceDisplay = useCallback((newBillingType: string) => {
-    const providerConfig = getActiveProviderConfig(config);
-    
-    data.plans.forEach((plan: any) => {
-      const productConfig = providerConfig.products[plan.key as 'free' | 'pro' | 'ultra'];
-      const pricing = productConfig.plans[newBillingType as 'monthly' | 'yearly'];
-      
-      const priceValueElement = document.querySelector(`[data-price-value="${plan.key}"]`) as HTMLElement;
-      if (priceValueElement) {
-        if (pricing.amount === 0) {
-          priceValueElement.textContent = 'Free';
-        } else {
-          priceValueElement.textContent = `${data.currency}${pricing.amount}`;
-        }
-      }
-      
-      const priceUnitElement = document.querySelector(`[data-price-unit="${plan.key}"]`) as HTMLElement;
-      if (priceUnitElement) {
-        const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
-        priceUnitElement.textContent = billingOption?.unit || '/month';
-      }
-      
-      const priceOriginalElement = document.querySelector(`[data-price-original="${plan.key}"]`) as HTMLElement;
-      const priceDiscountElement = document.querySelector(`[data-price-discount="${plan.key}"]`) as HTMLElement;
-      if (pricing.originalAmount && pricing.discountPercent) {
-        if (priceOriginalElement) {
-          priceOriginalElement.style.display = 'inline';
-          priceOriginalElement.textContent = `${data.currency}${pricing.originalAmount}`;
-        }
-        if (priceDiscountElement) {
-          priceDiscountElement.style.display = 'inline';
-          const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
-          if (billingOption?.discountText) {
-            priceDiscountElement.textContent = billingOption.discountText.replace('{percent}', String(pricing.discountPercent));
-          }
-        }
-      } else {
-        if (priceOriginalElement) priceOriginalElement.style.display = 'none';
-        if (priceDiscountElement) priceDiscountElement.style.display = 'none';
+  const maxFeaturesCount = useMemo(() => {
+    const featureCounts = data.plans.map(plan => plan.features?.length || 0);
+    return Math.max(config.display.minFeaturesCount || 0, ...featureCounts);
+  }, [data.plans, config.display.minFeaturesCount]);
+
+  const getFeatureRows = useCallback((plan: any) => {
+    const features = plan.features || [];
+    const filled = [...features];
+    while (filled.length < maxFeaturesCount) filled.push(null);
+    return filled;
+  }, [maxFeaturesCount]);
+
+  const getPricingForPlan = useCallback((planKey: 'free' | 'pro' | 'ultra') => {
+    return getProductPricing(
+      planKey,
+      billingType,
+      config.activeProvider,
+      config
+    );
+  }, [billingType, config]);
+
+  const selectedBillingOption = billingOptionMap[billingType];
+  const discountBadgeText = useMemo(() => {
+    if (!selectedBillingOption?.discountText) return null;
+
+    let discountPercent: number | null = null;
+    PLAN_KEYS.forEach(planKey => {
+      const pricing = providerConfig.products[planKey].plans[billingType];
+      if (pricing.discountPercent) {
+        discountPercent = pricing.discountPercent;
       }
     });
-  }, [config, data]);
 
-  // 更新折扣信息
-  const updateDiscountInfo = useCallback((newBillingType: string) => {
-    const discountInfoElement = document.querySelector('[data-discount-info]') as HTMLElement;
-    if (discountInfoElement) {
-      const billingOption = data.billingSwitch.options.find(opt => opt.key === newBillingType);
-      let hasDiscount = false;
-      let discountPercent = 0;
-      const providerConfig = getActiveProviderConfig(config);
-      ['pro', 'ultra'].forEach(planKey => {
-        const pricing = providerConfig.products[planKey as 'pro' | 'ultra'].plans[newBillingType as 'monthly' | 'yearly'];
-        if (pricing.discountPercent) {
-          hasDiscount = true;
-          discountPercent = pricing.discountPercent;
-        }
-      });
-      discountInfoElement.innerHTML = '';
-      if (hasDiscount && billingOption?.discountText) {
-        const discountBadge = document.createElement('span');
-        discountBadge.className = 'px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap';
-        discountBadge.textContent = billingOption.discountText.replace('{percent}', String(discountPercent));
-        discountInfoElement.appendChild(discountBadge);
-      }
-    }
-  }, [config, data]);
+    if (!discountPercent) return null;
+    return selectedBillingOption.discountText.replace('{percent}', String(discountPercent));
+  }, [selectedBillingOption, providerConfig, billingType]);
 
-  // 更新按钮样式
-  const updateButtonStyles = useCallback((newBillingType: string) => {
-    const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLElement;
-    const yearlyButton = document.querySelector('[data-billing-button="yearly"]') as HTMLElement;
-    if (monthlyButton) {
-      monthlyButton.className = newBillingType === 'monthly' 
-        ? cn('min-w-[120px] px-6 py-2 font-medium transition text-lg relative', 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm')
-        : cn('min-w-[120px] px-6 py-2 font-medium transition text-lg relative', 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full');
-    }
-    if (yearlyButton) {
-      yearlyButton.className = newBillingType === 'yearly' 
-        ? cn('min-w-[120px] px-6 py-2 font-medium transition text-lg relative', 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm')
-        : cn('min-w-[120px] px-6 py-2 font-medium transition text-lg relative', 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full');
-    }
+  const handleTooltipShow = useCallback((content: string, event: React.MouseEvent) => {
+    setTooltip({
+      show: true,
+      content,
+      x: event.clientX,
+      y: event.clientY
+    });
   }, []);
 
-  // State for button portals
-  const [buttonPortals, setButtonPortals] = useState<React.ReactElement[]>([]);
+  const handleTooltipMove = useCallback((event: React.MouseEvent) => {
+    setTooltip(prev => prev.show ? { ...prev, x: event.clientX, y: event.clientY } : prev);
+  }, []);
 
-  // 处理月付/年付切换和 tooltip 功能
-  useEffect(() => {
-    const monthlyButton = document.querySelector('[data-billing-button="monthly"]') as HTMLButtonElement;
-    const yearlyButton = document.querySelector('[data-billing-button="yearly"]') as HTMLButtonElement;
-    
-    const handleMonthlyClick = () => {
-      setBillingType('monthly');
-      updatePriceDisplay('monthly');
-      updateButtonStyles('monthly');
-      updateDiscountInfo('monthly');
-    };
-    
-    const handleYearlyClick = () => {
-      setBillingType('yearly');
-      updatePriceDisplay('yearly');
-      updateButtonStyles('yearly');
-      updateDiscountInfo('yearly');
-    };
-    
-    if (monthlyButton) {
-      monthlyButton.addEventListener('click', handleMonthlyClick);
-    }
-    if (yearlyButton) {
-      yearlyButton.addEventListener('click', handleYearlyClick);
-    }
-    
-    const tooltipHandlers: Array<{
-      element: HTMLElement;
-      handlers: {
-        mouseenter: (e: MouseEvent) => void;
-        mousemove: (e: MouseEvent) => void;
-        mouseleave: () => void;
-      };
-    }> = [];
-    
-    data.plans.forEach((plan: any) => {
-      plan.features?.forEach((feature: any, i: number) => {
-        if (feature?.tooltip) {
-          const tooltipTrigger = document.querySelector(`[data-tooltip-trigger="${plan.key}-${i}"]`) as HTMLElement;
-          if (tooltipTrigger) {
-            const handlers = {
-              mouseenter: (e: MouseEvent) => {
-                setTooltip({
-                  show: true,
-                  content: feature.tooltip,
-                  x: e.clientX,
-                  y: e.clientY
-                });
-              },
-              mousemove: (e: MouseEvent) => {
-                setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
-              },
-              mouseleave: () => {
-                setTooltip(prev => ({ ...prev, show: false }));
-              }
-            };
-            
-            tooltipTrigger.addEventListener('mouseenter', handlers.mouseenter);
-            tooltipTrigger.addEventListener('mousemove', handlers.mousemove);
-            tooltipTrigger.addEventListener('mouseleave', handlers.mouseleave);
-            
-            tooltipHandlers.push({ element: tooltipTrigger, handlers });
-          }
-        }
-      });
-    });
+  const handleTooltipHide = useCallback(() => {
+    setTooltip(prev => ({ ...prev, show: false }));
+  }, []);
 
-    return () => {
-      if (monthlyButton) {
-        monthlyButton.removeEventListener('click', handleMonthlyClick);
-      }
-      if (yearlyButton) {
-        yearlyButton.removeEventListener('click', handleYearlyClick);
-      }
-      
-      tooltipHandlers.forEach(({ element, handlers }) => {
-        element.removeEventListener('mouseenter', handlers.mouseenter);
-        element.removeEventListener('mousemove', handlers.mousemove);
-        element.removeEventListener('mouseleave', handlers.mouseleave);
-      });
-    };
-  }, [data, updatePriceDisplay, updateButtonStyles, updateDiscountInfo, userContext, handleLogin, handleUpgrade, isProcessing]);
-
-  // 单独的 effect 用于初始更新，只在组件挂载时执行一次
-  useEffect(() => {
-    // 直接在这里重新计算，避免闭包问题
-    const initialBillingType = (() => {
-      if (fingerprintContext?.xSubscription?.status === 'active' && fingerprintContext.xSubscription.priceId) {
-        const userPriceId = fingerprintContext.xSubscription.priceId;
-        const providerConfig = getActiveProviderConfig(config);
-        
-        const yearlyPriceIds = [
-          providerConfig.products.free.plans.yearly.priceId,
-          providerConfig.products.pro.plans.yearly.priceId,
-          providerConfig.products.ultra.plans.yearly.priceId
-        ];
-        
-        return yearlyPriceIds.includes(userPriceId) ? 'yearly' : 'monthly';
-      }
-      return data.billingSwitch.defaultKey as 'monthly' | 'yearly';
-    })();
-    
-    updatePriceDisplay(initialBillingType);
-    updateDiscountInfo(initialBillingType);
-    updateButtonStyles(initialBillingType);
-  }, []); // 空依赖数组，只执行一次
-
-  // Create button portals after component mounts
-  useEffect(() => {
-    const portals: React.ReactElement[] = [];
-    
-    data.plans.forEach((plan: any) => {
-      const placeholder = document.querySelector(`[data-button-placeholder="${plan.key}"]`) as HTMLElement;
-      if (placeholder) {
-        console.log('Creating portal for', `[data-button-placeholder="${plan.key}"]`);
-        portals.push(
-          createPortal(
-            <MoneyPriceButton
-              key={plan.key}
-              planKey={plan.key}
-              userContext={userContext}
-              billingType={billingType}
-              onLogin={handleLogin}
-              onUpgrade={handleUpgrade}
-              texts={data.buttonTexts}
-              isProcessing={isProcessing}
-            />,
-            placeholder
-          )
-        );
-      }
-    });
-    
-    setButtonPortals(portals);
-  }, [data.plans, userContext, billingType, handleLogin, handleUpgrade, data.buttonTexts, isProcessing]);
-
-  // Tooltip 组件
   const Tooltip = ({ show, content, x, y }: typeof tooltip) => {
     if (!show) return null;
     const style: React.CSSProperties = {
@@ -431,7 +297,7 @@ export function MoneyPriceInteractive({
       whiteSpace: 'pre-line',
     };
     return (
-      <div 
+      <div
         style={style}
         className="bg-gray-700 dark:bg-gray-200 text-gray-100 dark:text-gray-800 text-xs leading-relaxed px-3 py-2 rounded-lg shadow-lg border border-gray-300 dark:border-gray-600 backdrop-blur-sm"
       >
@@ -442,8 +308,169 @@ export function MoneyPriceInteractive({
 
   return (
     <>
+      <div className="flex flex-col items-center">
+        <div className="flex items-center relative mb-3">
+          <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
+            {billingOptions.map(option => {
+              const isActive = option.key === billingType;
+              const buttonClasses = isActive
+                ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+                : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full';
+
+              return (
+                <button
+                  key={option.key}
+                  className={cn(
+                    'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
+                    buttonClasses
+                  )}
+                  type="button"
+                  data-billing-button={option.key}
+                  onClick={() => setBillingType(option.key as BillingType)}
+                >
+                  {option.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
+          {discountBadgeText ? (
+            <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
+              {discountBadgeText}
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+        {data.plans.map((plan: any) => {
+          const planKey = plan.key as 'free' | 'pro' | 'ultra';
+          if (!PLAN_KEYS.includes(planKey)) {
+            console.warn(`Unknown plan key "${plan.key}" detected in pricing plans`);
+            return null;
+          }
+          const pricing = getPricingForPlan(planKey);
+
+          const showBillingSubtitle = plan.showBillingSubTitle !== false;
+          const billingSubtitle = showBillingSubtitle ? selectedBillingOption?.subTitle || '' : '';
+          const hasDiscount = !!pricing.discountPercent && !!pricing.originalAmount;
+
+          return (
+            <div
+              key={plan.key}
+              data-price-plan={planKey}
+              className={cn(
+                'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-8 h-full shadow-sm dark:shadow-none min-w-[350px]',
+                'hover:border-2 hover:border-purple-500',
+                'focus-within:border-2 focus-within:border-purple-500'
+              )}
+              style={{ minHeight: maxFeaturesCount * 100 }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{plan.title}</span>
+                {plan.titleTags && plan.titleTags.map((tag: string, i: number) => (
+                  <span key={i} className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 font-semibold align-middle">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-col items-start w-full" data-price-container={planKey}>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100" data-price-value={planKey}>
+                    {pricing.amount === 0 ? 'Free' : `${data.currency}${pricing.amount}`}
+                  </span>
+                  {pricing.amount > 0 && (
+                    <span className="text-lg text-gray-700 dark:text-gray-300 font-medium mb-1" data-price-unit={planKey}>
+                      {selectedBillingOption?.unit || '/month'}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 min-h-[24px] mt-1">
+                  {hasDiscount && (
+                    <>
+                      <span className="text-base text-gray-400 line-through" data-price-original={planKey}>
+                        {data.currency}{pricing.originalAmount}
+                      </span>
+                      {selectedBillingOption?.discountText && (
+                        <span className="px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle" data-price-discount={planKey}>
+                          {selectedBillingOption.discountText.replace('{percent}', String(pricing.discountPercent))}
+                        </span>
+                      )}
+                    </>
+                  )}
+                  <span
+                    className={cn(
+                      'text-xs text-gray-700 dark:text-gray-300 font-medium',
+                      !showBillingSubtitle && 'opacity-0 select-none'
+                    )}
+                    data-price-subtitle={planKey}
+                  >
+                    {billingSubtitle}
+                  </span>
+                </div>
+              </div>
+
+              <ul className="flex-1 mb-6 mt-4">
+                {getFeatureRows(plan).map((feature: any, i: number) => (
+                  <li key={i} className="flex items-center gap-2 mb-2 min-h-[28px]" data-feature-item={`${planKey}-${i}`}>
+                    {feature ? (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 mr-1">
+                        {feature.icon ? <span>{feature.icon}</span> : <span className="font-bold">✓</span>}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full mr-1">&nbsp;</span>
+                    )}
+                    {feature && feature.tag && (
+                      <span className="px-1 py-0.5 text-[6px] rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 font-semibold align-middle">
+                        {feature.tag}
+                      </span>
+                    )}
+                    {feature ? (
+                      <span className="relative group cursor-pointer text-sm text-gray-800 dark:text-gray-200">
+                        {feature.description}
+                        {feature.tooltip && (
+                          <span
+                            className="ml-1 align-middle inline-flex"
+                            data-tooltip-trigger={`${planKey}-${i}`}
+                            data-tooltip-content={feature.tooltip}
+                            onMouseEnter={(event) => handleTooltipShow(feature.tooltip, event)}
+                            onMouseMove={handleTooltipMove}
+                            onMouseLeave={handleTooltipHide}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <span>&nbsp;</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex-1" />
+
+              <MoneyPriceButton
+                planKey={planKey}
+                userContext={userContext}
+                billingType={billingType}
+                onLogin={handleLogin}
+                onUpgrade={handleUpgrade}
+                texts={data.buttonTexts}
+                isProcessing={isProcessing}
+              />
+            </div>
+          );
+        })}
+      </div>
+
       <Tooltip {...tooltip} />
-      {buttonPortals}
     </>
   );
 }

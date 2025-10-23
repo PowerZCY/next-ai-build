@@ -19,7 +19,17 @@ export function MoneyPriceButton({
 }: MoneyPriceButtonProps) {
   const { isAuthenticated, subscriptionStatus } = userContext;
   const [isLoading, setIsLoading] = useState(false);
-  
+  const subscriptionBilling = userContext.subscriptionType;
+  const planTier = planKey;
+  const planBilling = billingType;
+
+  const getPlanRank = (tier: 'free' | 'pro' | 'ultra', billing: 'monthly' | 'yearly') => {
+    if (tier === 'free') return 0;
+    if (tier === 'pro') return billing === 'monthly' ? 1 : 3;
+    if (tier === 'ultra') return billing === 'monthly' ? 2 : 4;
+    return 0;
+  };
+
   // 决定按钮显示和行为
   const getButtonConfig = () => {
     // 匿名用户
@@ -35,46 +45,116 @@ export function MoneyPriceButton({
     
     // 已登录用户
     switch (subscriptionStatus) {
-      case UserState.FreeUser:
-        if (planKey === 'free') {
-          return { 
-            text: texts.currentPlan, 
-            disabled: true, 
-            hidden: false
-          };
-        }
-        const getFreeUserText = planKey === 'pro' ? texts.getPro : texts.getUltra;
-        return {
-          text: getFreeUserText,
-          onClick: () => onUpgrade(planKey, billingType),
-          disabled: false,
-          hidden: false
-        };
-        
-      case UserState.ProUser:
-        if (planKey === 'free') return { hidden: true };
-        if (planKey === 'pro') {
-          return { 
-            text: texts.currentPlan, 
-            disabled: true, 
+      case UserState.FreeUser: {
+        if (planTier === 'free') {
+          return {
+            text: texts.currentPlan,
+            disabled: true,
             hidden: false
           };
         }
         return {
           text: texts.upgrade,
-          onClick: () => onUpgrade('ultra', billingType),
+          onClick: () => onUpgrade(planTier, planBilling),
           disabled: false,
           hidden: false
         };
+      }
+
+      case UserState.ProUser: {
+        // 不允许降级到 Free
+        if (planTier === 'free') {
+          return { hidden: true };
+        }
+
+        const currentBilling = subscriptionBilling === 'yearly' ? 'yearly' : 'monthly';
+        const currentRank = getPlanRank('pro', currentBilling);
+
+        if (planTier === 'pro') {
+          const targetRank = getPlanRank('pro', planBilling);
+
+          if (planBilling === currentBilling) {
+            return {
+              text: texts.currentPlan,
+              disabled: true,
+              hidden: false
+            };
+          }
+
+          if (targetRank > currentRank) {
+            return {
+              text: texts.upgrade,
+              onClick: () => onUpgrade('pro', planBilling),
+              disabled: false,
+              hidden: false
+            };
+          }
+
+          return { hidden: true };
+        }
+
+        if (planTier === 'ultra') {
+          const targetRank = getPlanRank('ultra', planBilling);
+          if (targetRank > currentRank) {
+            return {
+              text: texts.upgrade,
+              onClick: () => onUpgrade('ultra', planBilling),
+              disabled: false,
+              hidden: false
+            };
+          }
+
+          return { hidden: true };
+        }
         
-      case UserState.UltraUser:
-        if (planKey !== 'ultra') return { hidden: true };
-        return { 
-          text: texts.currentPlan, 
-          disabled: true, 
-          hidden: false
-        };
-        
+        return { hidden: true };
+      }
+
+      case UserState.UltraUser: {
+        const currentBilling = subscriptionBilling === 'yearly' ? 'yearly' : 'monthly';
+        const currentRank = getPlanRank('ultra', currentBilling);
+
+        if (planTier === 'free') {
+          return { hidden: true };
+        }
+
+        if (planTier === 'pro') {
+          const targetRank = getPlanRank('pro', planBilling);
+          if (targetRank > currentRank) {
+            return {
+              text: texts.upgrade,
+              onClick: () => onUpgrade('pro', planBilling),
+              disabled: false,
+              hidden: false
+            };
+          }
+          return { hidden: true };
+        }
+
+        if (planTier === 'ultra') {
+          const targetRank = getPlanRank('ultra', planBilling);
+
+          if (planBilling === currentBilling) {
+            return {
+              text: texts.currentPlan,
+              disabled: true,
+              hidden: false
+            };
+          }
+
+          if (targetRank > currentRank) {
+            return {
+              text: texts.upgrade,
+              onClick: () => onUpgrade('ultra', planBilling),
+              disabled: false,
+              hidden: false
+            };
+          }
+        }
+
+        return { hidden: true };
+      }
+
       default:
         return { text: '', disabled: true, hidden: true };
     }
