@@ -29,7 +29,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Features locale={locale} />
       <Tips locale={locale} />
       <FAQ locale={locale} />
-      <MoneyPrice locale={locale} config={moneyPriceConfig} upgradeApiEndpoint="/api/subscriptions/create"/>
+      <MoneyPrice locale={locale} config={moneyPriceConfig} upgradeApiEndpoint="/api/subscriptions/create"
+        enabledBillingTypes={['monthly', 'yearly', 'onetime']}
+      />
       <SeoContent locale={locale} />
       <CTA locale={locale} />
     </>
