@@ -64,6 +64,7 @@ export async function MoneyPrice({
       getUltra: string;
       currentPlan: string;
       upgrade: string;
+      buyCredits: string
     },
     currency: config.display.currency
   };
