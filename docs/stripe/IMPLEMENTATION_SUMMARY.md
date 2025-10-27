@@ -78,8 +78,9 @@ if (mode === 'payment') {
 
 ### 3. API Updates
 
-#### File: `apps/ddaas/src/app/api/subscriptions/create/route.ts`
+#### File: `apps/ddaas/src/app/api/stripe/checkout/route.ts`
 **Changes:**
+- ✅ Renamed from `/api/subscriptions/create` to `/api/stripe/checkout` for better clarity
 - ✅ Added `interval` parameter to `createCheckoutSession` call
 - ✅ Fixed transaction type logic to correctly distinguish subscription vs one-time
 
@@ -146,7 +147,7 @@ await tx.credit.update({
 ## 🔄 Payment Flow Summary
 
 ### Subscription Flow
-1. User calls `/api/subscriptions/create` with monthly/yearly plan
+1. User calls `/api/stripe/checkout` with monthly/yearly plan
 2. API creates Transaction (type: subscription) + Stripe Checkout Session (mode: subscription)
 3. User completes payment
 4. Webhook: `checkout.session.completed` → `handleSubscriptionCheckout`
@@ -157,7 +158,7 @@ await tx.credit.update({
    - Extends paidEnd to new period
 
 ### One-time Payment Flow
-1. User calls `/api/subscriptions/create` with onetime plan
+1. User calls `/api/stripe/checkout` with onetime plan
 2. API creates Transaction (type: one_time) + Stripe Checkout Session (mode: payment)
 3. User completes payment
 4. Webhook: `checkout.session.completed` → `handleOneTimeCheckout`
@@ -180,7 +181,7 @@ await tx.credit.update({
 - One-time credits have fixed 1-year expiration
 
 ### ✅ Single API Endpoint
-- `/api/subscriptions/create` handles both modes
+- `/api/stripe/checkout` handles both modes (subscriptions and one-time payments)
 - Mode automatically determined by `interval` field
 - No code duplication
 
@@ -262,16 +263,17 @@ Consider implementing a scheduled job (cron) to clean expired credits:
 
 ## 📊 Files Changed
 
-### Modified Files (5)
+### Modified Files (4)
 1. `apps/ddaas/prisma/schema.prisma`
 2. `apps/ddaas/src/lib/stripe-config.ts`
-3. `apps/ddaas/src/app/api/subscriptions/create/route.ts`
+3. `apps/ddaas/src/app/[locale]/(home)/page.tsx`
 
-### New Files (4)
-4. `apps/ddaas/src/app/api/webhooks/stripe/route.ts`
-5. `apps/ddaas/src/services/stripe/webhook-handler.ts`
-6. `apps/ddaas/prisma/migrations/add_credit_expiration_fields.sql`
-7. `apps/ddaas/prisma/migrations/rollback_credit_expiration_fields.sql`
+### New Files (5)
+4. `apps/ddaas/src/app/api/stripe/checkout/route.ts` (renamed from subscriptions/create)
+5. `apps/ddaas/src/app/api/webhooks/stripe/route.ts`
+6. `apps/ddaas/src/services/stripe/webhook-handler.ts`
+7. `apps/ddaas/prisma/migrations/add_credit_expiration_fields.sql`
+8. `apps/ddaas/prisma/migrations/rollback_credit_expiration_fields.sql`
 
 ---
 

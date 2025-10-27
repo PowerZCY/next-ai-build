@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { 
-  createCheckoutSession, 
-  createOrGetCustomer, 
+import {
+  createCheckoutSession,
+  createOrGetCustomer,
 } from '@/lib/stripe-config';
-import { 
-  transactionService, 
+import {
+  transactionService,
   TransactionType,
   OrderStatus,
-  PaySupplier 
+  PaySupplier
 } from '@/services/database';
 import { ApiAuthUtils } from '@/lib/auth-utils';
 import { getPriceConfig } from '@/lib/money-price-config';
 
-// Request validation schema - 使用统一认证后大大简化了用户识别
-const createSubscriptionSchema = z.object({
+// Request validation schema
+const createCheckoutSchema = z.object({
   priceId: z.string().min(1, 'PriceID is required'),
   plan: z.string().min(1, 'Plan is required'),
   billingType: z.string().min(1, 'BillingType is required'),
@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json();
-    const { priceId, plan, billingType, provider } = createSubscriptionSchema.parse(body);
+    const { priceId, plan, billingType, provider } = createCheckoutSchema.parse(body);
 
-    console.log(`Create Subscription: ${priceId} | ${plan} | ${billingType} | ${provider}`);
+    console.log(`Create Checkout: ${priceId} | ${plan} | ${billingType} | ${provider}`);
 
-    // 使用统一认证工具获取用户信息（避免重复查询）
+    // Use unified authentication to get user info
     const authUtils = new ApiAuthUtils(request);
     const { user } = await authUtils.requireAuthWithUser();
 
@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Create subscription error:', error);
-    
+    console.error('Create checkout error:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to create subscription' },
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     );
   }

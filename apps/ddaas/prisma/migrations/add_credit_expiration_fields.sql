@@ -41,10 +41,6 @@ WHERE c.user_id = s.user_id
   AND c.balance_paid > 0
   AND c.paid_start IS NULL;
 
--- Step 6: Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_credits_free_end ON credits(free_end);
-CREATE INDEX IF NOT EXISTS idx_credits_paid_end ON credits(paid_end);
-CREATE INDEX IF NOT EXISTS idx_credits_onetime_paid_end ON credits(onetime_paid_end);
 
 -- Step 7: Verification
 DO $$

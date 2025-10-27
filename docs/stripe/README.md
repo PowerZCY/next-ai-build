@@ -101,8 +101,7 @@ billingCycle      VARCHAR(20)     -- monthly/yearly
   - 统一 `createCheckoutSession` 函数
   - Webhook事件列表（11个关键事件）
 - API接口设计
-  - `POST /api/subscriptions/create`（订阅创建）
-  - `POST /api/payments/create`（一次性支付）
+  - `POST /api/stripe/checkout`（统一创建订阅和一次性支付）
   - 接口请求/响应定义
 - Webhook事件处理详解
   - `checkout.session.completed`（首次支付）
@@ -152,7 +151,7 @@ billingCycle      VARCHAR(20)     -- monthly/yearly
 
 ### 场景1：用户首次订阅 Pro Monthly
 ```
-1. 前端调用: POST /api/subscriptions/create
+1. 前端调用: POST /api/stripe/checkout
    - priceId: "price_pro_monthly"
    - planKey: "P2"
    - billingCycle: "monthly"
@@ -276,9 +275,8 @@ await prisma.$transaction(async (tx) => {
 3. 测试环境验证
 
 ### 阶段3：API接口实现（2-3天）
-1. 实现 `/api/subscriptions/create`
-2. 实现 `/api/payments/create`
-3. 实现Webhook处理逻辑
+1. 实现 `/api/stripe/checkout`（统一处理订阅和一次性支付）
+2. 实现Webhook处理逻辑
 
 ### 阶段4：测试与上线（2-3天）
 1. 单元测试编写

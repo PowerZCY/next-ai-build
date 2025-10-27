@@ -163,11 +163,11 @@ export const createCheckoutSession = async (
 
 ### 2.1 统一订阅/一次性支付接口（推荐）
 
-基于现有代码，`/api/subscriptions/create` 已经通过 `getPriceConfig` 的 `interval` 字段自动判断类型，**无需分离接口**。
+基于现有代码，`/api/stripe/checkout` 已经通过 `getPriceConfig` 的 `interval` 字段自动判断类型，**无需分离接口**。
 
 #### 2.1.1 接口定义
 ```typescript
-// POST /api/subscriptions/create
+// POST /api/stripe/checkout
 // 同时支持订阅和一次性支付
 
 interface CreatePaymentRequest {
@@ -196,7 +196,7 @@ interface CreatePaymentResponse {
 
 #### 2.1.2 完整实现（参考现有代码风格）
 ```typescript
-// apps/ddaas/src/app/api/subscriptions/create/route.ts
+// apps/ddaas/src/app/api/stripe/checkout/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -341,7 +341,7 @@ export async function POST(request: NextRequest) {
 ### 3.1 Webhook接口主入口
 
 ```typescript
-// apps/ddaas/src/app/api/webhooks/stripe/route.ts
+// apps/ddaas/src/app/api/webhook/stripe/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';

@@ -50,7 +50,7 @@ money-price/
   - ProUser (yearly)：Year·Pro → Current Plan；Year·Ultra → Upgrade；其它卡片（含 Month·Pro、Month·Ultra、两张 Free）隐藏（价格更低）。
   - UltraUser (monthly)：Month·Ultra → Current Plan；Year·Ultra → Upgrade；其它全部隐藏（价格更低）。
   - UltraUser (yearly)：Year·Ultra → Current Plan；其它五张隐藏（价格更低）。
-- `onUpgrade` 请求携带 `priceId/plan/billingType/provider`，默认调用 `upgradeApiEndpoint` (post→`/api/subscriptions/create` 等)。若未提供接口则跳转首页。
+- `onUpgrade` 请求携带 `priceId/plan/billingType/provider`，默认调用 `upgradeApiEndpoint` (post→`/api/stripe/checkout` 等)。若未提供接口则跳转首页。
 
 ### 规则总结
 

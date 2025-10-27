@@ -4,11 +4,6 @@
 
 BEGIN;
 
--- Drop indexes first
-DROP INDEX IF EXISTS idx_credits_free_end;
-DROP INDEX IF EXISTS idx_credits_paid_end;
-DROP INDEX IF EXISTS idx_credits_onetime_paid_end;
-
 -- Remove added columns
 ALTER TABLE credits
 DROP COLUMN IF EXISTS balance_onetime_paid,
