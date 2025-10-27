@@ -49,10 +49,25 @@ model Subscription {
 model Credit {
   id             BigInt    @id @default(autoincrement())
   userId         String    @unique @map("user_id") @db.Uuid
+
+  // ===== 免费积分 =====
   balanceFree    Int       @default(0) @map("balance_free")
   totalFreeLimit Int       @default(0) @map("total_free_limit")
+  freeStart      DateTime? @map("free_start") @db.Timestamptz(6)
+  freeEnd        DateTime? @map("free_end") @db.Timestamptz(6)
+
+  // ===== 订阅付费积分 =====
   balancePaid    Int       @default(0) @map("balance_paid")
   totalPaidLimit Int       @default(0) @map("total_paid_limit")
+  paidStart      DateTime? @map("paid_start") @db.Timestamptz(6)
+  paidEnd        DateTime? @map("paid_end") @db.Timestamptz(6)
+
+  // ===== 一次性支付积分 =====
+  balanceOneTimePaid    Int       @default(0) @map("balance_onetime_paid")
+  totalOneTimePaidLimit Int       @default(0) @map("total_onetime_paid_limit")
+  oneTimePaidStart      DateTime? @map("onetime_paid_start") @db.Timestamptz(6)
+  oneTimePaidEnd        DateTime? @map("onetime_paid_end") @db.Timestamptz(6)
+
   createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   user           User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)

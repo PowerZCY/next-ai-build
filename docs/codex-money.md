@@ -1,6 +1,16 @@
 # Money Price 价格卡片：设计与实现文档
 
 ## 1. 组件分层总览
+
+```
+money-price/
+├── money-price.tsx              # 服务端组件，处理SSR、翻译、静态渲染
+├── money-price-interactive.tsx  # 客户端组件，处理交互逻辑
+├── money-price-config.ts        # 配置文件，包含价格和产品信息
+├── money-price-types.ts         # 类型定义
+└── money-price-button.tsx       # 按钮组件，封装动态逻辑
+```
+
 - **服务端组件 `money-price.tsx`**：在服务器端构造展示所需的文本与价格信息，支持动态模式选择（订阅/积分包/混合），负责渲染静态 DOM 结构和计费类型切换按钮。
 - **客户端组件 `money-price-interactive.tsx`**：注入交互行为（计费周期切换、动态价格更新、用户状态检测、工具提示等），支持配置驱动的计费类型过滤。
 - **按钮客户端组件 `money-price-button.tsx`**：独立封装按钮渲染与行为，支持订阅模式和OneTime模式的不同逻辑，依据 `UserContext` 与 `billingType` 决定按钮状态。

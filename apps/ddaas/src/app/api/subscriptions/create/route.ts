@@ -57,13 +57,14 @@ export async function POST(request: NextRequest) {
     const defaultSuccessUrl = `${baseUrl}`;
     const defaultCancelUrl = `${baseUrl}`;
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with interval for dynamic mode
     const session = await createCheckoutSession({
       priceId,
       customerId: customer.id,
       clientReferenceId: user.userId,
       successUrl: defaultSuccessUrl,
       cancelUrl: defaultCancelUrl,
+      interval: priceConfig.interval, // ✅ Pass interval to auto-determine mode
       metadata: {
         order_id: orderId,
         user_id: user.userId,
@@ -83,7 +84,10 @@ export async function POST(request: NextRequest) {
       priceName: priceConfig.priceName,
       amount: priceConfig.amount,
       currency: priceConfig.currency,
-      type: priceConfig.interval ? TransactionType.SUBSCRIPTION : TransactionType.ONE_TIME,
+      // ✅ Fixed: Check interval is not 'onetime'
+      type: priceConfig.interval && priceConfig.interval !== 'onetime'
+        ? TransactionType.SUBSCRIPTION
+        : TransactionType.ONE_TIME,
       creditsGranted: priceConfig.credits,
       orderDetail: priceConfig.description,
     });

@@ -8,12 +8,28 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 // Webhook Configuration
 export const STRIPE_WEBHOOK_EVENTS = [
+  // Checkout events (both subscription and one-time payment)
   'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+  'checkout.session.async_payment_failed',
+
+  // Invoice events (subscription only)
   'invoice.paid',
   'invoice.payment_failed',
+  'invoice.payment_action_required',
+
+  // Subscription events
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
+  'customer.subscription.paused',
+  'customer.subscription.resumed',
+
+  // Payment Intent events (one-time payment only)
+  'payment_intent.succeeded',
+  'payment_intent.payment_failed',
+
+  // Refund events
   'charge.refunded',
 ] as const;
 
@@ -26,19 +42,37 @@ export const validateStripeWebhook = (
   return stripe.webhooks.constructEvent(payload, signature, secret);
 };
 
-// Helper function to create checkout session
-export const createCheckoutSession = async (params: {
+export interface CreateCheckoutSessionParams {
   priceId: string;
   customerId?: string;
   clientReferenceId: string; // user_id
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
-}): Promise<Stripe.Checkout.Session> => {
-  const { priceId, customerId, clientReferenceId, successUrl, cancelUrl, metadata } = params;
-  
+  // ✅ New: Auto-determine mode based on interval
+  interval?: string; // 'month' | 'year' | 'onetime' | undefined
+}
+
+// Helper function to create checkout session
+export const createCheckoutSession = async (
+  params: CreateCheckoutSessionParams
+): Promise<Stripe.Checkout.Session> => {
+  const {
+    priceId,
+    customerId,
+    clientReferenceId,
+    successUrl,
+    cancelUrl,
+    metadata,
+    interval
+  } = params;
+
+  // ✅ Dynamic mode determination: subscription if interval is not 'onetime'
+  const mode: 'subscription' | 'payment' =
+    interval && interval !== 'onetime' ? 'subscription' : 'payment';
+
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
-    mode: 'subscription',
+    mode, // ✅ Dynamic mode
     payment_method_types: ['card'],
     line_items: [
       {
@@ -49,28 +83,37 @@ export const createCheckoutSession = async (params: {
     success_url: successUrl,
     cancel_url: cancelUrl,
     client_reference_id: clientReferenceId,
-    metadata,
+    metadata: {
+      ...metadata,
+      mode, // Record mode for webhook processing
+    },
   };
 
-  // TODO: 暂时不支持一次性付费方式
-
-  // 如果有客户ID，添加到session
+  // Add customer if provided
   if (customerId) {
     sessionParams.customer = customerId;
   }
 
+  // One-time payment specific configuration
+  if (mode === 'payment') {
+    sessionParams.invoice_creation = {
+      enabled: false, // One-time payments don't create invoices
+    };
+  }
+
   // Create log record with request
   const logId = await Apilogger.logStripeOutgoing('createCheckoutSession', params);
-  
+
   try {
     const session = await stripe.checkout.sessions.create(sessionParams);
-    
+
     // Update log record with response
     Apilogger.updateResponse(logId, {
       session_id: session.id,
-      url: session.url
+      url: session.url,
+      mode: session.mode
     });
-    
+
     return session;
   } catch (error) {
     // Update log record with error
