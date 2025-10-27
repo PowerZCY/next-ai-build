@@ -41,7 +41,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "tslib": "^2.8.1",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.8"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
