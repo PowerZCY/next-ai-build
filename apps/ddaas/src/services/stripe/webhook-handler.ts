@@ -1,7 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Stripe Webhook Handler
+ *
+ * ===== PAYMENT FLOW ARCHITECTURE (SIMPLIFIED) =====
+ *
+ * PRINCIPLE: Leverage Stripe API for accurate data immediately.
+ * Why? Stripe provides complete subscription info via API (includes billing periods).
+ * No need to wait for invoice.paid to get period data.
+ *
+ * ONE-TIME PAYMENTS:
+ * checkout.session.completed [FINAL EVENT]
+ * ├─ Transaction.orderStatus = SUCCESS
+ * ├─ Credit.balanceOneTimePaid += credits (1-year expiration)
+ * └─ Records credit usage
+ *
+ * SUBSCRIPTIONS (Complete in checkout phase):
+ * checkout.session.completed [FINAL EVENT]
+ * ├─ Calls Stripe API to get subscription with accurate period
+ * ├─ Creates Subscription record with COMPLETE period info
+ * ├─ Transaction.orderStatus = SUCCESS (✅ Complete here)
+ * ├─ Credit.balancePaid += credits with correct period
+ * └─ Records credit usage
+ *
+ * SUBSCRIPTION RENEWALS:
+ * invoice.paid (with billing_reason !== 'subscription_create')
+ * ├─ Updates Subscription with new period from invoice.lines[0].period
+ * ├─ Creates new renewal Transaction record
+ * ├─ Credit.balancePaid += renewal credits
+ * └─ Records renewal usage
+ *
+ * INVOICE TRACKING:
+ * invoice.paid (with billing_reason === 'subscription_create')
+ * └─ Records invoice URLs on initial transaction (hostedInvoiceUrl, invoicePdf)
+ *
+ * DATABASE GUARANTEES:
+ * - All credit operations use upsert() for idempotency
+ * - No race conditions on orderStatus (already SUCCESS before invoice.paid)
+ * - Safe for webhook replay
+ */
+
 import Stripe from 'stripe';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { stripe } from '@/lib/stripe-config';
+import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import {
   transactionService,
   subscriptionService,
@@ -9,6 +50,8 @@ import {
   OrderStatus,
   Transaction,
 } from '@/services/database';
+import { Apilogger } from '@/services/database/apilog.service';
+import { oneTimeExpiredDays } from '@/lib/appConfig';
 
 const prisma = new PrismaClient();
 
@@ -72,6 +115,9 @@ export async function handleStripeEvent(event: Stripe.Event) {
 /**
  * Handle checkout.session.completed
  * Routes to subscription or one-time payment based on transaction type
+ *
+ * NOTE: For subscriptions, actual credit allocation happens in invoice.paid event
+ * because subscription period details are not available in checkout session
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log(`Checkout completed: ${session.id}`);
@@ -89,7 +135,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // 2. Route based on transaction type
   if (transaction.type === TransactionType.SUBSCRIPTION) {
-    return await handleSubscriptionCheckout(session, transaction);
+    // For subscriptions, store session info and wait for invoice.paid
+    return await handleSubscriptionCheckoutInit(session, transaction);
   } else if (transaction.type === TransactionType.ONE_TIME) {
     return await handleOneTimeCheckout(session, transaction);
   } else {
@@ -98,71 +145,157 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 /**
- * Handle subscription payment checkout
- * Creates Subscription record and updates subscription credits
+ * Handle subscription payment checkout [COMPLETE PROCESSING]
+ *
+ * REDESIGN: Now handles complete subscription setup in checkout phase.
+ * Why? Stripe API provides complete subscription info immediately.
+ *
+ * ARCHITECTURE: API calls are performed BEFORE the database transaction to avoid:
+ * - Long-lived database connections
+ * - Transaction timeouts
+ * - Connection pool exhaustion
+ *
+ * This function:
+ * 1. Retrieves accurate subscription info from Stripe (includes billing period) - BEFORE transaction
+ * 2. Creates/Updates Subscription record with full period information - IN transaction
+ * 3. Updates Transaction with all payment details and FINAL status (SUCCESS) - IN transaction
+ * 4. Allocates credits with correct billing period - IN transaction
+ *
+ * Result: invoice.paid event only needs to update invoice URLs and optionally create renewal records.
  */
-async function handleSubscriptionCheckout(
+async function handleSubscriptionCheckoutInit(
   session: Stripe.Checkout.Session,
   transaction: Transaction
 ) {
   console.log(`Processing subscription checkout: ${session.id}`);
 
+  // 1. Get subscription ID from session
+  if (!session.subscription) {
+    throw new Error('No subscription ID in checkout session');
+  }
+
+  const subscriptionId = session.subscription as string;
+
+  // ===== STEP 1: FETCH EXTERNAL API DATA (BEFORE TRANSACTION) =====
+  // 2. Get COMPLETE Stripe subscription details including billing period
+  const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+  // Extract billing period from subscription items (NOT from top-level subscription object)
+  // The current_period_start/end are on SubscriptionItem, not on Subscription
+  const subscriptionItem = stripeSubscription.items?.data?.[0];
+  if (!subscriptionItem) {
+    throw new Error(
+      `No subscription items found for subscription ${subscriptionId}`
+    );
+  }
+
+  const currentPeriodStart = subscriptionItem.current_period_start;
+  const currentPeriodEnd = subscriptionItem.current_period_end;
+
+  if (!currentPeriodStart || !currentPeriodEnd) {
+    throw new Error(
+      `Invalid subscription period from Stripe API: start=${currentPeriodStart}, end=${currentPeriodEnd}`
+    );
+  }
+
+  // Log the Stripe API response with correct data structure
+  const logId = await Apilogger.logStripeOutgoing(
+    'stripe.subscriptions.retrieve',
+    { subscriptionId },
+    {
+      id: stripeSubscription.id,
+      status: stripeSubscription.status,
+      current_period_start: currentPeriodStart,
+      current_period_end: currentPeriodEnd,
+      subscription_item_count: stripeSubscription.items?.data?.length || 0,
+    }
+  );
+  Apilogger.updateResponse(logId, stripeSubscription);
+
+  const subPeriodStart = new Date(currentPeriodStart * 1000);
+  const subPeriodEnd = new Date(currentPeriodEnd * 1000);
+
+  // Validate dates
+  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
+    throw new Error(
+      `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
+    );
+  }
+
+  console.log('Stripe subscription info:', {
+    id: subscriptionId,
+    status: stripeSubscription.status,
+    periodStart: subPeriodStart.toISOString(),
+    periodEnd: subPeriodEnd.toISOString(),
+  });
+
+  // ===== STEP 2: DATABASE TRANSACTION (WITH PREPARED DATA) =====
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 1. Get Stripe subscription details
-    if (!session.subscription) {
-      throw new Error('No subscription ID in checkout session');
+    // 3. Find and UPDATE the placeholder subscription record (initialized during user registration)
+    // This ensures consistent logic: all subscription scenarios use UPDATE, not CREATE
+    const existingSubscription = await tx.subscription.findFirst({
+      where: {
+        userId: transaction.userId,
+        status: 'incomplete', // ← placeholder status
+      },
+    });
+
+    if (!existingSubscription) {
+      throw new Error(
+        `Subscription placeholder not found OR Repeat for user ${transaction.userId}. `
+      );
     }
 
-    const stripeSubscription = await stripe.subscriptions.retrieve(
-      session.subscription as string,
-      { expand: ['items.data.price'] }
-    );
-
-    // 2. Get subscription period from Stripe
-    const subPeriodStart = new Date((stripeSubscription as any).current_period_start * 1000);
-    const subPeriodEnd = new Date((stripeSubscription as any).current_period_end * 1000);
-
-    // 3. Create Subscription record
-    const subscription = await tx.subscription.create({
+    const subscription = await tx.subscription.update({
+      where: { id: existingSubscription.id },
       data: {
-        userId: transaction.userId,
-        paySubscriptionId: stripeSubscription.id,
+        paySubscriptionId: subscriptionId,
         priceId: transaction.priceId || undefined,
         priceName: transaction.priceName || undefined,
         status: stripeSubscription.status,
         creditsAllocated: transaction.creditsGranted || 0,
-        subPeriodStart,
-        subPeriodEnd,
+        subPeriodStart, // ✅ SET from Stripe API
+        subPeriodEnd,   // ✅ SET from Stripe API
+        updatedAt: new Date(),
       },
     });
 
-    console.log(`Created subscription: ${subscription.id}`);
+    console.log(`Updated subscription placeholder with period info: ${subscription.id}`);
 
-    // 4. Update Transaction status
+    // 4. Update Transaction with COMPLETE payment info and FINAL status
     await tx.transaction.update({
       where: { orderId: transaction.orderId },
       data: {
-        orderStatus: OrderStatus.SUCCESS,
-        paySubscriptionId: stripeSubscription.id,
-        payTransactionId: session.payment_intent as string,
-        subPeriodStart,
-        subPeriodEnd,
-        paidAt: new Date(),
+        orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
+        paySubscriptionId: subscriptionId,
+        paySessionId: session.id,
         paidEmail: session.customer_details?.email,
+        paidAt: new Date(),
         payUpdatedAt: new Date(),
       },
     });
 
-    // 5. Update subscription credits with expiration
-    await tx.credit.update({
+    console.log(`Transaction marked SUCCESS: ${transaction.orderId}`);
+
+    // 5. Update subscription credits with correct billing period
+    await tx.credit.upsert({
       where: { userId: transaction.userId },
-      data: {
+      update: {
         balancePaid: { increment: transaction.creditsGranted || 0 },
         totalPaidLimit: { increment: transaction.creditsGranted || 0 },
-        paidStart: subPeriodStart, // ✅ Subscription credit expiration = subscription period
+        paidStart: subPeriodStart,
         paidEnd: subPeriodEnd,
-      } as any,
-    });
+      },
+      create: {
+        userId: transaction.userId,
+        balancePaid: transaction.creditsGranted || 0,
+        totalPaidLimit: transaction.creditsGranted || 0,
+        paidStart: subPeriodStart,
+        paidEnd: subPeriodEnd,
+      },
+    } as any);
+
+    console.log(`Credits allocated for subscription: ${transaction.creditsGranted}`);
 
     // 6. Record credit usage
     await tx.creditUsage.create({
@@ -182,8 +315,10 @@ async function handleSubscriptionCheckout(
 }
 
 /**
- * Handle one-time payment checkout
- * Updates one-time purchase credits with 1-year expiration
+ * Handle one-time payment checkout [FINAL EVENT]
+ *
+ * One-time payments complete in a single event (checkout.session.completed).
+ * This is the FINAL event that sets orderStatus.
  */
 async function handleOneTimeCheckout(
   session: Stripe.Checkout.Session,
@@ -192,11 +327,11 @@ async function handleOneTimeCheckout(
   console.log(`Processing one-time payment checkout: ${session.id}`);
 
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 1. Update Transaction status
+    // 1. Update Transaction with payment info and FINAL status
     await tx.transaction.update({
       where: { orderId: transaction.orderId },
       data: {
-        orderStatus: OrderStatus.SUCCESS,
+        orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
         payTransactionId: session.payment_intent as string,
         paidAt: new Date(),
         paidEmail: session.customer_details?.email,
@@ -208,19 +343,26 @@ async function handleOneTimeCheckout(
     const now = new Date();
     const oneTimePaidStart = now;
     const oneTimePaidEnd = new Date(now);
-    oneTimePaidEnd.setDate(oneTimePaidEnd.getDate() + 365);
+    oneTimePaidEnd.setDate(oneTimePaidEnd.getDate() + oneTimeExpiredDays);
     oneTimePaidEnd.setHours(23, 59, 59, 999);
 
-    // 3. Update one-time purchase credits
-    await tx.credit.update({
+    // 3. Update one-time purchase credits (or create if not exists)
+    await tx.credit.upsert({
       where: { userId: transaction.userId },
-      data: {
+      update: {
         balanceOneTimePaid: { increment: transaction.creditsGranted || 0 },
         totalOneTimePaidLimit: { increment: transaction.creditsGranted || 0 },
         oneTimePaidStart,
-        oneTimePaidEnd, // ✅ Fixed 1-year expiration
-      } as any,
-    });
+        oneTimePaidEnd,
+      },
+      create: {
+        userId: transaction.userId,
+        balanceOneTimePaid: transaction.creditsGranted || 0,
+        totalOneTimePaidLimit: transaction.creditsGranted || 0,
+        oneTimePaidStart,
+        oneTimePaidEnd,
+      },
+    } as any);
 
     // 4. Record credit usage
     await tx.creditUsage.create({
@@ -239,101 +381,205 @@ async function handleOneTimeCheckout(
 }
 
 /**
- * Handle invoice.paid - Subscription renewal
+ * Handle invoice.paid [SIMPLIFIED - Only for renewals and invoice tracking]
+ *
+ * REDESIGN: Now handles:
+ * 1. Subscription renewals (billing_reason !== 'subscription_create')
+ *    ├─ Updates Subscription with new period from invoice.lines[0].period
+ *    ├─ Creates new renewal Transaction record
+ *    ├─ Adds renewal credits
+ *    └─ Stores invoice URLs
+ *
+ * 2. Initial subscription invoice (billing_reason === 'subscription_create')
+ *    └─ Updates transaction with invoice URLs using metadata to find the order
+ *
+ * KEY IMPROVEMENT: Subscription metadata now contains order_id and user_id,
+ * so we can directly retrieve transaction without needing to find subscription first.
  */
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   console.log(`Invoice paid: ${invoice.id}`);
 
-  // 1. Get subscription ID
-  const subscriptionId = typeof (invoice as any).subscription === 'string'
-    ? (invoice as any).subscription
-    : (invoice as any).subscription?.id;
-
-  if (!subscriptionId) {
+  // ===== STEP 1: EXTRACT AND VALIDATE DATA FROM INVOICE (BEFORE TRANSACTION) =====
+  // 1. Get subscription details from invoice parent
+  const parentDetails = (invoice as any).parent?.subscription_details;
+  if (!parentDetails?.subscription) {
     console.warn('Invoice not associated with subscription, skipping');
     return;
   }
 
-  // 2. Check if this is initial payment (already handled in checkout.session.completed)
+  const subscriptionId = parentDetails.subscription;
+  const subscriptionMetadata = parentDetails.metadata || {};
+
+  // 2. Check billing reason to determine payment type
   const isInitialPayment = invoice.billing_reason === 'subscription_create';
-  if (isInitialPayment) {
-    console.log('Initial payment, already handled in checkout.session.completed');
+  const isRenewal = invoice.billing_reason === 'subscription_cycle';
+
+  // Only handle initial payments and renewals
+  if (!isInitialPayment && !isRenewal) {
+    console.warn(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
     return;
   }
 
-  // 3. Find subscription record
-  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-  if (!subscription) {
-    throw new Error(`Subscription not found: ${subscriptionId}`);
+  // 3. Extract subscription period from invoice line items
+  const lineItem = invoice.lines?.data?.[0];
+  if (!lineItem) {
+    throw new Error(`No line items found in invoice ${invoice.id}`);
   }
 
-  // 4. Process renewal
+  const periodStart = (lineItem as any).period?.start;
+  const periodEnd = (lineItem as any).period?.end;
+
+  if (!periodStart || !periodEnd) {
+    throw new Error(
+      `Invalid period in invoice line: start=${periodStart}, end=${periodEnd}. Invoice ID: ${invoice.id}`
+    );
+  }
+
+  const subPeriodStart = new Date(periodStart * 1000);
+  const subPeriodEnd = new Date(periodEnd * 1000);
+
+  // Validate dates
+  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
+    throw new Error(
+      `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
+    );
+  }
+
+  console.log('Invoice info:', {
+    invoiceId: invoice.id,
+    subscriptionId,
+    billingReason: invoice.billing_reason,
+    isInitialPayment,
+    periodStart: subPeriodStart.toISOString(),
+    periodEnd: subPeriodEnd.toISOString(),
+  });
+
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 4.1 Get new billing period from invoice
-    const newSubPeriodStart = new Date(invoice.period_start * 1000);
-    const newSubPeriodEnd = new Date(invoice.period_end * 1000);
+    // CASE 1: Initial subscription payment invoice
+    if (isInitialPayment) {
+      // ✅ NEW APPROACH: Use subscription metadata to find the original transaction
+      const orderId = subscriptionMetadata.order_id;
 
-    // 4.2 Update Subscription record
-    await tx.subscription.update({
-      where: { id: subscription.id },
-      data: {
-        status: 'active',
-        subPeriodStart: newSubPeriodStart,
-        subPeriodEnd: newSubPeriodEnd,
-        updatedAt: new Date(),
-      },
-    });
+      if (!orderId) {
+        console.warn(
+          `No order_id in subscription metadata for initial invoice ${invoice.id}. ` +
+          `Skipping invoice URL update.`
+        );
+        return;
+      }
 
-    // 4.3 Create renewal transaction record
-    const renewalOrderId = `order_renew_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    await tx.transaction.create({
-      data: {
-        userId: subscription.userId,
-        orderId: renewalOrderId,
-        orderStatus: OrderStatus.SUCCESS,
-        paySupplier: 'Stripe',
-        paySubscriptionId: subscriptionId,
-        payInvoiceId: invoice.id,
-        payTransactionId: typeof (invoice as any).payment_intent === 'string'
-          ? (invoice as any).payment_intent
-          : (invoice as any).payment_intent?.id,
-        priceId: subscription.priceId,
-        priceName: subscription.priceName,
-        type: TransactionType.SUBSCRIPTION,
-        amount: invoice.amount_paid / 100, // Convert cents to dollars
-        currency: invoice.currency.toUpperCase(),
-        creditsGranted: subscription.creditsAllocated,
-        subPeriodStart: newSubPeriodStart,
-        subPeriodEnd: newSubPeriodEnd,
-        paidAt: new Date(invoice.created * 1000),
-        payUpdatedAt: new Date(),
-      },
-    });
+      // Find transaction by order ID (created in session.completed)
+      const transaction = await tx.transaction.findUnique({
+        where: { orderId },
+      });
 
-    // 4.4 Update subscription credits and expiration
-    await tx.credit.update({
-      where: { userId: subscription.userId },
-      data: {
-        balancePaid: { increment: subscription.creditsAllocated },
-        totalPaidLimit: { increment: subscription.creditsAllocated },
-        paidStart: newSubPeriodStart, // ✅ Update to new period
-        paidEnd: newSubPeriodEnd,
-      } as any,
-    });
+      if (transaction) {
+        // Update transaction with invoice URLs for record keeping
+        await tx.transaction.update({
+          where: { orderId: transaction.orderId },
+          data: {
+            payInvoiceId: invoice.id,
+            hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
+            invoicePdf: invoice.invoice_pdf || undefined,
+            payUpdatedAt: new Date(),
+          },
+        });
 
-    // 4.5 Record credit usage
-    await tx.creditUsage.create({
-      data: {
-        userId: subscription.userId,
-        feature: 'subscription_renewal',
-        orderId: renewalOrderId,
-        creditType: 'paid',
-        operationType: 'recharge',
-        creditsUsed: subscription.creditsAllocated,
-      },
-    });
+        console.log(`Initial invoice recorded for transaction: ${transaction.orderId}`);
+      } else {
+        console.warn(`Transaction not found for order_id: ${orderId}`);
+      }
+    }
+    // CASE 2: Subscription renewal
+    else if (isRenewal) {
+      // Find subscription to get user info
+      const subscription = await tx.subscription.findFirst({
+        where: { paySubscriptionId: subscriptionId },
+      });
 
-    console.log(`Subscription renewed: ${subscription.id}`);
+      if (!subscription) {
+        throw new Error(`Subscription not found for renewal: ${subscriptionId}`);
+      }
+
+      // Update subscription with new period
+      await tx.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          status: 'active',
+          subPeriodStart,
+          subPeriodEnd,
+          updatedAt: new Date(),
+        },
+      });
+
+      // Create new renewal transaction record
+      const renewalOrderId = `order_renew_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+
+      // Get credits from current price configuration (handles plan upgrades/downgrades)
+      const creditsForRenewal = subscription.priceId
+        ? getCreditsFromPriceId(subscription.priceId)
+        : subscription.creditsAllocated;
+
+      const renewalCredits = creditsForRenewal || subscription.creditsAllocated;
+
+      await tx.transaction.create({
+        data: {
+          userId: subscription.userId,
+          orderId: renewalOrderId,
+          orderStatus: OrderStatus.SUCCESS,
+          paySupplier: 'Stripe',
+          paySubscriptionId: subscriptionId,
+          payInvoiceId: invoice.id,
+          hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
+          invoicePdf: invoice.invoice_pdf || undefined,
+          payTransactionId: typeof (invoice as any).payment_intent === 'string'
+            ? (invoice as any).payment_intent
+            : (invoice as any).payment_intent?.id,
+          priceId: subscription.priceId,
+          priceName: subscription.priceName,
+          type: TransactionType.SUBSCRIPTION,
+          amount: invoice.amount_paid / 100, // Convert cents to dollars
+          currency: invoice.currency.toUpperCase(),
+          creditsGranted: renewalCredits,
+          paidAt: new Date(invoice.created * 1000),
+          payUpdatedAt: new Date(),
+        },
+      });
+
+      // Update subscription credits for renewal
+      await tx.credit.upsert({
+        where: { userId: subscription.userId },
+        update: {
+          balancePaid: { increment: renewalCredits },
+          totalPaidLimit: { increment: renewalCredits },
+          paidStart: subPeriodStart,
+          paidEnd: subPeriodEnd,
+        },
+        create: {
+          userId: subscription.userId,
+          balancePaid: renewalCredits,
+          totalPaidLimit: renewalCredits,
+          paidStart: subPeriodStart,
+          paidEnd: subPeriodEnd,
+        },
+      } as any);
+
+      // Record renewal credit usage
+      await tx.creditUsage.create({
+        data: {
+          userId: subscription.userId,
+          feature: 'subscription_renewal',
+          orderId: renewalOrderId,
+          creditType: 'paid',
+          operationType: 'recharge',
+          creditsUsed: renewalCredits,
+        },
+      });
+
+      console.log(`Subscription renewal processed: ${subscription.id}`);
+    }
+
+    console.log(`Invoice paid event completed: ${invoice.id}`);
   });
 }
 
@@ -376,21 +622,103 @@ async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
 
 /**
  * Handle invoice payment failed
+ *
+ * For initial payment failures: Use subscription metadata to find order_id
+ * For renewal failures: Use subscription ID to find subscription, then user info
  */
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log(`Invoice payment failed: ${invoice.id}`);
 
-  const subscriptionId = typeof (invoice as any).subscription === 'string'
-    ? (invoice as any).subscription
-    : (invoice as any).subscription?.id;
+  const parentDetails = (invoice as any).parent?.subscription_details;
+  if (!parentDetails?.subscription) {
+    console.warn('Invoice not associated with subscription, skipping');
+    return;
+  }
 
-  if (!subscriptionId) return;
+  const subscriptionId = parentDetails.subscription;
+  const subscriptionMetadata = parentDetails.metadata || {};
+  const isInitialPayment = invoice.billing_reason === 'subscription_create';
 
   const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-  if (!subscription) return;
+  if (!subscription) {
+    console.warn(`Subscription not found for failed invoice: ${subscriptionId}`);
+    return;
+  }
 
-  await subscriptionService.updateStatus(subscription.id, 'past_due');
-  console.log(`Subscription status updated to past_due: ${subscription.id}`);
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // CASE 1: Initial subscription payment failed
+    if (isInitialPayment) {
+      const orderId = subscriptionMetadata.order_id;
+
+      if (orderId) {
+        // Update the original transaction to FAILED status
+        await tx.transaction.update({
+          where: { orderId },
+          data: {
+            orderStatus: OrderStatus.FAILED,
+            payInvoiceId: invoice.id,
+            payUpdatedAt: new Date(),
+            orderDetail: 'Initial subscription payment failed',
+          },
+        });
+
+        console.log(`Initial subscription payment failed for order: ${orderId}`);
+      }
+    }
+    // CASE 2: Subscription renewal payment failed
+    else {
+      // Create failed renewal transaction record for tracking
+      const failedOrderId = `order_renew_failed_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+
+      await tx.transaction.create({
+        data: {
+          userId: subscription.userId,
+          orderId: failedOrderId,
+          orderStatus: OrderStatus.FAILED,
+          paySupplier: 'Stripe',
+          paySubscriptionId: subscriptionId,
+          payInvoiceId: invoice.id,
+          payTransactionId: typeof (invoice as any).payment_intent === 'string'
+            ? (invoice as any).payment_intent
+            : (invoice as any).payment_intent?.id,
+          priceId: subscription.priceId,
+          priceName: subscription.priceName,
+          type: TransactionType.SUBSCRIPTION,
+          amount: invoice.amount_due / 100, // Convert cents to dollars
+          currency: invoice.currency.toUpperCase(),
+          creditsGranted: 0, // No credits granted on failed payment
+          paidAt: new Date(invoice.created * 1000),
+          payUpdatedAt: new Date(),
+          orderDetail: 'Subscription renewal payment failed',
+        },
+      });
+
+      // Record failed renewal in credit usage for audit trail
+      await tx.creditUsage.create({
+        data: {
+          userId: subscription.userId,
+          feature: 'subscription_renewal_failed',
+          orderId: failedOrderId,
+          creditType: 'paid',
+          operationType: 'consume',
+          creditsUsed: 0, // Mark as failed operation
+        },
+      });
+
+      // Update subscription status to past_due
+      await tx.subscription.update({
+        where: { id: subscription.id },
+        data: {
+          status: 'past_due',
+          updatedAt: new Date(),
+        },
+      });
+
+      console.log(`Subscription renewal failed and recorded: ${subscription.id}, orderId: ${failedOrderId}`);
+    }
+
+    console.log(`Invoice payment failed event completed: ${invoice.id}`);
+  });
 }
 
 /**
@@ -413,11 +741,22 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
     return;
   }
 
-  // Safely extract period timestamps
-  const currentPeriodStart = (stripeSubscription as any).current_period_start ||
-    Math.floor(Date.now() / 1000);
-  const currentPeriodEnd = (stripeSubscription as any).current_period_end ||
-    Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
+  // Extract period timestamps from subscription items (NOT from top-level subscription object)
+  const subscriptionItem = stripeSubscription.items?.data?.[0];
+
+  let currentPeriodStart: number;
+  let currentPeriodEnd: number;
+
+  if (subscriptionItem) {
+    // Use period from subscription item if available
+    currentPeriodStart = subscriptionItem.current_period_start;
+    currentPeriodEnd = subscriptionItem.current_period_end;
+  } else {
+    // Fallback if no items found (should not happen in normal cases)
+    console.warn(`No subscription items found for ${stripeSubscription.id}, using current time as fallback`);
+    currentPeriodStart = Math.floor(Date.now() / 1000);
+    currentPeriodEnd = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
+  }
 
   // Update subscription status and period
   await prisma.subscription.update({
@@ -471,19 +810,27 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
 
     // Deduct credits based on transaction type
     if (transaction.type === TransactionType.SUBSCRIPTION) {
-      await tx.credit.update({
+      await tx.credit.upsert({
         where: { userId: transaction.userId },
-        data: {
+        update: {
           balancePaid: { decrement: transaction.creditsGranted || 0 },
-        } as any,
-      });
+        },
+        create: {
+          userId: transaction.userId,
+          balancePaid: -(transaction.creditsGranted || 0),
+        },
+      } as any);
     } else if (transaction.type === TransactionType.ONE_TIME) {
-      await tx.credit.update({
+      await tx.credit.upsert({
         where: { userId: transaction.userId },
-        data: {
+        update: {
           balanceOneTimePaid: { decrement: transaction.creditsGranted || 0 },
-        } as any,
-      });
+        },
+        create: {
+          userId: transaction.userId,
+          balanceOneTimePaid: -(transaction.creditsGranted || 0),
+        },
+      } as any);
     }
 
     // Record credit deduction

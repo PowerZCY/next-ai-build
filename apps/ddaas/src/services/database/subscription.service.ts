@@ -5,6 +5,27 @@ import { SubscriptionStatus } from '@/db/constants';
 const prisma = new PrismaClient();
 
 export class SubscriptionService {
+  /**
+   * Initialize a placeholder subscription record for new users
+   * This allows Stripe webhook handlers to UPDATE instead of CREATE,
+   * ensuring consistent logic across all subscription scenarios.
+   *
+   * The record will be updated once the user subscribes via Stripe.
+   *
+   * @param userId - The user ID to initialize subscription for
+   * @returns The created placeholder subscription record
+   */
+  async initializeSubscription(userId: string): Promise<Subscription> {
+    return await prisma.subscription.create({
+      data: {
+        userId,
+        status: SubscriptionStatus.INCOMPLETE,
+        creditsAllocated: 0,
+        // All other fields (paySubscriptionId, priceId, periods) will be set when user actually subscribes
+      },
+    });
+  }
+
   // Create a new subscription
   async createSubscription(data: {
     userId: string;

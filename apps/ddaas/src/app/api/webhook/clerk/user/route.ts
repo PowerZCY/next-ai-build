@@ -7,8 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
-import { userService, creditService, creditUsageService, Apilogger } from '@/services/database';
+import { userService, creditService, creditUsageService, subscriptionService, Apilogger } from '@/services/database';
 import { UserStatus, CreditType, OperationType } from '@/services/database';
+import { freeAmount } from '@/lib/appConfig';
 
 // 定义Clerk Webhook事件类型
 interface ClerkWebhookEvent {
@@ -37,7 +38,7 @@ interface ClerkWebhookEvent {
 }
 
 // 免费积分配置
-const FREE_CREDITS_AMOUNT = 50;
+const FREE_CREDITS_AMOUNT = freeAmount;
 
 export async function POST(request: NextRequest) {
   try {
@@ -258,10 +259,20 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
 
 /**
  * 创建新的注册用户
+ *
+ * 初始化步骤（与 credit 平行）：
+ * 1. 创建 User 记录
+ * 2. 初始化 Credit 记录（免费积分）
+ * 3. 初始化 Subscription 记录（占位符，status=INCOMPLETE）
+ * 4. 记录 CreditUsage（审计）
+ *
+ * 后续当用户通过 Stripe 订阅时：
+ * - session.completed 或 invoice.paid 会 UPDATE subscription 记录
+ * - 不需要 CREATE，只需 UPDATE 确保逻辑一致
  */
 async function createNewRegisteredUser(
-  clerkUserId: string, 
-  email?: string, 
+  clerkUserId: string,
+  email?: string,
   fingerprintId?: string
 ) {
   // 创建新用户
@@ -279,6 +290,11 @@ async function createNewRegisteredUser(
     0 // 注册时只给免费积分，付费积分为0
   );
 
+  // ✅ 初始化订阅记录（占位符）
+  // 这样后续 Stripe webhook 可以直接 UPDATE，无需 CREATE
+  // 确保所有订阅场景下的处理逻辑一致
+  await subscriptionService.initializeSubscription(newUser.userId);
+
   // 记录免费积分充值记录
   await creditUsageService.recordCreditOperation({
     userId: newUser.userId,
@@ -288,5 +304,5 @@ async function createNewRegisteredUser(
     creditsUsed: FREE_CREDITS_AMOUNT
   });
 
-  console.log(`Created new registered user ${newUser.userId} with ${FREE_CREDITS_AMOUNT} free credits`);
+  console.log(`Created new registered user ${newUser.userId} with ${FREE_CREDITS_AMOUNT} free credits and initialized subscription placeholder`);
 }

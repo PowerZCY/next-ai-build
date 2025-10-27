@@ -12,8 +12,9 @@ export * from './price-plan';
 // Money Price Server Component and Types
 export { MoneyPrice } from './money-price/money-price';
 export {
-  getActiveProviderConfig,
-  getProductPricing
+  getActiveProviderConfigUtil,
+  getCreditsFromPriceIdUtil,
+  getPriceConfigUtil
 } from './money-price/money-price-config-util';
 
 // Money Price Types (shared between server and client)

@@ -19,15 +19,12 @@ const protectedPageRoutes = createRouteMatcher([
 
 // 需要身份认证的API路由
 const protectedApiRoutes = createRouteMatcher([
-  // 订阅相关API
-  '/api/subscriptions(.*)',
+  // Stripe支付相关API
+  '/api/stripe(.*)',
   // 积分相关API  
-  '/api/subscriptions(.*)',
+  '/api/credit(.*)',
   // 交易记录API
-  '/api/subscriptions(.*)',
-  // 用户资料API
-  '/api/subscriptions(.*)',
-  '/api/subscriptions(.*)',
+  '/api/transaction(.*)'
 ]);
 
 // 免认证的API路由（webhook、匿名用户初始化等）
@@ -41,6 +38,8 @@ const publicApiRoutes = createRouteMatcher([
   // 健康检查等
   '/api/health',
   '/api/legal',
+  '/api/docs',
+  '/api/search',
   '/api/blog'
 ]);
 

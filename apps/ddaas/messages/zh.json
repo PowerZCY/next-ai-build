@@ -172,10 +172,10 @@
         {
           "key": "F1",
           "title": "入门包",
-          "subtitle": "200积分",
+          "subtitle": "5积分",
           "showBillingSubTitle": false,
           "features": [
-            { "description": "200次AI生成" },
+            { "description": "5次AI生成" },
             { "description": "适合尝鲜使用" },
             { "description": "永不过期" },
             { "description": "立即生效" }
@@ -184,11 +184,11 @@
         {
           "key": "P2",
           "title": "热门包",
-          "subtitle": "500积分",
+          "subtitle": "10积分",
           "showBillingSubTitle": false,
           "titleTags": ["优先推荐"],
           "features": [
-            { "description": "500次AI生成" },
+            { "description": "10次AI生成" },
             { "description": "适合日常使用" },
             { "description": "永不过期" },
             { "description": "立即生效" },
@@ -198,10 +198,10 @@
         {
           "key": "U3",
           "title": "超值包",
-          "subtitle": "1000积分",
+          "subtitle": "20积分",
           "showBillingSubTitle": false,
           "features": [
-            { "description": "1000次AI生成" },
+            { "description": "20次AI生成" },
             { "description": "适合重度用户" },
             { "description": "永不过期" },
             { "description": "立即生效" }

@@ -19,14 +19,10 @@ export class TransactionService {
     payInvoiceId?: string;
     priceId?: string;
     priceName?: string;
-    subIntervalCount?: number;
-    subCycleAnchor?: Date;
     amount?: number;
     currency?: string;
     type?: string;
     creditsGranted?: number;
-    subPeriodStart?: Date;
-    subPeriodEnd?: Date;
     orderDetail?: string;
     orderExpiredAt?: Date;
     paidAt?: Date;
@@ -45,14 +41,10 @@ export class TransactionService {
         payInvoiceId: data.payInvoiceId,
         priceId: data.priceId,
         priceName: data.priceName,
-        subIntervalCount: data.subIntervalCount,
-        subCycleAnchor: data.subCycleAnchor,
         amount: data.amount,
         currency: data.currency || 'CNY',
         type: data.type,
         creditsGranted: data.creditsGranted || 0,
-        subPeriodStart: data.subPeriodStart,
-        subPeriodEnd: data.subPeriodEnd,
         orderDetail: data.orderDetail,
         paidAt: data.paidAt,
         payUpdatedAt: data.payUpdatedAt,

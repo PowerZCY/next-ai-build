@@ -14,6 +14,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   return (
     <>
       { (forceShow || isDev) && <FingerprintStatus />}
+      <MoneyPrice locale={locale} config={moneyPriceConfig} upgradeApiEndpoint="/api/stripe/checkout"
+        enabledBillingTypes={['monthly', 'yearly', 'onetime']}
+      />
       <Hero locale={locale}/>
       <Gallery
         locale={locale}
@@ -29,9 +32,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Features locale={locale} />
       <Tips locale={locale} />
       <FAQ locale={locale} />
-      <MoneyPrice locale={locale} config={moneyPriceConfig} upgradeApiEndpoint="/api/stripe/checkout"
-        enabledBillingTypes={['monthly', 'yearly', 'onetime']}
-      />
       <SeoContent locale={locale} />
       <CTA locale={locale} />
     </>

@@ -91,19 +91,17 @@ model Transaction {
   payInvoiceId      String?   @map("pay_invoice_id") @db.VarChar(255)
   priceId           String?   @map("price_id") @db.VarChar(255)
   priceName         String?   @map("price_name") @db.VarChar(255)
-  subIntervalCount  Int?      @map("sub_interval_count")
-  subCycleAnchor    DateTime? @map("sub_cycle_anchor") @db.Timestamptz(6)
   amount            Decimal?  @db.Decimal(10, 2)
   currency          String?   @db.VarChar(10)
   type              String?   @db.VarChar(20)
   creditsGranted    Int?      @default(0) @map("credits_granted")
-  subPeriodStart    DateTime? @map("sub_period_start") @db.Timestamptz(6)
-  subPeriodEnd      DateTime? @map("sub_period_end") @db.Timestamptz(6)
   orderDetail       String?   @map("order_detail")
   paidAt            DateTime? @map("paid_at") @db.Timestamptz(6)
   paidEmail         String?   @map("paid_email") @db.VarChar(255)
   paidDetail        String?   @map("paid_detail")
   payUpdatedAt      DateTime? @map("pay_updated_at") @db.Timestamptz(6)
+  hostedInvoiceUrl  String?   @map("hosted_invoice_url") @db.Text
+  invoicePdf        String?   @map("invoice_pdf") @db.Text
   deleted           Int       @default(0)
   user              User      @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 

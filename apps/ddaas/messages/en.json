@@ -172,10 +172,10 @@
         {
           "key": "F1",
           "title": "Starter",
-          "subtitle": "200 Credits",
+          "subtitle": "5 Credits",
           "showBillingSubTitle": true,
           "features": [
-            { "description": "200 AI generations" },
+            { "description": "5 AI generations" },
             { "description": "Perfect for trying out" },
             { "description": "No expiration" },
             { "description": "Instant activation" }
@@ -184,11 +184,11 @@
         {
           "key": "P2",
           "title": "Popular",
-          "subtitle": "500 Credits",
+          "subtitle": "10 Credits",
           "showBillingSubTitle": true,
           "titleTags": ["Preferred"],
           "features": [
-            { "description": "500 AI generations" },
+            { "description": "10 AI generations" },
             { "description": "Great for regular use" },
             { "description": "No expiration" },
             { "description": "Instant activation" },
@@ -198,10 +198,10 @@
         {
           "key": "U3",
           "title": "Power",
-          "subtitle": "1000 Credits",
+          "subtitle": "20 Credits",
           "showBillingSubTitle": true,
           "features": [
-            { "description": "1000 AI generations" },
+            { "description": "20 AI generations" },
             { "description": "Perfect for heavy users" },
             { "description": "No expiration" },
             { "description": "Instant activation" }

@@ -51,6 +51,8 @@ export interface CreateCheckoutSessionParams {
   metadata?: Record<string, string>;
   // ✅ New: Auto-determine mode based on interval
   interval?: string; // 'month' | 'year' | 'onetime' | undefined
+  // ✅ New: Subscription metadata for webhook processing
+  subscriptionData?: Stripe.Checkout.SessionCreateParams.SubscriptionData;
 }
 
 // Helper function to create checkout session
@@ -64,6 +66,7 @@ export const createCheckoutSession = async (
     successUrl,
     cancelUrl,
     metadata,
+    subscriptionData,
     interval
   } = params;
 
@@ -87,6 +90,8 @@ export const createCheckoutSession = async (
       ...metadata,
       mode, // Record mode for webhook processing
     },
+    // 在这里注入订单元数据，以保证后续事件处理能根据订单去匹配处理
+    subscription_data: subscriptionData
   };
 
   // Add customer if provided

@@ -71,10 +71,16 @@ export async function POST(request: NextRequest) {
         price_name: priceConfig.priceName,
         credits_granted: priceConfig.credits?.toString() || '',
       },
+      subscriptionData: {
+        metadata: {
+          order_id: orderId,
+          user_id: user.userId,
+        },
+      },
     });
 
     // Create transaction record with session info
-    const _transaction = await transactionService.createTransaction({
+    await transactionService.createTransaction({
       userId: user.userId,
       orderId,
       orderStatus: OrderStatus.CREATED,

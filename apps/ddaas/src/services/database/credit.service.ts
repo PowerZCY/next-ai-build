@@ -1,6 +1,7 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { Credit, CreditUsage } from '@prisma/client';
 import { CreditType, OperationType } from '@/db/constants';
+import { freeExpiredDays } from '@/lib/appConfig';
 
 const prisma = new PrismaClient();
 
@@ -11,11 +12,18 @@ export class CreditService {
     freeCredits: number = 50,
     paidCredits: number = 0
   ): Promise<Credit> {
+    const now = new Date();
+    const freeStart = now;
+    const freeEnd = new Date(now);
+    freeEnd.setDate(freeEnd.getDate() + freeExpiredDays);
+    freeEnd.setHours(23, 59, 59, 999);
     return await prisma.credit.create({
       data: {
         userId,
         balanceFree: freeCredits,
         totalFreeLimit: freeCredits,
+        freeStart: freeStart,
+        freeEnd: freeEnd,
         balancePaid: paidCredits,
         totalPaidLimit: paidCredits,
       },

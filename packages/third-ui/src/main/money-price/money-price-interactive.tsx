@@ -12,7 +12,7 @@ import React, {
   useState
 } from 'react';
 import { MoneyPriceButton } from './money-price-button';
-import { getActiveProviderConfig, getProductPricing } from './money-price-config-util';
+import { getActiveProviderConfigUtil, getProductPricing } from './money-price-config-util';
 import {
   UserState,
   type MoneyPriceInteractiveProps,
@@ -43,7 +43,7 @@ export function MoneyPriceInteractive({
   const { redirectToSignIn, user } = useClerk();
   const router = useRouter();
 
-  const providerConfig = useMemo(() => getActiveProviderConfig(config), [config]);
+  const providerConfig = useMemo(() => getActiveProviderConfigUtil(config), [config]);
   const billingOptions = useMemo(() => {
     const options = data.billingSwitch.options as BillingOption[];
 
