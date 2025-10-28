@@ -904,50 +904,130 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   const transaction = await transactionService.findByPayTransactionId(paymentIntentId);
   if (!transaction) return;
 
-  await prisma.$transaction(async (tx) => {
-    // Update transaction status
-    await tx.transaction.update({
-      where: { orderId: transaction.orderId },
-      data: { orderStatus: OrderStatus.REFUNDED },
-    });
+  if (transaction.orderStatus === OrderStatus.REFUNDED) {
+    console.log(`Transaction already marked refunded: ${transaction.orderId}, skipping.`);
+    return;
+  }
 
-    // Deduct credits based on transaction type
-    if (transaction.type === TransactionType.SUBSCRIPTION) {
+  if (transaction.type === TransactionType.SUBSCRIPTION) {
+    await prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const subscription = transaction.paySubscriptionId
+        ? await tx.subscription.findFirst({
+            where: { paySubscriptionId: transaction.paySubscriptionId },
+          })
+        : null;
+
+      const creditRecord = await tx.credit.findUnique({
+        where: { userId: transaction.userId },
+      });
+
+      const balancePaid = Math.max(creditRecord?.balancePaid ?? 0, 0);
+      const newBalancePaid = 0; // 订阅退款将已付积分全部清零
+      const creditsRemoved = balancePaid - newBalancePaid;
+
+      await tx.transaction.update({
+        where: { orderId: transaction.orderId },
+        data: {
+          orderStatus: OrderStatus.REFUNDED,
+          paymentStatus: PaymentStatus.UN_PAID,
+          payUpdatedAt: now,
+        },
+      });
+
+      if (subscription) {
+        await tx.subscription.update({
+          where: { id: subscription.id },
+          data: {
+            status: SubscriptionStatus.CANCELED,
+            updatedAt: now,
+          },
+        });
+      }
+
       await tx.credit.upsert({
         where: { userId: transaction.userId },
         update: {
-          balancePaid: { decrement: transaction.creditsGranted || 0 },
+          balancePaid: newBalancePaid,
         },
         create: {
           userId: transaction.userId,
-          balancePaid: -(transaction.creditsGranted || 0),
+          balancePaid: newBalancePaid,
         },
       } as any);
-    } else if (transaction.type === TransactionType.ONE_TIME) {
+
+      await tx.creditUsage.create({
+        data: {
+          userId: transaction.userId,
+          feature: OrderStatus.REFUNDED,
+          orderId: transaction.orderId,
+          creditType: CreditType.PAID,
+          operationType: OperationType.CONSUME,
+          creditsUsed: -creditsRemoved,
+        },
+      });
+    });
+
+    console.log(`Subscription refund processed for transaction: ${transaction.orderId}`);
+    return;
+  }
+
+  if (transaction.type === TransactionType.ONE_TIME) {
+    await prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const creditRecord = await tx.credit.findUnique({
+        where: { userId: transaction.userId },
+      });
+
+      const currentBalance = Math.max(creditRecord?.balanceOneTimePaid ?? 0, 0);
+      const granted = Math.max(transaction.creditsGranted ?? 0, 0);
+      const newBalance = Math.max(currentBalance - granted, 0);
+      const creditsRemoved = currentBalance - newBalance;
+
+      await tx.transaction.update({
+        where: { orderId: transaction.orderId },
+        data: {
+          orderStatus: OrderStatus.REFUNDED,
+          paymentStatus: PaymentStatus.UN_PAID,
+          payUpdatedAt: now,
+        },
+      });
+
       await tx.credit.upsert({
         where: { userId: transaction.userId },
         update: {
-          balanceOneTimePaid: { decrement: transaction.creditsGranted || 0 },
+          balanceOneTimePaid: newBalance,
         },
         create: {
           userId: transaction.userId,
-          balanceOneTimePaid: -(transaction.creditsGranted || 0),
+          balanceOneTimePaid: newBalance,
         },
       } as any);
-    }
 
-    // Record credit deduction
-    await tx.creditUsage.create({
-      data: {
-        userId: transaction.userId,
-        feature: OrderStatus.REFUNDED,
-        orderId: transaction.orderId,
-        creditType: CreditType.PAID,
-        operationType: OperationType.CONSUME,
-        creditsUsed: -(transaction.creditsGranted || 0), // Negative to indicate deduction
-      },
+      await tx.creditUsage.create({
+        data: {
+          userId: transaction.userId,
+          feature: OrderStatus.REFUNDED,
+          orderId: transaction.orderId,
+          creditType: CreditType.PAID,
+          operationType: OperationType.CONSUME,
+          creditsUsed: -creditsRemoved,
+        },
+      });
     });
+
+    console.log(`One-time refund processed for transaction: ${transaction.orderId}`);
+    return;
+  }
+  // for other type, not available
+  await prisma.transaction.update({
+    where: { orderId: transaction.orderId },
+    data: {
+      orderStatus: OrderStatus.REFUNDED,
+      paymentStatus: PaymentStatus.UN_PAID,
+      payUpdatedAt: new Date(),
+    },
   });
 
-  console.log(`Refund processed for transaction: ${transaction.orderId}`);
+  console.log(`Refund processed for transaction without credit adjustments: ${transaction.orderId}`);
 }
