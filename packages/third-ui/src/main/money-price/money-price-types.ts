@@ -87,21 +87,19 @@ export interface MoneyPriceProps {
   locale: string;
   config: MoneyPriceConfig;
   className?: string;
-  upgradeApiEndpoint?: string;
+  checkoutApiEndpoint?: string;
   signInPath?: string;
   sectionClassName?: string;
   enabledBillingTypes?: string[];
-  mode?: 'subscription' | 'onetime' | 'mixed';
 }
 
 // 交互组件属性
 export interface MoneyPriceInteractiveProps {
   data: MoneyPriceData;
   config: MoneyPriceConfig;
-  upgradeApiEndpoint?: string;
+  checkoutApiEndpoint?: string;
   signInPath?: string;
   enabledBillingTypes?: string[];
-  mode?: 'subscription' | 'onetime' | 'mixed';
 }
 
 // 按钮组件属性

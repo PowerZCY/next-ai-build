@@ -6,11 +6,10 @@ import type { MoneyPriceProps, MoneyPriceData } from './money-price-types';
 export async function MoneyPrice({
   locale,
   config,
-  upgradeApiEndpoint,
+  checkoutApiEndpoint,
   signInPath,
   sectionClassName,
   enabledBillingTypes,
-  mode
 }: MoneyPriceProps) {
   const t = await getTranslations({ locale, namespace: 'moneyPrice' });
   
@@ -80,10 +79,9 @@ export async function MoneyPrice({
       <MoneyPriceInteractive
         data={data}
         config={config}
-        upgradeApiEndpoint={upgradeApiEndpoint}
+        checkoutApiEndpoint={checkoutApiEndpoint}
         signInPath={signInPath}
         enabledBillingTypes={enabledBillingTypes}
-        mode={mode}
       />
     </section>
   );

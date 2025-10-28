@@ -34,10 +34,9 @@ const PLAN_KEYS: Array<'F1' | 'P2' | 'U3'> = ['F1', 'P2', 'U3'];
 export function MoneyPriceInteractive({
   data,
   config,
-  upgradeApiEndpoint,
+  checkoutApiEndpoint,
   signInPath,
   enabledBillingTypes,
-  mode
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, user } = useClerk();
@@ -195,7 +194,7 @@ export function MoneyPriceInteractive({
   }, [signInPath, redirectToSignIn, router]);
 
   const handleUpgrade = useCallback(async (plan: string, billing: string) => {
-    if (!upgradeApiEndpoint) {
+    if (!checkoutApiEndpoint) {
       router.push('/');
       return;
     }
@@ -209,7 +208,7 @@ export function MoneyPriceInteractive({
         config
       );
 
-      const response = await fetch(upgradeApiEndpoint, {
+      const response = await fetch(checkoutApiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,7 +265,7 @@ export function MoneyPriceInteractive({
     } finally {
       setIsProcessing(false);
     }
-  }, [upgradeApiEndpoint, config, router, signInPath, redirectToSignIn]);
+  }, [checkoutApiEndpoint, config, router, signInPath, redirectToSignIn]);
 
   // 根据当前计费类型动态选择要显示的 plans
   const currentPlans = useMemo(() => {
