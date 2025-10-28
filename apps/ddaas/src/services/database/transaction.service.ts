@@ -17,6 +17,7 @@ export class TransactionService {
     paySubscriptionId?: string;
     paySessionId?: string;
     payInvoiceId?: string;
+    billingReason?: string;
     priceId?: string;
     priceName?: string;
     amount?: number;
@@ -39,6 +40,7 @@ export class TransactionService {
         paySubscriptionId: data.paySubscriptionId,
         paySessionId: data.paySessionId,
         payInvoiceId: data.payInvoiceId,
+        billingReason: data.billingReason,
         priceId: data.priceId,
         priceName: data.priceName,
         amount: data.amount,

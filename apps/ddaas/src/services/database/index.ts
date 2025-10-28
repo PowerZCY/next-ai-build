@@ -26,12 +26,14 @@ export {
   CreditType,
   OperationType,
   PaySupplier,
+  BillingReason,
   isValidUserStatus,
   isValidSubscriptionStatus,
   isValidOrderStatus,
   isValidTransactionType,
   isValidCreditType,
   isValidOperationType,
+  isValidBillingReason,
 } from './constants';
 
 // Export Enum Type Definitions
@@ -43,4 +45,5 @@ export type {
   CreditType as CreditTypeType,
   OperationType as OperationTypeType,
   PaySupplier as PaySupplierType,
+  BillingReason as BillingReasonType,
 } from './constants';

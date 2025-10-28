@@ -47,6 +47,11 @@ export const PaySupplier = {
   PAYPAL: 'Paypal',
 } as const;
 
+export const BillingReason = {
+  SUBSCRIPTION_CREATE: 'subscription_create',
+  SUBSCRIPTION_CYCLE: 'subscription_cycle',
+} as const;
+
 // Type Definitions
 export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 export type SubscriptionStatus = typeof SubscriptionStatus[keyof typeof SubscriptionStatus];
@@ -55,6 +60,7 @@ export type TransactionType = typeof TransactionType[keyof typeof TransactionTyp
 export type CreditType = typeof CreditType[keyof typeof CreditType];
 export type OperationType = typeof OperationType[keyof typeof OperationType];
 export type PaySupplier = typeof PaySupplier[keyof typeof PaySupplier];
+export type BillingReason = typeof BillingReason[keyof typeof BillingReason];
 
 // Validation Functions
 export const isValidUserStatus = (status: string): status is UserStatus => {
@@ -83,4 +89,8 @@ export const isValidOperationType = (type: string): type is OperationType => {
 
 export const isValidPaySupplier = (supplier: string): supplier is PaySupplier => {
   return Object.values(PaySupplier).includes(supplier as PaySupplier);
+};
+
+export const isValidBillingReason = (reason: string): reason is BillingReason => {
+  return Object.values(BillingReason).includes(reason as BillingReason);
 };

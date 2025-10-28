@@ -39,14 +39,41 @@ export async function POST(request: NextRequest) {
 
     console.log(`Received webhook event: ${event.type} | ID: ${event.id}`);
 
-    // 3. Log incoming webhook
-    await Apilogger.logStripeIncoming(event.type, event);
+    // 3. Log incoming webhook and capture log ID for later updates
+    const logId = await Apilogger.logStripeIncoming(event.type, event.id, event);
 
-    // 4. Handle the event
-    await handleStripeEvent(event);
+    try {
+      // 4. Handle the event
+      await handleStripeEvent(event);
 
-    // 5. Return success response
-    return NextResponse.json({ received: true });
+      // 5. Update log with success response
+      const processingResult = {
+        success: true,
+        message: 'Event processed successfully'
+      };
+
+      Apilogger.updateResponse(logId, processingResult);
+
+      return NextResponse.json({ received: true });
+    } catch (handlerError) {
+      console.error('Stripe webhook processing error:', handlerError);
+
+      const errorResult = {
+        success: false,
+        error:
+          handlerError instanceof Error
+            ? handlerError.message
+            : 'Unknown error',
+        stack: handlerError instanceof Error ? handlerError.stack : undefined,
+      };
+
+      Apilogger.updateResponse(logId, errorResult);
+
+      return NextResponse.json(
+        { error: 'Webhook processing failed' },
+        { status: 500 }
+      );
+    }
 
   } catch (error) {
     console.error('Webhook error:', error);

@@ -46,9 +46,14 @@ import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import {
   transactionService,
   subscriptionService,
+  Transaction,
   TransactionType,
   OrderStatus,
-  Transaction,
+  SubscriptionStatus,
+  CreditType,
+  OperationType,
+  PaySupplier,
+  BillingReason,
 } from '@/services/database';
 import { Apilogger } from '@/services/database/apilog.service';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
@@ -236,7 +241,7 @@ async function handleSubscriptionCheckoutInit(
     const existingSubscription = await tx.subscription.findFirst({
       where: {
         userId: transaction.userId,
-        status: 'incomplete', // ← placeholder status
+        status: SubscriptionStatus.INCOMPLETE, // ← placeholder status
       },
     });
 
@@ -301,10 +306,10 @@ async function handleSubscriptionCheckoutInit(
     await tx.creditUsage.create({
       data: {
         userId: transaction.userId,
-        feature: 'subscription',
+        feature: TransactionType.SUBSCRIPTION,
         orderId: transaction.orderId,
-        creditType: 'paid',
-        operationType: 'recharge',
+        creditType: CreditType.PAID,
+        operationType: OperationType.RECHARGE,
         creditsUsed: transaction.creditsGranted || 0,
       },
     });
@@ -368,10 +373,10 @@ async function handleOneTimeCheckout(
     await tx.creditUsage.create({
       data: {
         userId: transaction.userId,
-        feature: 'credit_pack',
+        feature: TransactionType.ONE_TIME,
         orderId: transaction.orderId,
-        creditType: 'paid',
-        operationType: 'recharge',
+        creditType: CreditType.PAID,
+        operationType: OperationType.RECHARGE,
         creditsUsed: transaction.creditsGranted || 0,
       },
     });
@@ -411,8 +416,8 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const subscriptionMetadata = parentDetails.metadata || {};
 
   // 2. Check billing reason to determine payment type
-  const isInitialPayment = invoice.billing_reason === 'subscription_create';
-  const isRenewal = invoice.billing_reason === 'subscription_cycle';
+  const isInitialPayment = invoice.billing_reason === BillingReason.SUBSCRIPTION_CREATE;
+  const isRenewal = invoice.billing_reason === BillingReason.SUBSCRIPTION_CYCLE;
 
   // Only handle initial payments and renewals
   if (!isInitialPayment && !isRenewal) {
@@ -454,33 +459,32 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     periodEnd: subPeriodEnd.toISOString(),
   });
 
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // CASE 1: Initial subscription payment invoice
-    if (isInitialPayment) {
-      // ✅ NEW APPROACH: Use subscription metadata to find the original transaction
-      const orderId = subscriptionMetadata.order_id;
+  if (isInitialPayment) {
+    const orderId = subscriptionMetadata.order_id;
 
-      if (!orderId) {
-        console.warn(
-          `No order_id in subscription metadata for initial invoice ${invoice.id}. ` +
-          `Skipping invoice URL update.`
-        );
-        return;
-      }
+    if (!orderId) {
+      console.warn(
+        `No order_id in subscription metadata for initial invoice ${invoice.id}. ` +
+        `Skipping invoice URL update.`
+      );
+      return;
+    }
 
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Find transaction by order ID (created in session.completed)
       const transaction = await tx.transaction.findUnique({
         where: { orderId },
       });
 
       if (transaction) {
-        // Update transaction with invoice URLs for record keeping
+        // Update transaction with invoice URLs and billing reason for record keeping
         await tx.transaction.update({
           where: { orderId: transaction.orderId },
           data: {
             payInvoiceId: invoice.id,
             hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
             invoicePdf: invoice.invoice_pdf || undefined,
+            billingReason: invoice.billing_reason || undefined,
             payUpdatedAt: new Date(),
           },
         });
@@ -489,9 +493,14 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       } else {
         console.warn(`Transaction not found for order_id: ${orderId}`);
       }
-    }
-    // CASE 2: Subscription renewal
-    else if (isRenewal) {
+    });
+
+    console.log(`Invoice paid event completed: ${invoice.id}`);
+    return;
+  }
+
+  if (isRenewal) {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Find subscription to get user info
       const subscription = await tx.subscription.findFirst({
         where: { paySubscriptionId: subscriptionId },
@@ -527,11 +536,12 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
           userId: subscription.userId,
           orderId: renewalOrderId,
           orderStatus: OrderStatus.SUCCESS,
-          paySupplier: 'Stripe',
+          paySupplier: PaySupplier.STRIPE,
           paySubscriptionId: subscriptionId,
           payInvoiceId: invoice.id,
           hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
           invoicePdf: invoice.invoice_pdf || undefined,
+          billingReason: invoice.billing_reason || undefined,
           payTransactionId: typeof (invoice as any).payment_intent === 'string'
             ? (invoice as any).payment_intent
             : (invoice as any).payment_intent?.id,
@@ -568,19 +578,19 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       await tx.creditUsage.create({
         data: {
           userId: subscription.userId,
-          feature: 'subscription_renewal',
+          feature: `${TransactionType.SUBSCRIPTION}_renewal`,
           orderId: renewalOrderId,
-          creditType: 'paid',
-          operationType: 'recharge',
+          creditType: CreditType.PAID,
+          operationType: OperationType.RECHARGE,
           creditsUsed: renewalCredits,
         },
       });
 
       console.log(`Subscription renewal processed: ${subscription.id}`);
-    }
+    });
 
     console.log(`Invoice paid event completed: ${invoice.id}`);
-  });
+  }
 }
 
 /**
@@ -595,7 +605,7 @@ async function handleSubscriptionDeleted(stripeSubscription: Stripe.Subscription
     return;
   }
 
-  await subscriptionService.updateStatus(subscription.id, 'canceled');
+  await subscriptionService.updateStatus(subscription.id, SubscriptionStatus.CANCELED);
   console.log(`Subscription status updated to canceled: ${subscription.id}`);
 }
 
@@ -623,6 +633,9 @@ async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
 /**
  * Handle invoice payment failed
  *
+ * ARCHITECTURE: Branch logic is outside transaction for clarity.
+ * Each case (initial vs renewal) has its own transaction block.
+ *
  * For initial payment failures: Use subscription metadata to find order_id
  * For renewal failures: Use subscription ID to find subscription, then user info
  */
@@ -637,23 +650,30 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
   const subscriptionId = parentDetails.subscription;
   const subscriptionMetadata = parentDetails.metadata || {};
-  const isInitialPayment = invoice.billing_reason === 'subscription_create';
+  const isInitialPayment = invoice.billing_reason === BillingReason.SUBSCRIPTION_CREATE;
 
-  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-  if (!subscription) {
-    console.warn(`Subscription not found for failed invoice: ${subscriptionId}`);
-    return;
-  }
+  // ===== CASE 1: Initial subscription payment failed =====
+  if (isInitialPayment) {
+    const orderId = subscriptionMetadata.order_id;
 
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // CASE 1: Initial subscription payment failed
-    if (isInitialPayment) {
-      const orderId = subscriptionMetadata.order_id;
+    if (!orderId) {
+      console.warn(
+        `No order_id in subscription metadata for failed initial invoice ${invoice.id}. ` +
+        `Skipping payment failure update.`
+      );
+      return;
+    }
 
-      if (orderId) {
+    return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Find transaction by order ID (created in session.completed or earlier)
+      const transaction = await tx.transaction.findUnique({
+        where: { orderId },
+      });
+
+      if (transaction) {
         // Update the original transaction to FAILED status
         await tx.transaction.update({
-          where: { orderId },
+          where: { orderId: transaction.orderId },
           data: {
             orderStatus: OrderStatus.FAILED,
             payInvoiceId: invoice.id,
@@ -663,60 +683,70 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         });
 
         console.log(`Initial subscription payment failed for order: ${orderId}`);
+      } else {
+        console.warn(`Transaction not found for order_id: ${orderId}`);
       }
-    }
-    // CASE 2: Subscription renewal payment failed
-    else {
-      // Create failed renewal transaction record for tracking
-      const failedOrderId = `order_renew_failed_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+    });
+  }
 
-      await tx.transaction.create({
-        data: {
-          userId: subscription.userId,
-          orderId: failedOrderId,
-          orderStatus: OrderStatus.FAILED,
-          paySupplier: 'Stripe',
-          paySubscriptionId: subscriptionId,
-          payInvoiceId: invoice.id,
-          payTransactionId: typeof (invoice as any).payment_intent === 'string'
-            ? (invoice as any).payment_intent
-            : (invoice as any).payment_intent?.id,
-          priceId: subscription.priceId,
-          priceName: subscription.priceName,
-          type: TransactionType.SUBSCRIPTION,
-          amount: invoice.amount_due / 100, // Convert cents to dollars
-          currency: invoice.currency.toUpperCase(),
-          creditsGranted: 0, // No credits granted on failed payment
-          paidAt: new Date(invoice.created * 1000),
-          payUpdatedAt: new Date(),
-          orderDetail: 'Subscription renewal payment failed',
-        },
-      });
+  // ===== CASE 2: Subscription renewal payment failed =====
+  // For renewals, we need the subscription to get user info
+  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
+  if (!subscription) {
+    console.warn(`Subscription not found for failed renewal invoice: ${subscriptionId}`);
+    return;
+  }
 
-      // Record failed renewal in credit usage for audit trail
-      await tx.creditUsage.create({
-        data: {
-          userId: subscription.userId,
-          feature: 'subscription_renewal_failed',
-          orderId: failedOrderId,
-          creditType: 'paid',
-          operationType: 'consume',
-          creditsUsed: 0, // Mark as failed operation
-        },
-      });
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // Create failed renewal transaction record for tracking
+    const failedOrderId = `order_renew_failed_${Date.now()}_${Math.random().toString(36).substring(2)}`;
 
-      // Update subscription status to past_due
-      await tx.subscription.update({
-        where: { id: subscription.id },
-        data: {
-          status: 'past_due',
-          updatedAt: new Date(),
-        },
-      });
+    await tx.transaction.create({
+      data: {
+        userId: subscription.userId,
+        orderId: failedOrderId,
+        orderStatus: OrderStatus.FAILED,
+        paySupplier: PaySupplier.STRIPE,
+        paySubscriptionId: subscriptionId,
+        payInvoiceId: invoice.id,
+        billingReason: invoice.billing_reason || undefined,
+        payTransactionId: typeof (invoice as any).payment_intent === 'string'
+          ? (invoice as any).payment_intent
+          : (invoice as any).payment_intent?.id,
+        priceId: subscription.priceId,
+        priceName: subscription.priceName,
+        type: TransactionType.SUBSCRIPTION,
+        amount: invoice.amount_due / 100, // Convert cents to dollars
+        currency: invoice.currency.toUpperCase(),
+        creditsGranted: 0, // No credits granted on failed payment
+        paidAt: new Date(invoice.created * 1000),
+        payUpdatedAt: new Date(),
+        orderDetail: 'Subscription renewal payment failed',
+      },
+    });
 
-      console.log(`Subscription renewal failed and recorded: ${subscription.id}, orderId: ${failedOrderId}`);
-    }
+    // Record failed renewal in credit usage for audit trail
+    await tx.creditUsage.create({
+      data: {
+        userId: subscription.userId,
+        feature: `${TransactionType.SUBSCRIPTION}_renewal_failed`,
+        orderId: failedOrderId,
+        creditType: CreditType.PAID,
+        operationType: OperationType.RECHARGE,
+        creditsUsed: 0, // Mark as failed operation
+      },
+    });
 
+    // Update subscription status to past_due
+    await tx.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        status: SubscriptionStatus.PAST_DUE,
+        updatedAt: new Date(),
+      },
+    });
+
+    console.log(`Subscription renewal failed and recorded: ${subscription.id}, orderId: ${failedOrderId}`);
     console.log(`Invoice payment failed event completed: ${invoice.id}`);
   });
 }
@@ -730,7 +760,7 @@ async function handleSubscriptionCreated(stripeSubscription: Stripe.Subscription
 }
 
 /**
- * Handle subscription updated
+ * Handle subscription updated  TODO
  */
 async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
   console.log(`Subscription updated: ${stripeSubscription.id}`);
@@ -837,10 +867,10 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     await tx.creditUsage.create({
       data: {
         userId: transaction.userId,
-        feature: 'refund',
+        feature: OrderStatus.REFUNDED,
         orderId: transaction.orderId,
-        creditType: 'paid',
-        operationType: 'consume',
+        creditType: CreditType.PAID,
+        operationType: OperationType.CONSUME,
         creditsUsed: -(transaction.creditsGranted || 0), // Negative to indicate deduction
       },
     });

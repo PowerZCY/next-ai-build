@@ -102,8 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the incoming webhook
-    const logId = await Apilogger.logClerkIncoming(`webhook.${event.type}`, {
-      event_type: event.type,
+    const logId = await Apilogger.logClerkIncoming(`${event.type}`, {
       clerk_user_id: event.data.id,
       email: event.data.email_addresses?.[0]?.email_address,
       fingerprint_id: event.data.unsafe_metadata?.fingerprint_id
@@ -124,7 +123,7 @@ export async function POST(request: NextRequest) {
           break;
         default:
           console.log(`Unhandled event type: ${type}`);
-          processingResult = { success: false, message: `Unhandled event type: ${type}` };
+          processingResult = { success: false, message: `Unhandled event type: ${type}`};
       }
 
       // Update response in log
