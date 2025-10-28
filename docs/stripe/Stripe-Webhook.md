@@ -280,3 +280,16 @@ flowchart TD
     B13 --> B14[更新 order.refunded_at<br/>发送退款邮件]
 ```
 
+## 幂等性控制
+
+1. checkout.session.completed / checkout.session.async_payment_succeeded：已通过订单状态与 paymentStatus 拦截重复处理，重复事件不会再次分配积分或更新订单
+2. checkout.session.async_payment_failed：会先检查订单是否已成功，再将状态置为 failed，重复事件安全
+3. invoice.paid（首次开通）：只更新发票相关字段，重复事件写入相同值，可视为幂等
+4. invoice.paid（续费成功）：校验发票ID，同一张发票不允许重复生成续费订单、累加积分、记 credit_usage
+5. invoice.payment_failed（续费失败）：校验发票ID，同一张发票不允许重复生成失败订单与 usage 记录，需要幂等保护
+6. charge.refunded：订单状态校验、积分安全扣减与订阅取消逻辑，重复退款事件不会再产生额外影响
+7. customer.subscription.created，主要做状态覆盖或简单更新，当前逻辑基本幂等
+8. customer.subscription.updated，主要做状态覆盖或简单更新，当前逻辑基本幂等
+9. customer.subscription.deleted，主要做状态覆盖或简单更新，当前逻辑基本幂等
+10. payment_intent.succeeded，主要做状态覆盖或简单更新，当前逻辑基本幂等
+11. payment_intent.payment_failed，主要做状态覆盖或简单更新，当前逻辑基本幂等

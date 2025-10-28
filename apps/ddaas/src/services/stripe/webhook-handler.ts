@@ -548,7 +548,18 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   }
 
   if (isRenewal) {
+    const renewalOrderId = `order_renew_${invoice.id}`;
+
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const existingOrder = await tx.transaction.findUnique({
+        where: { orderId: renewalOrderId },
+      });
+
+      if (existingOrder) {
+        console.log(`Renewal invoice ${invoice.id} already processed as ${existingOrder.orderId}, skipping.`);
+        return;
+      }
+
       // Find subscription to get user info
       const subscription = await tx.subscription.findFirst({
         where: { paySubscriptionId: subscriptionId },
@@ -568,9 +579,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
           updatedAt: new Date(),
         },
       });
-
-      // Create new renewal transaction record
-      const renewalOrderId = `order_renew_${Date.now()}_${Math.random().toString(36).substring(2)}`;
 
       // Get credits from current price configuration (handles plan upgrades/downgrades)
       const creditsForRenewal = subscription.priceId
@@ -635,7 +643,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         },
       });
 
-      console.log(`Subscription renewal processed: ${subscription.id}`);
+      console.log(`Subscription renewal processed: ${subscription.id}, orderId: ${renewalOrderId}`);
     });
 
     console.log(`Invoice paid event completed: ${invoice.id}`);
@@ -766,10 +774,19 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     return;
   }
 
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // Create failed renewal transaction record for tracking
-    const failedOrderId = `order_renew_failed_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+  const failedOrderId = `order_renew_failed_${invoice.id}`;
 
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const existingFailure = await tx.transaction.findUnique({
+      where: { orderId: failedOrderId },
+    });
+
+    if (existingFailure) {
+      console.log(`Renewal failure for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
+      return;
+    }
+
+    // Create failed renewal transaction record for tracking
     await tx.transaction.create({
       data: {
         userId: subscription.userId,
@@ -923,7 +940,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
       });
 
       const balancePaid = Math.max(creditRecord?.balancePaid ?? 0, 0);
-      const newBalancePaid = 0; // 订阅退款将已付积分全部清零
+      const newBalancePaid = 0; // Reset paid balance to zero on subscription refund
       const creditsRemoved = balancePaid - newBalancePaid;
 
       await tx.transaction.update({
