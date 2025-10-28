@@ -293,3 +293,114 @@ flowchart TD
 9. customer.subscription.deleted，主要做状态覆盖或简单更新，当前逻辑基本幂等
 10. payment_intent.succeeded，主要做状态覆盖或简单更新，当前逻辑基本幂等
 11. payment_intent.payment_failed，主要做状态覆盖或简单更新，当前逻辑基本幂等
+
+
+## 退款与争议处理
+
+### 退款流程
+
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant Merchant as 商家 (你)
+    participant Stripe as Stripe Dashboard
+    participant Bank as 银行/支付方式
+    participant Webhook as 你的 Webhook
+
+    User->>Merchant: 发邮件：请求退款
+    Merchant->>Stripe: 在 Dashboard 点击 "Refund"
+    Stripe->>Stripe: 创建 Refund 对象
+    Stripe->>Bank: 发起退款指令
+    Bank-->>Stripe: 退款处理中（1-10 天）
+    Stripe->>Webhook: 触发 charge.refunded 事件
+    Webhook->>Merchant: 更新订单状态为 refunded
+    Bank-->>User: 钱回到账（银行卡/余额）
+```
+
+### 支付方式特点
+| 支付方式 | 同步/异步 | 说明 | `payment_status` | 是否激活 | 退款到账时间 |
+|--------|----------|------|--------------------------------------------------|------------------|-------------|
+| **信用卡（Visa, MasterCard, Amex 等）** | 同步 | 实时扣款，秒级确认 | `paid` | 是 | 5–10 个工作日 |
+| **Apple Pay** | 同步 | 实时授权 | `paid` | 是 | 1–3 个工作日 |
+| **Google Pay** | 同步 | 实时授权 | `paid` | 是 | 1–3 个工作日 |
+| **Link by Stripe** | 同步 | 基于卡的快速支付 | `paid` | 是 | 5–10 个工作日 |
+| **Alipay（国际卡）** | 同步 | 实时 | `paid` | 是 | 1–3 个工作日 |
+| **WeChat Pay（国际卡）** | 同步 | 实时 | `paid` | 是 | 1–3 个工作日 |
+| **GrabPay** | 同步 | 实时 | `paid` | 是 | 1–3 个工作日 |
+| **FPX（马来西亚）** | 同步 | 实时银行转账 | `paid` | 是 | 1–3 个工作日 |
+| **SEPA Direct Debit** | 异步 | 1–5 天到账 | `unpaid` | 否（需等 `async_payment_succeeded`） | 5–7 个工作日 |
+| **ACH Direct Debit（美国）** | 异步 | 2–5 天到账 | `unpaid` | 否 | 2–5 个工作日 |
+| **Bacs Direct Debit（英国）** | 异步 | 3 天到账 | `unpaid` | 否 | 3–5 个工作日 |
+| **iDEAL（荷兰）** | 异步 | 银行跳转，1–2 天 | `unpaid` | 否 | 1–3 个工作日 |
+| **Bancontact（比利时）** | 异步 | 银行跳转 | `unpaid` | 否 | 1–3 个工作日 |
+| **Przelewy24（波兰）** | 异步 | 银行跳转 | `unpaid` | 否 | 1–3 个工作日 |
+| **Konbini（日本便利店）** | 异步 | 用户需去便利店付款 | `unpaid` | 否 | 1–3 个工作日 |
+| **Boleto（巴西）** | 异步 | 1–3 天到账 | `unpaid` | 否 | 1–3 个工作日 |
+| **OXXO（墨西哥）** | 异步 | 1–3 天到账 | `unpaid` | 否 | 1–3 个工作日 |
+| **Afterpay / Clearpay** | 异步 | 分期支付，需审核 | `unpaid` | 否 | 按分期计划退款 |
+
+## Stripe概念
+
+| 对象 | 一句话解释 | 真实作用 |
+|------|-----------|--------|
+| **Balance** | 你的 Stripe 钱包余额 | 账户中可提现的净资金（收入 - 退款 - 费用） |
+| **Balance Transactions** | 钱的每笔进出记录 | 详细流水：收入、退款、费用、提现、拒付 |
+| **Charges** | 用户付钱的原始小票 | 每次成功扣款的原始记录，不可变 |
+| **Disputes** | 用户找银行投诉的退款 | 银行强制扣款，需提供证据反驳 |
+| **Mandates** | 长期扣款的银行授权书 | 允许 Stripe 代表你重复扣款（如订阅） |
+| **Payment Intents** | 一次支付的完整指令 | 管理支付全流程（创建 → 认证 → 确认） |
+| **Payouts** | 把钱转到你银行的工资单 | 从 Balance 提现至银行账户 |
+| **Refunds** | 你主动退给用户的钱 | 商家发起的退款，扣减 Balance |
+
+```mermaid
+sequenceDiagram
+    participant User as 小明（用户）
+    participant You as 你（商家）
+    participant Stripe as Stripe 系统
+    participant Bank as 银行
+
+    %% 订阅首次支付（创建 Mandate）
+    User->>You: 订阅每月 ¥99 咖啡套餐
+    You->>Stripe: 创建 Subscription + Payment Intent (SEPA)
+    Stripe->>User: 跳转 Checkout，输入 IBAN
+    User->>Stripe: 提交
+    Stripe->>Stripe: 创建 Mandate（银行授权书）
+    Stripe->>Bank: 首次扣款指令
+    Bank-->>Stripe: 扣款成功
+    Stripe->>Stripe: 创建 Charge（收款小票）
+    Stripe->>Balance: +¥99
+    Stripe->>Balance Transactions: +99 收入
+    Stripe->>You: charge.succeeded
+
+    %% 每月自动续订（复用 Mandate）
+    Note over Stripe: 第30天
+    Stripe->>Bank: 使用同一 Mandate 扣款
+    Bank-->>Stripe: 成功
+    Stripe->>Stripe: 创建新 Charge
+    Stripe->>Balance: +¥99
+    Stripe->>Balance Transactions: +99 收入
+    Stripe->>You: invoice.paid
+
+    %% 用户退款
+    User->>You: 退款请求
+    You->>Stripe: 创建 Refund
+    Stripe->>Balance: -¥99
+    Stripe->>Balance Transactions: -99 退款
+    Stripe->>You: charge.refunded
+
+    %% 提现
+    You->>Stripe: 申请提现
+    Stripe->>Stripe: 创建 Payout
+    Stripe->>Balance: -¥1000
+    Stripe->>Balance Transactions: -1000 提现
+    Stripe->>Bank: 转账
+    Bank-->>You: 收到钱
+
+    %% 拒付
+    User->>Bank: 发起拒付
+    Bank->>Stripe: 强制扣款
+    Stripe->>Stripe: 创建 Dispute
+    Stripe->>Balance: -¥99
+    Stripe->>Balance Transactions: -99 拒付
+    Stripe->>You: charge.dispute.created
+```
