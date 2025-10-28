@@ -8,7 +8,8 @@ import {
   transactionService,
   TransactionType,
   OrderStatus,
-  PaySupplier
+  PaySupplier,
+  PaymentStatus
 } from '@/services/database';
 import { ApiAuthUtils } from '@/lib/auth-utils';
 import { getPriceConfig } from '@/lib/money-price-config';
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
       userId: user.userId,
       orderId,
       orderStatus: OrderStatus.CREATED,
+      paymentStatus: PaymentStatus.UN_PAID,
       paySupplier: PaySupplier.STRIPE,
       paySessionId: session.id,
       priceId,

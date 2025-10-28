@@ -54,11 +54,29 @@ import {
   OperationType,
   PaySupplier,
   BillingReason,
+  PaymentStatus,
 } from '@/services/database';
 import { Apilogger } from '@/services/database/apilog.service';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
 
 const prisma = new PrismaClient();
+
+const mapPaymentStatus = (
+  status?: Stripe.Checkout.Session.PaymentStatus | null
+): PaymentStatus => {
+  switch (status) {
+    case 'paid':
+      return PaymentStatus.PAID;
+    case 'no_payment_required':
+      return PaymentStatus.NO_PAYMENT_REQUIRED;
+    case 'unpaid':
+    default:
+      return PaymentStatus.UN_PAID;
+  }
+};
+
+const isPaymentSettled = (paymentStatus: PaymentStatus) =>
+  paymentStatus === PaymentStatus.PAID || paymentStatus === PaymentStatus.NO_PAYMENT_REQUIRED;
 
 /**
  * Main event handler - routes events to specific handlers
@@ -138,12 +156,38 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw new Error(`Transaction not found: ${orderId}`);
   }
 
+  if (transaction.orderStatus === OrderStatus.SUCCESS) {
+    console.log(`Transaction already processed successfully: ${transaction.orderId}, skipping.`);
+    return;
+  }
+
+  // Stripe docs: checkout.session.completed fires even when payment is pending for async methods
+  // https://stripe.com/docs/payments/checkout/one-time#webhooks
+  const paymentStatus = mapPaymentStatus(session.payment_status);
+
+  if (!isPaymentSettled(paymentStatus)) {
+    console.log(
+      `Checkout session ${session.id} payment incomplete (status=${session.payment_status}), awaiting async confirmation.`
+    );
+
+    if (
+      transaction.orderStatus === OrderStatus.CREATED ||
+      transaction.orderStatus === OrderStatus.PENDING_UNPAID
+    ) {
+      await transactionService.updateStatus(orderId, OrderStatus.PENDING_UNPAID, {
+        payUpdatedAt: new Date(),
+        paymentStatus,
+      });
+    }
+    return;
+  }
+
   // 2. Route based on transaction type
   if (transaction.type === TransactionType.SUBSCRIPTION) {
     // For subscriptions, store session info and wait for invoice.paid
-    return await handleSubscriptionCheckoutInit(session, transaction);
+    return await handleSubscriptionCheckoutInit(session, transaction, paymentStatus);
   } else if (transaction.type === TransactionType.ONE_TIME) {
-    return await handleOneTimeCheckout(session, transaction);
+    return await handleOneTimeCheckout(session, transaction, paymentStatus);
   } else {
     throw new Error(`Unknown transaction type: ${transaction.type}`);
   }
@@ -170,7 +214,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
  */
 async function handleSubscriptionCheckoutInit(
   session: Stripe.Checkout.Session,
-  transaction: Transaction
+  transaction: Transaction,
+  paymentStatus: PaymentStatus
 ) {
   console.log(`Processing subscription checkout: ${session.id}`);
 
@@ -272,6 +317,7 @@ async function handleSubscriptionCheckoutInit(
       where: { orderId: transaction.orderId },
       data: {
         orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
+        paymentStatus,
         paySubscriptionId: subscriptionId,
         paySessionId: session.id,
         paidEmail: session.customer_details?.email,
@@ -327,7 +373,8 @@ async function handleSubscriptionCheckoutInit(
  */
 async function handleOneTimeCheckout(
   session: Stripe.Checkout.Session,
-  transaction: Transaction
+  transaction: Transaction,
+  paymentStatus: PaymentStatus
 ) {
   console.log(`Processing one-time payment checkout: ${session.id}`);
 
@@ -337,6 +384,7 @@ async function handleOneTimeCheckout(
       where: { orderId: transaction.orderId },
       data: {
         orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
+        paymentStatus,
         payTransactionId: session.payment_intent as string,
         paidAt: new Date(),
         paidEmail: session.customer_details?.email,
@@ -514,7 +562,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       await tx.subscription.update({
         where: { id: subscription.id },
         data: {
-          status: 'active',
+          status: SubscriptionStatus.ACTIVE,
           subPeriodStart,
           subPeriodEnd,
           updatedAt: new Date(),
@@ -536,6 +584,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
           userId: subscription.userId,
           orderId: renewalOrderId,
           orderStatus: OrderStatus.SUCCESS,
+          paymentStatus: PaymentStatus.PAID,
           paySupplier: PaySupplier.STRIPE,
           paySubscriptionId: subscriptionId,
           payInvoiceId: invoice.id,
@@ -614,8 +663,11 @@ async function handleSubscriptionDeleted(stripeSubscription: Stripe.Subscription
  */
 async function handleAsyncPaymentSucceeded(session: Stripe.Checkout.Session) {
   console.log(`Async payment succeeded: ${session.id}`);
-  // Similar to checkout.session.completed
-  return await handleCheckoutCompleted(session);
+
+  // Retrieve the latest session state to ensure payment_status is up to date
+  const latestSession = await stripe.checkout.sessions.retrieve(session.id);
+
+  return await handleCheckoutCompleted(latestSession);
 }
 
 /**
@@ -627,7 +679,23 @@ async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
 
-  await transactionService.updateStatus(orderId, OrderStatus.FAILED);
+  const transaction = await transactionService.findByOrderId(orderId);
+  if (!transaction) {
+    console.warn(`Transaction not found for async payment failure, orderId=${orderId}`);
+    return;
+  }
+
+  if (transaction.orderStatus === OrderStatus.SUCCESS) {
+    console.warn(
+      `Received async payment failed for already successful order ${orderId}, ignoring.`
+    );
+    return;
+  }
+
+  await transactionService.updateStatus(orderId, OrderStatus.FAILED, {
+    payUpdatedAt: new Date(),
+    paymentStatus: PaymentStatus.UN_PAID,
+  });
 }
 
 /**
@@ -676,6 +744,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
           where: { orderId: transaction.orderId },
           data: {
             orderStatus: OrderStatus.FAILED,
+            paymentStatus: PaymentStatus.UN_PAID,
             payInvoiceId: invoice.id,
             payUpdatedAt: new Date(),
             orderDetail: 'Initial subscription payment failed',
@@ -706,6 +775,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         userId: subscription.userId,
         orderId: failedOrderId,
         orderStatus: OrderStatus.FAILED,
+        paymentStatus: PaymentStatus.UN_PAID,
         paySupplier: PaySupplier.STRIPE,
         paySubscriptionId: subscriptionId,
         payInvoiceId: invoice.id,
@@ -811,7 +881,10 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
   // Find transaction by payment intent ID
   const transaction = await transactionService.findByPayTransactionId(paymentIntent.id);
   if (transaction) {
-    await transactionService.updateStatus(transaction.orderId, OrderStatus.FAILED);
+    await transactionService.updateStatus(transaction.orderId, OrderStatus.FAILED, {
+      paymentStatus: PaymentStatus.UN_PAID,
+      payUpdatedAt: new Date(),
+    });
   }
 }
 

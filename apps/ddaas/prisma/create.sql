@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     currency             VARCHAR(10),
     credits_granted      INTEGER      NOT NULL DEFAULT 0,
     pay_invoice_id       VARCHAR(255),
+    payment_status       VARCHAR(20)  NOT NULL DEFAULT 'un_paid',
     billing_reason       VARCHAR(50),
     hosted_invoice_url   TEXT,
     invoice_pdf          TEXT,
@@ -102,9 +103,10 @@ CREATE TABLE IF NOT EXISTS public.transactions (
         REFERENCES public.users (user_id)
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT transactions_order_status_check CHECK (order_status::text = ANY (ARRAY['created'::character varying, 'success'::character varying, 'refunded'::character varying, 'canceled'::character varying, 'failed'::character varying]::text[])),
+    CONSTRAINT transactions_order_status_check CHECK (order_status::text = ANY (ARRAY['created'::character varying, 'pending_unpaid'::character varying, 'success'::character varying, 'refunded'::character varying, 'canceled'::character varying, 'failed'::character varying]::text[])),
     CONSTRAINT transactions_pay_supplier_check CHECK (pay_supplier::text = ANY (ARRAY['Stripe'::character varying, 'Apple'::character varying, 'Paypal'::character varying]::text[])),
     CONSTRAINT transactions_type_check CHECK (type::text = ANY (ARRAY['subscription'::character varying, 'one_time'::character varying]::text[])),
+    CONSTRAINT transactions_payment_status_check CHECK (payment_status::text = ANY (ARRAY['un_paid'::character varying, 'paid'::character varying, 'no_payment_required'::character varying]::text[])),
     CONSTRAINT transactions_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
 );
 

@@ -18,6 +18,7 @@ export const SubscriptionStatus = {
 
 export const OrderStatus = {
   CREATED: 'created',
+  PENDING_UNPAID: 'pending_unpaid',
   SUCCESS: 'success',
   REFUNDED: 'refunded',
   CANCELED: 'canceled',
@@ -52,6 +53,12 @@ export const BillingReason = {
   SUBSCRIPTION_CYCLE: 'subscription_cycle',
 } as const;
 
+export const PaymentStatus = {
+  PAID: 'paid',
+  UN_PAID: 'un_paid',
+  NO_PAYMENT_REQUIRED: 'no_payment_required',
+} as const;
+
 // Type Definitions
 export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
 export type SubscriptionStatus = typeof SubscriptionStatus[keyof typeof SubscriptionStatus];
@@ -61,6 +68,7 @@ export type CreditType = typeof CreditType[keyof typeof CreditType];
 export type OperationType = typeof OperationType[keyof typeof OperationType];
 export type PaySupplier = typeof PaySupplier[keyof typeof PaySupplier];
 export type BillingReason = typeof BillingReason[keyof typeof BillingReason];
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
 
 // Validation Functions
 export const isValidUserStatus = (status: string): status is UserStatus => {
@@ -93,4 +101,8 @@ export const isValidPaySupplier = (supplier: string): supplier is PaySupplier =>
 
 export const isValidBillingReason = (reason: string): reason is BillingReason => {
   return Object.values(BillingReason).includes(reason as BillingReason);
+};
+
+export const isValidPaymentStatus = (status: string): status is PaymentStatus => {
+  return Object.values(PaymentStatus).includes(status as PaymentStatus);
 };

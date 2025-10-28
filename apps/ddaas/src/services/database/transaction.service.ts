@@ -2,7 +2,7 @@
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { Transaction } from '@prisma/client';
-import { OrderStatus, TransactionType, PaySupplier } from '@/db/constants';
+import { OrderStatus, TransactionType, PaySupplier, PaymentStatus } from '@/db/constants';
 
 const prisma = new PrismaClient();
 
@@ -12,6 +12,7 @@ export class TransactionService {
     userId: string;
     orderId: string;
     orderStatus?: string;
+    paymentStatus?: string;
     paySupplier?: PaySupplier;
     payTransactionId?: string;
     paySubscriptionId?: string;
@@ -34,6 +35,7 @@ export class TransactionService {
         userId: data.userId,
         orderId: data.orderId,
         orderStatus: data.orderStatus || OrderStatus.CREATED,
+        paymentStatus: data.paymentStatus || PaymentStatus.UN_PAID,
         orderExpiredAt: data.orderExpiredAt || new Date(Date.now() + 30 * 60 * 1000), // 默认30分钟过期
         paySupplier: data.paySupplier,
         payTransactionId: data.payTransactionId,
@@ -129,6 +131,7 @@ export class TransactionService {
       paidEmail?: string;
       paidDetail?: string;
       payUpdatedAt?: Date;
+      paymentStatus?: string;
     }
   ): Promise<Transaction> {
     const updateData: Prisma.TransactionUpdateInput = {
@@ -153,6 +156,7 @@ export class TransactionService {
       paidDetail?: string;
       creditsGranted?: number;
       payUpdatedAt?: Date;
+      paymentStatus?: string;
     }
   ): Promise<Transaction> {
     return await prisma.transaction.update({
@@ -165,6 +169,7 @@ export class TransactionService {
         paidDetail: paymentData.paidDetail,
         creditsGranted: paymentData.creditsGranted,
         payUpdatedAt: paymentData.payUpdatedAt,
+        paymentStatus: paymentData.paymentStatus || PaymentStatus.PAID,
       },
     });
   }
@@ -206,6 +211,7 @@ export class TransactionService {
       data: {
         orderStatus: OrderStatus.CANCELED,
         orderDetail: reason || 'User canceled',
+        paymentStatus: PaymentStatus.UN_PAID,
       },
     });
   }
@@ -236,6 +242,7 @@ export class TransactionService {
       data: {
         orderStatus: OrderStatus.FAILED,
         orderDetail: 'Order expired',
+        paymentStatus: PaymentStatus.UN_PAID,
       },
     });
 

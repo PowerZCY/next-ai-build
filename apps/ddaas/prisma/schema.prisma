@@ -94,6 +94,7 @@ model Transaction {
   currency          String?   @db.VarChar(10)
   creditsGranted    Int?      @default(0) @map("credits_granted")
   payInvoiceId      String?   @map("pay_invoice_id") @db.VarChar(255)
+  paymentStatus String    @default("un_paid") @map("payment_status") @db.VarChar(20)
   billingReason     String?   @map("billing_reason") @db.VarChar(50)
   hostedInvoiceUrl  String?   @map("hosted_invoice_url") @db.Text
   invoicePdf        String?   @map("invoice_pdf") @db.Text
