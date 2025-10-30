@@ -1,37 +1,10 @@
 import Stripe from 'stripe';
-import { Apilogger } from '@/db/index';
+import { Apilogger, userService } from '@/db/index';
 
 // Stripe Configuration
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
 });
-
-// Webhook Configuration
-export const STRIPE_WEBHOOK_EVENTS = [
-  // Checkout events (both subscription and one-time payment)
-  'checkout.session.completed',
-  'checkout.session.async_payment_succeeded',
-  'checkout.session.async_payment_failed',
-
-  // Invoice events (subscription only)
-  'invoice.paid',
-  'invoice.payment_failed',
-  'invoice.payment_action_required',
-
-  // Subscription events
-  'customer.subscription.created',
-  'customer.subscription.updated',
-  'customer.subscription.deleted',
-  'customer.subscription.paused',
-  'customer.subscription.resumed',
-
-  // Payment Intent events (one-time payment only)
-  'payment_intent.succeeded',
-  'payment_intent.payment_failed',
-
-  // Refund events
-  'charge.refunded',
-] as const;
 
 // Helper function to validate webhook signature
 export const validateStripeWebhook = (
@@ -131,21 +104,54 @@ export const createCheckoutSession = async (
 
 // Helper function to create or retrieve customer
 export const createOrGetCustomer = async (params: {
-  email?: string;
   userId: string;
-  name?: string;
-}): Promise<Stripe.Customer> => {
-  const { email, userId, name } = params;
+}): Promise<string> => {
+  const { userId } = params;
 
-  // 先尝试查找现有客户
-  if (email) {
+  const user = await userService.findByUserId(userId);
+
+  if (!user) {
+    throw new Error(`User not found for userId: ${userId}`);
+  }
+
+  const setStripeCustomerId = async (stripeCusId: string | null) => {
+    try {
+      await userService.updateStripeCustomerId(userId, stripeCusId);
+    } catch (error) {
+      console.error('Failed to update stripe customer id', { userId, stripeCusId, error });
+    }
+  };
+
+  if (user.stripeCusId) {
+    try {
+      const customer = await stripe.customers.retrieve(user.stripeCusId);
+      if ('deleted' in customer) {
+        await setStripeCustomerId(null);
+      } else {
+        return customer.id;
+      }
+    } catch (error) {
+      await setStripeCustomerId(null);
+      console.warn('Failed to retrieve Stripe customer, fallback to lookup by email', {
+        userId,
+        stripeCusId: user.stripeCusId,
+        error,
+      });
+    }
+  }
+
+  if (user.email) {
     const existingCustomers = await stripe.customers.list({
-      email,
+      email: user.email,
       limit: 1,
     });
 
     if (existingCustomers.data.length > 0) {
-      return existingCustomers.data[0];
+      const stripeCustomer = existingCustomers.data[0];
+      if (!user.stripeCusId || user.stripeCusId !== stripeCustomer.id) {
+        await setStripeCustomerId(stripeCustomer.id);
+      }
+      return stripeCustomer.id;
     }
   }
 
@@ -156,19 +162,24 @@ export const createOrGetCustomer = async (params: {
     },
   };
 
-  if (email) {
-    customerParams.email = email;
+  if (user.email) {
+    customerParams.email = user.email;
   }
-
-  if (name) {
-    customerParams.name = name;
+  const derivedName = user.email ? user.email.split('@')[0] : undefined;
+  if (derivedName) {
+    customerParams.name = derivedName;
   }
 
   // Create log record with request
-  const logId = await Apilogger.logStripeOutgoing('createCustomer', params);
+  const logId = await Apilogger.logStripeOutgoing('createCustomer', {
+    userId,
+    email: customerParams.email,
+    name: customerParams.name,
+  });
   
   try {
     const customer = await stripe.customers.create(customerParams);
+    await setStripeCustomerId(customer.id);
     
     // Update log record with response
     Apilogger.updateResponse(logId, {
@@ -176,7 +187,7 @@ export const createOrGetCustomer = async (params: {
       email: customer.email
     });
     
-    return customer;
+    return customer.id;
   } catch (error) {
     // Update log record with error
     Apilogger.updateResponse(logId, {

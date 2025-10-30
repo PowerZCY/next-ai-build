@@ -11,6 +11,7 @@ export class UserService {
   async createUser(data: {
     fingerprintId?: string;
     clerkUserId?: string;
+    stripeCusId?: string;
     email?: string;
     status?: string;
   }): Promise<User> {
@@ -18,6 +19,7 @@ export class UserService {
       data: {
         fingerprintId: data.fingerprintId,
         clerkUserId: data.clerkUserId,
+        stripeCusId: data.stripeCusId,
         email: data.email,
         status: data.status || UserStatus.ANONYMOUS,
       },
@@ -33,6 +35,7 @@ export class UserService {
         userId: true,
         fingerprintId: true,
         clerkUserId: true,
+        stripeCusId: true,
         email: true,
         status: true,
         createdAt: true,
@@ -56,6 +59,7 @@ export class UserService {
         userId: true,
         fingerprintId: true,
         clerkUserId: true,
+        stripeCusId: true,
         email: true,
         status: true,
         createdAt: true,
@@ -79,6 +83,7 @@ export class UserService {
         userId: true,
         fingerprintId: true,
         clerkUserId: true,
+        stripeCusId: true,
         email: true,
         status: true,
         createdAt: true,
@@ -98,6 +103,7 @@ export class UserService {
         userId: true,
         fingerprintId: true,
         clerkUserId: true,
+        stripeCusId: true,
         email: true,
         status: true,
         createdAt: true,
@@ -120,6 +126,16 @@ export class UserService {
     return await prisma.user.update({
       where: { userId },
       data,
+    });
+  }
+
+  async updateStripeCustomerId(
+    userId: string,
+    stripeCusId: string | null
+  ): Promise<User> {
+    return await prisma.user.update({
+      where: { userId },
+      data: { stripeCusId },
     });
   }
 
@@ -149,6 +165,7 @@ export class UserService {
         status: UserStatus.DELETED,
         email: null,
         clerkUserId: null,
+        stripeCusId: null,
       },
     });
   }
@@ -208,6 +225,7 @@ export class UserService {
           userId: true,
           fingerprintId: true,
           clerkUserId: true,
+          stripeCusId: true,
           email: true,
           status: true,
           createdAt: true,

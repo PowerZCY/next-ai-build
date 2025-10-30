@@ -9,6 +9,6 @@
 
 'use client';
 
-import { createSignUpPage } from '@third-ui/clerk/server';
+import { createSignUpPageWithFingerprint } from '@third-ui/clerk';
 
-export default createSignUpPage();
+export default createSignUpPageWithFingerprint()

@@ -13,6 +13,7 @@ model User {
   status        String         @default("anonymous") @db.VarChar(20)
   fingerprintId String?        @map("fingerprint_id") @db.VarChar(255)
   clerkUserId   String?        @unique @map("clerk_user_id") @db.VarChar(255)
+  stripeCusId   String?        @unique @map("stripe_cus_id") @db.VarChar(255)
   email         String?        @db.VarChar(255)
   createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

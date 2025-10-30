@@ -44,10 +44,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create or get Stripe customer
-    const customer = await createOrGetCustomer({
-      email: user.email || undefined,
+    const customerId = await createOrGetCustomer({
       userId: user.userId,
-      name: user.email ? user.email.split('@')[0] : undefined,
     });
 
     // Generate order ID
@@ -61,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe checkout session with interval for dynamic mode
     const session = await createCheckoutSession({
       priceId,
-      customerId: customer.id,
+      customerId,
       clientReferenceId: user.userId,
       successUrl: defaultSuccessUrl,
       cancelUrl: defaultCancelUrl,

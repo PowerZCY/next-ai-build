@@ -5,11 +5,13 @@ CREATE TABLE IF NOT EXISTS public.users (
     status            VARCHAR(20)    NOT NULL DEFAULT 'anonymous',
     fingerprint_id    VARCHAR(255),
     clerk_user_id     VARCHAR(255),
+    stripe_cus_id     VARCHAR(255),
     email             VARCHAR(255),
     created_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT users_user_id_key UNIQUE (user_id),
     CONSTRAINT users_clerk_user_id_key UNIQUE (clerk_user_id),
+    CONSTRAINT users_stripe_cus_id_key UNIQUE (stripe_cus_id),
     CONSTRAINT users_status_check CHECK (status::text = ANY (ARRAY['anonymous'::character varying, 'registered'::character varying, 'frozen'::character varying, 'deleted'::character varying]::text[]))
 );
 
@@ -29,10 +31,6 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     created_at           TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     deleted              INTEGER     NOT NULL DEFAULT 0,
-    CONSTRAINT subscriptions_user_fk FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
     CONSTRAINT subscriptions_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'canceled'::character varying, 'past_due'::character varying, 'incomplete'::character varying, 'trialing'::character varying]::text[])),
     CONSTRAINT transactions_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
 );
@@ -58,11 +56,7 @@ CREATE TABLE IF NOT EXISTS public.credits (
     onetime_paid_end          TIMESTAMPTZ,
     created_at                TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at                TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT credits_user_id_key UNIQUE (user_id),
-    CONSTRAINT credits_user_fk FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    CONSTRAINT credits_user_id_key UNIQUE (user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_credits_user_id ON public.credits (user_id);
@@ -99,10 +93,6 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     deleted              INTEGER      NOT NULL DEFAULT 0,
     CONSTRAINT transactions_order_id_key UNIQUE (order_id),
     CONSTRAINT transactions_pay_transaction_id_key UNIQUE (pay_transaction_id),
-    CONSTRAINT transactions_user_fk FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
     CONSTRAINT transactions_order_status_check CHECK (order_status::text = ANY (ARRAY['created'::character varying, 'pending_unpaid'::character varying, 'success'::character varying, 'refunded'::character varying, 'canceled'::character varying, 'failed'::character varying]::text[])),
     CONSTRAINT transactions_pay_supplier_check CHECK (pay_supplier::text = ANY (ARRAY['Stripe'::character varying, 'Apple'::character varying, 'Paypal'::character varying]::text[])),
     CONSTRAINT transactions_type_check CHECK (type::text = ANY (ARRAY['subscription'::character varying, 'one_time'::character varying]::text[])),
@@ -126,12 +116,6 @@ CREATE TABLE IF NOT EXISTS public.credit_usage (
     order_id         VARCHAR(255),
     created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
     deleted          INTEGER      NOT NULL DEFAULT 0,
-    CONSTRAINT credit_usage_user_fk FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id)
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT credit_usage_credit_type_check CHECK (credit_type::text = ANY (ARRAY['free'::character varying, 'paid'::character varying]::text[])),
-    CONSTRAINT credit_usage_operation_type_check CHECK (operation_type::text = ANY (ARRAY['consume'::character varying, 'recharge'::character varying, 'freeze'::character varying, 'unfreeze'::character varying]::text[])),
     CONSTRAINT credit_usage_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
 );
 
@@ -169,6 +153,5 @@ CREATE TABLE IF NOT EXISTS public.apilog (
     summary       TEXT,
     request       TEXT,
     response      TEXT,
-    created_at    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT apilog_api_type_check CHECK (api_type::text = ANY (ARRAY['from_clerk_in'::character varying, 'to_clerk_out'::character varying, 'from_stripe_in'::character varying, 'to_stripe_out'::character varying]::text[]))
+    created_at    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP
 );
