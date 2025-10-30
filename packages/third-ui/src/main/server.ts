@@ -8,6 +8,13 @@ export * from './seo-content';
 export * from './cta';
 export * from './footer';
 export * from './price-plan';
+export { CreditOverview } from './credit/credit-overview';
+export type {
+  CreditOverviewData,
+  CreditBucket,
+  CreditBucketStatus,
+  SubscriptionInfo,
+} from './credit/types';
 
 // Money Price Server Component and Types
 export { MoneyPrice } from './money-price/money-price';

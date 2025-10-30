@@ -11,7 +11,9 @@ export * from './rich-text-expert'
 export * from './faq-interactive'
 export * from './price-plan-interactive'
 export * from './gallery-interactive'
-
 // Money Price Client Components
 export { MoneyPriceInteractive } from './money-price/money-price-interactive';
 export { MoneyPriceButton } from './money-price/money-price-button';
+
+export { CreditOverviewClient } from './credit/credit-overview-client';
+export { CreditNavButton } from './credit/credit-nav-button'

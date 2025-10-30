@@ -218,6 +218,39 @@
       "upgrade": "Upgrade"
     }
   },
+  "credit": {
+    "summary": {
+      "title": "My Credits",
+      "description": "Displays remaining credits from all current channels",
+      "totalLabel": "Total Credits"
+    },
+    "buckets": {
+      "title": "Credit Details",
+      "empty": "No credits have been acquired yet",
+      "limitLabel": "Quota",
+      "usedLabel": "Remaining Balance",
+      "status": {
+        "active": "In Use",
+        "expiringSoon": "Expiring Soon",
+        "expired": "Expired"
+      },
+      "labels": {
+        "free": "Free Credits",
+        "subscription": "Subscription Credits",
+        "onetime": "One-Time Credits pack"
+      }
+    },
+    "subscription": {
+      "title": "Subscription Information",
+      "active": "Current Subscription",
+      "periodLabel": "Billing Cycle",
+      "manage": "Manage Subscription",
+      "inactive": "No Active Subscription"
+    },
+    "actions": {
+      "buyCredits": "Buy Credits pack"
+    }
+  },
   "features": {
     "title": "Why Choose",
     "eyesOn": "Reve Image",

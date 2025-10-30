@@ -218,55 +218,38 @@
       "upgrade": "升级"
     }
   },
-  "pricePlan": {
-    "title": "Choose Your Plan",
-    "subtitle": "Get the best of Raphael AI with faster generation and commercial usage",
-    "billingSwitch": {
-      "options": [
-        { "key": "monthly", "name": "Monthly", "unit": "/month", "discountText": "", "subTitle": "Billed Monthly" },
-        { "key": "yearly", "name": "Yearly", "unit": "/month", "discountText": "Save {percent}%", "subTitle": "Billed Annually" }
-      ],
-      "defaultKey": "yearly"
+  "credit": {
+    "summary": {
+      "title": "我的积分",
+      "description": "展示当前所有渠道的剩余积分",
+      "totalLabel": "积分总额"
     },
-    "plans": [
-      {
-        "key": "free",
-        "title": "Hobby Version",
-        "showBillingSubTitle": false,
-        "features": [
-          { "description": "Access to all templates" },
-          { "description": "Unlimited editing and customization"},
-          { "description": "Download in multiple formats" },
-          { "description": "No watermarks" },
-          { "description": "No registration required" }
-        ],
-        "button": { "text": "Get started" }
+    "buckets": {
+      "title": "积分明细",
+      "empty": "当前暂未获得任何积分",
+      "limitLabel": "额度",
+      "usedLabel": "余额",
+      "status": {
+        "active": "使用中",
+        "expiringSoon": "即将过期",
+        "expired": "已过期"
       },
-      {
-        "key": "premium",
-        "title": "Premium Version",
-        "showBillingSubTitle": true,
-        "features": [
-          { "description": "All features available", "tag": "Hobby Version" },
-          { "description": "UnLimited for Export/Import" },
-          { "description": "Limited 200 credits for AI-text", "tooltip": "1 credit = 1 AI conversation" }
-        ],
-        "button": { "text": "Upgrade to Premium" }
-      },
-      {
-        "key": "ultimate",
-        "title": "Ultimate Version",
-        "showBillingSubTitle": true,
-        "titleTags": ["Most Popular"],
-        "features": [
-          { "description": "All features available", "tag": "Premium Version" },
-          { "description": "Limited 500 credits AI-text", "tooltip": "1 credit = 1 AI conversation" },
-          { "description": "Early access to new features" },
-          { "description": "Team Support", "tooltip": "You can get our help with priority service support" }
-        ],
-        "button": { "text": "Upgrade to Ultimate" }
+      "labels": {
+        "free": "免费积分",
+        "subscription": "订阅积分",
+        "onetime": "一次性积分"
       }
-    ]
+    },
+    "subscription": {
+      "title": "订阅信息",
+      "active": "当前订阅",
+      "periodLabel": "账期",
+      "manage": "管理订阅",
+      "inactive": "暂无订阅"
+    },
+    "actions": {
+      "buyCredits": "购买积分包"
+    }
   },
   "features": {
     "title": "为什么选择",

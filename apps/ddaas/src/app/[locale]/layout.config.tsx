@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { ClerkUser } from '@third-ui/clerk/server';
 import { i18n } from '@/i18n';
 import { appConfig } from '@/lib/appConfig';
+import { CreditPopover } from '@/components/credit-popover';
 
 // 首页普通菜单
 export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
@@ -23,6 +24,11 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
       icon: <icons.BTC />,
       text: t1('pricing'),
       url: `/${locale}#money-pricing`,
+    },
+    {
+      type: 'custom',
+      secondary: true,
+      children: <CreditPopover locale={locale} />,
     },
     {
       type: 'custom',
