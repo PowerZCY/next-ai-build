@@ -34,7 +34,6 @@
  * └─ Records invoice URLs on initial transaction (hostedInvoiceUrl, invoicePdf)
  *
  * DATABASE GUARANTEES:
- * - All credit operations use upsert() for idempotency
  * - No race conditions on orderStatus (already SUCCESS before invoice.paid)
  * - Safe for webhook replay
  */
@@ -389,22 +388,15 @@ async function handleOneTimeCheckout(
   oneTimePaidEnd.setHours(23, 59, 59, 999);
 
   // 3. Update one-time purchase credits (or create if not exists)
-  await tx.credit.upsert({
+  await tx.credit.update({
     where: { userId: transaction.userId },
-    update: {
+    data: {
       balanceOneTimePaid: { increment: transaction.creditsGranted || 0 },
       totalOneTimePaidLimit: { increment: transaction.creditsGranted || 0 },
       oneTimePaidStart,
       oneTimePaidEnd,
-    },
-    create: {
-      userId: transaction.userId,
-      balanceOneTimePaid: transaction.creditsGranted || 0,
-      totalOneTimePaidLimit: transaction.creditsGranted || 0,
-      oneTimePaidStart,
-      oneTimePaidEnd,
-    },
-  } as any);
+    }
+  });
 
   // 4. Record credit usage
   await tx.creditUsage.create({
@@ -989,16 +981,12 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
       },
     });
 
-    await tx.credit.upsert({
+    await tx.credit.update({
       where: { userId: transaction.userId },
-      update: {
+      data: {
         balanceOneTimePaid: newBalance,
-      },
-      create: {
-        userId: transaction.userId,
-        balanceOneTimePaid: newBalance,
-      },
-    } as any);
+      }
+    });
 
     await tx.creditUsage.create({
       data: {
