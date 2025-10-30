@@ -5,7 +5,7 @@ import {
   createOrGetCustomer,
 } from '@/lib/stripe-config';
 import { ApiAuthUtils } from '@/lib/auth-utils';
-import { subscriptionService } from '@/services/database';
+import { subscriptionService } from '@/db/index';
 
 const createCustomerPortalSchema = z
   .object({

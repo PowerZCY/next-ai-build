@@ -16,6 +16,18 @@ type CreditLimitAdjustments = {
   oneTimePaid?: number;
 };
 
+type CreditOperationOptions = {
+  context: string;
+  operationType: typeof OperationType[keyof typeof OperationType];
+  updateMode: 'increment' | 'decrement';
+  feature?: string;
+  orderId?: string;
+  limitAdjustments?: CreditLimitAdjustments;
+  defaultLimitAdjustmentsToAmounts?: boolean;
+  ensureSufficientBalance?: boolean;
+  ensureSufficientLimits?: boolean;
+};
+
 export class CreditService {
 
   private normalizeAmounts(amounts?: CreditAmounts): Required<CreditAmounts> {
@@ -110,6 +122,61 @@ export class CreditService {
       }
     }
     return data;
+  }
+
+  private async executeCreditOperation(
+    userId: string,
+    amounts: CreditAmounts,
+    options: CreditOperationOptions,
+    tx?: Prisma.TransactionClient
+  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+    const normalized = this.normalizeAmounts(amounts);
+    this.ensureNonNegative(normalized, options.context);
+
+    if (!this.hasAnyChange(normalized)) {
+      throw new Error(`${options.context}: no credit change specified`);
+    }
+
+    let normalizedLimitAdjustments: Required<CreditLimitAdjustments> | undefined;
+    if (options.limitAdjustments || options.defaultLimitAdjustmentsToAmounts) {
+      const raw = options.limitAdjustments ?? amounts;
+      normalizedLimitAdjustments = this.normalizeAmounts(raw);
+      this.ensureNonNegative(normalizedLimitAdjustments, `${options.context} limitAdjustments`);
+    }
+
+    const client = getDbClient(tx);
+    const currentCredit = await client.credit.findUnique({
+      where: { userId },
+    });
+
+    if (!currentCredit) {
+      throw new Error('User credits not found');
+    }
+
+    if (options.ensureSufficientBalance) {
+      this.ensureSufficientBalance(currentCredit, normalized);
+    }
+
+    if (options.ensureSufficientLimits && normalizedLimitAdjustments) {
+      this.ensureSufficientLimits(currentCredit, normalizedLimitAdjustments);
+    }
+
+    const data =
+      options.updateMode === 'increment'
+        ? this.buildIncrementData(normalized, normalizedLimitAdjustments)
+        : this.buildDecrementData(normalized, normalizedLimitAdjustments);
+
+    const credit = await client.credit.update({
+      where: { userId },
+      data,
+    });
+
+    const usage = await this.recordCreditUsage(client, userId, options.operationType, normalized, {
+      feature: options.feature,
+      orderId: options.orderId,
+    });
+
+    return { credit, usage };
   }
 
   private async recordCreditUsage(
@@ -245,38 +312,20 @@ export class CreditService {
     } = {},
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = getDbClient(tx);
-    const normalized = this.normalizeAmounts(amounts);
-      this.ensureNonNegative(normalized, 'rechargeCredit');
-
-      if (!this.hasAnyChange(normalized)) {
-        throw new Error('rechargeCredit: no credit change specified');
-      }
-
-      const limitAdjustments = options.limitAdjustments
-        ? this.normalizeAmounts(options.limitAdjustments)
-        : normalized;
-      this.ensureNonNegative(limitAdjustments, 'rechargeCredit limitAdjustments');
-
-      const currentCredit = await client.credit.findUnique({
-        where: { userId },
-      });
-
-      if (!currentCredit) {
-        throw new Error('User credits not found');
-      }
-
-      const credit = await client.credit.update({
-        where: { userId },
-        data: this.buildIncrementData(normalized, limitAdjustments),
-      });
-
-      const usage = await this.recordCreditUsage(client, userId, OperationType.RECHARGE, normalized, {
+    return this.executeCreditOperation(
+      userId,
+      amounts,
+      {
+        context: 'rechargeCredit',
+        operationType: OperationType.RECHARGE,
+        updateMode: 'increment',
         feature: options.feature,
         orderId: options.orderId,
-      });
-
-      return { credit, usage };
+        limitAdjustments: options.limitAdjustments,
+        defaultLimitAdjustmentsToAmounts: options.limitAdjustments === undefined,
+      },
+      tx
+    );
   }
 
   // Consume Credits (Transactional)
@@ -289,36 +338,19 @@ export class CreditService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    
-    const client = getDbClient(tx);
-    const normalized = this.normalizeAmounts(amounts);
-      this.ensureNonNegative(normalized, 'consumeCredit');
-
-      if (!this.hasAnyChange(normalized)) {
-        throw new Error('consumeCredit: no credit change specified');
-      }
-
-      const currentCredit = await client.credit.findUnique({
-        where: { userId },
-      });
-
-      if (!currentCredit) {
-        throw new Error('User credits not found');
-      }
-
-      this.ensureSufficientBalance(currentCredit, normalized);
-
-      const credit = await client.credit.update({
-        where: { userId },
-        data: this.buildDecrementData(normalized),
-      });
-
-      const usage = await this.recordCreditUsage(client, userId, OperationType.CONSUME, normalized, {
+    return this.executeCreditOperation(
+      userId,
+      amounts,
+      {
+        context: 'consumeCredit',
+        operationType: OperationType.CONSUME,
+        updateMode: 'decrement',
         feature: options.feature,
         orderId: options.orderId,
-      });
-
-      return { credit, usage };
+        ensureSufficientBalance: true,
+      },
+      tx
+    );
   }
 
   // Freeze Credits
@@ -328,34 +360,18 @@ export class CreditService {
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = getDbClient(tx);
-    const normalized = this.normalizeAmounts(amounts);
-      this.ensureNonNegative(normalized, 'freezeCredit');
-
-      if (!this.hasAnyChange(normalized)) {
-        throw new Error('freezeCredit: no credit change specified');
-      }
-
-      const currentCredit = await client.credit.findUnique({
-        where: { userId },
-      });
-
-      if (!currentCredit) {
-        throw new Error('User credits not found');
-      }
-
-      this.ensureSufficientBalance(currentCredit, normalized);
-
-      const credit = await client.credit.update({
-        where: { userId },
-        data: this.buildDecrementData(normalized),
-      });
-
-      const usage = await this.recordCreditUsage(client, userId, OperationType.FREEZE, normalized, {
+    return this.executeCreditOperation(
+      userId,
+      amounts,
+      {
+        context: 'freezeCredit',
+        operationType: OperationType.FREEZE,
+        updateMode: 'decrement',
         feature: reason,
-      });
-
-      return { credit, usage };
+        ensureSufficientBalance: true,
+      },
+      tx
+    );
   }
 
   // Unfreeze Credits
@@ -365,33 +381,17 @@ export class CreditService {
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = getDbClient(tx);
-    const normalized = this.normalizeAmounts(amounts);
-      this.ensureNonNegative(normalized, 'unfreezeCredit');
-
-      if (!this.hasAnyChange(normalized)) {
-        throw new Error('unfreezeCredit: no credit change specified');
-      }
-
-      const currentCredit = await client.credit.findUnique({
-        where: { userId },
-      });
-
-      if (!currentCredit) {
-        throw new Error('User credits not found');
-      }
-
-      const credit = await client.credit.update({
-        where: { userId },
-        data: this.buildIncrementData(normalized),
-      });
-
-      const usage = await this.recordCreditUsage(client, userId, OperationType.UNFREEZE, normalized, {
+    return this.executeCreditOperation(
+      userId,
+      amounts,
+      {
+        context: 'unfreezeCredit',
+        operationType: OperationType.UNFREEZE,
+        updateMode: 'increment',
         feature: reason,
-      });
-
-      return { credit, usage };
-      
+      },
+      tx
+    );
   }
 
   // Refund Credits
@@ -405,41 +405,22 @@ export class CreditService {
     } = {},
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = getDbClient(tx);
-    const normalized = this.normalizeAmounts(amounts);
-      this.ensureNonNegative(normalized, 'refundCredit');
-
-      if (!this.hasAnyChange(normalized)) {
-        throw new Error('refundCredit: no credit change specified');
-      }
-
-      const limitAdjustments = options.limitAdjustments
-        ? this.normalizeAmounts(options.limitAdjustments)
-        : normalized;
-      this.ensureNonNegative(limitAdjustments, 'refundCredit limitAdjustments');
-
-      const currentCredit = await client.credit.findUnique({
-        where: { userId },
-      });
-
-      if (!currentCredit) {
-        throw new Error('User credits not found');
-      }
-
-      this.ensureSufficientBalance(currentCredit, normalized);
-      this.ensureSufficientLimits(currentCredit, limitAdjustments);
-
-      const credit = await client.credit.update({
-        where: { userId },
-        data: this.buildDecrementData(normalized, limitAdjustments),
-      });
-
-      const usage = await this.recordCreditUsage(client, userId, OperationType.CONSUME, normalized, {
+    return this.executeCreditOperation(
+      userId,
+      amounts,
+      {
+        context: 'refundCredit',
+        operationType: OperationType.CONSUME,
+        updateMode: 'decrement',
         feature: options.feature ?? 'Refund',
         orderId,
-      });
-
-      return { credit, usage };
+        limitAdjustments: options.limitAdjustments,
+        defaultLimitAdjustmentsToAmounts: options.limitAdjustments === undefined,
+        ensureSufficientBalance: true,
+        ensureSufficientLimits: true,
+      },
+      tx
+    );
   }
 
   // Reset Free Credits 
@@ -468,12 +449,13 @@ export class CreditService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<Credit> {
-    const currentCredit = await this.getCredit(userId, tx);
+    const client = getDbClient(tx);
+    const currentCredit = await client.credit.findUnique({
+      where: { userId },
+    });
     if (!currentCredit) {
       throw new Error('User credits not found');
     }
-
-    const client = getDbClient(tx);
 
     const nextBalanceFree = adjustments.balanceFree ?? currentCredit.balanceFree;
     const nextBalancePaid = adjustments.balancePaid ?? currentCredit.balancePaid;
@@ -495,7 +477,25 @@ export class CreditService {
       throw new Error('adjustCredit: credit values cannot be negative');
     }
 
-    return await client.credit.update({
+    const increaseDiff = this.normalizeAmounts({
+      free: Math.max(nextBalanceFree - currentCredit.balanceFree, 0),
+      paid: Math.max(nextBalancePaid - currentCredit.balancePaid, 0),
+      oneTimePaid: Math.max(
+        nextBalanceOneTimePaid - currentCredit.balanceOneTimePaid,
+        0
+      ),
+    });
+
+    const decreaseDiff = this.normalizeAmounts({
+      free: Math.max(currentCredit.balanceFree - nextBalanceFree, 0),
+      paid: Math.max(currentCredit.balancePaid - nextBalancePaid, 0),
+      oneTimePaid: Math.max(
+        currentCredit.balanceOneTimePaid - nextBalanceOneTimePaid,
+        0
+      ),
+    });
+
+    const credit = await client.credit.update({
       where: { userId },
       data: {
         balanceFree: nextBalanceFree,
@@ -506,6 +506,66 @@ export class CreditService {
         totalOneTimePaidLimit: nextTotalOneTimePaidLimit,
       },
     });
+
+    if (this.hasAnyChange(increaseDiff)) {
+      await this.recordCreditUsage(client, userId, OperationType.ADJUST_INCREASE, increaseDiff, {
+        feature: 'admin_adjust',
+      });
+    }
+
+    if (this.hasAnyChange(decreaseDiff)) {
+      await this.recordCreditUsage(client, userId, OperationType.ADJUST_DECREASE, decreaseDiff, {
+        feature: 'admin_adjust',
+      });
+    }
+
+    return credit;
+  }
+
+  async purgeCredit(
+    userId: string,
+    reason: string,
+    tx?: Prisma.TransactionClient
+  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+    const client = getDbClient(tx);
+    const currentCredit = await client.credit.findUnique({
+      where: { userId },
+    });
+    if (!currentCredit) {
+      throw new Error('User credits not found');
+    }
+
+    const deduction = this.normalizeAmounts({
+      free: currentCredit.balanceFree,
+      paid: currentCredit.balancePaid,
+      oneTimePaid: currentCredit.balanceOneTimePaid,
+    });
+
+    const credit = await client.credit.update({
+      where: { userId },
+      data: {
+        balanceFree: 0,
+        balancePaid: 0,
+        balanceOneTimePaid: 0,
+        totalFreeLimit: 0,
+        totalPaidLimit: 0,
+        totalOneTimePaidLimit: 0,
+        freeStart: null,
+        freeEnd: null,
+        paidStart: null,
+        paidEnd: null,
+        oneTimePaidStart: null,
+        oneTimePaidEnd: null,
+      },
+    });
+
+    const usage = this.hasAnyChange(deduction)
+      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
+          feature: reason,
+        })
+      : [];
+
+    return { credit, usage };
   }
 
   // Get Users with Low Credit Balance

@@ -11,7 +11,7 @@ import {
   OrderStatus,
   PaySupplier,
   PaymentStatus
-} from '@/services/database';
+} from '@/db/index';
 import { ApiAuthUtils } from '@/lib/auth-utils';
 import { getPriceConfig } from '@/lib/money-price-config';
 

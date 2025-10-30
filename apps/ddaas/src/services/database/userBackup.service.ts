@@ -2,7 +2,7 @@
 
 import type { Prisma } from '@prisma/client';
 import type { UserBackup } from '@prisma/client';
-import { getDbClient, prisma } from '@/db/prisma';
+import { getDbClient } from '@/db/prisma';
 
 export class UserBackupService {
 
@@ -146,7 +146,7 @@ export class UserBackupService {
       };
     };
 
-    return tx ? restore(tx) : prisma.$transaction(restore);
+    return restore(getDbClient(tx)) ;
   }
 
   // List backups

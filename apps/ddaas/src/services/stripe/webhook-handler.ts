@@ -40,7 +40,6 @@
  */
 
 import Stripe from 'stripe';
-import type { Prisma } from '@prisma/client';
 import { stripe } from '@/lib/stripe-config';
 import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import {
@@ -55,9 +54,9 @@ import {
   PaySupplier,
   BillingReason,
   PaymentStatus,
-} from '@/services/database';
-import { Apilogger } from '@/services/database/apilog.service';
-import { prisma } from '@/db/prisma';
+} from '@/db/index';
+import { Apilogger } from '@/db/index';
+import { getDbClient } from '@/db/prisma';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
 
 const mapPaymentStatus = (
@@ -279,89 +278,81 @@ async function handleSubscriptionCheckoutInit(
   });
 
   // ===== STEP 2: DATABASE TRANSACTION (WITH PREPARED DATA) =====
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 3. Find and UPDATE the placeholder subscription record (initialized during user registration)
-    // This ensures consistent logic: all subscription scenarios use UPDATE, not CREATE
-    const existingSubscription = await tx.subscription.findFirst({
-      where: {
-        userId: transaction.userId,
-        status: SubscriptionStatus.INCOMPLETE, // ← placeholder status
-      },
-    });
-
-    if (!existingSubscription) {
-      throw new Error(
-        `Subscription placeholder not found OR Repeat for user ${transaction.userId}. `
-      );
-    }
-
-    const subscription = await tx.subscription.update({
-      where: { id: existingSubscription.id },
-      data: {
-        paySubscriptionId: subscriptionId,
-        priceId: transaction.priceId || undefined,
-        priceName: transaction.priceName || undefined,
-        status: stripeSubscription.status,
-        creditsAllocated: transaction.creditsGranted || 0,
-        subPeriodStart, // ✅ SET from Stripe API
-        subPeriodEnd,   // ✅ SET from Stripe API
-        updatedAt: new Date(),
-      },
-    });
-
-    console.log(`Updated subscription placeholder with period info: ${subscription.id}`);
-
-    // 4. Update Transaction with COMPLETE payment info and FINAL status
-    await tx.transaction.update({
-      where: { orderId: transaction.orderId },
-      data: {
-        orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
-        paymentStatus,
-        paySubscriptionId: subscriptionId,
-        paySessionId: session.id,
-        paidEmail: session.customer_details?.email,
-        paidAt: new Date(),
-        payUpdatedAt: new Date(),
-      },
-    });
-
-    console.log(`Transaction marked SUCCESS: ${transaction.orderId}`);
-
-    // 5. Update subscription credits with correct billing period
-    await tx.credit.upsert({
-      where: { userId: transaction.userId },
-      update: {
-        balancePaid: { increment: transaction.creditsGranted || 0 },
-        totalPaidLimit: { increment: transaction.creditsGranted || 0 },
-        paidStart: subPeriodStart,
-        paidEnd: subPeriodEnd,
-      },
-      create: {
-        userId: transaction.userId,
-        balancePaid: transaction.creditsGranted || 0,
-        totalPaidLimit: transaction.creditsGranted || 0,
-        paidStart: subPeriodStart,
-        paidEnd: subPeriodEnd,
-      },
-    } as any);
-
-    console.log(`Credits allocated for subscription: ${transaction.creditsGranted}`);
-
-    // 6. Record credit usage
-    await tx.creditUsage.create({
-      data: {
-        userId: transaction.userId,
-        feature: TransactionType.SUBSCRIPTION,
-        orderId: transaction.orderId,
-        creditType: CreditType.PAID,
-        operationType: OperationType.RECHARGE,
-        creditsUsed: transaction.creditsGranted || 0,
-      },
-    });
-
-    console.log(`Subscription checkout completed: ${transaction.orderId}`);
-    return subscription;
+  const tx = getDbClient();
+  // 3. Find and UPDATE the placeholder subscription record (initialized during user registration)
+  // This ensures consistent logic: all subscription scenarios use UPDATE, not CREATE
+  const existingSubscription = await tx.subscription.findFirst({
+    where: {
+      userId: transaction.userId,
+      status: SubscriptionStatus.INCOMPLETE, // ← placeholder status
+    },
   });
+
+  if (!existingSubscription) {
+    throw new Error(
+      `Subscription placeholder not found OR Repeat for user ${transaction.userId}. `
+    );
+  }
+
+  const subscription = await tx.subscription.update({
+    where: { id: existingSubscription.id },
+    data: {
+      paySubscriptionId: subscriptionId,
+      priceId: transaction.priceId || undefined,
+      priceName: transaction.priceName || undefined,
+      status: stripeSubscription.status,
+      creditsAllocated: transaction.creditsGranted || 0,
+      subPeriodStart, // ✅ SET from Stripe API
+      subPeriodEnd,   // ✅ SET from Stripe API
+      updatedAt: new Date(),
+    },
+  });
+
+  console.log(`Updated subscription placeholder with period info: ${subscription.id}`);
+
+  // 4. Update Transaction with COMPLETE payment info and FINAL status
+  await tx.transaction.update({
+    where: { orderId: transaction.orderId },
+    data: {
+      orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
+      paymentStatus,
+      paySubscriptionId: subscriptionId,
+      paySessionId: session.id,
+      paidEmail: session.customer_details?.email,
+      paidAt: new Date(),
+      payUpdatedAt: new Date(),
+    },
+  });
+
+  console.log(`Transaction marked SUCCESS: ${transaction.orderId}`);
+
+  // 5. Update subscription credits with correct billing period
+  await tx.credit.update({
+    where: { userId: transaction.userId },
+    data: {
+      balancePaid: { increment: transaction.creditsGranted || 0 },
+      totalPaidLimit: { increment: transaction.creditsGranted || 0 },
+      paidStart: subPeriodStart,
+      paidEnd: subPeriodEnd,
+    }
+  });
+
+  console.log(`Credits allocated for subscription: ${transaction.creditsGranted}`);
+
+  // 6. Record credit usage
+  await tx.creditUsage.create({
+    data: {
+      userId: transaction.userId,
+      feature: TransactionType.SUBSCRIPTION,
+      orderId: transaction.orderId,
+      creditType: CreditType.PAID,
+      operationType: OperationType.RECHARGE,
+      creditsUsed: transaction.creditsGranted || 0,
+    },
+  });
+
+  console.log(`Subscription checkout completed: ${transaction.orderId}`);
+  return subscription;
 }
 
 /**
@@ -376,60 +367,58 @@ async function handleOneTimeCheckout(
   paymentStatus: PaymentStatus
 ) {
   console.log(`Processing one-time payment checkout: ${session.id}`);
-
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 1. Update Transaction with payment info and FINAL status
-    await tx.transaction.update({
-      where: { orderId: transaction.orderId },
-      data: {
-        orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
-        paymentStatus,
-        payTransactionId: session.payment_intent as string,
-        paidAt: new Date(),
-        paidEmail: session.customer_details?.email,
-        payUpdatedAt: new Date(),
-      },
-    });
-
-    // 2. Calculate one-time credit expiration (1 year from purchase)
-    const now = new Date();
-    const oneTimePaidStart = now;
-    const oneTimePaidEnd = new Date(now);
-    oneTimePaidEnd.setDate(oneTimePaidEnd.getDate() + oneTimeExpiredDays);
-    oneTimePaidEnd.setHours(23, 59, 59, 999);
-
-    // 3. Update one-time purchase credits (or create if not exists)
-    await tx.credit.upsert({
-      where: { userId: transaction.userId },
-      update: {
-        balanceOneTimePaid: { increment: transaction.creditsGranted || 0 },
-        totalOneTimePaidLimit: { increment: transaction.creditsGranted || 0 },
-        oneTimePaidStart,
-        oneTimePaidEnd,
-      },
-      create: {
-        userId: transaction.userId,
-        balanceOneTimePaid: transaction.creditsGranted || 0,
-        totalOneTimePaidLimit: transaction.creditsGranted || 0,
-        oneTimePaidStart,
-        oneTimePaidEnd,
-      },
-    } as any);
-
-    // 4. Record credit usage
-    await tx.creditUsage.create({
-      data: {
-        userId: transaction.userId,
-        feature: TransactionType.ONE_TIME,
-        orderId: transaction.orderId,
-        creditType: CreditType.PAID,
-        operationType: OperationType.RECHARGE,
-        creditsUsed: transaction.creditsGranted || 0,
-      },
-    });
-
-    console.log(`One-time payment completed: ${transaction.orderId}`);
+  const tx = getDbClient()
+  // 1. Update Transaction with payment info and FINAL status
+  await tx.transaction.update({
+    where: { orderId: transaction.orderId },
+    data: {
+      orderStatus: OrderStatus.SUCCESS, // ✅ FINAL STATUS SET HERE
+      paymentStatus,
+      payTransactionId: session.payment_intent as string,
+      paidAt: new Date(),
+      paidEmail: session.customer_details?.email,
+      payUpdatedAt: new Date(),
+    },
   });
+
+  // 2. Calculate one-time credit expiration (1 year from purchase)
+  const now = new Date();
+  const oneTimePaidStart = now;
+  const oneTimePaidEnd = new Date(now);
+  oneTimePaidEnd.setDate(oneTimePaidEnd.getDate() + oneTimeExpiredDays);
+  oneTimePaidEnd.setHours(23, 59, 59, 999);
+
+  // 3. Update one-time purchase credits (or create if not exists)
+  await tx.credit.upsert({
+    where: { userId: transaction.userId },
+    update: {
+      balanceOneTimePaid: { increment: transaction.creditsGranted || 0 },
+      totalOneTimePaidLimit: { increment: transaction.creditsGranted || 0 },
+      oneTimePaidStart,
+      oneTimePaidEnd,
+    },
+    create: {
+      userId: transaction.userId,
+      balanceOneTimePaid: transaction.creditsGranted || 0,
+      totalOneTimePaidLimit: transaction.creditsGranted || 0,
+      oneTimePaidStart,
+      oneTimePaidEnd,
+    },
+  } as any);
+
+  // 4. Record credit usage
+  await tx.creditUsage.create({
+    data: {
+      userId: transaction.userId,
+      feature: TransactionType.ONE_TIME,
+      orderId: transaction.orderId,
+      creditType: CreditType.PAID,
+      operationType: OperationType.RECHARGE,
+      creditsUsed: transaction.creditsGranted || 0,
+    },
+  });
+
+  console.log(`One-time payment completed: ${transaction.orderId}`);
 }
 
 /**
@@ -516,136 +505,124 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       );
       return;
     }
-
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Find transaction by order ID (created in session.completed)
-      const transaction = await tx.transaction.findUnique({
-        where: { orderId },
-      });
-
-      if (transaction) {
-        // Update transaction with invoice URLs and billing reason for record keeping
-        await tx.transaction.update({
-          where: { orderId: transaction.orderId },
-          data: {
-            payInvoiceId: invoice.id,
-            hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
-            invoicePdf: invoice.invoice_pdf || undefined,
-            billingReason: invoice.billing_reason || undefined,
-            payUpdatedAt: new Date(),
-          },
-        });
-
-        console.log(`Initial invoice recorded for transaction: ${transaction.orderId}`);
-      } else {
-        console.warn(`Transaction not found for order_id: ${orderId}`);
-      }
+    const tx = getDbClient()
+     // Find transaction by order ID (created in session.completed)
+     const transaction = await tx.transaction.findUnique({
+      where: { orderId },
     });
 
-    console.log(`Invoice paid event completed: ${invoice.id}`);
+    if (!transaction) {
+      console.warn(`Transaction not found for order_id: ${orderId}`);
+    } else {
+      // Update transaction with invoice URLs and billing reason for record keeping
+      await tx.transaction.update({
+        where: { orderId: transaction.orderId },
+        data: {
+          payInvoiceId: invoice.id,
+          hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
+          invoicePdf: invoice.invoice_pdf || undefined,
+          billingReason: invoice.billing_reason || undefined,
+          payUpdatedAt: new Date(),
+        },
+      });
+  
+      console.log(`Initial invoice recorded for transaction: ${transaction.orderId}`);
+    }
+
+    console.log(`Invoice paid event completed, invoiceId: ${invoice.id}`);
     return;
   }
 
   if (isRenewal) {
     const renewalOrderId = `order_renew_${invoice.id}`;
-
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const existingOrder = await tx.transaction.findUnique({
-        where: { orderId: renewalOrderId },
-      });
-
-      if (existingOrder) {
-        console.log(`Renewal invoice ${invoice.id} already processed as ${existingOrder.orderId}, skipping.`);
-        return;
-      }
-
-      // Find subscription to get user info
-      const subscription = await tx.subscription.findFirst({
-        where: { paySubscriptionId: subscriptionId },
-      });
-
-      if (!subscription) {
-        throw new Error(`Subscription not found for renewal: ${subscriptionId}`);
-      }
-
-      // Update subscription with new period
-      await tx.subscription.update({
-        where: { id: subscription.id },
-        data: {
-          status: SubscriptionStatus.ACTIVE,
-          subPeriodStart,
-          subPeriodEnd,
-          updatedAt: new Date(),
-        },
-      });
-
-      // Get credits from current price configuration (handles plan upgrades/downgrades)
-      const creditsForRenewal = subscription.priceId
-        ? getCreditsFromPriceId(subscription.priceId)
-        : subscription.creditsAllocated;
-
-      const renewalCredits = creditsForRenewal || subscription.creditsAllocated;
-
-      await tx.transaction.create({
-        data: {
-          userId: subscription.userId,
-          orderId: renewalOrderId,
-          orderStatus: OrderStatus.SUCCESS,
-          paymentStatus: PaymentStatus.PAID,
-          paySupplier: PaySupplier.STRIPE,
-          paySubscriptionId: subscriptionId,
-          payInvoiceId: invoice.id,
-          hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
-          invoicePdf: invoice.invoice_pdf || undefined,
-          billingReason: invoice.billing_reason || undefined,
-          payTransactionId: typeof (invoice as any).payment_intent === 'string'
-            ? (invoice as any).payment_intent
-            : (invoice as any).payment_intent?.id,
-          priceId: subscription.priceId,
-          priceName: subscription.priceName,
-          type: TransactionType.SUBSCRIPTION,
-          amount: invoice.amount_paid / 100, // Convert cents to dollars
-          currency: invoice.currency.toUpperCase(),
-          creditsGranted: renewalCredits,
-          paidAt: new Date(invoice.created * 1000),
-          payUpdatedAt: new Date(),
-        },
-      });
-
-      // Update subscription credits for renewal
-      await tx.credit.upsert({
-        where: { userId: subscription.userId },
-        update: {
-          balancePaid: { increment: renewalCredits },
-          totalPaidLimit: { increment: renewalCredits },
-          paidStart: subPeriodStart,
-          paidEnd: subPeriodEnd,
-        },
-        create: {
-          userId: subscription.userId,
-          balancePaid: renewalCredits,
-          totalPaidLimit: renewalCredits,
-          paidStart: subPeriodStart,
-          paidEnd: subPeriodEnd,
-        },
-      } as any);
-
-      // Record renewal credit usage
-      await tx.creditUsage.create({
-        data: {
-          userId: subscription.userId,
-          feature: `${TransactionType.SUBSCRIPTION}_renewal`,
-          orderId: renewalOrderId,
-          creditType: CreditType.PAID,
-          operationType: OperationType.RECHARGE,
-          creditsUsed: renewalCredits,
-        },
-      });
-
-      console.log(`Subscription renewal processed: ${subscription.id}, orderId: ${renewalOrderId}`);
+    const tx = getDbClient()
+    const existingOrder = await tx.transaction.findUnique({
+      where: { orderId: renewalOrderId },
     });
 
-    console.log(`Invoice paid event completed: ${invoice.id}`);
+    if (existingOrder) {
+      console.log(`Renewal invoice ${invoice.id} already processed as ${existingOrder.orderId}, skipping.`);
+      return;
+    }
+
+    // Find subscription to get user info
+    const subscription = await tx.subscription.findFirst({
+      where: { paySubscriptionId: subscriptionId },
+    });
+
+    if (!subscription) {
+      throw new Error(`Subscription not found for renewal: ${subscriptionId}`);
+    }
+
+    // Update subscription with new period
+    await tx.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        status: SubscriptionStatus.ACTIVE,
+        subPeriodStart,
+        subPeriodEnd,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Get credits from current price configuration (handles plan upgrades/downgrades)
+    const creditsForRenewal = subscription.priceId
+      ? getCreditsFromPriceId(subscription.priceId)
+      : subscription.creditsAllocated;
+
+    const renewalCredits = creditsForRenewal || subscription.creditsAllocated;
+
+    await tx.transaction.create({
+      data: {
+        userId: subscription.userId,
+        orderId: renewalOrderId,
+        orderStatus: OrderStatus.SUCCESS,
+        paymentStatus: PaymentStatus.PAID,
+        paySupplier: PaySupplier.STRIPE,
+        paySubscriptionId: subscriptionId,
+        payInvoiceId: invoice.id,
+        hostedInvoiceUrl: invoice.hosted_invoice_url || undefined,
+        invoicePdf: invoice.invoice_pdf || undefined,
+        billingReason: invoice.billing_reason || undefined,
+        payTransactionId: typeof (invoice as any).payment_intent === 'string'
+          ? (invoice as any).payment_intent
+          : (invoice as any).payment_intent?.id,
+        priceId: subscription.priceId,
+        priceName: subscription.priceName,
+        type: TransactionType.SUBSCRIPTION,
+        amount: invoice.amount_paid / 100, // Convert cents to dollars
+        currency: invoice.currency.toUpperCase(),
+        creditsGranted: renewalCredits,
+        paidAt: new Date(invoice.created * 1000),
+        payUpdatedAt: new Date(),
+      },
+    });
+
+    // Update subscription credits for renewal
+    await tx.credit.update({
+      where: { userId: subscription.userId },
+      data: {
+        balancePaid: { increment: renewalCredits },
+        totalPaidLimit: { increment: renewalCredits },
+        paidStart: subPeriodStart,
+        paidEnd: subPeriodEnd,
+      }
+    });
+
+    // Record renewal credit usage
+    await tx.creditUsage.create({
+      data: {
+        userId: subscription.userId,
+        feature: `${TransactionType.SUBSCRIPTION}_renewal`,
+        orderId: renewalOrderId,
+        creditType: CreditType.PAID,
+        operationType: OperationType.RECHARGE,
+        creditsUsed: renewalCredits,
+      },
+    });
+
+    console.log(`Invoice renewal paid event completed, and invoiceId: ${invoice.id}, subscriptionId: ${subscription.id}, orderId: ${renewalOrderId}`);
+    return;
   }
 }
 
@@ -715,7 +692,7 @@ async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
  * For renewal failures: Use subscription ID to find subscription, then user info
  */
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  console.log(`Invoice payment failed: ${invoice.id}`);
+  console.log(`Invoice payment-failed event: ${invoice.id}`);
 
   const parentDetails = (invoice as any).parent?.subscription_details;
   if (!parentDetails?.subscription) {
@@ -726,6 +703,13 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   const subscriptionId = parentDetails.subscription;
   const subscriptionMetadata = parentDetails.metadata || {};
   const isInitialPayment = invoice.billing_reason === BillingReason.SUBSCRIPTION_CREATE;
+  const isRenewal = invoice.billing_reason === BillingReason.SUBSCRIPTION_CYCLE;
+
+  // Only handle initial payments and renewals
+  if (!isInitialPayment && !isRenewal) {
+    console.warn(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
+    return;
+  }
 
   // ===== CASE 1: Initial subscription payment failed =====
   if (isInitialPayment) {
@@ -739,49 +723,49 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       return;
     }
 
-    return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Find transaction by order ID (created in session.completed or earlier)
-      const transaction = await tx.transaction.findUnique({
-        where: { orderId },
-      });
-
-      if (transaction) {
-        // Update the original transaction to FAILED status
-        await tx.transaction.update({
-          where: { orderId: transaction.orderId },
-          data: {
-            orderStatus: OrderStatus.FAILED,
-            paymentStatus: PaymentStatus.UN_PAID,
-            payInvoiceId: invoice.id,
-            payUpdatedAt: new Date(),
-            orderDetail: 'Initial subscription payment failed',
-          },
-        });
-
-        console.log(`Initial subscription payment failed for order: ${orderId}`);
-      } else {
-        console.warn(`Transaction not found for order_id: ${orderId}`);
-      }
+    const tx = getDbClient()
+    // Find transaction by order ID (created in session.completed or earlier)
+    const transaction = await tx.transaction.findUnique({
+      where: { orderId },
     });
-  }
 
-  // ===== CASE 2: Subscription renewal payment failed =====
-  // For renewals, we need the subscription to get user info
-  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-  if (!subscription) {
-    console.warn(`Subscription not found for failed renewal invoice: ${subscriptionId}`);
+    if (!transaction) {
+      console.warn(`Transaction not found for order_id: ${orderId}`);
+    } else {
+      // Update the original transaction to FAILED status
+      await tx.transaction.update({
+        where: { orderId: transaction.orderId },
+        data: {
+          orderStatus: OrderStatus.FAILED,
+          paymentStatus: PaymentStatus.UN_PAID,
+          payInvoiceId: invoice.id,
+          payUpdatedAt: new Date(),
+          orderDetail: 'Initial subscription payment failed',
+        },
+      });
+      console.log(`Initial subscription payment-failed event updated for order: ${orderId}`);
+    }
+    // 返回, 增加代码阅读性
     return;
   }
 
-  const failedOrderId = `order_renew_failed_${invoice.id}`;
+  // ===== CASE 2: Subscription renewal payment failed =====
+  if (isRenewal) {
+    // For renewals, we need the subscription to get user info
+    const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
+    if (!subscription) {
+      console.warn(`Subscription not found for renewal payment-failed event, and invoice ${invoice.id}`);
+      return;
+    }
+    const failedOrderId = `order_renew_failed_${invoice.id}`;
 
-  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const existingFailure = await tx.transaction.findUnique({
+    const tx = getDbClient();
+    const existingFailureOrder = await tx.transaction.findUnique({
       where: { orderId: failedOrderId },
     });
 
-    if (existingFailure) {
-      console.log(`Renewal failure for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
+    if (existingFailureOrder) {
+      console.log(`Renewal payment-failure event for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
       return;
     }
 
@@ -832,9 +816,10 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       },
     });
 
-    console.log(`Subscription renewal failed and recorded: ${subscription.id}, orderId: ${failedOrderId}`);
-    console.log(`Invoice payment failed event completed: ${invoice.id}`);
-  });
+    console.log(`Invoice renewal  payment-failed event completed,  and invoiceId: ${invoice.id}, recorded: ${subscription.id}, orderId: ${failedOrderId}`);
+    return;
+  }
+  
 }
 
 /**
@@ -851,7 +836,8 @@ async function handleSubscriptionCreated(stripeSubscription: Stripe.Subscription
 async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
   console.log(`Subscription updated: ${stripeSubscription.id}`);
 
-  const subscription = await subscriptionService.findByPaySubscriptionId(stripeSubscription.id);
+  const tx = getDbClient();
+  const subscription = await subscriptionService.findByPaySubscriptionId(stripeSubscription.id, tx);
   if (!subscription) {
     console.warn(`Subscription not found in DB: ${stripeSubscription.id}`);
     return;
@@ -875,7 +861,7 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
   }
 
   // Update subscription status and period
-  await prisma.subscription.update({
+  await tx.subscription.update({
     where: { id: subscription.id },
     data: {
       status: stripeSubscription.status,
@@ -893,14 +879,14 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
  */
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
   console.log(`Payment intent failed: ${paymentIntent.id}`);
-
+  const tx = getDbClient();
   // Find transaction by payment intent ID
-  const transaction = await transactionService.findByPayTransactionId(paymentIntent.id);
+  const transaction = await transactionService.findByPayTransactionId(paymentIntent.id, tx);
   if (transaction) {
     await transactionService.updateStatus(transaction.orderId, OrderStatus.FAILED, {
       paymentStatus: PaymentStatus.UN_PAID,
       payUpdatedAt: new Date(),
-    });
+    }, tx);
   }
 }
 
@@ -917,7 +903,8 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
 
   if (!paymentIntentId) return;
 
-  const transaction = await transactionService.findByPayTransactionId(paymentIntentId);
+  const tx = getDbClient();
+  const transaction = await transactionService.findByPayTransactionId(paymentIntentId, tx);
   if (!transaction) return;
 
   if (transaction.orderStatus === OrderStatus.REFUNDED) {
@@ -926,62 +913,56 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   }
 
   if (transaction.type === TransactionType.SUBSCRIPTION) {
-    await prisma.$transaction(async (tx) => {
-      const now = new Date();
-      const subscription = transaction.paySubscriptionId
-        ? await tx.subscription.findFirst({
-            where: { paySubscriptionId: transaction.paySubscriptionId },
-          })
-        : null;
+    const now = new Date();
+    const subscription = transaction.paySubscriptionId
+      ? await tx.subscription.findFirst({
+          where: { paySubscriptionId: transaction.paySubscriptionId },
+        })
+      : null;
 
-      const creditRecord = await tx.credit.findUnique({
-        where: { userId: transaction.userId },
-      });
+    const creditRecord = await tx.credit.findUnique({
+      where: { userId: transaction.userId },
+    });
 
-      const balancePaid = Math.max(creditRecord?.balancePaid ?? 0, 0);
-      const newBalancePaid = 0; // Reset paid balance to zero on subscription refund
-      const creditsRemoved = balancePaid - newBalancePaid;
+    const balancePaid = Math.max(creditRecord?.balancePaid ?? 0, 0);
+    const newBalancePaid = 0; // Reset paid balance to zero on subscription refund
+    const creditsRemoved = balancePaid - newBalancePaid;
 
-      await tx.transaction.update({
-        where: { orderId: transaction.orderId },
+    await tx.transaction.update({
+      where: { orderId: transaction.orderId },
+      data: {
+        orderStatus: OrderStatus.REFUNDED,
+        paymentStatus: PaymentStatus.UN_PAID,
+        payUpdatedAt: now,
+      },
+    });
+
+    if (subscription) {
+      await tx.subscription.update({
+        where: { id: subscription.id },
         data: {
-          orderStatus: OrderStatus.REFUNDED,
-          paymentStatus: PaymentStatus.UN_PAID,
-          payUpdatedAt: now,
+          status: SubscriptionStatus.CANCELED,
+          updatedAt: now,
         },
       });
+    }
 
-      if (subscription) {
-        await tx.subscription.update({
-          where: { id: subscription.id },
-          data: {
-            status: SubscriptionStatus.CANCELED,
-            updatedAt: now,
-          },
-        });
+    await tx.credit.update({
+      where: { userId: transaction.userId },
+      data: {
+        balancePaid: newBalancePaid,
       }
+    });
 
-      await tx.credit.upsert({
-        where: { userId: transaction.userId },
-        update: {
-          balancePaid: newBalancePaid,
-        },
-        create: {
-          userId: transaction.userId,
-          balancePaid: newBalancePaid,
-        },
-      } as any);
-
-      await tx.creditUsage.create({
-        data: {
-          userId: transaction.userId,
-          feature: OrderStatus.REFUNDED,
-          orderId: transaction.orderId,
-          creditType: CreditType.PAID,
-          operationType: OperationType.CONSUME,
-          creditsUsed: -creditsRemoved,
-        },
-      });
+    await tx.creditUsage.create({
+      data: {
+        userId: transaction.userId,
+        feature: OrderStatus.REFUNDED,
+        orderId: transaction.orderId,
+        creditType: CreditType.PAID,
+        operationType: OperationType.CONSUME,
+        creditsUsed: -creditsRemoved,
+      },
     });
 
     console.log(`Subscription refund processed for transaction: ${transaction.orderId}`);
@@ -989,54 +970,52 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   }
 
   if (transaction.type === TransactionType.ONE_TIME) {
-    await prisma.$transaction(async (tx) => {
-      const now = new Date();
-      const creditRecord = await tx.credit.findUnique({
-        where: { userId: transaction.userId },
-      });
+    const now = new Date();
+    const creditRecord = await tx.credit.findUnique({
+      where: { userId: transaction.userId },
+    });
 
-      const currentBalance = Math.max(creditRecord?.balanceOneTimePaid ?? 0, 0);
-      const granted = Math.max(transaction.creditsGranted ?? 0, 0);
-      const newBalance = Math.max(currentBalance - granted, 0);
-      const creditsRemoved = currentBalance - newBalance;
+    const currentBalance = Math.max(creditRecord?.balanceOneTimePaid ?? 0, 0);
+    const granted = Math.max(transaction.creditsGranted ?? 0, 0);
+    const newBalance = Math.max(currentBalance - granted, 0);
+    const creditsRemoved = currentBalance - newBalance;
 
-      await tx.transaction.update({
-        where: { orderId: transaction.orderId },
-        data: {
-          orderStatus: OrderStatus.REFUNDED,
-          paymentStatus: PaymentStatus.UN_PAID,
-          payUpdatedAt: now,
-        },
-      });
+    await tx.transaction.update({
+      where: { orderId: transaction.orderId },
+      data: {
+        orderStatus: OrderStatus.REFUNDED,
+        paymentStatus: PaymentStatus.UN_PAID,
+        payUpdatedAt: now,
+      },
+    });
 
-      await tx.credit.upsert({
-        where: { userId: transaction.userId },
-        update: {
-          balanceOneTimePaid: newBalance,
-        },
-        create: {
-          userId: transaction.userId,
-          balanceOneTimePaid: newBalance,
-        },
-      } as any);
+    await tx.credit.upsert({
+      where: { userId: transaction.userId },
+      update: {
+        balanceOneTimePaid: newBalance,
+      },
+      create: {
+        userId: transaction.userId,
+        balanceOneTimePaid: newBalance,
+      },
+    } as any);
 
-      await tx.creditUsage.create({
-        data: {
-          userId: transaction.userId,
-          feature: OrderStatus.REFUNDED,
-          orderId: transaction.orderId,
-          creditType: CreditType.PAID,
-          operationType: OperationType.CONSUME,
-          creditsUsed: -creditsRemoved,
-        },
-      });
+    await tx.creditUsage.create({
+      data: {
+        userId: transaction.userId,
+        feature: OrderStatus.REFUNDED,
+        orderId: transaction.orderId,
+        creditType: CreditType.PAID,
+        operationType: OperationType.CONSUME,
+        creditsUsed: -creditsRemoved,
+      },
     });
 
     console.log(`One-time refund processed for transaction: ${transaction.orderId}`);
     return;
   }
   // for other type, not available
-  await prisma.transaction.update({
+  await tx.transaction.update({
     where: { orderId: transaction.orderId },
     data: {
       orderStatus: OrderStatus.REFUNDED,

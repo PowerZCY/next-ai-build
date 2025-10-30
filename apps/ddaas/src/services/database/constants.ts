@@ -40,6 +40,9 @@ export const OperationType = {
   RECHARGE: 'recharge',
   FREEZE: 'freeze',
   UNFREEZE: 'unfreeze',
+  ADJUST_INCREASE: 'adjust_increase',
+  ADJUST_DECREASE: 'adjust_decrease',
+  PURGE: 'purge',
 } as const;
 
 export const PaySupplier = {

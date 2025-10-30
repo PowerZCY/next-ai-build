@@ -205,10 +205,7 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
     );
     if (anonymousUser) {
       // 匿名用户升级
-      await userService.upgradeToRegistered(anonymousUser.userId, {
-        email,
-        clerkUserId
-      });
+      await userAggregateService.upgradeToRegistered(anonymousUser.userId, email, clerkUserId);
       console.log(`Successfully upgraded anonymous user ${anonymousUser.userId} to registered user`);
       return;
     }
@@ -234,10 +231,12 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
 
   try {
     // 备份用户数据并硬删除用户
-    const userId = await userAggregateService.hardDeleteUser(clerkUserId);
-
-    console.log(`Successfully deleted user ${userId} (clerkUserId: ${clerkUserId})`);
-    
+    const userId = await userAggregateService.hardDeleteUserByClerkId(clerkUserId);
+    if (!userId) {
+      console.warn(`User not found, skipping oprate , (clerkUserId: ${clerkUserId})`);
+    } else {
+      console.log(`Successfully deleted user ${userId} , (clerkUserId: ${clerkUserId})`);
+    }
   } catch (error) {
     console.error('Error handling user.deleted event:', error);
     throw error;
