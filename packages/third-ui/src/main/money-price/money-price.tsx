@@ -7,9 +7,11 @@ export async function MoneyPrice({
   locale,
   config,
   checkoutApiEndpoint,
+  customerPortalApiEndpoint,
   signInPath,
   sectionClassName,
   enabledBillingTypes,
+  enableSubscriptionUpgrade = true,
 }: MoneyPriceProps) {
   const t = await getTranslations({ locale, namespace: 'moneyPrice' });
   
@@ -80,8 +82,10 @@ export async function MoneyPrice({
         data={data}
         config={config}
         checkoutApiEndpoint={checkoutApiEndpoint}
+        customerPortalApiEndpoint={customerPortalApiEndpoint}
         signInPath={signInPath}
         enabledBillingTypes={enabledBillingTypes}
+        enableSubscriptionUpgrade={enableSubscriptionUpgrade}
       />
     </section>
   );

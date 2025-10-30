@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { Apilogger, userService } from '@/db/index';
+import { Apilogger, userService, subscriptionService } from '@/db/index';
 
 // Stripe Configuration
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -44,8 +44,15 @@ export const createCheckoutSession = async (
   } = params;
 
   // ✅ Dynamic mode determination: subscription if interval is not 'onetime'
-  const mode: 'subscription' | 'payment' =
-    interval && interval !== 'onetime' ? 'subscription' : 'payment';
+  const mode: 'subscription' | 'payment' = interval && interval !== 'onetime' ? 'subscription' : 'payment';
+  const isSubscriptionMode = mode === 'subscription';
+
+  if (isSubscriptionMode) {
+    const activeSubscription = await subscriptionService.getActiveSubscription(clientReferenceId);
+    if (activeSubscription) {
+      throw new ActiveSubscriptionExistsError();
+    }
+  }
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode, // ✅ Dynamic mode
@@ -237,6 +244,32 @@ export const updateSubscription = async (params: {
   }
 };
 
+export const createCustomerPortalSession = async (params: {
+  customerId: string;
+  returnUrl: string;
+}): Promise<Stripe.BillingPortal.Session> => {
+  const logId = await Apilogger.logStripeOutgoing('createCustomerPortalSession', params);
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: params.customerId,
+      return_url: params.returnUrl,
+    });
+
+    Apilogger.updateResponse(logId, {
+      session_id: session.id,
+      url: session.url,
+    });
+
+    return session;
+  } catch (error) {
+    Apilogger.updateResponse(logId, {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    throw error;
+  }
+};
+
 // Helper function to cancel subscription
 export const cancelSubscription = async (
   subscriptionId: string,
@@ -275,3 +308,10 @@ export const cancelSubscription = async (
     throw error;
   }
 };
+
+export class ActiveSubscriptionExistsError extends Error {
+  constructor() {
+    super('ACTIVE_SUBSCRIPTION_EXISTS');
+    this.name = 'ActiveSubscriptionExistsError';
+  }
+}

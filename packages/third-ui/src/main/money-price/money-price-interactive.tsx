@@ -35,8 +35,10 @@ export function MoneyPriceInteractive({
   data,
   config,
   checkoutApiEndpoint,
+  customerPortalApiEndpoint,
   signInPath,
   enabledBillingTypes,
+  enableSubscriptionUpgrade = true,
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, user } = useClerk();
@@ -193,14 +195,89 @@ export function MoneyPriceInteractive({
     }
   }, [signInPath, redirectToSignIn, router]);
 
-  const handleUpgrade = useCallback(async (plan: string, billing: string) => {
-    if (!checkoutApiEndpoint) {
-      router.push('/');
+  const handleAction = useCallback(async (plan: string, billing: string) => {
+    const isSubscriptionFlow = billing !== 'onetime';
+
+    if (isSubscriptionFlow && !enableSubscriptionUpgrade) {
       return;
     }
 
     setIsProcessing(true);
     try {
+      const hasActiveSubscription =
+        userContext.isAuthenticated &&
+        (userContext.subscriptionStatus === UserState.ProUser ||
+          userContext.subscriptionStatus === UserState.UltraUser);
+
+      const shouldUsePortal = isSubscriptionFlow && hasActiveSubscription;
+
+      const attemptPortalRedirect = async (): Promise<boolean> => {
+        if (!customerPortalApiEndpoint) {
+          console.error('Customer portal endpoint is not configured.');
+          alert('Customer portal is temporarily unavailable. A new checkout flow will be attempted instead.');
+          return false;
+        }
+
+        try {
+          const response = await fetch(customerPortalApiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              returnUrl: window.location.href,
+            }),
+          });
+
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            console.error('Received non-JSON response from customer portal API');
+            return false;
+          }
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            const errorMessage = result.error || `Request failed with status ${response.status}`;
+            console.error('Customer portal request failed:', errorMessage);
+
+            if (response.status === 401 || response.status === 403) {
+              if (signInPath) {
+                window.location.href = signInPath;
+              } else {
+                redirectToSignIn();
+              }
+              return true;
+            }
+            alert(`Operation failed: ${errorMessage}`);
+            return false;
+          }
+
+          if (result.success && result.data?.sessionUrl) {
+            window.location.href = result.data.sessionUrl;
+            return true;
+          }
+
+          console.error('Customer portal session response invalid', result);
+          return false;
+        } catch (error) {
+          console.error('Error creating customer portal session:', error);
+          return false;
+        }
+      };
+
+      if (shouldUsePortal) {
+        const handled = await attemptPortalRedirect();
+        if (handled) {
+          return;
+        }
+      }
+
+      if (!checkoutApiEndpoint) {
+        router.push('/');
+        return;
+      }
+
       const pricing = getProductPricing(
         plan as 'F1' | 'P2' | 'U3',
         billing as BillingType,
@@ -265,7 +342,16 @@ export function MoneyPriceInteractive({
     } finally {
       setIsProcessing(false);
     }
-  }, [checkoutApiEndpoint, config, router, signInPath, redirectToSignIn]);
+  }, [
+    customerPortalApiEndpoint,
+    checkoutApiEndpoint,
+    config,
+    router,
+    signInPath,
+    redirectToSignIn,
+    userContext,
+    enableSubscriptionUpgrade,
+  ]);
 
   // 根据当前计费类型动态选择要显示的 plans
   const currentPlans = useMemo(() => {
@@ -534,9 +620,10 @@ export function MoneyPriceInteractive({
                 userContext={userContext}
                 billingType={billingType}
                 onLogin={handleLogin}
-                onUpgrade={handleUpgrade}
+                onAction={handleAction}
                 texts={data.buttonTexts}
                 isProcessing={isProcessing}
+                enableSubscriptionUpgrade={enableSubscriptionUpgrade}
               />
             </div>
           );

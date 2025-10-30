@@ -10,9 +10,10 @@ export function MoneyPriceButton({
   userContext,
   billingType,
   onLogin,
-  onUpgrade,
+  onAction,
   texts,
-  isProcessing = false
+  isProcessing = false,
+  enableSubscriptionUpgrade = true
 }: MoneyPriceButtonProps) {
   const { isAuthenticated, subscriptionStatus } = userContext;
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +43,7 @@ export function MoneyPriceButton({
     // 登录用户：OneTime 模式下所有卡片都显示购买积分按钮
     return {
       text: texts.buyCredits || texts.upgrade,
-      onClick: () => onUpgrade(planKey, billingType),
+      onClick: () => onAction(planKey, billingType),
       disabled: false,
       hidden: false
     };
@@ -85,7 +86,7 @@ export function MoneyPriceButton({
         }
         return {
           text: texts.upgrade,
-          onClick: () => onUpgrade(planTier, planBilling),
+          onClick: () => onAction(planTier, planBilling),
           disabled: false,
           hidden: false
         };
@@ -114,7 +115,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('P2', planBilling),
+              onClick: () => onAction('P2', planBilling),
               disabled: false,
               hidden: false
             };
@@ -128,7 +129,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('U3', planBilling),
+              onClick: () => onAction('U3', planBilling),
               disabled: false,
               hidden: false
             };
@@ -153,7 +154,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('P2', planBilling),
+              onClick: () => onAction('P2', planBilling),
               disabled: false,
               hidden: false
             };
@@ -175,7 +176,7 @@ export function MoneyPriceButton({
           if (targetRank > currentRank) {
             return {
               text: texts.upgrade,
-              onClick: () => onUpgrade('U3', planBilling),
+              onClick: () => onAction('U3', planBilling),
               disabled: false,
               hidden: false
             };
@@ -201,6 +202,15 @@ export function MoneyPriceButton({
   const config = getButtonConfig();
   
   if (config.hidden) return null;
+
+  if (
+    !enableSubscriptionUpgrade &&
+    billingType !== 'onetime' &&
+    config.text === texts.upgrade &&
+    typeof config.onClick === 'function'
+  ) {
+    return null;
+  }
 
   const handleClick = async (e: React.MouseEvent) => {
     if (config.disabled || isLoading || isProcessing) {

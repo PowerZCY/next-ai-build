@@ -88,9 +88,11 @@ export interface MoneyPriceProps {
   config: MoneyPriceConfig;
   className?: string;
   checkoutApiEndpoint?: string;
+  customerPortalApiEndpoint?: string;
   signInPath?: string;
   sectionClassName?: string;
   enabledBillingTypes?: string[];
+  enableSubscriptionUpgrade?: boolean;
 }
 
 // 交互组件属性
@@ -98,8 +100,10 @@ export interface MoneyPriceInteractiveProps {
   data: MoneyPriceData;
   config: MoneyPriceConfig;
   checkoutApiEndpoint?: string;
+  customerPortalApiEndpoint?: string;
   signInPath?: string;
   enabledBillingTypes?: string[];
+  enableSubscriptionUpgrade?: boolean;
 }
 
 // 按钮组件属性
@@ -108,7 +112,7 @@ export interface MoneyPriceButtonProps {
   userContext: UserContext;
   billingType: string;
   onLogin: () => void;
-  onUpgrade: (plan: string, billingType: string) => void | Promise<void>;
+  onAction: (plan: string, billingType: string) => void | Promise<void>;
   texts: {
     buyCredits: string;
     getStarted: string;
@@ -118,6 +122,7 @@ export interface MoneyPriceButtonProps {
     upgrade: string;
   };
   isProcessing?: boolean;
+  enableSubscriptionUpgrade?: boolean;
 }
 
 // 数据结构

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createCheckoutSession,
   createOrGetCustomer,
+  ActiveSubscriptionExistsError,
 } from '@/lib/stripe-config';
 import {
   transactionService,
@@ -116,6 +117,16 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Create checkout error:', error);
+
+    if (error instanceof ActiveSubscriptionExistsError) {
+      return NextResponse.json(
+        {
+          error: 'Active subscription exists',
+          detail: 'Please use the customer portal to manage your existing subscription.',
+        },
+        { status: 409 }
+      );
+    }
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
