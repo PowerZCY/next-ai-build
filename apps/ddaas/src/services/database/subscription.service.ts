@@ -133,6 +133,20 @@ export class SubscriptionService {
     });
   }
 
+  async findAnonymousInitRecord(
+    userId: string,
+    tx?: Prisma.TransactionClient
+  ): Promise<Subscription | null> {
+    const client = getDbClient(tx);
+
+    return await client.subscription.findFirst({
+      where: {
+        userId,
+        status: SubscriptionStatus.INCOMPLETE,
+      },
+    });
+  }
+
   // Update subscription
   async updateSubscription(
     id: bigint,

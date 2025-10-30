@@ -18,6 +18,8 @@ export class TransactionService {
     paySubscriptionId?: string;
     paySessionId?: string;
     payInvoiceId?: string;
+    hostedInvoiceUrl?: string,
+    invoicePdf?: string,
     billingReason?: string;
     priceId?: string;
     priceName?: string;
@@ -44,6 +46,8 @@ export class TransactionService {
         paySubscriptionId: data.paySubscriptionId,
         paySessionId: data.paySessionId,
         payInvoiceId: data.payInvoiceId,
+        hostedInvoiceUrl: data.hostedInvoiceUrl,
+        invoicePdf: data.invoicePdf,
         billingReason: data.billingReason,
         priceId: data.priceId,
         priceName: data.priceName,
@@ -144,6 +148,13 @@ export class TransactionService {
       paidDetail?: string;
       payUpdatedAt?: Date;
       paymentStatus?: string;
+      paySubscriptionId?: string;
+      paySessionId?: string;
+      payInvoiceId?: string;
+      hostedInvoiceUrl?: string;
+      invoicePdf?: string;
+      billingReason?: string;
+      orderDetail?: string;
     },
     tx?: Prisma.TransactionClient
   ): Promise<Transaction> {
@@ -158,6 +169,19 @@ export class TransactionService {
     return await client.transaction.update({
       where: { orderId },
       data: updateData,
+    });
+  }
+
+  async update(
+    orderId: string,
+    data: Prisma.TransactionUpdateInput,
+    tx?: Prisma.TransactionClient
+  ): Promise<Transaction> {
+    const client = getDbClient(tx);
+
+    return await client.transaction.update({
+      where: { orderId },
+      data,
     });
   }
 
