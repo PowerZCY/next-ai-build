@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { PrismaClient } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import type { Apilog } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { getDbClient } from '@/db/prisma';
 
 export type ApiType = 'from_clerk_in' | 'to_clerk_out' | 'from_stripe_in' | 'to_stripe_out';
 
@@ -15,9 +14,11 @@ export interface CreateApiLogData {
 }
 
 export class ApilogService {
+
   // Create API log record with request
-  async createApilog(data: CreateApiLogData): Promise<string> {
-    const log = await prisma.apilog.create({
+  async createApilog(data: CreateApiLogData, tx?: Prisma.TransactionClient): Promise<string> {
+    const client = getDbClient(tx);
+    const log = await client.apilog.create({
       data: {
         methodName: data.methodName,
         request: data.request ? JSON.stringify(data.request) : null,
@@ -29,8 +30,9 @@ export class ApilogService {
   }
 
   // Update API log record with response
-  async updateApilogResponse(logId: string, response: any): Promise<void> {
-    await prisma.apilog.update({
+  async updateApilogResponse(logId: string, response: any, tx?: Prisma.TransactionClient): Promise<void> {
+    const client = getDbClient(tx);
+    await client.apilog.update({
       where: { id: BigInt(logId) },
       data: {
         response: response ? JSON.stringify(response) : null,
@@ -39,8 +41,9 @@ export class ApilogService {
   }
 
   // Get API log by ID
-  async getApilog(logId: string): Promise<Apilog | null> {
-    return await prisma.apilog.findUnique({
+  async getApilog(logId: string, tx?: Prisma.TransactionClient): Promise<Apilog | null> {
+    const client = getDbClient(tx);
+    return await client.apilog.findUnique({
       where: { id: BigInt(logId) },
     });
   }
@@ -51,10 +54,12 @@ export class ApilogService {
     methodName?: string;
     limit?: number;
     offset?: number;
-  }): Promise<Apilog[]> {
+  }, tx?: Prisma.TransactionClient): Promise<Apilog[]> {
     const { apiType, methodName, limit = 50, offset = 0 } = params;
 
-    return await prisma.apilog.findMany({
+    const client = getDbClient(tx);
+
+    return await client.apilog.findMany({
       where: {
         ...(apiType && { apiType }),
         ...(methodName && { methodName: { contains: methodName } }),
@@ -66,11 +71,12 @@ export class ApilogService {
   }
 
   // Delete old API logs (cleanup)
-  async deleteOldLogList(daysOld: number = 30): Promise<number> {
+  async deleteOldLogList(daysOld: number = 30, tx?: Prisma.TransactionClient): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const result = await prisma.apilog.deleteMany({
+    const client = getDbClient(tx);
+    const result = await client.apilog.deleteMany({
       where: {
         createdAt: {
           lt: cutoffDate,
@@ -82,19 +88,20 @@ export class ApilogService {
   }
 
   // Get API log statistics
-  async getApilogStats(): Promise<{
+  async getApilogStats(tx?: Prisma.TransactionClient): Promise<{
     totalLogs: number;
     clerkIncoming: number;
     clerkOutgoing: number;
     stripeIncoming: number;
     stripeOutgoing: number;
   }> {
+    const client = getDbClient(tx);
     const [total, clerkIn, clerkOut, stripeIn, stripeOut] = await Promise.all([
-      prisma.apilog.count(),
-      prisma.apilog.count({ where: { apiType: 'from_clerk_in' } }),
-      prisma.apilog.count({ where: { apiType: 'to_clerk_out' } }),
-      prisma.apilog.count({ where: { apiType: 'from_stripe_in' } }),
-      prisma.apilog.count({ where: { apiType: 'to_stripe_out' } }),
+      client.apilog.count(),
+      client.apilog.count({ where: { apiType: 'from_clerk_in' } }),
+      client.apilog.count({ where: { apiType: 'to_clerk_out' } }),
+      client.apilog.count({ where: { apiType: 'from_stripe_in' } }),
+      client.apilog.count({ where: { apiType: 'to_stripe_out' } }),
     ]);
 
     return {

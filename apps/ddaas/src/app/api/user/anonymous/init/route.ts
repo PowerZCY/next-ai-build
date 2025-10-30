@@ -6,14 +6,12 @@
 };
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userService, creditService, creditUsageService, User, Credit, Subscription } from '@/services/database';
-import { subscriptionService } from '@/services/database/subscription.service';
-import { UserStatus, CreditType, OperationType } from '@/services/database';
+import { userService, creditService, subscriptionService, User, Credit, Subscription } from '@/db/index';
+import { userAggregateService }  from '@/agg/index';
+import { UserStatus } from '@/db/constants';
 import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';
 import { XUser, XCredit, XSubscription } from '@third-ui/clerk/fingerprint';
 
-// 免费积分配置
-const FREE_CREDITS_AMOUNT = 50;
 
 // ==================== 类型定义 ====================
 
@@ -179,26 +177,7 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
     }
 
     // 创建新的匿名用户
-    const newUser = await userService.createUser({
-      fingerprintId,
-      status: UserStatus.ANONYMOUS,
-    });
-
-    // 初始化积分记录
-    const credit = await creditService.initializeCredit(
-      newUser.userId,
-      FREE_CREDITS_AMOUNT,
-      0 // 匿名用户只给免费积分
-    );
-
-    // 记录免费积分充值记录
-    await creditUsageService.recordCreditOperation({
-      userId: newUser.userId,
-      feature: 'anonymous_user_init',
-      creditType: CreditType.FREE,
-      operationType: OperationType.RECHARGE,
-      creditsUsed: FREE_CREDITS_AMOUNT,
-    });
+    const { newUser, credit } = await userAggregateService.initAnonymousUser(fingerprintId);
 
     console.log(`Created new anonymous user ${newUser.userId} with fingerprint ${fingerprintId}`);
 

@@ -40,7 +40,7 @@
  */
 
 import Stripe from 'stripe';
-import { PrismaClient, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { stripe } from '@/lib/stripe-config';
 import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import {
@@ -57,9 +57,8 @@ import {
   PaymentStatus,
 } from '@/services/database';
 import { Apilogger } from '@/services/database/apilog.service';
+import { prisma } from '@/db/prisma';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
-
-const prisma = new PrismaClient();
 
 const mapPaymentStatus = (
   status?: Stripe.Checkout.Session.PaymentStatus | null

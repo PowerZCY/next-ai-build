@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import type { User } from '@prisma/client';
 import { UserStatus } from '@/db/constants';
-
-const prisma = new PrismaClient();
+import { getDbClient } from '@/db/prisma';
 
 export class UserService {
+
   // Create user
   async createUser(data: {
     fingerprintId?: string;
@@ -14,8 +14,10 @@ export class UserService {
     stripeCusId?: string;
     email?: string;
     status?: string;
-  }): Promise<User> {
-    return await prisma.user.create({
+  }, tx?: Prisma.TransactionClient): Promise<User> {
+    const client = getDbClient(tx);
+
+    return await client.user.create({
       data: {
         fingerprintId: data.fingerprintId,
         clerkUserId: data.clerkUserId,
@@ -27,8 +29,10 @@ export class UserService {
   }
 
   // Find user by ID
-  async findByUserId(userId: string): Promise<User | null> {
-    return await prisma.user.findUnique({
+  async findByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<User | null> {
+    const client = getDbClient(tx);
+
+    return await client.user.findUnique({
       where: { userId },
       select: {
         id: true,
@@ -51,8 +55,10 @@ export class UserService {
   }
 
   // Find user by email
-  async findByEmail(email: string): Promise<User | null> {
-    return await prisma.user.findFirst({
+  async findByEmail(email: string, tx?: Prisma.TransactionClient): Promise<User | null> {
+    const client = getDbClient(tx);
+
+    return await client.user.findFirst({
       where: { email },
       select: {
         id: true,
@@ -75,8 +81,10 @@ export class UserService {
   }
 
   // Find users by Fingerprint ID, fp_id can be used for multi user_ids
-  async findListByFingerprintId(fingerprintId: string): Promise<User[]> {
-    return await prisma.user.findMany({
+  async findListByFingerprintId(fingerprintId: string, tx?: Prisma.TransactionClient): Promise<User[]> {
+    const client = getDbClient(tx);
+
+    return await client.user.findMany({
       where: { fingerprintId },
       select: {
         id: true,
@@ -95,8 +103,10 @@ export class UserService {
   }
 
   // Find user by Clerk user ID
-  async findByClerkUserId(clerkUserId: string): Promise<User | null> {
-    return await prisma.user.findUnique({
+  async findByClerkUserId(clerkUserId: string, tx?: Prisma.TransactionClient): Promise<User | null> {
+    const client = getDbClient(tx);
+
+    return await client.user.findUnique({
       where: { clerkUserId },
       select: {
         id: true,
@@ -121,9 +131,12 @@ export class UserService {
   // Update user
   async updateUser(
     userId: string,
-    data: Prisma.UserUpdateInput
+    data: Prisma.UserUpdateInput,
+    tx?: Prisma.TransactionClient
   ): Promise<User> {
-    return await prisma.user.update({
+    const client = getDbClient(tx);
+
+    return await client.user.update({
       where: { userId },
       data,
     });
@@ -131,9 +144,12 @@ export class UserService {
 
   async updateStripeCustomerId(
     userId: string,
-    stripeCusId: string | null
+    stripeCusId: string | null,
+    tx?: Prisma.TransactionClient
   ): Promise<User> {
-    return await prisma.user.update({
+    const client = getDbClient(tx);
+
+    return await client.user.update({
       where: { userId },
       data: { stripeCusId },
     });
@@ -145,9 +161,12 @@ export class UserService {
     data: {
       email: string;
       clerkUserId: string;
-    }
+    },
+    tx?: Prisma.TransactionClient
   ): Promise<User> {
-    return await prisma.user.update({
+    const client = getDbClient(tx);
+
+    return await client.user.update({
       where: { userId },
       data: {
         email: data.email,
@@ -158,8 +177,10 @@ export class UserService {
   }
 
   // Soft delete user (mark as deleted)
-  async softDeleteUser(userId: string): Promise<User> {
-    return await prisma.user.update({
+  async softDeleteUser(userId: string, tx?: Prisma.TransactionClient): Promise<User> {
+    const client = getDbClient(tx);
+
+    return await client.user.update({
       where: { userId },
       data: {
         status: UserStatus.DELETED,
@@ -170,52 +191,20 @@ export class UserService {
     });
   }
 
-  // Hard delete user (permanent deletion)
-  async hardDeleteUser(userId: string): Promise<void> {
-    // Backup user data before deletion
-    const user = await prisma.user.findUnique({
-      where: { userId },
-      include: {
-        credits: true,
-        subscriptions: true,
-        transactions: true,
-        creditUsage: true,
-      },
-    });
-
-    if (user) {
-      // Backup user data to UserBackup table
-      await prisma.userBackup.create({
-        data: {
-          originalUserId: user.userId,
-          fingerprintId: user.fingerprintId,
-          clerkUserId: user.clerkUserId,
-          email: user.email,
-          status: user.status,
-          backupData: user as any,
-        },
-      });
-
-      // Delete user (cascading delete will automatically delete associated data)
-      await prisma.user.delete({
-        where: { userId },
-      });
-    }
-  }
-
   // Get user list
   async listUsers(params: {
     skip?: number;
     take?: number;
     status?: string;
     orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<{ users: User[]; total: number }> {
+  }, tx?: Prisma.TransactionClient): Promise<{ users: User[]; total: number }> {
+    const client = getDbClient(tx);
     const { skip = 0, take = 10, status, orderBy = { createdAt: 'desc' } } = params;
 
     const where: Prisma.UserWhereInput = status ? { status } : {};
 
     const [users, total] = await Promise.all([
-      prisma.user.findMany({
+      client.user.findMany({
         where,
         skip,
         take,
@@ -233,7 +222,7 @@ export class UserService {
           credits: true,
         },
       }),
-      prisma.user.count({ where }),
+      client.user.count({ where }),
     ]);
 
     return { users, total };
@@ -241,14 +230,16 @@ export class UserService {
 
   // 批量创建匿名用户
   async createBatchAnonymousUsers(
-    fingerprintIds: string[]
+    fingerprintIds: string[],
+    tx?: Prisma.TransactionClient
   ): Promise<number> {
+    const client = getDbClient(tx);
     const data = fingerprintIds.map((fingerprintId) => ({
       fingerprintId,
       status: UserStatus.ANONYMOUS,
     }));
 
-    const result = await prisma.user.createMany({
+    const result = await client.user.createMany({
       data,
       skipDuplicates: true,
     });
@@ -257,27 +248,29 @@ export class UserService {
   }
 
   // Check if user exists
-  async exists(userId: string): Promise<boolean> {
-    const count = await prisma.user.count({
+  async exists(userId: string, tx?: Prisma.TransactionClient): Promise<boolean> {
+    const client = getDbClient(tx);
+    const count = await client.user.count({
       where: { userId },
     });
     return count > 0;
   }
 
   // Get user statistics
-  async getUserStats(): Promise<{
+  async getUserStats(tx?: Prisma.TransactionClient): Promise<{
     total: number;
     anonymous: number;
     registered: number;
     frozen: number;
     deleted: number;
   }> {
+    const client = getDbClient(tx);
     const [total, anonymous, registered, frozen, deleted] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { status: UserStatus.ANONYMOUS } }),
-      prisma.user.count({ where: { status: UserStatus.REGISTERED } }),
-      prisma.user.count({ where: { status: UserStatus.FROZEN } }),
-      prisma.user.count({ where: { status: UserStatus.DELETED } }),
+      client.user.count(),
+      client.user.count({ where: { status: UserStatus.ANONYMOUS } }),
+      client.user.count({ where: { status: UserStatus.REGISTERED } }),
+      client.user.count({ where: { status: UserStatus.FROZEN } }),
+      client.user.count({ where: { status: UserStatus.DELETED } }),
     ]);
 
     return { total, anonymous, registered, frozen, deleted };

@@ -27,6 +27,7 @@
       "@/*": [ "./src/*" ],
       ".source/*": ["./.source/*"],
       "@/db/*": [ "./src/services/database/*" ],
+      "@/agg/*": [ "./src/services/aggregate/*" ],
       "@third-ui/*": ["../../packages/third-ui/src/*"],
       "@base-ui/*": ["../../packages/base-ui/src/*"],
       "@lib/*": ["../../packages/lib/src/*"]

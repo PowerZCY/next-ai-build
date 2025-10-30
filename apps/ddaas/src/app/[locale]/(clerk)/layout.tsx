@@ -13,6 +13,8 @@ import { FumaBannerSuit } from '@third-ui/fuma/server';
 import { ReactNode } from 'react';
 import { clerkPageBanner } from '@/lib/appConfig';
 import { ClerkProviderClient } from '@third-ui/clerk';
+import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
+import { fingerprintConfig } from '@/lib/fingerprint-config';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps>{
   const resolvedBaseOptions = await baseOptions(locale);
@@ -33,20 +35,22 @@ export default async function RootLayout({
 
   return (
     <ClerkProviderClient locale={locale}>
-      <HomeLayout
-        {...customeOptions}
-        searchToggle={{
-          enabled: false,
-        }}
-        themeSwitch={{
-          enabled: true,
-          mode: 'light-dark-system',
-        }}
-        className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${clerkPageBanner ? 'pt-30 has-banner' : 'pt-20 no-banner'}`}
-        >
-        <FumaBannerSuit locale={locale} showBanner={clerkPageBanner}/>
-        {children}
-      </HomeLayout>
+      <FingerprintProvider config={fingerprintConfig}>
+        <HomeLayout
+          {...customeOptions}
+          searchToggle={{
+            enabled: false,
+          }}
+          themeSwitch={{
+            enabled: true,
+            mode: 'light-dark-system',
+          }}
+          className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${clerkPageBanner ? 'pt-30 has-banner' : 'pt-20 no-banner'}`}
+          >
+          <FumaBannerSuit locale={locale} showBanner={clerkPageBanner}/>
+          {children}
+        </HomeLayout>
+        </FingerprintProvider>
     </ClerkProviderClient>
   );
 }

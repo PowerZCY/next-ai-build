@@ -4,12 +4,12 @@
   return this.toString();
 };
 
-import { NextRequest, NextResponse } from 'next/server';
+import { userAggregateService } from '@/agg/index';
+import { UserStatus } from '@/db/constants';
+import { Apilogger, userService } from '@/db/index';
 import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { userService, creditService, creditUsageService, subscriptionService, Apilogger } from '@/services/database';
-import { UserStatus, CreditType, OperationType } from '@/services/database';
-import { freeAmount } from '@/lib/appConfig';
 
 // 定义Clerk Webhook事件类型
 interface ClerkWebhookEvent {
@@ -36,10 +36,6 @@ interface ClerkWebhookEvent {
   timestamp: number;
   type: 'user.created' | 'user.deleted';
 }
-
-// 免费积分配置
-const FREE_CREDITS_AMOUNT = freeAmount;
-
 export async function POST(request: NextRequest) {
   try {
     // 获取原始请求体
@@ -218,7 +214,7 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
     }
 
     // 同设备新账号，创建新用户
-    await createNewRegisteredUser(clerkUserId, email, fingerprintId);
+    await userAggregateService.createNewRegisteredUser(clerkUserId, email, fingerprintId);
     console.log(`Created new user for device ${fingerprintId} with email ${email}`);
     
   } catch (error) {
@@ -237,18 +233,10 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
   console.log('Processing user.deleted event:', { clerkUserId });
 
   try {
-    // 根据clerkUserId查找用户
-    const user = await userService.findByClerkUserId(clerkUserId);
-    
-    if (!user) {
-      console.log(`User with clerkUserId ${clerkUserId} not found`);
-      return;
-    }
-
     // 备份用户数据并硬删除用户
-    await userService.hardDeleteUser(user.userId);
-    
-    console.log(`Successfully deleted user ${user.userId} (clerkUserId: ${clerkUserId})`);
+    const userId = await userAggregateService.hardDeleteUser(clerkUserId);
+
+    console.log(`Successfully deleted user ${userId} (clerkUserId: ${clerkUserId})`);
     
   } catch (error) {
     console.error('Error handling user.deleted event:', error);
@@ -256,52 +244,3 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
   }
 }
 
-/**
- * 创建新的注册用户
- *
- * 初始化步骤（与 credit 平行）：
- * 1. 创建 User 记录
- * 2. 初始化 Credit 记录（免费积分）
- * 3. 初始化 Subscription 记录（占位符，status=INCOMPLETE）
- * 4. 记录 CreditUsage（审计）
- *
- * 后续当用户通过 Stripe 订阅时：
- * - session.completed 或 invoice.paid 会 UPDATE subscription 记录
- * - 不需要 CREATE，只需 UPDATE 确保逻辑一致
- */
-async function createNewRegisteredUser(
-  clerkUserId: string,
-  email?: string,
-  fingerprintId?: string
-) {
-  // 创建新用户
-  const newUser = await userService.createUser({
-    clerkUserId,
-    email,
-    fingerprintId,
-    status: UserStatus.REGISTERED
-  });
-
-  // 初始化积分记录
-  await creditService.initializeCredit(
-    newUser.userId,
-    FREE_CREDITS_AMOUNT,
-    0 // 注册时只给免费积分，付费积分为0
-  );
-
-  // ✅ 初始化订阅记录（占位符）
-  // 这样后续 Stripe webhook 可以直接 UPDATE，无需 CREATE
-  // 确保所有订阅场景下的处理逻辑一致
-  await subscriptionService.initializeSubscription(newUser.userId);
-
-  // 记录免费积分充值记录
-  await creditUsageService.recordCreditOperation({
-    userId: newUser.userId,
-    feature: 'user_registration',
-    creditType: CreditType.FREE,
-    operationType: OperationType.RECHARGE,
-    creditsUsed: FREE_CREDITS_AMOUNT
-  });
-
-  console.log(`Created new registered user ${newUser.userId} with ${FREE_CREDITS_AMOUNT} free credits and initialized subscription placeholder`);
-}

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { CreditUsage } from '@prisma/client';
 import { CreditType, OperationType } from '@/db/constants';
-
-const prisma = new PrismaClient();
+import { getDbClient } from '@/db/prisma';
 
 export class CreditUsageService {
+
   // Record Credit Usage
   async recordUsage(data: {
     userId: string;
@@ -15,8 +15,10 @@ export class CreditUsageService {
     creditType: string;
     operationType: string;
     creditsUsed: number;
-  }): Promise<CreditUsage> {
-    return await prisma.creditUsage.create({
+  }, tx?: Prisma.TransactionClient): Promise<CreditUsage> {
+    const client = getDbClient(tx);
+
+    return await client.creditUsage.create({
       data: {
         userId: data.userId,
         feature: data.feature,
@@ -36,15 +38,17 @@ export class CreditUsageService {
     creditType: string;
     operationType: string;
     creditsUsed: number;
-  }): Promise<CreditUsage> {
-    return this.recordUsage(data);
+  }, tx?: Prisma.TransactionClient): Promise<CreditUsage> {
+    return this.recordUsage(data, tx);
   }
 
   // Batch Record Credit Usage
   async recordBatchUsage(
-    usages: Prisma.CreditUsageCreateManyInput[]
+    usages: Prisma.CreditUsageCreateManyInput[],
+    tx?: Prisma.TransactionClient
   ): Promise<number> {
-    const result = await prisma.creditUsage.createMany({
+    const client = getDbClient(tx);
+    const result = await client.creditUsage.createMany({
       data: usages,
     });
     return result.count;
@@ -62,8 +66,10 @@ export class CreditUsageService {
       skip?: number;
       take?: number;
       orderBy?: Prisma.CreditUsageOrderByWithRelationInput;
-    }
+    },
+    tx?: Prisma.TransactionClient
   ): Promise<{ usage: CreditUsage[]; total: number }> {
+    const client = getDbClient(tx);
     const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
 
     if (params?.creditType) {
@@ -85,21 +91,23 @@ export class CreditUsageService {
     }
 
     const [usage, total] = await Promise.all([
-      prisma.creditUsage.findMany({
+      client.creditUsage.findMany({
         where,
         skip: params?.skip || 0,
         take: params?.take || 20,
         orderBy: params?.orderBy || { createdAt: 'desc' },
       }),
-      prisma.creditUsage.count({ where }),
+      client.creditUsage.count({ where }),
     ]);
 
     return { usage, total };
   }
 
   // Get Credit Usage Record by Order ID
-  async getOrderUsage(orderId: string): Promise<CreditUsage[]> {
-    return await prisma.creditUsage.findMany({
+  async getOrderUsage(orderId: string, tx?: Prisma.TransactionClient): Promise<CreditUsage[]> {
+    const client = getDbClient(tx);
+
+    return await client.creditUsage.findMany({
       where: { orderId, deleted: 0 },
       orderBy: { createdAt: 'desc' },
     });
@@ -109,7 +117,8 @@ export class CreditUsageService {
   async getUserUsageStats(
     userId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    tx?: Prisma.TransactionClient
   ): Promise<{
     totalConsumed: number;
     totalRecharged: number;
@@ -119,6 +128,7 @@ export class CreditUsageService {
     paidRecharged: number;
     featureUsage: { feature: string; credits: number }[];
   }> {
+    const client = getDbClient(tx);
     const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
 
     if (startDate || endDate) {
@@ -128,7 +138,7 @@ export class CreditUsageService {
     }
 
     // Get all usage records
-    const allUsage = await prisma.creditUsage.findMany({
+    const allUsage = await client.creditUsage.findMany({
       where,
       select: {
         creditType: true,
@@ -189,8 +199,10 @@ export class CreditUsageService {
   async getPopularFeatures(
     limit: number = 10,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    tx?: Prisma.TransactionClient
   ): Promise<{ feature: string | null; totalCredits: number; usageCount: number }[]> {
+    const client = getDbClient(tx);
     const where: Prisma.CreditUsageWhereInput = {
       operationType: OperationType.CONSUME,
       feature: { not: null },
@@ -203,7 +215,7 @@ export class CreditUsageService {
       if (endDate) where.createdAt.lte = endDate;
     }
 
-    const result = await prisma.creditUsage.groupBy({
+    const result = await client.creditUsage.groupBy({
       by: ['feature'],
       where,
       _sum: {
@@ -228,7 +240,8 @@ export class CreditUsageService {
   // Get Daily Credit Usage Trend
   async getDailyUsageTrend(
     days: number = 30,
-    userId?: string
+    userId?: string,
+    tx?: Prisma.TransactionClient
   ): Promise<{
     date: Date;
     consumed: number;
@@ -242,7 +255,9 @@ export class CreditUsageService {
 
     const whereCondition = userId ? `AND user_id = '${userId}'::uuid` : '';
 
-    const result = await prisma.$queryRaw`
+    const client = getDbClient(tx);
+
+    const result = await client.$queryRaw`
       SELECT 
         DATE(created_at) as date,
         SUM(CASE WHEN operation_type = 'consume' THEN credits_used ELSE 0 END) as consumed,
@@ -273,9 +288,12 @@ export class CreditUsageService {
   // Get Recent Credit Usage Operations
   async getRecentOperations(
     userId: string,
-    limit: number = 10
+    limit: number = 10,
+    tx?: Prisma.TransactionClient
   ): Promise<CreditUsage[]> {
-    return await prisma.creditUsage.findMany({
+    const client = getDbClient(tx);
+
+    return await client.creditUsage.findMany({
       where: { userId, deleted: 0 },
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -283,11 +301,13 @@ export class CreditUsageService {
   }
 
   // Soft Delete Old Credit Usage Records
-  async deleteOldRecords(daysToKeep: number = 365): Promise<number> {
+  async deleteOldRecords(daysToKeep: number = 365, tx?: Prisma.TransactionClient): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const result = await prisma.creditUsage.updateMany({
+    const client = getDbClient(tx);
+
+    const result = await client.creditUsage.updateMany({
       where: {
         createdAt: {
           lt: cutoffDate,
@@ -303,7 +323,7 @@ export class CreditUsageService {
   }
 
   // Get System-wide Credit Usage Statistics
-  async getSystemStats(): Promise<{
+  async getSystemStats(tx?: Prisma.TransactionClient): Promise<{
     totalUsers: number;
     totalOperations: number;
     totalConsumed: number;
@@ -311,23 +331,24 @@ export class CreditUsageService {
     avgDailyConsumption: number;
     avgDailyRecharge: number;
   }> {
+    const client = getDbClient(tx);
     const [
       totalUsers,
       totalOperations,
       consumeStats,
       rechargeStats,
     ] = await Promise.all([
-      prisma.creditUsage.groupBy({
+      client.creditUsage.groupBy({
         by: ['userId'],
         where: { deleted: 0 },
       }).then((result) => result.length),
-      prisma.creditUsage.count({ where: { deleted: 0 } }),
-      prisma.creditUsage.aggregate({
+      client.creditUsage.count({ where: { deleted: 0 } }),
+      client.creditUsage.aggregate({
         where: { operationType: OperationType.CONSUME, deleted: 0 },
         _sum: { creditsUsed: true },
         _count: true,
       }),
-      prisma.creditUsage.aggregate({
+      client.creditUsage.aggregate({
         where: { operationType: OperationType.RECHARGE, deleted: 0 },
         _sum: { creditsUsed: true },
         _count: true,
@@ -335,7 +356,7 @@ export class CreditUsageService {
     ]);
 
     // Calculate operating days (from first record to now)
-    const firstRecord = await prisma.creditUsage.findFirst({
+    const firstRecord = await client.creditUsage.findFirst({
       where: { deleted: 0 },
       orderBy: { createdAt: 'asc' },
       select: { createdAt: true },
@@ -362,9 +383,11 @@ export class CreditUsageService {
   async isDuplicateOperation(
     userId: string,
     orderId: string,
-    operationType: string
+    operationType: string,
+    tx?: Prisma.TransactionClient
   ): Promise<boolean> {
-    const count = await prisma.creditUsage.count({
+    const client = getDbClient(tx);
+    const count = await client.creditUsage.count({
       where: {
         userId,
         orderId,

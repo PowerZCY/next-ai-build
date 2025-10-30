@@ -4,7 +4,8 @@ import { createCommonAppConfig, createI18nHelpers, LOCALE_PRESETS } from "@lib/c
 export const appConfig = {
   ...createCommonAppConfig(LOCALE_PRESETS.EN_ZH),
   creditsConfig: {
-    freeAmount: 50,
+    freeAmount: 1,
+    freeRegisterAmount: 2,
     freeExpiredDays: 7,
     oneTimeExpiredDays: 30
   }
@@ -16,4 +17,4 @@ export const { isSupportedLocale, getValidLocale, generatedLocales } = createI18
 // export shortcuts
 export const { iconColor, watermark, showBanner, clerkPageBanner, clerkAuthInModal, placeHolderImage } = appConfig.shortcuts;
 
-export const { freeAmount, freeExpiredDays, oneTimeExpiredDays } = appConfig.creditsConfig;
+export const { freeAmount, freeRegisterAmount, freeExpiredDays, oneTimeExpiredDays } = appConfig.creditsConfig;

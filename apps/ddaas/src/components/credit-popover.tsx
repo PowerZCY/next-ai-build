@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { getTranslations } from 'next-intl/server';
 import { CreditOverview } from '@third-ui/main/server';
 import type { CreditOverviewData } from '@third-ui/main/server';
-import { creditService, subscriptionService } from '@/services/database';
+import { creditService, subscriptionService, userService } from '@/db/index';
 import { CreditNavButton } from '@third-ui/main';
 
 interface CreditPopoverProps {
@@ -16,9 +16,15 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
     return null;
   }
 
+  const user = await userService.findByClerkUserId(clerkUserId);
+  if (!user) {
+    console.error('User not found!');
+    return null;
+  }
+
   const [credit, subscription, t] = await Promise.all([
-    creditService.getCredit(clerkUserId),
-    subscriptionService.getActiveSubscription(clerkUserId),
+    creditService.getCredit(user.userId),
+    subscriptionService.getActiveSubscription(user.userId),
     getTranslations({ locale, namespace: 'credit' }),
   ]);
 

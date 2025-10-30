@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import type { UserBackup } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { getDbClient, prisma } from '@/db/prisma';
 
 export class UserBackupService {
+
   // Create user backup
   async createBackup(data: {
     originalUserId: string;
@@ -14,8 +14,10 @@ export class UserBackupService {
     email?: string;
     status?: string;
     backupData?: any;
-  }): Promise<UserBackup> {
-    return await prisma.userBackup.create({
+  }, tx?: Prisma.TransactionClient): Promise<UserBackup> {
+    const client = getDbClient(tx);
+
+    return await client.userBackup.create({
       data: {
         originalUserId: data.originalUserId,
         fingerprintId: data.fingerprintId,
@@ -28,9 +30,10 @@ export class UserBackupService {
   }
 
   // Backup user basic data
-  async backupUserData(userId: string): Promise<UserBackup> {
+  async backupUserData(userId: string, tx?: Prisma.TransactionClient): Promise<UserBackup> {
+    const client = getDbClient(tx);
     // Get user basic data
-    const userData = await prisma.user.findUnique({
+    const userData = await client.user.findUnique({
       where: { userId },
     });
 
@@ -55,22 +58,27 @@ export class UserBackupService {
         createdAt: userData.createdAt?.toISOString(),
         updatedAt: userData.updatedAt?.toISOString(),
       },
-    });
+    }, tx);
   }
 
   // Find backup by original user ID
   async findByOriginalUserId(
-    originalUserId: string
+    originalUserId: string,
+    tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    return await prisma.userBackup.findMany({
+    const client = getDbClient(tx);
+
+    return await client.userBackup.findMany({
       where: { originalUserId, deleted: 0 },
       orderBy: { deletedAt: 'desc' },
     });
   }
 
   // Find backup by email
-  async findByEmail(email: string): Promise<UserBackup[]> {
-    return await prisma.userBackup.findMany({
+  async findByEmail(email: string, tx?: Prisma.TransactionClient): Promise<UserBackup[]> {
+    const client = getDbClient(tx);
+
+    return await client.userBackup.findMany({
       where: { email, deleted: 0 },
       orderBy: { deletedAt: 'desc' },
     });
@@ -78,9 +86,12 @@ export class UserBackupService {
 
   // Find backup by Fingerprint ID
   async findByFingerprintId(
-    fingerprintId: string
+    fingerprintId: string,
+    tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    return await prisma.userBackup.findMany({
+    const client = getDbClient(tx);
+
+    return await client.userBackup.findMany({
       where: { fingerprintId, deleted: 0 },
       orderBy: { deletedAt: 'desc' },
     });
@@ -88,24 +99,29 @@ export class UserBackupService {
 
   // Find backup by Clerk user ID
   async findByClerkUserId(
-    clerkUserId: string
+    clerkUserId: string,
+    tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    return await prisma.userBackup.findMany({
+    const client = getDbClient(tx);
+
+    return await client.userBackup.findMany({
       where: { clerkUserId, deleted: 0 },
       orderBy: { deletedAt: 'desc' },
     });
   }
 
   // Find backup by backup ID
-  async getBackupById(id: bigint): Promise<UserBackup | null> {
-    return await prisma.userBackup.findFirst({
+  async getBackupById(id: bigint, tx?: Prisma.TransactionClient): Promise<UserBackup | null> {
+    const client = getDbClient(tx);
+
+    return await client.userBackup.findFirst({
       where: { id, deleted: 0 },
     });
   }
 
   // Restore user data from backup
-  async restoreUserData(backupId: bigint): Promise<{ user: unknown }> {
-    const backup = await this.getBackupById(backupId);
+  async restoreUserData(backupId: bigint, tx?: Prisma.TransactionClient): Promise<{ user: unknown }> {
+    const backup = await this.getBackupById(backupId, tx);
     if (!backup) {
       throw new Error('Backup not found');
     }
@@ -115,9 +131,8 @@ export class UserBackupService {
       throw new Error('No backup data available');
     }
 
-    return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Restore user main data
-      const user = await tx.user.create({
+    const restore = async (client: Prisma.TransactionClient) => {
+      const user = await client.user.create({
         data: {
           fingerprintId: backupData.fingerprintId,
           clerkUserId: backupData.clerkUserId,
@@ -129,7 +144,9 @@ export class UserBackupService {
       return {
         user,
       };
-    });
+    };
+
+    return tx ? restore(tx) : prisma.$transaction(restore);
   }
 
   // List backups
@@ -139,7 +156,8 @@ export class UserBackupService {
     startDate?: Date;
     endDate?: Date;
     orderBy?: Prisma.UserBackupOrderByWithRelationInput;
-  }): Promise<{ backups: UserBackup[]; total: number }> {
+  }, tx?: Prisma.TransactionClient): Promise<{ backups: UserBackup[]; total: number }> {
+    const client = getDbClient(tx);
     const where: Prisma.UserBackupWhereInput = { deleted: 0 };
 
     if (params.startDate || params.endDate) {
@@ -149,7 +167,7 @@ export class UserBackupService {
     }
 
     const [backups, total] = await Promise.all([
-      prisma.userBackup.findMany({
+      client.userBackup.findMany({
         where,
         skip: params.skip || 0,
         take: params.take || 20,
@@ -167,18 +185,20 @@ export class UserBackupService {
           deleted: true,
         },
       }),
-      prisma.userBackup.count({ where }),
+      client.userBackup.count({ where }),
     ]);
 
     return { backups, total };
   }
 
   // Soft Delete old backups (data cleanup)
-  async deleteOldBackups(daysToKeep: number = 90): Promise<number> {
+  async deleteOldBackups(daysToKeep: number = 90, tx?: Prisma.TransactionClient): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const result = await prisma.userBackup.updateMany({
+    const client = getDbClient(tx);
+
+    const result = await client.userBackup.updateMany({
       where: {
         deletedAt: {
           lt: cutoffDate,
@@ -194,13 +214,14 @@ export class UserBackupService {
   }
 
   // Get backup statistics
-  async getBackupStats(): Promise<{
+  async getBackupStats(tx?: Prisma.TransactionClient): Promise<{
     totalBackups: number;
     last24Hours: number;
     last7Days: number;
     last30Days: number;
     avgBackupSize: number;
   }> {
+    const client = getDbClient(tx);
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -212,20 +233,20 @@ export class UserBackupService {
       last7Days,
       last30Days,
     ] = await Promise.all([
-      prisma.userBackup.count({ where: { deleted: 0 } }),
-      prisma.userBackup.count({
+      client.userBackup.count({ where: { deleted: 0 } }),
+      client.userBackup.count({
         where: { deletedAt: { gte: oneDayAgo }, deleted: 0 },
       }),
-      prisma.userBackup.count({
+      client.userBackup.count({
         where: { deletedAt: { gte: sevenDaysAgo }, deleted: 0 },
       }),
-      prisma.userBackup.count({
+      client.userBackup.count({
         where: { deletedAt: { gte: thirtyDaysAgo }, deleted: 0 },
       }),
     ]);
 
     // Calculate average backup size (simplified calculation)
-    const sampleBackups = await prisma.userBackup.findMany({
+    const sampleBackups = await client.userBackup.findMany({
       where: { deleted: 0 },
       take: 100,
       select: { backupData: true },
@@ -248,8 +269,8 @@ export class UserBackupService {
   }
 
   // Export backup data as JSON
-  async exportBackup(backupId: bigint): Promise<string> {
-    const backup = await this.getBackupById(backupId);
+  async exportBackup(backupId: bigint, tx?: Prisma.TransactionClient): Promise<string> {
+    const backup = await this.getBackupById(backupId, tx);
     if (!backup) {
       throw new Error('Backup not found');
     }
@@ -258,12 +279,12 @@ export class UserBackupService {
   }
 
   // Batch backup users (for scheduled backup tasks)
-  async batchBackupUsers(userIds: string[]): Promise<number> {
+  async batchBackupUsers(userIds: string[], tx?: Prisma.TransactionClient): Promise<number> {
     let successCount = 0;
 
     for (const userId of userIds) {
       try {
-        await this.backupUserData(userId);
+        await this.backupUserData(userId, tx);
         successCount++;
       } catch (error) {
         console.error(`Failed to backup user ${userId}:`, error);
