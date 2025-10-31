@@ -166,7 +166,7 @@ export class UserAggregateService {
       where: { userId },
       include: {
         credits: true,
-        subscriptions: true,
+        subscription: true,
         transactions: true,
         creditUsage: true,
       },

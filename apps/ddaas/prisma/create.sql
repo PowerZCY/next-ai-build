@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     created_at           TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     deleted              INTEGER     NOT NULL DEFAULT 0,
+    CONSTRAINT subscriptions_user_id_key UNIQUE (user_id),
     CONSTRAINT subscriptions_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'canceled'::character varying, 'past_due'::character varying, 'incomplete'::character varying, 'trialing'::character varying]::text[])),
     CONSTRAINT transactions_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
 );

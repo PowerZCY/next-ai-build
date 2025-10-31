@@ -45,11 +45,7 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         credits: true,
-        subscriptions: {
-          where: { status: 'active' },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
+        subscription: true,
       },
     });
   }
@@ -71,11 +67,7 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         credits: true,
-        subscriptions: {
-          where: { status: 'active' },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
+        subscription: true,
       },
     });
   }
@@ -119,11 +111,7 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         credits: true,
-        subscriptions: {
-          where: { status: 'active' },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
+        subscription: true,
       },
     });
   }

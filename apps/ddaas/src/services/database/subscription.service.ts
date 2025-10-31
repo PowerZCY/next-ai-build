@@ -51,7 +51,7 @@ export class SubscriptionService {
         creditsAllocated: data.creditsAllocated,
         subPeriodStart: data.subPeriodStart,
         subPeriodEnd: data.subPeriodEnd,
-      },
+      }
     });
   }
 
@@ -82,7 +82,7 @@ export class SubscriptionService {
     });
   }
 
-  // Get user's subscription list
+  // Get user's subscription
   async findByUserId(
     userId: string,
     params?: {
@@ -90,7 +90,7 @@ export class SubscriptionService {
       includeExpired?: boolean;
     },
     tx?: Prisma.TransactionClient
-  ): Promise<Subscription[]> {
+  ): Promise<Subscription | null> {
     const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.SubscriptionWhereInput = {
       userId,
@@ -108,7 +108,7 @@ export class SubscriptionService {
       ];
     }
 
-    return await client.subscription.findMany({
+    return await client.subscription.findFirst({
       where,
       orderBy: { createdAt: 'desc' },
     });

@@ -19,7 +19,7 @@ model User {
   updatedAt     DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   creditUsage   CreditUsage[]
   credits       Credit?
-  subscriptions Subscription[]
+  subscription  Subscription?
   transactions  Transaction[]
 
   @@index([fingerprintId], map: "idx_users_fingerprint_id")
@@ -28,7 +28,7 @@ model User {
 
 model Subscription {
   id                BigInt    @id @default(autoincrement())
-  userId            String    @map("user_id") @db.Uuid
+  userId            String    @unique @map("user_id") @db.Uuid
   status            String    @default("incomplete") @db.VarChar(20)
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
   priceId           String?   @map("price_id") @db.VarChar(255)
@@ -42,7 +42,6 @@ model Subscription {
   user              User      @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([paySubscriptionId], map: "idx_subscriptions_pay_subscription_id")
-  @@index([userId], map: "idx_subscriptions_user_id")
   @@map("subscriptions")
 }
 
