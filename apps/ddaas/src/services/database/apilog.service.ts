@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from '@prisma/client';
-import type { Apilog } from '@prisma/client';
-import { getDbClient } from '@/db/prisma';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { Apilog } from '@/db/prisma-model-type';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export type ApiType = 'from_clerk_in' | 'to_clerk_out' | 'from_stripe_in' | 'to_stripe_out';
 
@@ -17,7 +17,7 @@ export class ApilogService {
 
   // Create API log record with request
   async createApilog(data: CreateApiLogData, tx?: Prisma.TransactionClient): Promise<string> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const log = await client.apilog.create({
       data: {
         methodName: data.methodName,
@@ -31,7 +31,7 @@ export class ApilogService {
 
   // Update API log record with response
   async updateApilogResponse(logId: string, response: any, tx?: Prisma.TransactionClient): Promise<void> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     await client.apilog.update({
       where: { id: BigInt(logId) },
       data: {
@@ -42,7 +42,7 @@ export class ApilogService {
 
   // Get API log by ID
   async getApilog(logId: string, tx?: Prisma.TransactionClient): Promise<Apilog | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     return await client.apilog.findUnique({
       where: { id: BigInt(logId) },
     });
@@ -57,7 +57,7 @@ export class ApilogService {
   }, tx?: Prisma.TransactionClient): Promise<Apilog[]> {
     const { apiType, methodName, limit = 50, offset = 0 } = params;
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.apilog.findMany({
       where: {
@@ -75,7 +75,7 @@ export class ApilogService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const result = await client.apilog.deleteMany({
       where: {
         createdAt: {
@@ -95,7 +95,7 @@ export class ApilogService {
     stripeIncoming: number;
     stripeOutgoing: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const [total, clerkIn, clerkOut, stripeIn, stripeOut] = await Promise.all([
       client.apilog.count(),
       client.apilog.count({ where: { apiType: 'from_clerk_in' } }),

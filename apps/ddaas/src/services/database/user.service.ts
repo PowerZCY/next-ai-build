@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from '@prisma/client';
-import type { User } from '@prisma/client';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { User } from '@/db/prisma-model-type';
 import { UserStatus } from '@/db/constants';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class UserService {
 
@@ -15,7 +15,7 @@ export class UserService {
     email?: string;
     status?: string;
   }, tx?: Prisma.TransactionClient): Promise<User> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.create({
       data: {
@@ -30,7 +30,7 @@ export class UserService {
 
   // Find user by ID
   async findByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<User | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.findUnique({
       where: { userId },
@@ -56,7 +56,7 @@ export class UserService {
 
   // Find user by email
   async findByEmail(email: string, tx?: Prisma.TransactionClient): Promise<User | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.findFirst({
       where: { email },
@@ -82,7 +82,7 @@ export class UserService {
 
   // Find users by Fingerprint ID, fp_id can be used for multi user_ids
   async findListByFingerprintId(fingerprintId: string, tx?: Prisma.TransactionClient): Promise<User[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.findMany({
       where: { fingerprintId },
@@ -104,7 +104,7 @@ export class UserService {
 
   // Find user by Clerk user ID
   async findByClerkUserId(clerkUserId: string, tx?: Prisma.TransactionClient): Promise<User | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.findUnique({
       where: { clerkUserId },
@@ -134,7 +134,7 @@ export class UserService {
     data: Prisma.UserUpdateInput,
     tx?: Prisma.TransactionClient
   ): Promise<User> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.update({
       where: { userId },
@@ -147,7 +147,7 @@ export class UserService {
     stripeCusId: string | null,
     tx?: Prisma.TransactionClient
   ): Promise<User> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.update({
       where: { userId },
@@ -164,7 +164,7 @@ export class UserService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<User> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.update({
       where: { userId },
@@ -178,7 +178,7 @@ export class UserService {
 
   // Soft delete user (mark as deleted)
   async softDeleteUser(userId: string, tx?: Prisma.TransactionClient): Promise<User> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.update({
       where: { userId },
@@ -198,7 +198,7 @@ export class UserService {
     status?: string;
     orderBy?: Prisma.UserOrderByWithRelationInput;
   }, tx?: Prisma.TransactionClient): Promise<{ users: User[]; total: number }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const { skip = 0, take = 10, status, orderBy = { createdAt: 'desc' } } = params;
 
     const where: Prisma.UserWhereInput = status ? { status } : {};
@@ -233,7 +233,7 @@ export class UserService {
     fingerprintIds: string[],
     tx?: Prisma.TransactionClient
   ): Promise<number> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const data = fingerprintIds.map((fingerprintId) => ({
       fingerprintId,
       status: UserStatus.ANONYMOUS,
@@ -249,7 +249,7 @@ export class UserService {
 
   // Check if user exists
   async exists(userId: string, tx?: Prisma.TransactionClient): Promise<boolean> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const count = await client.user.count({
       where: { userId },
     });
@@ -264,7 +264,7 @@ export class UserService {
     frozen: number;
     deleted: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const [total, anonymous, registered, frozen, deleted] = await Promise.all([
       client.user.count(),
       client.user.count({ where: { status: UserStatus.ANONYMOUS } }),

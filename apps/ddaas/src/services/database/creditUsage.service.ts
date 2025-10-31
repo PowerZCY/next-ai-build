@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Prisma } from '@prisma/client';
-import type { CreditUsage } from '@prisma/client';
+import { Prisma } from '@/db/prisma-model-type';
+import type { CreditUsage } from '@/db/prisma-model-type';
 import { CreditType, OperationType } from '@/db/constants';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class CreditUsageService {
 
@@ -16,7 +16,7 @@ export class CreditUsageService {
     operationType: string;
     creditsUsed: number;
   }, tx?: Prisma.TransactionClient): Promise<CreditUsage> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.creditUsage.create({
       data: {
@@ -47,7 +47,7 @@ export class CreditUsageService {
     usages: Prisma.CreditUsageCreateManyInput[],
     tx?: Prisma.TransactionClient
   ): Promise<number> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const result = await client.creditUsage.createMany({
       data: usages,
     });
@@ -69,7 +69,7 @@ export class CreditUsageService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<{ usage: CreditUsage[]; total: number }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
 
     if (params?.creditType) {
@@ -105,7 +105,7 @@ export class CreditUsageService {
 
   // Get Credit Usage Record by Order ID
   async getOrderUsage(orderId: string, tx?: Prisma.TransactionClient): Promise<CreditUsage[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.creditUsage.findMany({
       where: { orderId, deleted: 0 },
@@ -128,7 +128,7 @@ export class CreditUsageService {
     paidRecharged: number;
     featureUsage: { feature: string; credits: number }[];
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
 
     if (startDate || endDate) {
@@ -202,7 +202,7 @@ export class CreditUsageService {
     endDate?: Date,
     tx?: Prisma.TransactionClient
   ): Promise<{ feature: string | null; totalCredits: number; usageCount: number }[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.CreditUsageWhereInput = {
       operationType: OperationType.CONSUME,
       feature: { not: null },
@@ -253,9 +253,8 @@ export class CreditUsageService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const whereCondition = userId ? `AND user_id = '${userId}'::uuid` : '';
-
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
+    const userFilter = userId ? Prisma.sql`AND user_id = ${userId}` : Prisma.sql``;
 
     const result = await client.$queryRaw`
       SELECT 
@@ -270,7 +269,7 @@ export class CreditUsageService {
       FROM credit_usage
       WHERE created_at >= ${startDate}
         AND deleted = 0
-        ${Prisma.raw(whereCondition)}
+        ${userFilter}
       GROUP BY DATE(created_at)
       ORDER BY date DESC
     `;
@@ -291,7 +290,7 @@ export class CreditUsageService {
     limit: number = 10,
     tx?: Prisma.TransactionClient
   ): Promise<CreditUsage[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.creditUsage.findMany({
       where: { userId, deleted: 0 },
@@ -305,7 +304,7 @@ export class CreditUsageService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const result = await client.creditUsage.updateMany({
       where: {
@@ -331,7 +330,7 @@ export class CreditUsageService {
     avgDailyConsumption: number;
     avgDailyRecharge: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const [
       totalUsers,
       totalOperations,
@@ -386,7 +385,7 @@ export class CreditUsageService {
     operationType: string,
     tx?: Prisma.TransactionClient
   ): Promise<boolean> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const count = await client.creditUsage.count({
       where: {
         userId,

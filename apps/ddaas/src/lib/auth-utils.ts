@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { userService, User } from '@/db/index';
+import { userService } from '@/db/index';
+import { User } from '@/db/prisma-model-type';
 
 /**
  * 认证结果类型

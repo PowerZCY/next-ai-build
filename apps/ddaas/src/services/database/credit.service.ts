@@ -1,8 +1,8 @@
-import type { Prisma } from '@prisma/client';
-import type { Credit, CreditUsage } from '@prisma/client';
+import { Prisma } from '@/db/prisma-model-type';
+import type { Credit, CreditUsage } from '@/db/prisma-model-type';
 import { CreditType, OperationType } from '@/db/constants';
 import { freeAmount, freeExpiredDays } from '@/lib/appConfig';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 type CreditAmounts = {
   free?: number;
@@ -144,7 +144,7 @@ export class CreditService {
       this.ensureNonNegative(normalizedLimitAdjustments, `${options.context} limitAdjustments`);
     }
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const currentCredit = await client.credit.findUnique({
       where: { userId },
     });
@@ -237,7 +237,7 @@ export class CreditService {
     return usages;
   }
 
-  // Initialize User Credits
+  // Initialize User Credits, use upsert for easy handle anonymous upgrade to register
   async initializeCreditWithFree(
     userId: string,
     free: number,
@@ -250,10 +250,19 @@ export class CreditService {
     freeEnd.setHours(23, 59, 59, 999);
     const normalized = this.normalizeAmounts({ free });
     this.ensureNonNegative(normalized, 'initializeCredit');
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.credit.create({
-      data: {
+    return await client.credit.upsert({
+      where: {
+        userId: userId
+      },
+      update: {
+        balanceFree: normalized.free,
+        totalFreeLimit: normalized.free,
+        freeStart: freeStart,
+        freeEnd: freeEnd,
+      },
+      create: {
         userId,
         balanceFree: normalized.free,
         totalFreeLimit: normalized.free,
@@ -265,7 +274,7 @@ export class CreditService {
 
   // Get User Credits
   async getCredit(userId: string, tx?: Prisma.TransactionClient): Promise<Credit | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const credit = await client.credit.findUnique({
       where: { userId },
@@ -425,7 +434,7 @@ export class CreditService {
 
   // Reset Free Credits 
   async resetFreeCredit(userId: string, newLimit: number = freeAmount, tx?: Prisma.TransactionClient): Promise<Credit> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.credit.update({
       where: { userId },
@@ -449,7 +458,7 @@ export class CreditService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<Credit> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const currentCredit = await client.credit.findUnique({
       where: { userId },
     });
@@ -527,7 +536,7 @@ export class CreditService {
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const currentCredit = await client.credit.findUnique({
       where: { userId },
     });
@@ -570,13 +579,15 @@ export class CreditService {
 
   // Get Users with Low Credit Balance
   async getLowBalanceUsers(threshold: number = 10, tx?: Prisma.TransactionClient): Promise<Credit[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.$queryRaw<Credit[]>`
+    const query = Prisma.sql`
       SELECT * FROM credits 
       WHERE (balance_free + balance_paid + balance_onetime_paid) < ${threshold}
       ORDER BY (balance_free + balance_paid + balance_onetime_paid) ASC
     `;
+
+    return await client.$queryRaw<Credit[]>(query);
   }
 
   // Get Credit Statistics
@@ -590,7 +601,7 @@ export class CreditService {
     avgOneTimePaidBalance: number;
     zeroBalanceUsers: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const stats = await client.credit.aggregate({
       _count: true,

@@ -1,8 +1,9 @@
 import { CreditType, OperationType, UserStatus } from '@/db/constants';
 import { creditService, creditUsageService, subscriptionService, userBackupService, userService } from '@/db/index';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
+import type { Credit, Prisma, User } from '@/db/prisma-model-type';
 import { freeAmount, freeRegisterAmount } from '@/lib/appConfig';
-import type { Credit, Prisma, User } from '@prisma/client';
+import { runInTransaction } from '../database/prisma-transaction-util';
 
 
 export class UserAggregateService {
@@ -10,31 +11,32 @@ export class UserAggregateService {
   async initAnonymousUser(
     fingerprintId: string,
   ): Promise<{ newUser: User; credit: Credit; }> {
-    const tx = getDbClient();
-    const newUser = await userService.createUser(
-      {
-        fingerprintId,
-        status: UserStatus.ANONYMOUS,
-      },
-      tx
-    );
+    return runInTransaction(async (tx) => {
+      const newUser = await userService.createUser(
+        {
+          fingerprintId,
+          status: UserStatus.ANONYMOUS,
+        },
+        tx
+      );
 
-    const credit = await creditService.initializeCreditWithFree( newUser.userId, freeAmount, tx );
+      const credit = await creditService.initializeCreditWithFree(newUser.userId, freeAmount, tx);
 
-    await creditUsageService.recordCreditOperation(
-      {
-        userId: newUser.userId,
-        feature: 'anonymous_user_init',
-        creditType: CreditType.FREE,
-        operationType: OperationType.RECHARGE,
-        creditsUsed: freeAmount,
-      },
-      tx
-    );
+      await creditUsageService.recordCreditOperation(
+        {
+          userId: newUser.userId,
+          feature: 'anonymous_user_init',
+          creditType: CreditType.FREE,
+          operationType: OperationType.RECHARGE,
+          creditsUsed: freeAmount,
+        },
+        tx
+      );
 
-    await subscriptionService.initializeSubscription(newUser.userId, tx);
+      await subscriptionService.initializeSubscription(newUser.userId, tx);
 
-    return { newUser, credit };
+      return { newUser, credit };
+    });
   }
 
   /**
@@ -55,32 +57,33 @@ export class UserAggregateService {
     email?: string,
     fingerprintId?: string
   ): Promise<{ newUser: User; credit: Credit; }> {
-    const tx = getDbClient();
-    const newUser = await userService.createUser(
-      {
-        clerkUserId,
-        email,
-        fingerprintId,
-        status: UserStatus.REGISTERED,
-      },
-      tx
-    );
+    return runInTransaction(async (tx) => {
+      const newUser = await userService.createUser(
+        {
+          clerkUserId,
+          email,
+          fingerprintId,
+          status: UserStatus.REGISTERED,
+        },
+        tx
+      );
 
-    const credit = await creditService.initializeCreditWithFree( newUser.userId, freeRegisterAmount, tx );
+      const credit = await creditService.initializeCreditWithFree(newUser.userId, freeRegisterAmount, tx);
 
-    await creditUsageService.recordCreditOperation(
-      {
-        userId: newUser.userId,
-        feature: 'user_registration_init',
-        creditType: CreditType.FREE,
-        operationType: OperationType.RECHARGE,
-        creditsUsed: freeRegisterAmount,
-      },
-      tx
-    );
+      await creditUsageService.recordCreditOperation(
+        {
+          userId: newUser.userId,
+          feature: 'user_registration_init',
+          creditType: CreditType.FREE,
+          operationType: OperationType.RECHARGE,
+          creditsUsed: freeRegisterAmount,
+        },
+        tx
+      );
 
-    await subscriptionService.initializeSubscription(newUser.userId, tx);
-    return { newUser, credit }
+      await subscriptionService.initializeSubscription(newUser.userId, tx);
+      return { newUser, credit };
+    });
   }
 
   
@@ -89,48 +92,50 @@ export class UserAggregateService {
     email: string,
     clerkUserId: string
   ): Promise<{ updateUser: User; credit: Credit; }> {
-    const tx = getDbClient();
-    const updateUser = await userService.upgradeToRegistered(
-      userId,
-      {
-        email,
-        clerkUserId
-      },
-      tx
-    );
+    return runInTransaction(async (tx) => {
+      const updateUser = await userService.upgradeToRegistered(
+        userId,
+        {
+          email,
+          clerkUserId
+        },
+        tx
+      );
 
-    const credit = await creditService.initializeCreditWithFree( updateUser.userId, freeRegisterAmount, tx );
+      const credit = await creditService.initializeCreditWithFree(updateUser.userId, freeRegisterAmount, tx);
 
-    await creditUsageService.recordCreditOperation(
-      {
-        userId: updateUser.userId,
-        feature: 'user_registration_init',
-        creditType: CreditType.FREE,
-        operationType: OperationType.RECHARGE,
-        creditsUsed: freeRegisterAmount,
-      },
-      tx
-    );
+      await creditUsageService.recordCreditOperation(
+        {
+          userId: updateUser.userId,
+          feature: 'user_registration_init',
+          creditType: CreditType.FREE,
+          operationType: OperationType.RECHARGE,
+          creditsUsed: freeRegisterAmount,
+        },
+        tx
+      );
 
-    await subscriptionService.initializeSubscription(updateUser.userId, tx);
+      await subscriptionService.initializeSubscription(updateUser.userId, tx);
 
-    return { updateUser: updateUser, credit: credit };
+      return { updateUser: updateUser, credit: credit };
+    });
   }
 
   async hardDeleteUserByClerkId(clerkUserId: string): Promise<string | null> { 
-    const tx = getDbClient();
-    // 根据clerkUserId查找用户
-    const user = await userService.findByClerkUserId(clerkUserId, tx);
-    if (!user) {
-      console.log(`User with clerkUserId ${clerkUserId} not found`);
-      return null;
-    }
-    await this.hardDeleteUser(user.userId);
-    return user.userId;
+    return runInTransaction(async (tx) => {
+      // 根据clerkUserId查找用户
+      const user = await userService.findByClerkUserId(clerkUserId, tx);
+      if (!user) {
+        console.log(`User with clerkUserId ${clerkUserId} not found`);
+        return null;
+      }
+      await this.hardDeleteUser(user.userId, tx);
+      return user.userId;
+    });
   }
 
   async hardDeleteUser(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
-    const client =  getDbClient(tx)
+    const client =  checkAndFallbackWithNonTCClient(tx)
     const user = await this.findUserWithRelations(userId, client);
     if (!user) {
       return;

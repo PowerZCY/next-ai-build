@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from '@prisma/client';
-import type { UserBackup } from '@prisma/client';
-import { getDbClient } from '@/db/prisma';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { UserBackup } from '@/db/prisma-model-type';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class UserBackupService {
 
@@ -15,7 +15,7 @@ export class UserBackupService {
     status?: string;
     backupData?: any;
   }, tx?: Prisma.TransactionClient): Promise<UserBackup> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.create({
       data: {
@@ -31,7 +31,7 @@ export class UserBackupService {
 
   // Backup user basic data
   async backupUserData(userId: string, tx?: Prisma.TransactionClient): Promise<UserBackup> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     // Get user basic data
     const userData = await client.user.findUnique({
       where: { userId },
@@ -66,7 +66,7 @@ export class UserBackupService {
     originalUserId: string,
     tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.findMany({
       where: { originalUserId, deleted: 0 },
@@ -76,7 +76,7 @@ export class UserBackupService {
 
   // Find backup by email
   async findByEmail(email: string, tx?: Prisma.TransactionClient): Promise<UserBackup[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.findMany({
       where: { email, deleted: 0 },
@@ -89,7 +89,7 @@ export class UserBackupService {
     fingerprintId: string,
     tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.findMany({
       where: { fingerprintId, deleted: 0 },
@@ -102,7 +102,7 @@ export class UserBackupService {
     clerkUserId: string,
     tx?: Prisma.TransactionClient
   ): Promise<UserBackup[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.findMany({
       where: { clerkUserId, deleted: 0 },
@@ -112,7 +112,7 @@ export class UserBackupService {
 
   // Find backup by backup ID
   async getBackupById(id: bigint, tx?: Prisma.TransactionClient): Promise<UserBackup | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.userBackup.findFirst({
       where: { id, deleted: 0 },
@@ -146,7 +146,7 @@ export class UserBackupService {
       };
     };
 
-    return restore(getDbClient(tx)) ;
+    return restore(checkAndFallbackWithNonTCClient(tx)) ;
   }
 
   // List backups
@@ -157,7 +157,7 @@ export class UserBackupService {
     endDate?: Date;
     orderBy?: Prisma.UserBackupOrderByWithRelationInput;
   }, tx?: Prisma.TransactionClient): Promise<{ backups: UserBackup[]; total: number }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.UserBackupWhereInput = { deleted: 0 };
 
     if (params.startDate || params.endDate) {
@@ -196,7 +196,7 @@ export class UserBackupService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const result = await client.userBackup.updateMany({
       where: {
@@ -221,7 +221,7 @@ export class UserBackupService {
     last30Days: number;
     avgBackupSize: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);

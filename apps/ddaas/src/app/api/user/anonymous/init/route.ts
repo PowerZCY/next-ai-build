@@ -6,7 +6,8 @@
 };
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userService, creditService, subscriptionService, User, Credit, Subscription } from '@/db/index';
+import { userService, creditService, subscriptionService } from '@/db/index';
+import { User, Credit, Subscription } from '@/db/prisma-model-type';
 import { userAggregateService }  from '@/agg/index';
 import { UserStatus } from '@/db/constants';
 import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';

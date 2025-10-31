@@ -6,17 +6,6 @@ export { creditUsageService } from './creditUsage.service';
 export { userBackupService } from './userBackup.service';
 export { apilogService, Apilogger } from './apilog.service';
 
-// Export Prisma Model Types
-export type {
-  User,
-  Subscription,
-  Credit,
-  Transaction,
-  CreditUsage,
-  UserBackup,
-  Apilog,
-} from '@prisma/client';
-
 // Export Enums and Types
 export {
   UserStatus,

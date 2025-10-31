@@ -1,7 +1,7 @@
-import type { Prisma } from '@prisma/client';
-import type { Subscription } from '@prisma/client';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { Subscription } from '@/db/prisma-model-type';
 import { SubscriptionStatus } from '@/db/constants';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class SubscriptionService {
 
@@ -17,7 +17,7 @@ export class SubscriptionService {
    * @returns The created placeholder subscription record
    */
   async initializeSubscription(userId: string, tx?: Prisma.TransactionClient): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.create({
       data: {
@@ -40,7 +40,7 @@ export class SubscriptionService {
     subPeriodStart?: Date;
     subPeriodEnd?: Date;
   }, tx?: Prisma.TransactionClient): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.create({
       data: {
@@ -58,7 +58,7 @@ export class SubscriptionService {
 
   // Find subscription by ID
   async findById(id: bigint, tx?: Prisma.TransactionClient): Promise<Subscription | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findFirst({
       where: { id, deleted: 0 },
@@ -73,7 +73,7 @@ export class SubscriptionService {
     paySubscriptionId: string,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findFirst({
       where: { paySubscriptionId, deleted: 0 },
@@ -92,7 +92,7 @@ export class SubscriptionService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<Subscription[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.SubscriptionWhereInput = {
       userId,
       deleted: 0,
@@ -117,7 +117,7 @@ export class SubscriptionService {
 
   // Get user's active subscription
   async getActiveSubscription(userId: string, tx?: Prisma.TransactionClient): Promise<Subscription | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findFirst({
       where: {
@@ -137,7 +137,7 @@ export class SubscriptionService {
     userId: string,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findFirst({
       where: {
@@ -153,7 +153,7 @@ export class SubscriptionService {
     data: Prisma.SubscriptionUpdateInput,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.update({
       where: { id },
@@ -167,7 +167,7 @@ export class SubscriptionService {
     status: string,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.update({
       where: { id },
@@ -182,7 +182,7 @@ export class SubscriptionService {
     subPeriodEnd: Date,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.update({
       where: { id },
@@ -207,7 +207,7 @@ export class SubscriptionService {
       updateData.subPeriodEnd = new Date();
     }
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.update({
       where: { id },
@@ -222,7 +222,7 @@ export class SubscriptionService {
     creditsToAdd?: number,
     tx?: Prisma.TransactionClient
   ): Promise<Subscription> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const subscription = await client.subscription.findFirst({
       where: { id },
@@ -247,7 +247,7 @@ export class SubscriptionService {
 
   // Soft Delete subscription
   async deleteSubscription(id: bigint, tx?: Prisma.TransactionClient): Promise<void> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     await client.subscription.update({
       where: { id },
@@ -261,7 +261,7 @@ export class SubscriptionService {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + days);
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findMany({
       where: {
@@ -280,7 +280,7 @@ export class SubscriptionService {
 
   // Get expired subscriptions
   async getExpiredSubscriptions(tx?: Prisma.TransactionClient): Promise<Subscription[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findMany({
       where: {
@@ -298,7 +298,7 @@ export class SubscriptionService {
 
   // Update expired subscriptions status
   async updateExpiredSubscriptions(tx?: Prisma.TransactionClient): Promise<number> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const result = await client.subscription.updateMany({
       where: {
@@ -326,7 +326,7 @@ export class SubscriptionService {
     trialing: number;
     revenue: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const [total, active, canceled, pastDue, incomplete, trialing] =
       await Promise.all([
         client.subscription.count({ where: { deleted: 0 } }),

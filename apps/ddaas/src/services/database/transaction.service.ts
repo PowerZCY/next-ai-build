@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from '@prisma/client';
-import type { Transaction } from '@prisma/client';
+import { Prisma } from '@/db/prisma-model-type';
+import type { Transaction } from '@/db/prisma-model-type';
 import { OrderStatus, TransactionType, PaySupplier, PaymentStatus } from '@/db/constants';
-import { getDbClient } from '@/db/prisma';
+import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class TransactionService {
 
@@ -32,7 +32,7 @@ export class TransactionService {
     paidAt?: Date;
     payUpdatedAt?: Date;
   }, tx?: Prisma.TransactionClient): Promise<Transaction> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.create({
       data: {
@@ -64,7 +64,7 @@ export class TransactionService {
 
   // Find transaction by order ID
   async findByOrderId(orderId: string, tx?: Prisma.TransactionClient): Promise<Transaction | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findFirst({
       where: { orderId, deleted: 0 },
@@ -79,7 +79,7 @@ export class TransactionService {
     paySessionId: string,
     tx?: Prisma.TransactionClient
   ): Promise<Transaction | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findFirst({
       where: { paySessionId, deleted: 0 },
@@ -94,7 +94,7 @@ export class TransactionService {
     payTransactionId: string,
     tx?: Prisma.TransactionClient
   ): Promise<Transaction | null> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findFirst({
       where: { payTransactionId, deleted: 0 },
@@ -113,7 +113,7 @@ export class TransactionService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<{ transactions: Transaction[]; total: number }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.TransactionWhereInput = { userId, deleted: 0 };
 
     if (params?.orderStatus) {
@@ -164,7 +164,7 @@ export class TransactionService {
     };
 
     console.log(`orderId: ${orderId}\n updateData: ${JSON.stringify(updateData)}`)
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.update({
       where: { orderId },
@@ -177,7 +177,7 @@ export class TransactionService {
     data: Prisma.TransactionUpdateInput,
     tx?: Prisma.TransactionClient
   ): Promise<Transaction> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.update({
       where: { orderId },
@@ -199,7 +199,7 @@ export class TransactionService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<Transaction> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.update({
       where: { orderId },
@@ -226,7 +226,7 @@ export class TransactionService {
     },
     tx?: Prisma.TransactionClient
   ): Promise<Transaction> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const transaction = await this.findByOrderId(orderId, tx);
     if (!transaction) {
       throw new Error('Transaction not found');
@@ -250,7 +250,7 @@ export class TransactionService {
 
   // Cancel order
   async cancelOrder(orderId: string, reason?: string, tx?: Prisma.TransactionClient): Promise<Transaction> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.update({
       where: { orderId },
@@ -264,7 +264,7 @@ export class TransactionService {
 
   // Get expired orders
   async getExpiredOrders(tx?: Prisma.TransactionClient): Promise<Transaction[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findMany({
       where: {
@@ -279,7 +279,7 @@ export class TransactionService {
 
   // Update expired orders status
   async updateExpiredOrders(tx?: Prisma.TransactionClient): Promise<number> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     const result = await client.transaction.updateMany({
       where: {
@@ -304,7 +304,7 @@ export class TransactionService {
     paySubscriptionId: string,
     tx?: Prisma.TransactionClient
   ): Promise<Transaction[]> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findMany({
       where: { paySubscriptionId, deleted: 0 },
@@ -325,7 +325,7 @@ export class TransactionService {
     oneTimeRevenue: number;
     refundedAmount: number;
   }> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const where: Prisma.TransactionWhereInput = {
       orderStatus: OrderStatus.SUCCESS,
       deleted: 0,
@@ -399,9 +399,9 @@ export class TransactionService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
-    const result = await client.$queryRaw`
+    const query = Prisma.sql`
       SELECT 
         DATE(paid_at) as date,
         COUNT(*) as transactions,
@@ -416,12 +416,14 @@ export class TransactionService {
       ORDER BY date DESC
     `;
 
+    const result = await client.$queryRaw(query);
+
     return result as any[];
   }
 
   // Soft Delete transaction
   async deleteTransaction(orderId: string, tx?: Prisma.TransactionClient): Promise<void> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
 
     await client.transaction.update({
       where: { orderId },
@@ -434,7 +436,7 @@ export class TransactionService {
     transactions: Prisma.TransactionCreateManyInput[],
     tx?: Prisma.TransactionClient
   ): Promise<number> {
-    const client = getDbClient(tx);
+    const client = checkAndFallbackWithNonTCClient(tx);
     const result = await client.transaction.createMany({
       data: transactions,
       skipDuplicates: true,

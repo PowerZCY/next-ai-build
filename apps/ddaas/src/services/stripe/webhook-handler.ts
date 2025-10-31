@@ -44,13 +44,13 @@ import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import {
   transactionService,
   subscriptionService,
-  Transaction,
   TransactionType,
   OrderStatus,
   SubscriptionStatus,
   BillingReason,
   PaymentStatus,
 } from '@/db/index';
+import { Transaction } from '@/db/prisma-model-type'
 import { Apilogger } from '@/db/index';
 import { billingAggregateService } from '@/agg/index';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
