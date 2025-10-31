@@ -70,8 +70,6 @@ export const createCheckoutSession = async (
       ...metadata,
       mode, // Record mode for webhook processing
     },
-    // 在这里注入订单元数据，以保证后续事件处理能根据订单去匹配处理
-    subscription_data: subscriptionData
   };
 
   // Add customer if provided
@@ -84,6 +82,9 @@ export const createCheckoutSession = async (
     sessionParams.invoice_creation = {
       enabled: false, // One-time payments don't create invoices
     };
+  } else {
+    // 在这里注入订单元数据，以保证后续事件处理能根据订单去匹配处理，只能在订阅模式里设置数据，否则Stripe报错
+    sessionParams.subscription_data = subscriptionData;
   }
 
   // Create log record with request
