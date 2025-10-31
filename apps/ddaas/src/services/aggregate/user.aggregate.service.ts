@@ -98,7 +98,7 @@ export class UserAggregateService {
       );
 
       // 先清空匿名积分并审计日志留痕
-      creditService.purgeFreeCredit(userId, 'user_registered_purge', tx);
+      await creditService.purgeFreeCredit(userId, 'user_registered_purge', tx);
       // 再初始化完成注册获得免费积分
       const credit = await creditService.initializeCreditWithFree(
         {
