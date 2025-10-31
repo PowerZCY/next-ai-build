@@ -1,5 +1,5 @@
 import { CreditType, OperationType, UserStatus } from '@/db/constants';
-import { creditService, creditUsageService, subscriptionService, userBackupService, userService } from '@/db/index';
+import { creditService, subscriptionService, userBackupService, userService } from '@/db/index';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 import type { Credit, Prisma, User } from '@/db/prisma-model-type';
 import { freeAmount, freeRegisterAmount } from '@/lib/appConfig';
@@ -20,9 +20,7 @@ export class UserAggregateService {
         tx
       );
 
-      const credit = await creditService.initializeCreditWithFree(newUser.userId, freeAmount, tx);
-
-      await creditUsageService.recordCreditOperation(
+      const credit = await creditService.initializeCreditWithFree(
         {
           userId: newUser.userId,
           feature: 'anonymous_user_init',
@@ -68,9 +66,7 @@ export class UserAggregateService {
         tx
       );
 
-      const credit = await creditService.initializeCreditWithFree(newUser.userId, freeRegisterAmount, tx);
-
-      await creditUsageService.recordCreditOperation(
+      const credit = await creditService.initializeCreditWithFree(
         {
           userId: newUser.userId,
           feature: 'user_registration_init',
@@ -78,7 +74,6 @@ export class UserAggregateService {
           operationType: OperationType.RECHARGE,
           creditsUsed: freeRegisterAmount,
         },
-        tx
       );
 
       await subscriptionService.initializeSubscription(newUser.userId, tx);
@@ -86,7 +81,7 @@ export class UserAggregateService {
     });
   }
 
-  
+  // 注意积分审查日志的处理
   async upgradeToRegistered(
     userId: string,
     email: string,
@@ -102,21 +97,20 @@ export class UserAggregateService {
         tx
       );
 
-      const credit = await creditService.initializeCreditWithFree(updateUser.userId, freeRegisterAmount, tx);
-
-      await creditUsageService.recordCreditOperation(
+      // 先清空匿名积分并审计日志留痕
+      creditService.purgeFreeCredit(userId, 'user_registered_purge', tx);
+      // 再初始化完成注册获得免费积分
+      const credit = await creditService.initializeCreditWithFree(
         {
           userId: updateUser.userId,
           feature: 'user_registration_init',
           creditType: CreditType.FREE,
           operationType: OperationType.RECHARGE,
           creditsUsed: freeRegisterAmount,
-        },
+        }, 
         tx
       );
-
-      await subscriptionService.initializeSubscription(updateUser.userId, tx);
-
+      
       return { updateUser: updateUser, credit: credit };
     });
   }

@@ -16,7 +16,7 @@ export async function CreditOverview({
   className,
   expiringSoonThresholdDays,
 }: CreditOverviewProps) {
-  const t = await getTranslations({ locale, namespace: 'credits' });
+  const t = await getTranslations({ locale, namespace: 'credit' });
 
   const translations: CreditOverviewTranslations = {
     summaryTitle: t('summary.title'),

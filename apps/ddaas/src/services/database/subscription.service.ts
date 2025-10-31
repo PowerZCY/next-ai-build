@@ -24,7 +24,6 @@ export class SubscriptionService {
         userId,
         status: SubscriptionStatus.INCOMPLETE,
         creditsAllocated: 0,
-        // All other fields (paySubscriptionId, priceId, periods) will be set when user actually subscribes
       },
     });
   }

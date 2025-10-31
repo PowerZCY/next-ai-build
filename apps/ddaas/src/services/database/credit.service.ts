@@ -3,6 +3,7 @@ import type { Credit, CreditUsage } from '@/db/prisma-model-type';
 import { CreditType, OperationType } from '@/db/constants';
 import { freeAmount, freeExpiredDays } from '@/lib/appConfig';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
+import { creditUsageService } from '@/db/index';
 
 type CreditAmounts = {
   free?: number;
@@ -27,6 +28,7 @@ type CreditOperationOptions = {
   ensureSufficientBalance?: boolean;
   ensureSufficientLimits?: boolean;
 };
+
 
 export class CreditService {
 
@@ -239,8 +241,13 @@ export class CreditService {
 
   // Initialize User Credits, use upsert for easy handle anonymous upgrade to register
   async initializeCreditWithFree(
-    userId: string,
-    free: number,
+    init: {
+      userId: string,
+      feature: string,
+      creditType: string,
+      operationType: string,
+      creditsUsed: number,
+    }, 
     tx?: Prisma.TransactionClient
   ): Promise<Credit> {
     const now = new Date();
@@ -248,13 +255,14 @@ export class CreditService {
     const freeEnd = new Date(now);
     freeEnd.setDate(freeEnd.getDate() + freeExpiredDays);
     freeEnd.setHours(23, 59, 59, 999);
-    const normalized = this.normalizeAmounts({ free });
+    const normalized = this.normalizeAmounts({ free: init.creditsUsed });
     this.ensureNonNegative(normalized, 'initializeCredit');
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.credit.upsert({
+    // 这里使用upsert语义是为了代码复用，处理匿名初始化和匿名->注册的初始化
+    const credit =  await client.credit.upsert({
       where: {
-        userId: userId
+        userId: init.userId
       },
       update: {
         balanceFree: normalized.free,
@@ -263,14 +271,34 @@ export class CreditService {
         freeEnd: freeEnd,
       },
       create: {
-        userId,
+        userId: init.userId,
         balanceFree: normalized.free,
         totalFreeLimit: normalized.free,
         freeStart: freeStart,
         freeEnd: freeEnd,
       },
     });
+
+    await creditUsageService.recordCreditOperation( init, tx );
+
+    return credit;
   }
+
+  async payFailedWatcher(
+    data: {
+      userId: string,
+      feature: string,
+      orderId: string
+      creditType: string,
+      operationType: string,
+      creditsUsed: number,
+    }, 
+    tx?: Prisma.TransactionClient
+  ): Promise<void> {
+    await creditUsageService.recordUsage( data, tx );
+    console.warn('payFailedWatcher completed');
+  }
+
 
   // Get User Credits
   async getCredit(userId: string, tx?: Prisma.TransactionClient): Promise<Credit | null> {
@@ -529,6 +557,44 @@ export class CreditService {
     }
 
     return credit;
+  }
+
+  async purgeFreeCredit(
+    userId: string,
+    reason: string,
+    tx?: Prisma.TransactionClient
+  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+    const client = checkAndFallbackWithNonTCClient(tx);
+    const currentCredit = await client.credit.findUnique({
+      where: { userId },
+    });
+    if (!currentCredit) {
+      throw new Error('User credits not found');
+    }
+
+    const deduction = this.normalizeAmounts({
+      free: currentCredit.balanceFree,
+      paid: 0,
+      oneTimePaid: 0,
+    });
+
+    const credit = await client.credit.update({
+      where: { userId },
+      data: {
+        balanceFree: 0,
+        totalFreeLimit: 0,
+        freeStart: null,
+        freeEnd: null,
+      },
+    });
+
+    const usage = this.hasAnyChange(deduction)
+      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
+          feature: reason,
+        })
+      : [];
+
+    return { credit, usage };
   }
 
   async purgeCredit(

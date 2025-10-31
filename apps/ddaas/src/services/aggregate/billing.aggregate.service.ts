@@ -1,7 +1,6 @@
 import {
   creditService,
   CreditType,
-  creditUsageService,
   OperationType,
   OrderStatus,
   PaymentStatus,
@@ -320,7 +319,7 @@ class BillingAggregateService {
         tx
       );
 
-      await creditUsageService.recordUsage(
+      await creditService.payFailedWatcher(
         {
           userId: params.subscription.userId,
           feature: `${TransactionType.SUBSCRIPTION}_renewal_failed`,
