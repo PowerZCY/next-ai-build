@@ -10,7 +10,7 @@ datasource db {
 model User {
   id            BigInt         @id @default(autoincrement())
   userId        String         @unique @default(dbgenerated("gen_random_uuid()")) @map("user_id") @db.Uuid
-  status        String         @default("anonymous") @db.VarChar(20)
+  status        String         @default("anonymous") @db.VarChar(50)
   fingerprintId String?        @map("fingerprint_id") @db.VarChar(255)
   clerkUserId   String?        @unique @map("clerk_user_id") @db.VarChar(255)
   stripeCusId   String?        @unique @map("stripe_cus_id") @db.VarChar(255)
@@ -29,7 +29,7 @@ model User {
 model Subscription {
   id                BigInt    @id @default(autoincrement())
   userId            String    @unique @map("user_id") @db.Uuid
-  status            String    @default("incomplete") @db.VarChar(20)
+  status            String    @default("incomplete") @db.VarChar(50)
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
   orderId           String?    @map("order_id") @db.VarChar(255)
   priceId           String?   @map("price_id") @db.VarChar(255)
@@ -81,27 +81,27 @@ model Transaction {
   id                BigInt    @id @default(autoincrement())
   userId            String    @map("user_id") @db.Uuid
   orderId           String    @unique @map("order_id") @db.VarChar(255)
-  orderStatus       String    @default("created") @map("order_status") @db.VarChar(20)
+  orderStatus       String    @default("created") @map("order_status") @db.VarChar(50)
   orderCreatedAt    DateTime? @default(now()) @map("order_created_at") @db.Timestamptz(6)
   orderExpiredAt    DateTime? @map("order_expired_at") @db.Timestamptz(6)
   orderUpdatedAt    DateTime? @default(now()) @updatedAt @map("order_updated_at") @db.Timestamptz(6)
-  type              String?   @db.VarChar(20)
-  paySupplier       String?   @map("pay_supplier") @db.VarChar(50)
+  type              String?   @db.VarChar(50)
+  paySupplier       String?   @map("pay_supplier") @db.VarChar(255)
   paySessionId      String?   @map("pay_session_id") @db.VarChar(255)
   payTransactionId  String?   @unique @map("pay_transaction_id") @db.VarChar(255)
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
   subPeriodStart    DateTime? @map("sub_period_start") @db.Timestamptz(6)
   subPeriodEnd      DateTime? @map("sub_period_end") @db.Timestamptz(6)
-  subPeriodCanceledAt      DateTime? @map("sub_period_cancel") @db.Timestamptz(6)
+  subPeriodCanceledAt      DateTime? @map("sub_period_canceled_at") @db.Timestamptz(6)
   subCancellationDetail  String?   @map("sub_cancellation_detail") @db.Text
   priceId           String?   @map("price_id") @db.VarChar(255)
   priceName         String?   @map("price_name") @db.VarChar(255)
   amount            Decimal?  @db.Decimal(10, 2)
-  currency          String?   @db.VarChar(10)
+  currency          String?   @db.VarChar(50)
   creditsGranted    Int?      @default(0) @map("credits_granted")
   payInvoiceId      String?   @map("pay_invoice_id") @db.VarChar(255)
-  paymentStatus String    @default("un_paid") @map("payment_status") @db.VarChar(20)
-  billingReason     String?   @map("billing_reason") @db.VarChar(50)
+  paymentStatus String    @default("un_paid") @map("payment_status") @db.VarChar(50)
+  billingReason     String?   @map("billing_reason") @db.VarChar(100)
   hostedInvoiceUrl  String?   @map("hosted_invoice_url") @db.Text
   invoicePdf        String?   @map("invoice_pdf") @db.Text
   orderDetail       String?   @map("order_detail")
@@ -122,8 +122,8 @@ model CreditUsage {
   id            BigInt    @id @default(autoincrement())
   userId        String    @map("user_id") @db.Uuid
   feature       String?   @db.VarChar(255)
-  creditType    String    @map("credit_type") @db.VarChar(10)
-  operationType String    @map("operation_type") @db.VarChar(20)
+  creditType    String    @map("credit_type") @db.VarChar(50)
+  operationType String    @map("operation_type") @db.VarChar(100)
   creditsUsed   Int       @map("credits_used")
   orderId       String?   @map("order_id") @db.VarChar(255)
   createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -157,7 +157,7 @@ model UserBackup {
 
 model Apilog {
   id         BigInt    @id @default(autoincrement())
-  apiType    String    @map("api_type") @db.VarChar(50)
+  apiType    String    @map("api_type") @db.VarChar(100)
   methodName String    @map("method_name") @db.VarChar(255)
   summary    String?
   request    String?
