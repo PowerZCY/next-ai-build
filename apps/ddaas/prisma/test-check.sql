@@ -37,4 +37,4 @@ SELECT
   FROM public.users u
   LEFT JOIN public.credits       c ON c.user_id = u.user_id
   LEFT JOIN public.subscriptions s ON s.user_id = u.user_id
-  WHERE u.user_id = "6c19e13c-fa37-4c2a-9a5d-0401da043b09";
+  WHERE u.user_id = '8a1adb33-b440-4084-8090-849188a165a9';
