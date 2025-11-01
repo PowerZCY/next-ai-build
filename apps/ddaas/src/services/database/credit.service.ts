@@ -29,6 +29,58 @@ type CreditOperationOptions = {
   ensureSufficientLimits?: boolean;
 };
 
+type CreditBalanceField = Extract<
+  keyof Credit,
+  'balanceFree' | 'balancePaid' | 'balanceOneTimePaid'
+>;
+type CreditLimitField = Extract<
+  keyof Credit,
+  'totalFreeLimit' | 'totalPaidLimit' | 'totalOneTimePaidLimit'
+>;
+type CreditWindowStartField = Extract<
+  keyof Credit,
+  'freeStart' | 'paidStart' | 'oneTimePaidStart'
+>;
+type CreditWindowEndField = Extract<
+  keyof Credit,
+  'freeEnd' | 'paidEnd' | 'oneTimePaidEnd'
+>;
+
+type CreditPurgeConfig = {
+  amountKey: keyof Required<CreditAmounts>;
+  balanceField: CreditBalanceField;
+  limitField: CreditLimitField;
+  startField: CreditWindowStartField;
+  endField: CreditWindowEndField;
+};
+
+const CREDIT_PURGE_CONFIG: Record<
+  typeof CreditType[keyof typeof CreditType],
+  CreditPurgeConfig
+> = {
+  [CreditType.FREE]: {
+    amountKey: 'free',
+    balanceField: 'balanceFree',
+    limitField: 'totalFreeLimit',
+    startField: 'freeStart',
+    endField: 'freeEnd',
+  },
+  [CreditType.PAID]: {
+    amountKey: 'paid',
+    balanceField: 'balancePaid',
+    limitField: 'totalPaidLimit',
+    startField: 'paidStart',
+    endField: 'paidEnd',
+  },
+  [CreditType.ONE_TIME_PAID]: {
+    amountKey: 'oneTimePaid',
+    balanceField: 'balanceOneTimePaid',
+    limitField: 'totalOneTimePaidLimit',
+    startField: 'oneTimePaidStart',
+    endField: 'oneTimePaidEnd',
+  },
+};
+
 
 export class CreditService {
 
@@ -220,7 +272,7 @@ export class CreditService {
         userId,
         feature: options.feature,
         orderId: options.orderId,
-        creditType: CreditType.PAID,
+        creditType: CreditType.ONE_TIME_PAID,
         operationType,
         creditsUsed: amounts.oneTimePaid,
       });
@@ -559,42 +611,59 @@ export class CreditService {
     return credit;
   }
 
+  private async purgeCreditsByTypes(
+    userId: string,
+    reason: string,
+    types: Array<typeof CreditType[keyof typeof CreditType]>,
+    tx?: Prisma.TransactionClient
+  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+    const uniqueTypes = Array.from(new Set(types));
+    if (uniqueTypes.length === 0) {
+      throw new Error('purgeCreditsByTypes: no credit types specified');
+    }
+
+    const client = checkAndFallbackWithNonTCClient(tx);
+    const currentCredit = await client.credit.findUnique({ where: { userId }, });
+
+    if (!currentCredit) {
+      throw new Error('User credits not found');
+    }
+
+    const deduction: CreditAmounts = {};
+    const updateData: Record<string, unknown> = {};
+
+    for (const type of uniqueTypes) {
+      const config = CREDIT_PURGE_CONFIG[type];
+      if (!config) {
+        throw new Error(`Unsupported credit type: ${type as string}`);
+      }
+
+      deduction[config.amountKey] = currentCredit[config.balanceField];
+
+      updateData[config.balanceField] = 0;
+      updateData[config.limitField] = 0;
+      updateData[config.startField] = null;
+      updateData[config.endField] = null;
+    }
+
+    const normalizedDeduction = this.normalizeAmounts(deduction);
+    const credit = await client.credit.update({
+      where: { userId },
+      data: updateData as Prisma.CreditUpdateInput,
+    });
+
+    // 强制留痕，即使是积分变化为0也记录，操作留痕
+    const usage = await this.recordCreditUsage(client, userId, OperationType.PURGE, normalizedDeduction, { feature: reason, })
+
+    return { credit, usage };
+  }
+
   async purgePaidCredit(
     userId: string,
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-    const currentCredit = await client.credit.findUnique({
-      where: { userId },
-    });
-    if (!currentCredit) {
-      throw new Error('User credits not found');
-    }
-
-    const deduction = this.normalizeAmounts({
-      free: 0,
-      paid: currentCredit.balancePaid,
-      oneTimePaid: 0,
-    });
-
-    const credit = await client.credit.update({
-      where: { userId },
-      data: {
-        balancePaid: 0,
-        totalPaidLimit: 0,
-        paidStart: null,
-        paidEnd: null,
-      },
-    });
-
-    const usage = this.hasAnyChange(deduction)
-      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
-          feature: reason,
-        })
-      : [];
-
-    return { credit, usage };
+    return this.purgeCreditsByTypes(userId, reason, [CreditType.PAID], tx);
   }
 
   async purgeFreeCredit(
@@ -602,37 +671,7 @@ export class CreditService {
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-    const currentCredit = await client.credit.findUnique({
-      where: { userId },
-    });
-    if (!currentCredit) {
-      throw new Error('User credits not found');
-    }
-
-    const deduction = this.normalizeAmounts({
-      free: currentCredit.balanceFree,
-      paid: 0,
-      oneTimePaid: 0,
-    });
-
-    const credit = await client.credit.update({
-      where: { userId },
-      data: {
-        balanceFree: 0,
-        totalFreeLimit: 0,
-        freeStart: null,
-        freeEnd: null,
-      },
-    });
-
-    const usage = this.hasAnyChange(deduction)
-      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
-          feature: reason,
-        })
-      : [];
-
-    return { credit, usage };
+    return this.purgeCreditsByTypes(userId, reason, [CreditType.FREE], tx);
   }
 
   async purgeCredit(
@@ -640,45 +679,12 @@ export class CreditService {
     reason: string,
     tx?: Prisma.TransactionClient
   ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-    const currentCredit = await client.credit.findUnique({
-      where: { userId },
-    });
-    if (!currentCredit) {
-      throw new Error('User credits not found');
-    }
-
-    const deduction = this.normalizeAmounts({
-      free: currentCredit.balanceFree,
-      paid: currentCredit.balancePaid,
-      oneTimePaid: currentCredit.balanceOneTimePaid,
-    });
-
-    const credit = await client.credit.update({
-      where: { userId },
-      data: {
-        balanceFree: 0,
-        balancePaid: 0,
-        balanceOneTimePaid: 0,
-        totalFreeLimit: 0,
-        totalPaidLimit: 0,
-        totalOneTimePaidLimit: 0,
-        freeStart: null,
-        freeEnd: null,
-        paidStart: null,
-        paidEnd: null,
-        oneTimePaidStart: null,
-        oneTimePaidEnd: null,
-      },
-    });
-
-    const usage = this.hasAnyChange(deduction)
-      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
-          feature: reason,
-        })
-      : [];
-
-    return { credit, usage };
+    return this.purgeCreditsByTypes(
+      userId,
+      reason,
+      [CreditType.FREE, CreditType.PAID, CreditType.ONE_TIME_PAID],
+      tx
+    );
   }
 
   // Get Users with Low Credit Balance

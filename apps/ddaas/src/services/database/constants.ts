@@ -33,6 +33,7 @@ export const TransactionType = {
 export const CreditType = {
   FREE: 'free',
   PAID: 'paid',
+  ONE_TIME_PAID: 'one_time_paid'
 } as const;
 
 export const OperationType = {
@@ -61,6 +62,7 @@ export const PaymentStatus = {
   UN_PAID: 'un_paid',
   NO_PAYMENT_REQUIRED: 'no_payment_required',
 } as const;
+
 
 // Type Definitions
 export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
