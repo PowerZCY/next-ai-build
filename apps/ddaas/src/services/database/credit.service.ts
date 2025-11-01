@@ -559,6 +559,44 @@ export class CreditService {
     return credit;
   }
 
+  async purgePaidCredit(
+    userId: string,
+    reason: string,
+    tx?: Prisma.TransactionClient
+  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+    const client = checkAndFallbackWithNonTCClient(tx);
+    const currentCredit = await client.credit.findUnique({
+      where: { userId },
+    });
+    if (!currentCredit) {
+      throw new Error('User credits not found');
+    }
+
+    const deduction = this.normalizeAmounts({
+      free: 0,
+      paid: currentCredit.balancePaid,
+      oneTimePaid: 0,
+    });
+
+    const credit = await client.credit.update({
+      where: { userId },
+      data: {
+        balancePaid: 0,
+        totalPaidLimit: 0,
+        paidStart: null,
+        paidEnd: null,
+      },
+    });
+
+    const usage = this.hasAnyChange(deduction)
+      ? await this.recordCreditUsage(client, userId, OperationType.PURGE, deduction, {
+          feature: reason,
+        })
+      : [];
+
+    return { credit, usage };
+  }
+
   async purgeFreeCredit(
     userId: string,
     reason: string,

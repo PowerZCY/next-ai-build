@@ -38,22 +38,21 @@
  * - Safe for webhook replay
  */
 
-import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe-config';
-import { getCreditsFromPriceId } from '@/lib/money-price-config';
-import {
-  transactionService,
-  subscriptionService,
-  TransactionType,
-  OrderStatus,
-  SubscriptionStatus,
-  BillingReason,
-  PaymentStatus,
-} from '@/db/index';
-import { Transaction } from '@/db/prisma-model-type'
-import { Apilogger } from '@/db/index';
 import { billingAggregateService } from '@/agg/index';
+import {
+  Apilogger,
+  BillingReason,
+  OrderStatus,
+  PaymentStatus,
+  subscriptionService,
+  transactionService,
+  TransactionType
+} from '@/db/index';
+import { Transaction } from '@/db/prisma-model-type';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
+import { getCreditsFromPriceId } from '@/lib/money-price-config';
+import { stripe } from '@/lib/stripe-config';
+import Stripe from 'stripe';
 
 const mapPaymentStatus = (
   status?: Stripe.Checkout.Session.PaymentStatus | null
@@ -490,15 +489,34 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
  * Handle customer.subscription.deleted
  */
 async function handleSubscriptionDeleted(stripeSubscription: Stripe.Subscription) {
-  console.log(`Subscription deleted: ${stripeSubscription.id}`);
+  const subscriptionId = stripeSubscription.id;
+  console.log(`Subscription deleted: ${subscriptionId}`);
 
-  const subscription = await subscriptionService.findByPaySubscriptionId(stripeSubscription.id);
+  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
   if (!subscription) {
-    console.warn(`Subscription not found in DB: ${stripeSubscription.id}`);
+    console.warn(`Subscription not found in DB: ${subscriptionId}`);
     return;
   }
 
-  await subscriptionService.updateStatus(subscription.id, SubscriptionStatus.CANCELED);
+  const userCanceledAt = stripeSubscription.canceled_at;
+  if (!userCanceledAt) {
+    throw new Error(
+      `Invalid period in invoice line: canceldAt=${userCanceledAt}, subscriptionId=${subscriptionId}`
+    );
+  }
+
+  const canceledAt =  new Date(userCanceledAt * 1000);
+  
+  const cancellationDetail = stripeSubscription.cancellation_details ? JSON.stringify(stripeSubscription.cancellation_details) : undefined;
+
+  await billingAggregateService.processSubscriptionCancel(
+    {
+      subscription,
+      canceledAt,
+      cancellationDetail
+    }
+  );
+  
   console.log(`Subscription status updated to canceled: ${subscription.id}`);
 }
 

@@ -32,6 +32,12 @@ type SubscriptionRenewalContext = {
   paidAt: Date;
 };
 
+type SubscriptionCancelContext = {
+  subscription: Subscription;
+  canceledAt: Date;
+  cancellationDetail?: string 
+};
+
 type SubscriptionRefundContext = {
   transaction: Transaction;
   subscription?: Subscription | null;
@@ -60,15 +66,16 @@ class BillingAggregateService {
   ): Promise<Subscription> {
     return runInTransaction(async (tx) => {
       const client = checkAndFallbackWithNonTCClient(tx);
-      const placeholder = await subscriptionService.findAnonymousInitRecord(params.userId, tx);
+      const anonymosPlaceholderRecord = await subscriptionService.findAnonymousInitRecord(params.userId, tx);
 
-      if (!placeholder) {
-        throw new Error(`Subscription placeholder not found for user ${params.userId}`);
+      if (!anonymosPlaceholderRecord) {
+        throw new Error(`Subscription anonymosPlaceholderRecord not found for user ${params.userId}`);
       }
 
       const updatedSubscription = await subscriptionService.updateSubscription(
-        placeholder.id,
+        anonymosPlaceholderRecord.id,
         {
+          orderId: params.orderId ?? undefined,
           paySubscriptionId: params.subscriptionId,
           priceId: params.priceId ?? undefined,
           priceName: params.priceName ?? undefined,
@@ -90,6 +97,8 @@ class BillingAggregateService {
           paymentStatus: params.paymentStatus,
           paySubscriptionId: params.subscriptionId,
           paySessionId: params.sessionId,
+          subPeriodStart: params.periodStart,
+          subPeriodEnd: params.periodEnd,
           paidEmail: params.paidEmail ?? undefined,
           paidAt: now,
           payUpdatedAt: now,
@@ -200,17 +209,6 @@ class BillingAggregateService {
     context: SubscriptionRenewalContext
   ): Promise<void> {
     await runInTransaction(async (tx) => {
-      await subscriptionService.updateSubscription(
-        context.subscription.id,
-        {
-          status: SubscriptionStatus.ACTIVE,
-          subPeriodStart: context.periodStart,
-          subPeriodEnd: context.periodEnd,
-          updatedAt: new Date(),
-        },
-        tx
-      );
-
       await transactionService.createTransaction(
         {
           userId: context.subscription.userId,
@@ -219,6 +217,8 @@ class BillingAggregateService {
           paymentStatus: PaymentStatus.PAID,
           paySupplier: PaySupplier.STRIPE,
           paySubscriptionId: context.subscription.paySubscriptionId ?? undefined,
+          subPeriodStart: context.periodStart,
+          subPeriodEnd: context.periodEnd,
           payInvoiceId: context.invoiceId,
           hostedInvoiceUrl: context.hostedInvoiceUrl ?? undefined,
           invoicePdf: context.invoicePdf ?? undefined,
@@ -232,6 +232,18 @@ class BillingAggregateService {
           creditsGranted: context.renewalCredits,
           paidAt: context.paidAt,
           payUpdatedAt: new Date(),
+        },
+        tx
+      );
+
+      await subscriptionService.updateSubscription(
+        context.subscription.id,
+        {
+          status: SubscriptionStatus.ACTIVE,
+          orderId: context.renewalOrderId,
+          subPeriodStart: context.periodStart,
+          subPeriodEnd: context.periodEnd,
+          updatedAt: new Date(),
         },
         tx
       );
@@ -337,6 +349,7 @@ class BillingAggregateService {
         params.subscription.id,
         {
           status: SubscriptionStatus.PAST_DUE,
+          orderId: params.failedOrderId,
           updatedAt: new Date(),
         },
         tx
@@ -365,6 +378,34 @@ class BillingAggregateService {
       );
     });
   }
+
+  async processSubscriptionCancel(
+    context: SubscriptionCancelContext
+  ): Promise<void> {
+    const orderId = context.subscription.orderId;
+    const userId = context.subscription.userId;
+    if (!orderId || !userId) {
+      console.warn(`Ilegal subscription for orderId OR userId is NULL, subscriptionId=${context.subscription.paySubscriptionId}`);
+      return;
+    }
+    await runInTransaction(async (tx) => {
+      // 更新订单, 记录取消信息
+      await transactionService.update(
+        orderId,
+        {
+          subPeriodCanceledAt: context.canceledAt,
+          subCancellationDetail: context.cancellationDetail ?? undefined
+        },
+        tx
+      )
+      // 更新订阅信息
+      await subscriptionService.updateStatus(context.subscription.id, SubscriptionStatus.CANCELED, tx);
+
+      // 清理积分并留痕
+      await creditService.purgePaidCredit(userId, 'cancel_subscription_purge', tx);
+    })
+  }
+  
 
   async processSubscriptionRefund(
     context: SubscriptionRefundContext

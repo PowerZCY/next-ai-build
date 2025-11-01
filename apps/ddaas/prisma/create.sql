@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     user_id              UUID        NOT NULL,
     status               VARCHAR(20) NOT NULL DEFAULT 'incomplete',
     pay_subscription_id  VARCHAR(255),
+    order_id             VARCHAR(255) NOT NULL,
     price_id             VARCHAR(255),
     price_name           VARCHAR(255),
     credits_allocated    INTEGER     NOT NULL DEFAULT 0,
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_subscriptions_pay_subscription_id ON public.subscriptions (pay_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_order_id ON public.subscriptions (order_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON public.subscriptions (user_id);
 
 -- 积分表
@@ -76,6 +78,10 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     pay_session_id       VARCHAR(255),
     pay_transaction_id   VARCHAR(255),
     pay_subscription_id  VARCHAR(255),
+    sub_period_start     TIMESTAMPTZ,
+    sub_period_end     TIMESTAMPTZ,
+    sub_period_canceled_at     TIMESTAMPTZ,
+    sub_cancellation_detail          TEXT,
     price_id             VARCHAR(255),
     price_name           VARCHAR(255),
     amount               NUMERIC(10, 2),

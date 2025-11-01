@@ -16,6 +16,8 @@ export class TransactionService {
     paySupplier?: PaySupplier;
     payTransactionId?: string;
     paySubscriptionId?: string;
+    subPeriodStart? : Date;
+    subPeriodEnd? : Date;
     paySessionId?: string;
     payInvoiceId?: string;
     hostedInvoiceUrl?: string,
@@ -205,7 +207,7 @@ export class TransactionService {
         paidDetail: paymentData.paidDetail,
         creditsGranted: paymentData.creditsGranted,
         payUpdatedAt: paymentData.payUpdatedAt,
-        paymentStatus: paymentData.paymentStatus || PaymentStatus.PAID,
+        paymentStatus: paymentData.paymentStatus || PaymentStatus.PAID
       },
     });
   }

@@ -31,6 +31,7 @@ model Subscription {
   userId            String    @unique @map("user_id") @db.Uuid
   status            String    @default("incomplete") @db.VarChar(20)
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
+  orderId           String?    @map("order_id") @db.VarChar(255)
   priceId           String?   @map("price_id") @db.VarChar(255)
   priceName         String?   @map("price_name") @db.VarChar(255)
   creditsAllocated  Int       @default(0) @map("credits_allocated")
@@ -42,6 +43,7 @@ model Subscription {
   user              User      @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([paySubscriptionId], map: "idx_subscriptions_pay_subscription_id")
+  @@index([orderId], map: "idx_subscriptions_order_id")
   @@map("subscriptions")
 }
 
@@ -88,6 +90,10 @@ model Transaction {
   paySessionId      String?   @map("pay_session_id") @db.VarChar(255)
   payTransactionId  String?   @unique @map("pay_transaction_id") @db.VarChar(255)
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
+  subPeriodStart    DateTime? @map("sub_period_start") @db.Timestamptz(6)
+  subPeriodEnd      DateTime? @map("sub_period_end") @db.Timestamptz(6)
+  subPeriodCanceledAt      DateTime? @map("sub_period_cancel") @db.Timestamptz(6)
+  subCancellationDetail  String?   @map("sub_cancellation_detail") @db.Text
   priceId           String?   @map("price_id") @db.VarChar(255)
   priceName         String?   @map("price_name") @db.VarChar(255)
   amount            Decimal?  @db.Decimal(10, 2)

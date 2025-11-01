@@ -5,7 +5,6 @@ import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
 export class SubscriptionService {
 
-
   /**
    * Initialize a placeholder subscription record for new users
    * This allows Stripe webhook handlers to UPDATE instead of CREATE,
@@ -31,6 +30,7 @@ export class SubscriptionService {
   // Create a new subscription
   async createSubscription(data: {
     userId: string;
+    orderId: string;
     paySubscriptionId?: string;
     priceId?: string;
     priceName?: string;
@@ -44,6 +44,7 @@ export class SubscriptionService {
     return await client.subscription.create({
       data: {
         userId: data.userId,
+        orderId: data.orderId,
         paySubscriptionId: data.paySubscriptionId,
         priceId: data.priceId,
         priceName: data.priceName,
