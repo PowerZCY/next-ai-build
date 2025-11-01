@@ -15,7 +15,7 @@ export const validateStripeWebhook = (
   return stripe.webhooks.constructEvent(payload, signature, secret);
 };
 
-export interface CreateCheckoutSessionParams {
+export interface BasicCheckoutSessionParams {
   priceId: string;
   customerId?: string;
   clientReferenceId: string; // user_id
@@ -25,12 +25,13 @@ export interface CreateCheckoutSessionParams {
   // ✅ New: Auto-determine mode based on interval
   interval?: string; // 'month' | 'year' | 'onetime' | undefined
   // ✅ New: Subscription metadata for webhook processing
-  subscriptionData?: Stripe.Checkout.SessionCreateParams.SubscriptionData;
+  
 }
 
 // Helper function to create checkout session
 export const createCheckoutSession = async (
-  params: CreateCheckoutSessionParams
+  params: BasicCheckoutSessionParams,
+  subscriptionData?: Stripe.Checkout.SessionCreateParams.SubscriptionData
 ): Promise<Stripe.Checkout.Session> => {
   const {
     priceId,
@@ -39,7 +40,6 @@ export const createCheckoutSession = async (
     successUrl,
     cancelUrl,
     metadata,
-    subscriptionData,
     interval
   } = params;
 
@@ -48,6 +48,9 @@ export const createCheckoutSession = async (
   const isSubscriptionMode = mode === 'subscription';
 
   if (isSubscriptionMode) {
+    if (!subscriptionData) { 
+      throw new Error('Subscription data is required for subscription mode');
+    }
     const activeSubscription = await subscriptionService.getActiveSubscription(clientReferenceId);
     if (activeSubscription) {
       throw new ActiveSubscriptionExistsError();
@@ -78,13 +81,18 @@ export const createCheckoutSession = async (
   }
 
   // One-time payment specific configuration
-  if (mode === 'payment') {
-    sessionParams.invoice_creation = {
-      enabled: false, // One-time payments don't create invoices
-    };
-  } else {
+  if (isSubscriptionMode) {
     // 在这里注入订单元数据，以保证后续事件处理能根据订单去匹配处理，只能在订阅模式里设置数据，否则Stripe报错
     sessionParams.subscription_data = subscriptionData;
+    // 续订时自动支付，不需要用户手动支付
+    sessionParams.payment_intent_data = {
+      setup_future_usage: "off_session"
+    };
+  } else {
+    // One-time payments don't create invoices
+    sessionParams.invoice_creation = {
+      enabled: false, 
+    };
   }
 
   // Create log record with request

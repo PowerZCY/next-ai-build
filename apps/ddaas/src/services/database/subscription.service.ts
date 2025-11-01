@@ -55,18 +55,6 @@ export class SubscriptionService {
     });
   }
 
-  // Find subscription by ID
-  async findById(id: bigint, tx?: Prisma.TransactionClient): Promise<Subscription | null> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-
-    return await client.subscription.findFirst({
-      where: { id, deleted: 0 },
-      include: {
-        user: true,
-      },
-    });
-  }
-
   // Find subscription by pay subscription ID
   async findByPaySubscriptionId(
     paySubscriptionId: string,
@@ -75,42 +63,7 @@ export class SubscriptionService {
     const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.subscription.findFirst({
-      where: { paySubscriptionId, deleted: 0 },
-      include: {
-        user: true,
-      },
-    });
-  }
-
-  // Get user's subscription
-  async findByUserId(
-    userId: string,
-    params?: {
-      status?: string;
-      includeExpired?: boolean;
-    },
-    tx?: Prisma.TransactionClient
-  ): Promise<Subscription | null> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-    const where: Prisma.SubscriptionWhereInput = {
-      userId,
-      deleted: 0,
-    };
-
-    if (params?.status) {
-      where.status = params.status;
-    }
-
-    if (!params?.includeExpired) {
-      where.OR = [
-        { subPeriodEnd: { gte: new Date() } },
-        { subPeriodEnd: null },
-      ];
-    }
-
-    return await client.subscription.findFirst({
-      where,
-      orderBy: { createdAt: 'desc' },
+      where: { paySubscriptionId, deleted: 0 }
     });
   }
 
@@ -118,17 +71,12 @@ export class SubscriptionService {
   async getActiveSubscription(userId: string, tx?: Prisma.TransactionClient): Promise<Subscription | null> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.subscription.findFirst({
+    return await client.subscription.findUnique({
       where: {
         userId,
         status: SubscriptionStatus.ACTIVE,
-        deleted: 0,
-        OR: [
-          { subPeriodEnd: { gte: new Date() } },
-          { subPeriodEnd: null },
-        ],
-      },
-      orderBy: { createdAt: 'desc' },
+        deleted: 0
+      }
     });
   }
 
@@ -270,10 +218,7 @@ export class SubscriptionService {
           gte: now,
           lte: expiryDate,
         },
-      },
-      include: {
-        user: true,
-      },
+      }
     });
   }
 
@@ -288,10 +233,7 @@ export class SubscriptionService {
         subPeriodEnd: {
           lt: new Date(),
         },
-      },
-      include: {
-        user: true,
-      },
+      }
     });
   }
 

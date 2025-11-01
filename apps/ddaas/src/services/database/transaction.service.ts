@@ -66,11 +66,8 @@ export class TransactionService {
   async findByOrderId(orderId: string, tx?: Prisma.TransactionClient): Promise<Transaction | null> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.transaction.findFirst({
-      where: { orderId, deleted: 0 },
-      include: {
-        user: true,
-      },
+    return await client.transaction.findUnique({
+      where: { orderId, deleted: 0 }
     });
   }
 
@@ -82,10 +79,7 @@ export class TransactionService {
     const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.transaction.findFirst({
-      where: { paySessionId, deleted: 0 },
-      include: {
-        user: true,
-      },
+      where: { paySessionId, deleted: 0 }
     });
   }
 

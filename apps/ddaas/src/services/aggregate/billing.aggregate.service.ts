@@ -263,6 +263,7 @@ class BillingAggregateService {
     params: {
       orderId: string;
       invoiceId: string;
+      paymentIntentId: string;
       detail?: string;
     }
   ): Promise<void> {
@@ -273,6 +274,7 @@ class BillingAggregateService {
         {
           paymentStatus: PaymentStatus.UN_PAID,
           payInvoiceId: params.invoiceId,
+          payTransactionId: params.paymentIntentId,
           payUpdatedAt: new Date(),
           paidDetail: params.detail ?? undefined,
           orderDetail: params.detail ?? undefined,
@@ -288,7 +290,7 @@ class BillingAggregateService {
       failedOrderId: string;
       invoiceId: string;
       billingReason?: NullableString;
-      paymentIntentId?: NullableString;
+      paymentIntentId: string;
       amountDueCents: number;
       currency: string;
       createdAt: Date;

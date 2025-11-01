@@ -43,9 +43,7 @@ export class UserService {
         email: true,
         status: true,
         createdAt: true,
-        updatedAt: true,
-        credits: true,
-        subscription: true,
+        updatedAt: true
       },
     });
   }
@@ -65,9 +63,7 @@ export class UserService {
         email: true,
         status: true,
         createdAt: true,
-        updatedAt: true,
-        credits: true,
-        subscription: true,
+        updatedAt: true
       },
     });
   }
@@ -87,8 +83,7 @@ export class UserService {
         email: true,
         status: true,
         createdAt: true,
-        updatedAt: true,
-        credits: true,
+        updatedAt: true
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -109,9 +104,7 @@ export class UserService {
         email: true,
         status: true,
         createdAt: true,
-        updatedAt: true,
-        credits: true,
-        subscription: true,
+        updatedAt: true
       },
     });
   }
@@ -206,8 +199,7 @@ export class UserService {
           email: true,
           status: true,
           createdAt: true,
-          updatedAt: true,
-          credits: true,
+          updatedAt: true
         },
       }),
       client.user.count({ where }),

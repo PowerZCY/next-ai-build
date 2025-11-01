@@ -571,6 +571,12 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     return;
   }
 
+  // 支付ID
+  const paymentIntentId =
+      typeof (invoice as any).payment_intent === 'string'
+        ? (invoice as any).payment_intent
+        : (invoice as any).payment_intent?.id;
+
   // ===== CASE 1: Initial subscription payment failed =====
   if (isInitialPayment) {
     const orderId = subscriptionMetadata.order_id;
@@ -592,6 +598,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         {
           orderId: transaction.orderId,
           invoiceId: invoice.id,
+          paymentIntentId: paymentIntentId,
           detail: 'Initial subscription payment failed',
         }
       );
@@ -617,11 +624,6 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       console.log(`Renewal payment-failure event for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
       return;
     }
-
-    const paymentIntentId =
-      typeof (invoice as any).payment_intent === 'string'
-        ? (invoice as any).payment_intent
-        : (invoice as any).payment_intent?.id;
 
     await billingAggregateService.recordRenewalPaymentFailure(
       {
@@ -656,28 +658,24 @@ async function handleSubscriptionCreated(stripeSubscription: Stripe.Subscription
 async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
   console.log(`Subscription updated: ${stripeSubscription.id}`);
 
+  // Extract period timestamps from subscription items (NOT from top-level subscription object)
+  const subscriptionItem = stripeSubscription.items?.data?.[0];
+
+  if (!subscriptionItem) {
+    console.warn(`No subscription items found for ${stripeSubscription.id}, reject!`);
+    return;
+  }
+
   const subscription = await subscriptionService.findByPaySubscriptionId(stripeSubscription.id);
   if (!subscription) {
     console.warn(`Subscription not found in DB: ${stripeSubscription.id}`);
     return;
   }
 
-  // Extract period timestamps from subscription items (NOT from top-level subscription object)
-  const subscriptionItem = stripeSubscription.items?.data?.[0];
 
-  let currentPeriodStart: number;
-  let currentPeriodEnd: number;
-
-  if (subscriptionItem) {
-    // Use period from subscription item if available
-    currentPeriodStart = subscriptionItem.current_period_start;
-    currentPeriodEnd = subscriptionItem.current_period_end;
-  } else {
-    // Fallback if no items found (should not happen in normal cases)
-    console.warn(`No subscription items found for ${stripeSubscription.id}, using current time as fallback`);
-    currentPeriodStart = Math.floor(Date.now() / 1000);
-    currentPeriodEnd = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-  }
+  // Use period from subscription item if available
+  const currentPeriodStart = subscriptionItem.current_period_start;
+  const currentPeriodEnd = subscriptionItem.current_period_end;
 
   await billingAggregateService.syncSubscriptionFromStripe(
     {

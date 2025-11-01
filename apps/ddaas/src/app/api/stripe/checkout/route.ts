@@ -58,7 +58,8 @@ export async function POST(request: NextRequest) {
     const defaultCancelUrl = `${baseUrl}`;
 
     // Create Stripe checkout session with interval for dynamic mode
-    const session = await createCheckoutSession({
+
+    const basciParams = {
       priceId,
       customerId,
       clientReferenceId: user.userId,
@@ -70,14 +71,16 @@ export async function POST(request: NextRequest) {
         user_id: user.userId,
         price_name: priceConfig.priceName,
         credits_granted: priceConfig.credits?.toString() || '',
+      }
+    }
+
+    const subscriptionData = {
+      metadata: {
+        order_id: orderId,
+        user_id: user.userId,
       },
-      subscriptionData: {
-        metadata: {
-          order_id: orderId,
-          user_id: user.userId,
-        },
-      },
-    });
+    };
+    const session = await createCheckoutSession(basciParams,subscriptionData);
 
     // Create transaction record with session info
     await transactionService.createTransaction({
