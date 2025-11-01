@@ -84,10 +84,6 @@ export const createCheckoutSession = async (
   if (isSubscriptionMode) {
     // 在这里注入订单元数据，以保证后续事件处理能根据订单去匹配处理，只能在订阅模式里设置数据，否则Stripe报错
     sessionParams.subscription_data = subscriptionData;
-    // 续订时自动支付，不需要用户手动支付
-    sessionParams.payment_intent_data = {
-      setup_future_usage: "off_session"
-    };
   } else {
     // One-time payments don't create invoices
     sessionParams.invoice_creation = {
@@ -117,6 +113,17 @@ export const createCheckoutSession = async (
     throw error;
   }
 };
+
+// 根据发票ID去查支付ID
+export const fetchPaymentId = async (invoiceId: string ): Promise<string> => {
+  const fullInvoice = await stripe.invoices.retrieve(invoiceId, {
+    expand: ['payments']
+  });
+  const payment = fullInvoice.payments?.data[0];
+  const paymentIntentInfo = payment?.payment?.payment_intent;
+  const paymentIntentId = typeof paymentIntentInfo === 'string' ? paymentIntentInfo : (paymentIntentInfo as Stripe.PaymentIntent)?.id;
+  return paymentIntentId;
+}
 
 // Helper function to create or retrieve customer
 export const createOrGetCustomer = async (params: {

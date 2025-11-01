@@ -1,7 +1,6 @@
-import type { Prisma } from '@/db/prisma-model-type';
-import type { Subscription } from '@/db/prisma-model-type';
 import { SubscriptionStatus } from '@/db/constants';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
+import type { Prisma, Subscription } from '@/db/prisma-model-type';
 
 export class SubscriptionService {
 
@@ -81,19 +80,18 @@ export class SubscriptionService {
     });
   }
 
-  async findAnonymousInitRecord(
-    userId: string,
-    tx?: Prisma.TransactionClient
-  ): Promise<Subscription | null> {
+  async getNonActiveSubscription(userId: string, tx?: Prisma.TransactionClient): Promise<Subscription | null> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.subscription.findFirst({
+    return await client.subscription.findUnique({
       where: {
         userId,
-        status: SubscriptionStatus.INCOMPLETE,
-      },
+        status: { not: SubscriptionStatus.ACTIVE },
+        deleted: 0
+      }
     });
   }
+
 
   // Update subscription
   async updateSubscription(

@@ -92,6 +92,7 @@ model Transaction {
   paySubscriptionId String?   @map("pay_subscription_id") @db.VarChar(255)
   subPeriodStart    DateTime? @map("sub_period_start") @db.Timestamptz(6)
   subPeriodEnd      DateTime? @map("sub_period_end") @db.Timestamptz(6)
+  subLastTryCancelAt  DateTime? @map("sub_last_try_cancel_at") @db.Timestamptz(6)
   subPeriodCanceledAt      DateTime? @map("sub_period_canceled_at") @db.Timestamptz(6)
   subCancellationDetail  String?   @map("sub_cancellation_detail") @db.Text
   priceId           String?   @map("price_id") @db.VarChar(255)

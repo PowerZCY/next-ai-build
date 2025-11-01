@@ -51,7 +51,7 @@ import {
 import { Transaction } from '@/db/prisma-model-type';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
 import { getCreditsFromPriceId } from '@/lib/money-price-config';
-import { stripe } from '@/lib/stripe-config';
+import { stripe, fetchPaymentId } from '@/lib/stripe-config';
 import Stripe from 'stripe';
 
 const mapPaymentStatus = (
@@ -393,14 +393,18 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     );
   }
 
-  console.log('Invoice info:', {
+  const paymentIntentId = await fetchPaymentId(invoice.id)
+
+  console.log('Invoice paid event key-info:', {
     invoiceId: invoice.id,
     subscriptionId,
+    paymentIntentId,
     billingReason: invoice.billing_reason,
     isInitialPayment,
     periodStart: subPeriodStart.toISOString(),
     periodEnd: subPeriodEnd.toISOString(),
   });
+
 
   if (isInitialPayment) {
     const orderId = subscriptionMetadata.order_id;
@@ -421,6 +425,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
         {
           orderId: transaction.orderId,
           invoiceId: invoice.id,
+          paymentIntentId,
           hostedInvoiceUrl: invoice.hosted_invoice_url,
           invoicePdf: invoice.invoice_pdf,
           billingReason: invoice.billing_reason,
@@ -456,11 +461,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
       : subscription.creditsAllocated;
 
     const renewalCredits = creditsForRenewal || subscription.creditsAllocated;
-
-    const paymentIntentId =
-      typeof (invoice as any).payment_intent === 'string'
-        ? (invoice as any).payment_intent
-        : (invoice as any).payment_intent?.id;
 
     await billingAggregateService.recordSubscriptionRenewalPayment(
       {
@@ -590,10 +590,15 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   }
 
   // 支付ID
-  const paymentIntentId =
-      typeof (invoice as any).payment_intent === 'string'
-        ? (invoice as any).payment_intent
-        : (invoice as any).payment_intent?.id;
+  const paymentIntentId = await fetchPaymentId(invoice.id)
+
+  console.log('Invoice payment failed event key-info:', {
+    invoiceId: invoice.id,
+    subscriptionId,
+    paymentIntentId,
+    billingReason: invoice.billing_reason,
+    isInitialPayment
+  });
 
   // ===== CASE 1: Initial subscription payment failed =====
   if (isInitialPayment) {
@@ -675,6 +680,10 @@ async function handleSubscriptionCreated(stripeSubscription: Stripe.Subscription
  */
 async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
   console.log(`Subscription updated: ${stripeSubscription.id}`);
+  const orderId = stripeSubscription.metadata?.order_id
+  if (!orderId) {
+    throw new Error('Missing order_id in session metadata');
+  }
 
   // Extract period timestamps from subscription items (NOT from top-level subscription object)
   const subscriptionItem = stripeSubscription.items?.data?.[0];
@@ -690,7 +699,8 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
     return;
   }
 
-
+  const isUserCancel = stripeSubscription.cancellation_details?.reason === 'cancellation_requested'
+  
   // Use period from subscription item if available
   const currentPeriodStart = subscriptionItem.current_period_start;
   const currentPeriodEnd = subscriptionItem.current_period_end;
@@ -701,6 +711,8 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
       status: stripeSubscription.status,
       periodStart: new Date(currentPeriodStart * 1000),
       periodEnd: new Date(currentPeriodEnd * 1000),
+      orderId,
+      isUserCancel
     }
   );
 

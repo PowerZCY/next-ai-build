@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
     pay_subscription_id  VARCHAR(255),
     sub_period_start     TIMESTAMPTZ,
     sub_period_end     TIMESTAMPTZ,
+    sub_last_try_cancel_at     TIMESTAMPTZ,
     sub_period_canceled_at     TIMESTAMPTZ,
     sub_cancellation_detail          TEXT,
     price_id             VARCHAR(255),

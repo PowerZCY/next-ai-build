@@ -66,14 +66,15 @@ class BillingAggregateService {
   ): Promise<Subscription> {
     return runInTransaction(async (tx) => {
       const client = checkAndFallbackWithNonTCClient(tx);
-      const anonymosPlaceholderRecord = await subscriptionService.findAnonymousInitRecord(params.userId, tx);
+      // 这里再次检查，防止事件重复导致积分重复增加
+      const nonActiveSubscription = await subscriptionService.getNonActiveSubscription(params.userId, tx);
 
-      if (!anonymosPlaceholderRecord) {
-        throw new Error(`Subscription anonymosPlaceholderRecord not found for user ${params.userId}`);
+      if (!nonActiveSubscription) {
+        throw new Error(`Subscription status is ACTIVE for user ${params.userId}, forbidden to re-active!`);
       }
 
       const updatedSubscription = await subscriptionService.updateSubscription(
-        anonymosPlaceholderRecord.id,
+        nonActiveSubscription.id,
         {
           orderId: params.orderId ?? undefined,
           paySubscriptionId: params.subscriptionId,
@@ -185,6 +186,7 @@ class BillingAggregateService {
     params: {
       orderId: string;
       invoiceId: string;
+      paymentIntentId: string,
       hostedInvoiceUrl?: NullableString;
       invoicePdf?: NullableString;
       billingReason?: NullableString;
@@ -195,6 +197,7 @@ class BillingAggregateService {
         params.orderId,
         {
           payInvoiceId: params.invoiceId,
+          payTransactionId: params.paymentIntentId,
           hostedInvoiceUrl: params.hostedInvoiceUrl ?? undefined,
           invoicePdf: params.invoicePdf ?? undefined,
           billingReason: params.billingReason ?? undefined,
@@ -363,9 +366,21 @@ class BillingAggregateService {
       status: string;
       periodStart: Date;
       periodEnd: Date;
+      orderId: string,
+      isUserCancel: boolean
     }
   ): Promise<void> {
     await runInTransaction(async (tx) => {
+      if (params.isUserCancel) {
+          // 记录用户取消订阅的时间信息
+          await transactionService.update(
+            params.orderId,
+            {
+              subLastTryCancelAt: new Date(),
+            },
+            tx
+          );
+      }
       await subscriptionService.updateSubscription(
         params.subscription.id,
         {
