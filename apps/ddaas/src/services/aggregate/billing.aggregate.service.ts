@@ -10,30 +10,40 @@ import {
   transactionService,
   TransactionType,
 } from '@/db/index';
-import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 import type { Subscription, Transaction } from '@/db/prisma-model-type';
 import { runInTransaction } from '../database/prisma-transaction-util';
 
 type NullableString = string | null | undefined;
 
-type SubscriptionRenewalContext = {
-  subscription: Subscription;
-  renewalOrderId: string;
+type BasicOrderContext = {
+  userId: string;
+  subIdKey: bigint;
+  orderId: string;
+  paySubscriptionId: string,
+  creditsGranted: number;
+  priceId?: NullableString;
+  priceName?: NullableString;
+  periodStart: Date | null;
+  periodEnd: Date | null;
   invoiceId: string;
   hostedInvoiceUrl?: NullableString;
   invoicePdf?: NullableString;
   billingReason?: NullableString;
-  paymentIntentId?: NullableString;
-  amountPaidCents: number;
-  currency: string;
-  renewalCredits: number;
-  periodStart: Date;
-  periodEnd: Date;
-  paidAt: Date;
+  paymentIntentId?: string;
+  paidAt:  Date | null;
+  paidEmail: string | null;
 };
 
+type RenewalOrderContext = BasicOrderContext & {
+  // 续订时以Stripe的发票价格为准
+  amountPaidCents: number;
+  currency: string;
+}
+
 type SubscriptionCancelContext = {
-  subscription: Subscription;
+  userId: string;
+  subIdKey: bigint;
+  orderId: string;
   canceledAt: Date;
   cancellationDetail?: string 
 };
@@ -48,88 +58,72 @@ type OneTimeRefundContext = {
 };
 
 class BillingAggregateService {
-  async completeSubscriptionCheckout(
-    params: {
-      userId: string;
-      orderId: string;
-      subscriptionId: string;
-      stripeStatus: string;
-      creditsGranted: number;
-      priceId?: NullableString;
-      priceName?: NullableString;
-      periodStart: Date;
-      periodEnd: Date;
-      paymentStatus: PaymentStatus;
-      sessionId: string;
-      paidEmail?: NullableString;
-    }
-  ): Promise<Subscription> {
-    return runInTransaction(async (tx) => {
-      const client = checkAndFallbackWithNonTCClient(tx);
-      // 这里再次检查，防止事件重复导致积分重复增加
-      const nonActiveSubscription = await subscriptionService.getNonActiveSubscription(params.userId, tx);
 
-      if (!nonActiveSubscription) {
-        throw new Error(`Subscription status is ACTIVE for user ${params.userId}, forbidden to re-active!`);
-      }
-
+  async recordSubscriptionInitPayment(
+    context: BasicOrderContext
+  ): Promise<void> {
+    await runInTransaction(async (tx) => {
+      const now = new Date();
       const updatedSubscription = await subscriptionService.updateSubscription(
-        nonActiveSubscription.id,
+        context.subIdKey,
         {
-          orderId: params.orderId ?? undefined,
-          paySubscriptionId: params.subscriptionId,
-          priceId: params.priceId ?? undefined,
-          priceName: params.priceName ?? undefined,
-          status: params.stripeStatus,
-          creditsAllocated: params.creditsGranted || 0,
-          subPeriodStart: params.periodStart,
-          subPeriodEnd: params.periodEnd,
-          updatedAt: new Date(),
+          status: SubscriptionStatus.ACTIVE,
+          orderId: context.orderId ?? undefined,
+          paySubscriptionId: context.paySubscriptionId,
+          priceId: context.priceId ?? undefined,
+          priceName: context.priceName ?? undefined,
+          creditsAllocated: context.creditsGranted || 0,
+          subPeriodStart: context.periodStart,
+          subPeriodEnd: context.periodEnd,
+          updatedAt: now,
         },
         tx
       );
 
-      const now = new Date();
 
       await transactionService.update(
-        params.orderId,
+        context.orderId,
         {
           orderStatus: OrderStatus.SUCCESS,
-          paymentStatus: params.paymentStatus,
-          paySubscriptionId: params.subscriptionId,
-          paySessionId: params.sessionId,
-          subPeriodStart: params.periodStart,
-          subPeriodEnd: params.periodEnd,
-          paidEmail: params.paidEmail ?? undefined,
-          paidAt: now,
+          paymentStatus: PaymentStatus.PAID,
+          paySubscriptionId: context.paySubscriptionId,
+          subPeriodStart: context.periodStart,
+          subPeriodEnd: context.periodEnd,
+          payInvoiceId: context.invoiceId,
+          hostedInvoiceUrl: context.hostedInvoiceUrl ?? undefined,
+          invoicePdf: context.invoicePdf ?? undefined,
+          billingReason: context.billingReason ?? undefined,
+          payTransactionId: context.paymentIntentId ?? undefined,
+          paidAt: context.paidAt,
           payUpdatedAt: now,
         },
         tx
       );
 
-      if (params.creditsGranted > 0) {
+      if (context.creditsGranted > 0) {
         await creditService.rechargeCredit(
-          params.userId,
-          { paid: params.creditsGranted },
+          context.userId,
+          { paid: context.creditsGranted },
           {
             feature: TransactionType.SUBSCRIPTION,
-            orderId: params.orderId,
+            orderId: context.orderId,
           },
           tx
         );
       }
 
-      await client.credit.update({
-        where: { userId: params.userId },
+      await tx.credit.update({
+        where: { userId: context.userId },
         data: {
-          paidStart: params.periodStart,
-          paidEnd: params.periodEnd,
+          paidStart: context.periodStart,
+          paidEnd: context.periodEnd,
         },
       });
 
       return updatedSubscription;
-    });
+    })
   }
+
 
   async completeOneTimeCheckout(
     params: {
@@ -171,8 +165,7 @@ class BillingAggregateService {
         );
       }
 
-      const client = checkAndFallbackWithNonTCClient(tx);
-      await client.credit.update({
+      await tx.credit.update({
         where: { userId: params.userId },
         data: {
           oneTimePaidStart: params.oneTimePaidStart,
@@ -209,41 +202,42 @@ class BillingAggregateService {
   }
 
   async recordSubscriptionRenewalPayment(
-    context: SubscriptionRenewalContext
+    context: RenewalOrderContext
   ): Promise<void> {
     await runInTransaction(async (tx) => {
       await transactionService.createTransaction(
         {
-          userId: context.subscription.userId,
-          orderId: context.renewalOrderId,
+          userId: context.userId,
+          orderId: context.orderId,
           orderStatus: OrderStatus.SUCCESS,
           paymentStatus: PaymentStatus.PAID,
           paySupplier: PaySupplier.STRIPE,
-          paySubscriptionId: context.subscription.paySubscriptionId ?? undefined,
-          subPeriodStart: context.periodStart,
-          subPeriodEnd: context.periodEnd,
+          paySubscriptionId: context.paySubscriptionId ?? undefined,
+          subPeriodStart: context.periodStart ?? undefined,
+          subPeriodEnd: context.periodEnd ?? undefined,
           payInvoiceId: context.invoiceId,
           hostedInvoiceUrl: context.hostedInvoiceUrl ?? undefined,
           invoicePdf: context.invoicePdf ?? undefined,
           billingReason: context.billingReason ?? undefined,
           payTransactionId: context.paymentIntentId ?? undefined,
-          priceId: context.subscription.priceId ?? undefined,
-          priceName: context.subscription.priceName ?? undefined,
+          priceId: context.priceId ?? undefined,
+          priceName: context.priceName ?? undefined,
           type: TransactionType.SUBSCRIPTION,
           amount: context.amountPaidCents / 100,
           currency: context.currency.toUpperCase(),
-          creditsGranted: context.renewalCredits,
-          paidAt: context.paidAt,
+          creditsGranted: context.creditsGranted,
+          paidAt: context.paidAt ?? undefined,
+          paidEmail: context.paidEmail,
           payUpdatedAt: new Date(),
         },
         tx
       );
 
       await subscriptionService.updateSubscription(
-        context.subscription.id,
+        context.subIdKey,
         {
           status: SubscriptionStatus.ACTIVE,
-          orderId: context.renewalOrderId,
+          orderId: context.orderId,
           subPeriodStart: context.periodStart,
           subPeriodEnd: context.periodEnd,
           updatedAt: new Date(),
@@ -251,21 +245,20 @@ class BillingAggregateService {
         tx
       );
 
-      if (context.renewalCredits > 0) {
+      if (context.creditsGranted > 0) {
         await creditService.rechargeCredit(
-          context.subscription.userId,
-          { paid: context.renewalCredits },
+          context.userId,
+          { paid: context.creditsGranted },
           {
             feature: `${TransactionType.SUBSCRIPTION}_renewal`,
-            orderId: context.renewalOrderId,
+            orderId: context.orderId,
           },
           tx
         );
       }
 
-      const client = checkAndFallbackWithNonTCClient(tx);
-      await client.credit.update({
-        where: { userId: context.subscription.userId },
+      await tx.credit.update({
+        where: { userId: context.userId },
         data: {
           paidStart: context.periodStart,
           paidEnd: context.periodEnd,
@@ -300,36 +293,28 @@ class BillingAggregateService {
   }
 
   async recordRenewalPaymentFailure(
-    params: {
-      subscription: Subscription;
-      failedOrderId: string;
-      invoiceId: string;
-      billingReason?: NullableString;
-      paymentIntentId: string;
-      amountDueCents: number;
-      currency: string;
-      createdAt: Date;
-    }
+    context: RenewalOrderContext
   ): Promise<void> {
     await runInTransaction(async (tx) => {
       await transactionService.createTransaction(
         {
-          userId: params.subscription.userId,
-          orderId: params.failedOrderId,
+          userId: context.userId,
+          orderId: context.orderId,
           orderStatus: OrderStatus.FAILED,
           paymentStatus: PaymentStatus.UN_PAID,
           paySupplier: PaySupplier.STRIPE,
-          paySubscriptionId: params.subscription.paySubscriptionId ?? undefined,
-          payInvoiceId: params.invoiceId,
-          billingReason: params.billingReason ?? undefined,
-          payTransactionId: params.paymentIntentId ?? undefined,
-          priceId: params.subscription.priceId ?? undefined,
-          priceName: params.subscription.priceName ?? undefined,
+          paySubscriptionId: context.paySubscriptionId ?? undefined,
+          payInvoiceId: context.invoiceId,
+          billingReason: context.billingReason ?? undefined,
+          payTransactionId: context.paymentIntentId ?? undefined,
+          priceId: context.priceId ?? undefined,
+          priceName: context.priceName ?? undefined,
           type: TransactionType.SUBSCRIPTION,
-          amount: params.amountDueCents / 100,
-          currency: params.currency.toUpperCase(),
+          amount: context.amountPaidCents / 100,
+          currency: context.currency.toUpperCase(),
           creditsGranted: 0,
-          paidAt: params.createdAt,
+          paidAt: context.paidAt ?? undefined,
+          paidEmail: context.paidEmail,
           payUpdatedAt: new Date(),
           orderDetail: 'Subscription renewal payment failed',
         },
@@ -338,9 +323,9 @@ class BillingAggregateService {
 
       await creditService.payFailedWatcher(
         {
-          userId: params.subscription.userId,
+          userId: context.userId,
           feature: `${TransactionType.SUBSCRIPTION}_renewal_failed`,
-          orderId: params.failedOrderId,
+          orderId: context.orderId,
           creditType: CreditType.PAID,
           operationType: OperationType.RECHARGE,
           creditsUsed: 0,
@@ -349,10 +334,10 @@ class BillingAggregateService {
       );
 
       await subscriptionService.updateSubscription(
-        params.subscription.id,
+        context.subIdKey,
         {
           status: SubscriptionStatus.PAST_DUE,
-          orderId: params.failedOrderId,
+          orderId: context.orderId,
           updatedAt: new Date(),
         },
         tx
@@ -397,16 +382,10 @@ class BillingAggregateService {
   async processSubscriptionCancel(
     context: SubscriptionCancelContext
   ): Promise<void> {
-    const orderId = context.subscription.orderId;
-    const userId = context.subscription.userId;
-    if (!orderId || !userId) {
-      console.warn(`Ilegal subscription for orderId OR userId is NULL, subscriptionId=${context.subscription.paySubscriptionId}`);
-      return;
-    }
     await runInTransaction(async (tx) => {
       // 更新订单, 记录取消信息
       await transactionService.update(
-        orderId,
+        context.orderId,
         {
           subPeriodCanceledAt: context.canceledAt,
           subCancellationDetail: context.cancellationDetail ?? undefined
@@ -414,10 +393,10 @@ class BillingAggregateService {
         tx
       )
       // 更新订阅信息
-      await subscriptionService.updateStatus(context.subscription.id, SubscriptionStatus.CANCELED, tx);
+      await subscriptionService.updateStatus(context.subIdKey, SubscriptionStatus.CANCELED, tx);
 
       // 清理积分并留痕
-      await creditService.purgePaidCredit(userId, 'cancel_subscription_purge', tx);
+      await creditService.purgePaidCredit(context.userId, 'cancel_subscription_purge', tx);
     })
   }
   

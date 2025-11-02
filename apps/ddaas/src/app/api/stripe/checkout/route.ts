@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
     const session = await createCheckoutSession(basciParams,subscriptionData);
 
     // Create transaction record with session info
+    const orderType = priceConfig.interval && priceConfig.interval !== 'onetime' ? TransactionType.SUBSCRIPTION : TransactionType.ONE_TIME;
     await transactionService.createTransaction({
       userId: user.userId,
       orderId,
@@ -94,12 +95,10 @@ export async function POST(request: NextRequest) {
       priceName: priceConfig.priceName,
       amount: priceConfig.amount,
       currency: priceConfig.currency,
-      // ✅ Fixed: Check interval is not 'onetime'
-      type: priceConfig.interval && priceConfig.interval !== 'onetime'
-        ? TransactionType.SUBSCRIPTION
-        : TransactionType.ONE_TIME,
+      type: orderType,
       creditsGranted: priceConfig.credits,
       orderDetail: priceConfig.description,
+      paidEmail: null
     });
 
     return NextResponse.json({

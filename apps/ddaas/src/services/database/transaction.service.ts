@@ -32,6 +32,7 @@ export class TransactionService {
     orderDetail?: string;
     orderExpiredAt?: Date;
     paidAt?: Date;
+    paidEmail : string | null,
     payUpdatedAt?: Date;
   }, tx?: Prisma.TransactionClient): Promise<Transaction> {
     const client = checkAndFallbackWithNonTCClient(tx);
@@ -54,11 +55,12 @@ export class TransactionService {
         priceId: data.priceId,
         priceName: data.priceName,
         amount: data.amount,
-        currency: data.currency || 'CNY',
+        currency: data.currency,
         type: data.type,
         creditsGranted: data.creditsGranted || 0,
         orderDetail: data.orderDetail,
         paidAt: data.paidAt,
+        paidEmail: data.paidEmail || undefined,
         payUpdatedAt: data.payUpdatedAt,
       },
     });

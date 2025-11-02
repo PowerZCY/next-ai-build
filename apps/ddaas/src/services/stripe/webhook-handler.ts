@@ -1,42 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/**
- * Stripe Webhook Handler
- *
- * ===== PAYMENT FLOW ARCHITECTURE (SIMPLIFIED) =====
- *
- * PRINCIPLE: Leverage Stripe API for accurate data immediately.
- * Why? Stripe provides complete subscription info via API (includes billing periods).
- * No need to wait for invoice.paid to get period data.
- *
- * ONE-TIME PAYMENTS:
- * checkout.session.completed [FINAL EVENT]
- * ├─ Transaction.orderStatus = SUCCESS
- * ├─ Credit.balanceOneTimePaid += credits (1-year expiration)
- * └─ Records credit usage
- *
- * SUBSCRIPTIONS (Complete in checkout phase):
- * checkout.session.completed [FINAL EVENT]
- * ├─ Calls Stripe API to get subscription with accurate period
- * ├─ Creates Subscription record with COMPLETE period info
- * ├─ Transaction.orderStatus = SUCCESS (✅ Complete here)
- * ├─ Credit.balancePaid += credits with correct period
- * └─ Records credit usage
- *
- * SUBSCRIPTION RENEWALS:
- * invoice.paid (with billing_reason !== 'subscription_create')
- * ├─ Updates Subscription with new period from invoice.lines[0].period
- * ├─ Creates new renewal Transaction record
- * ├─ Credit.balancePaid += renewal credits
- * └─ Records renewal usage
- *
- * INVOICE TRACKING:
- * invoice.paid (with billing_reason === 'subscription_create')
- * └─ Records invoice URLs on initial transaction (hostedInvoiceUrl, invoicePdf)
- *
- * DATABASE GUARANTEES:
- * - No race conditions on orderStatus (already SUCCESS before invoice.paid)
- * - Safe for webhook replay
- */
 
 import { billingAggregateService } from '@/agg/index';
 import {
@@ -51,7 +13,7 @@ import {
 import { Transaction } from '@/db/prisma-model-type';
 import { oneTimeExpiredDays } from '@/lib/appConfig';
 import { getCreditsFromPriceId } from '@/lib/money-price-config';
-import { stripe, fetchPaymentId } from '@/lib/stripe-config';
+import { fetchPaymentId, stripe } from '@/lib/stripe-config';
 import Stripe from 'stripe';
 
 const mapPaymentStatus = (
@@ -113,7 +75,8 @@ export async function handleStripeEvent(event: Stripe.Event) {
         return;
 
       case 'payment_intent.payment_failed':
-        return await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
+        console.log(`Payment Intent failed: ${(event.data.object as Stripe.PaymentIntent).id}`);
+        return;
 
       // ===== Refund Events =====
       case 'charge.refunded':
@@ -128,15 +91,8 @@ export async function handleStripeEvent(event: Stripe.Event) {
   }
 }
 
-/**
- * Handle checkout.session.completed
- * Routes to subscription or one-time payment based on transaction type
- *
- * NOTE: For subscriptions, actual credit allocation happens in invoice.paid event
- * because subscription period details are not available in checkout session
- */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  console.log(`Checkout completed: ${session.id}`);
+  console.log(`Checkout session completed: ${session.id}`);
 
   // 1. Get transaction by session ID or order ID
   const orderId = session.metadata?.order_id;
@@ -150,8 +106,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   if (transaction.orderStatus === OrderStatus.SUCCESS) {
-    console.log(`Transaction already processed successfully: ${transaction.orderId}, skipping.`);
-    return;
+    throw new Error(`Transaction already processed successfully: ${transaction.orderId}, skipping.`);
   }
 
   // Stripe docs: checkout.session.completed fires even when payment is pending for async methods
@@ -159,8 +114,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const paymentStatus = mapPaymentStatus(session.payment_status);
 
   if (!isPaymentSettled(paymentStatus)) {
-    console.log(
-      `Checkout session ${session.id} payment incomplete (status=${session.payment_status}), awaiting async confirmation.`
+    console.log( `Checkout session ${session.id} payment incomplete (status=${session.payment_status}), awaiting async confirmation.`
     );
 
     if (
@@ -178,37 +132,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // 2. Route based on transaction type
   if (transaction.type === TransactionType.SUBSCRIPTION) {
     // For subscriptions, store session info and wait for invoice.paid
-    return await handleSubscriptionCheckoutInit(session, transaction, paymentStatus);
-  } else if (transaction.type === TransactionType.ONE_TIME) {
-    return await handleOneTimeCheckout(session, transaction, paymentStatus);
-  } else {
-    throw new Error(`Unknown transaction type: ${transaction.type}`);
-  }
+    return await handleSubscriptionCheckoutInit(session, transaction);
+  } 
+  return await handleOneTimeCheckout(session, transaction, paymentStatus);
 }
 
-/**
- * Handle subscription payment checkout [COMPLETE PROCESSING]
- *
- * REDESIGN: Now handles complete subscription setup in checkout phase.
- * Why? Stripe API provides complete subscription info immediately.
- *
- * ARCHITECTURE: API calls are performed BEFORE the database transaction to avoid:
- * - Long-lived database connections
- * - Transaction timeouts
- * - Connection pool exhaustion
- *
- * This function:
- * 1. Retrieves accurate subscription info from Stripe (includes billing period) - BEFORE transaction
- * 2. Creates/Updates Subscription record with full period information - IN transaction
- * 3. Updates Transaction with all payment details and FINAL status (SUCCESS) - IN transaction
- * 4. Allocates credits with correct billing period - IN transaction
- *
- * Result: invoice.paid event only needs to update invoice URLs and optionally create renewal records.
- */
 async function handleSubscriptionCheckoutInit(
   session: Stripe.Checkout.Session,
   transaction: Transaction,
-  paymentStatus: PaymentStatus
 ) {
   console.log(`Processing subscription checkout: ${session.id}`);
 
@@ -227,20 +158,23 @@ async function handleSubscriptionCheckoutInit(
   // The current_period_start/end are on SubscriptionItem, not on Subscription
   const subscriptionItem = stripeSubscription.items?.data?.[0];
   if (!subscriptionItem) {
-    throw new Error(
-      `No subscription items found for subscription ${subscriptionId}`
-    );
+    throw new Error( `No subscription items found for subscription ${subscriptionId}` );
   }
 
   const currentPeriodStart = subscriptionItem.current_period_start;
   const currentPeriodEnd = subscriptionItem.current_period_end;
 
   if (!currentPeriodStart || !currentPeriodEnd) {
-    throw new Error(
-      `Invalid subscription period from Stripe API: start=${currentPeriodStart}, end=${currentPeriodEnd}`
-    );
+    throw new Error( `Invalid subscription period from Stripe API: start=${currentPeriodStart}, end=${currentPeriodEnd}` );
   }
 
+  const subPeriodStart = new Date(currentPeriodStart * 1000);
+  const subPeriodEnd = new Date(currentPeriodEnd * 1000);
+
+  // Validate dates
+  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
+    throw new Error( `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}` );
+  }
   // Log the Stripe API response with correct data structure
   const logId = await Apilogger.logStripeOutgoing(
     'stripe.subscriptions.retrieve',
@@ -248,57 +182,22 @@ async function handleSubscriptionCheckoutInit(
     {
       id: stripeSubscription.id,
       status: stripeSubscription.status,
-      current_period_start: currentPeriodStart,
-      current_period_end: currentPeriodEnd,
-      subscription_item_count: stripeSubscription.items?.data?.length || 0,
+      subPeriodStart: subPeriodStart,
+      subPeriodEnd: subPeriodEnd,
+      subscriptionItemCount: stripeSubscription.items?.data?.length || 0,
     }
   );
   Apilogger.updateResponse(logId, stripeSubscription);
 
-  const subPeriodStart = new Date(currentPeriodStart * 1000);
-  const subPeriodEnd = new Date(currentPeriodEnd * 1000);
-
-  // Validate dates
-  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
-    throw new Error(
-      `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
-    );
-  }
-
-  console.log('Stripe subscription info:', {
+  console.log('Subscription checkout completed, just log:', {
     id: subscriptionId,
+    orderId: transaction.orderId,
     status: stripeSubscription.status,
     periodStart: subPeriodStart.toISOString(),
     periodEnd: subPeriodEnd.toISOString(),
   });
-
-  const updatedSubscription = await billingAggregateService.completeSubscriptionCheckout(
-    {
-      userId: transaction.userId,
-      orderId: transaction.orderId,
-      subscriptionId,
-      stripeStatus: stripeSubscription.status,
-      creditsGranted: transaction.creditsGranted || 0,
-      priceId: transaction.priceId,
-      priceName: transaction.priceName,
-      periodStart: subPeriodStart,
-      periodEnd: subPeriodEnd,
-      paymentStatus,
-      sessionId: session.id,
-      paidEmail: session.customer_details?.email,
-    }
-  );
-
-  console.log(`Subscription checkout completed: ${transaction.orderId}`);
-  return updatedSubscription;
 }
 
-/**
- * Handle one-time payment checkout [FINAL EVENT]
- *
- * One-time payments complete in a single event (checkout.session.completed).
- * This is the FINAL event that sets orderStatus.
- */
 async function handleOneTimeCheckout(
   session: Stripe.Checkout.Session,
   transaction: Transaction,
@@ -328,22 +227,6 @@ async function handleOneTimeCheckout(
   console.log(`One-time payment completed: ${transaction.orderId}`);
 }
 
-/**
- * Handle invoice.paid [SIMPLIFIED - Only for renewals and invoice tracking]
- *
- * REDESIGN: Now handles:
- * 1. Subscription renewals (billing_reason !== 'subscription_create')
- *    ├─ Updates Subscription with new period from invoice.lines[0].period
- *    ├─ Creates new renewal Transaction record
- *    ├─ Adds renewal credits
- *    └─ Stores invoice URLs
- *
- * 2. Initial subscription invoice (billing_reason === 'subscription_create')
- *    └─ Updates transaction with invoice URLs using metadata to find the order
- *
- * KEY IMPROVEMENT: Subscription metadata now contains order_id and user_id,
- * so we can directly retrieve transaction without needing to find subscription first.
- */
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
   console.log(`Invoice paid: ${invoice.id}`);
 
@@ -351,50 +234,53 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   // 1. Get subscription details from invoice parent
   const parentDetails = (invoice as any).parent?.subscription_details;
   if (!parentDetails?.subscription) {
-    console.warn('Invoice not associated with subscription, skipping');
-    return;
+    throw new Error('Invoice not associated with subscription, skipping');
   }
-
-  const subscriptionId = parentDetails.subscription;
-  const subscriptionMetadata = parentDetails.metadata || {};
-
+  
   // 2. Check billing reason to determine payment type
   const isInitialPayment = invoice.billing_reason === BillingReason.SUBSCRIPTION_CREATE;
   const isRenewal = invoice.billing_reason === BillingReason.SUBSCRIPTION_CYCLE;
-
+  
   // Only handle initial payments and renewals
   if (!isInitialPayment && !isRenewal) {
-    console.warn(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
-    return;
+    throw new Error(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
   }
-
+  
   // 3. Extract subscription period from invoice line items
   const lineItem = invoice.lines?.data?.[0];
   if (!lineItem) {
     throw new Error(`No line items found in invoice ${invoice.id}`);
   }
-
+  
   const periodStart = (lineItem as any).period?.start;
   const periodEnd = (lineItem as any).period?.end;
-
   if (!periodStart || !periodEnd) {
-    throw new Error(
-      `Invalid period in invoice line: start=${periodStart}, end=${periodEnd}. Invoice ID: ${invoice.id}`
+    throw new Error( `Invalid period in invoice line: start=${periodStart}, end=${periodEnd}. Invoice ID: ${invoice.id}`
     );
   }
-
   const subPeriodStart = new Date(periodStart * 1000);
   const subPeriodEnd = new Date(periodEnd * 1000);
-
   // Validate dates
   if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
-    throw new Error(
-      `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
+    throw new Error( `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
     );
   }
-
+  
+  const subscriptionMetadata = parentDetails.metadata || {};
+  const orderId = subscriptionMetadata.order_id;
+  if (!orderId) {
+    throw new Error( `No order_id in subscription metadata for initial invoice ${invoice.id}. ` + `Skipping invoice URL update.` );
+  }
+  const transaction = await transactionService.findByOrderId(orderId);
+  if (!transaction) {
+    throw new Error(`Transaction not found for order_id: ${orderId}`);
+  } 
+  
+  const subscriptionId = parentDetails.subscription;
+  
+  const userId = transaction.userId;
   const paymentIntentId = await fetchPaymentId(invoice.id)
-
+  
   console.log('Invoice paid event key-info:', {
     invoiceId: invoice.id,
     subscriptionId,
@@ -404,58 +290,59 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
     periodStart: subPeriodStart.toISOString(),
     periodEnd: subPeriodEnd.toISOString(),
   });
-
+  
+  const invoicePaidAt = invoice.status_transitions?.paid_at;
+  const paidAt = invoicePaidAt ? new Date(invoicePaidAt * 1000) : new Date();
+  const paidEmail = invoice.customer_email;
 
   if (isInitialPayment) {
-    const orderId = subscriptionMetadata.order_id;
-
-    if (!orderId) {
-      console.warn(
-        `No order_id in subscription metadata for initial invoice ${invoice.id}. ` +
-        `Skipping invoice URL update.`
-      );
-      return;
-    }
-    const transaction = await transactionService.findByOrderId(orderId);
-
-    if (!transaction) {
-      console.warn(`Transaction not found for order_id: ${orderId}`);
-    } else {
-      await billingAggregateService.recordInitialInvoiceDetails(
-        {
-          orderId: transaction.orderId,
-          invoiceId: invoice.id,
-          paymentIntentId,
-          hostedInvoiceUrl: invoice.hosted_invoice_url,
-          invoicePdf: invoice.invoice_pdf,
-          billingReason: invoice.billing_reason,
-        }
-      );
-
-      console.log(`Initial invoice recorded for transaction: ${transaction.orderId}`);
+    // 首次订阅校验
+    const nonActiveSubscription = await subscriptionService.getNonActiveSubscription(userId);
+    if (!nonActiveSubscription) {
+      throw new Error(`Subscription status is ACTIVE for user ${userId}, forbidden to re-active!`);
     }
 
-    console.log(`Invoice paid event completed, invoiceId: ${invoice.id}`);
+    await billingAggregateService.recordSubscriptionInitPayment(
+      {
+        userId,
+        subIdKey: nonActiveSubscription.id,
+        orderId,
+        paySubscriptionId: subscriptionId,
+        creditsGranted: transaction.creditsGranted || 0,
+        priceId: transaction.priceId,
+        priceName: transaction.priceName,
+        periodStart: subPeriodStart,
+        periodEnd: subPeriodEnd,
+        invoiceId: invoice.id,
+        hostedInvoiceUrl: invoice.hosted_invoice_url,
+        invoicePdf: invoice.invoice_pdf,
+        billingReason: invoice.billing_reason,
+        paymentIntentId,
+        paidAt,
+        paidEmail
+      }
+    );
+
+    console.log(`Initial invoice recorded for transaction: ${orderId}`);
     return;
   }
 
   if (isRenewal) {
-    const renewalOrderId = `order_renew_${invoice.id}`;
-    const existingOrder = await transactionService.findByOrderId(renewalOrderId);
-
-    if (existingOrder) {
-      console.log(`Renewal invoice ${invoice.id} already processed as ${existingOrder.orderId}, skipping.`);
-      return;
-    }
-
-    // Find subscription to get user info
+    // 续订时，一定要查到订阅记录
     const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-
     if (!subscription) {
       throw new Error(`Subscription not found for renewal: ${subscriptionId}`);
     }
 
+    const renewalOrderId = `order_renew_${invoice.id}`;
+    const existingOrder = await transactionService.findByOrderId(renewalOrderId);
+    if (existingOrder) {
+      throw new Error(`Renewal invoice ${invoice.id} already processed as ${existingOrder.orderId}, skipping.`);
+    }
+
     // Get credits from current price configuration (handles plan upgrades/downgrades)
+    // 优先从配置中取，取不到就以上个周期的为准作为Fallback，后续有问题再人工补偿，优先保证能用
+    // 只要配置正确，这里就不会出错！
     const creditsForRenewal = subscription.priceId
       ? getCreditsFromPriceId(subscription.priceId)
       : subscription.creditsAllocated;
@@ -464,19 +351,24 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
 
     await billingAggregateService.recordSubscriptionRenewalPayment(
       {
-        subscription,
-        renewalOrderId,
+        userId,
+        subIdKey: subscription.id,
+        orderId: renewalOrderId,
+        paySubscriptionId: subscriptionId,
+        creditsGranted: renewalCredits,
+        priceId: subscription.priceId,
+        priceName: subscription.priceName,
+        periodStart: subPeriodStart,
+        periodEnd: subPeriodEnd,
         invoiceId: invoice.id,
         hostedInvoiceUrl: invoice.hosted_invoice_url,
         invoicePdf: invoice.invoice_pdf,
         billingReason: invoice.billing_reason,
         paymentIntentId,
+        paidAt: paidAt,
+        paidEmail,
         amountPaidCents: invoice.amount_paid,
         currency: invoice.currency,
-        renewalCredits,
-        periodStart: subPeriodStart,
-        periodEnd: subPeriodEnd,
-        paidAt: new Date(invoice.created * 1000),
       }
     );
 
@@ -492,26 +384,33 @@ async function handleSubscriptionDeleted(stripeSubscription: Stripe.Subscription
   const subscriptionId = stripeSubscription.id;
   console.log(`Subscription deleted: ${subscriptionId}`);
 
-  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
-  if (!subscription) {
-    console.warn(`Subscription not found in DB: ${subscriptionId}`);
-    return;
-  }
-
   const userCanceledAt = stripeSubscription.canceled_at;
   if (!userCanceledAt) {
-    throw new Error(
-      `Invalid period in invoice line: canceldAt=${userCanceledAt}, subscriptionId=${subscriptionId}`
-    );
+    throw new Error( `Invalid period in invoice line: canceldAt=${userCanceledAt}, subscriptionId=${subscriptionId}` );
+  }
+
+  const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
+  if (!subscription) {
+    throw new Error(`Subscription id invalid: ${subscriptionId}`);
+  }
+
+  const orderId = subscription.orderId;
+  if (!orderId) {
+    throw new Error(`Subscription's orderId is NULL: ${subscriptionId}`);
+  }
+
+  const transaction = await transactionService.findByOrderId(orderId);
+  if (!transaction) {
+    throw new Error(`Subscription's orderId is illegal: subscriptionId=${subscriptionId}, orderId=${orderId}`);
   }
 
   const canceledAt =  new Date(userCanceledAt * 1000);
-  
   const cancellationDetail = stripeSubscription.cancellation_details ? JSON.stringify(stripeSubscription.cancellation_details) : undefined;
-
   await billingAggregateService.processSubscriptionCancel(
     {
-      subscription,
+      userId: subscription.userId,
+      subIdKey: subscription.id,
+      orderId,
       canceledAt,
       cancellationDetail
     }
@@ -520,9 +419,6 @@ async function handleSubscriptionDeleted(stripeSubscription: Stripe.Subscription
   console.log(`Subscription status updated to canceled: ${subscription.id}`);
 }
 
-/**
- * Handle async payment succeeded
- */
 async function handleAsyncPaymentSucceeded(session: Stripe.Checkout.Session) {
   console.log(`Async payment succeeded: ${session.id}`);
 
@@ -532,26 +428,21 @@ async function handleAsyncPaymentSucceeded(session: Stripe.Checkout.Session) {
   return await handleCheckoutCompleted(latestSession);
 }
 
-/**
- * Handle async payment failed
- */
 async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
   console.log(`Async payment failed: ${session.id}`);
 
   const orderId = session.metadata?.order_id;
-  if (!orderId) return;
+  if (!orderId) {
+    throw new Error(`Transaction orderId is NULL for async payment failure`);
+  }
 
   const transaction = await transactionService.findByOrderId(orderId);
   if (!transaction) {
-    console.warn(`Transaction not found for async payment failure, orderId=${orderId}`);
-    return;
+    throw new Error(`Transaction not found for async payment failure, orderId=${orderId}`);
   }
 
   if (transaction.orderStatus === OrderStatus.SUCCESS) {
-    console.warn(
-      `Received async payment failed for already successful order ${orderId}, ignoring.`
-    );
-    return;
+    throw new Error( `Received async payment failed for already successful order ${orderId}, skipping.` );
   }
 
   await transactionService.updateStatus(orderId, OrderStatus.FAILED, {
@@ -560,34 +451,24 @@ async function handleAsyncPaymentFailed(session: Stripe.Checkout.Session) {
   });
 }
 
-/**
- * Handle invoice payment failed
- *
- * ARCHITECTURE: Branch logic is outside transaction for clarity.
- * Each case (initial vs renewal) has its own transaction block.
- *
- * For initial payment failures: Use subscription metadata to find order_id
- * For renewal failures: Use subscription ID to find subscription, then user info
- */
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.log(`Invoice payment-failed event: ${invoice.id}`);
 
   const parentDetails = (invoice as any).parent?.subscription_details;
   if (!parentDetails?.subscription) {
-    console.warn('Invoice not associated with subscription, skipping');
-    return;
+    throw new Error('Invoice not associated with subscription, skipping');
   }
 
-  const subscriptionId = parentDetails.subscription;
-  const subscriptionMetadata = parentDetails.metadata || {};
   const isInitialPayment = invoice.billing_reason === BillingReason.SUBSCRIPTION_CREATE;
   const isRenewal = invoice.billing_reason === BillingReason.SUBSCRIPTION_CYCLE;
-
+  
   // Only handle initial payments and renewals
   if (!isInitialPayment && !isRenewal) {
-    console.warn(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
-    return;
+    throw new Error(`Unhandled invoice billing_reason: ${invoice.billing_reason}, skipping`);
   }
+  
+  const subscriptionId = parentDetails.subscription;
+  const subscriptionMetadata = parentDetails.metadata || {};
 
   // 支付ID
   const paymentIntentId = await fetchPaymentId(invoice.id)
@@ -600,34 +481,29 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     isInitialPayment
   });
 
+  const paidEmail = invoice.customer_email;
+
+  const orderId = subscriptionMetadata.order_id;
+  if (!orderId) {
+    throw new Error( `No order_id in subscription metadata for failed initial invoice ${invoice.id}. ` + `Skipping payment failure update.` );
+  }
+
+  const transaction = await transactionService.findByOrderId(orderId);
+  if (!transaction) {
+    throw new Error(`Transaction not found for order_id: ${orderId}`);
+  }
+
   // ===== CASE 1: Initial subscription payment failed =====
   if (isInitialPayment) {
-    const orderId = subscriptionMetadata.order_id;
-
-    if (!orderId) {
-      console.warn(
-        `No order_id in subscription metadata for failed initial invoice ${invoice.id}. ` +
-        `Skipping payment failure update.`
-      );
-      return;
-    }
-
-    const transaction = await transactionService.findByOrderId(orderId);
-
-    if (!transaction) {
-      console.warn(`Transaction not found for order_id: ${orderId}`);
-    } else {
-      await billingAggregateService.recordInitialPaymentFailure(
-        {
-          orderId: transaction.orderId,
-          invoiceId: invoice.id,
-          paymentIntentId: paymentIntentId,
-          detail: 'Initial subscription payment failed',
-        }
-      );
-      console.log(`Initial subscription payment-failed event updated for order: ${orderId}`);
-    }
-    // 返回, 增加代码阅读性
+    await billingAggregateService.recordInitialPaymentFailure(
+      {
+        orderId: transaction.orderId,
+        invoiceId: invoice.id,
+        paymentIntentId: paymentIntentId,
+        detail: 'Initial subscription payment failed',
+      }
+    );
+    console.log(`Initial subscription payment-failed event updated for order: ${orderId}`);
     return;
   }
 
@@ -636,28 +512,33 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // For renewals, we need the subscription to get user info
     const subscription = await subscriptionService.findByPaySubscriptionId(subscriptionId);
     if (!subscription) {
-      console.warn(`Subscription not found for renewal payment-failed event, and invoice ${invoice.id}`);
-      return;
+      throw new Error(`Subscription not found for renewal payment-failed event, and invoice ${invoice.id}`);
     }
+
     const failedOrderId = `order_renew_failed_${invoice.id}`;
-
     const existingFailureOrder = await transactionService.findByOrderId(failedOrderId);
-
     if (existingFailureOrder) {
-      console.log(`Renewal payment-failure event for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
-      return;
+      throw new Error(`Renewal payment-failure event for invoice ${invoice.id} already recorded as ${failedOrderId}, skipping.`);
     }
 
     await billingAggregateService.recordRenewalPaymentFailure(
       {
-        subscription,
-        failedOrderId,
+        userId: subscription.userId,
+        subIdKey: subscription.id,
+        orderId: failedOrderId,
+        paySubscriptionId: subscriptionId,
+        creditsGranted: 0,
+        priceId: subscription.priceId,
+        priceName: subscription.priceName,
+        periodStart: null,
+        periodEnd: null,
         invoiceId: invoice.id,
         billingReason: invoice.billing_reason,
         paymentIntentId,
-        amountDueCents: invoice.amount_due,
+        amountPaidCents: invoice.amount_due,
         currency: invoice.currency,
-        createdAt: new Date(invoice.created * 1000),
+        paidAt: null,
+        paidEmail
       }
     );
 
@@ -667,9 +548,6 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   
 }
 
-/**
- * Handle subscription created
- */
 async function handleSubscriptionCreated(stripeSubscription: Stripe.Subscription) {
   console.log(`Subscription created: ${stripeSubscription.id}`);
   // Usually handled by checkout.session.completed
@@ -689,14 +567,12 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
   const subscriptionItem = stripeSubscription.items?.data?.[0];
 
   if (!subscriptionItem) {
-    console.warn(`No subscription items found for ${stripeSubscription.id}, reject!`);
-    return;
+    throw new Error(`No subscription items found for ${stripeSubscription.id}, reject!`);
   }
 
   const subscription = await subscriptionService.findByPaySubscriptionId(stripeSubscription.id);
   if (!subscription) {
-    console.warn(`Subscription not found in DB: ${stripeSubscription.id}`);
-    return;
+    throw new Error(`Subscription not found in DB: ${stripeSubscription.id}`);
   }
 
   const isUserCancel = stripeSubscription.cancellation_details?.reason === 'cancellation_requested'
@@ -719,24 +595,7 @@ async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription
   console.log(`Subscription updated in DB: ${subscription.id}`);
 }
 
-/**
- * Handle payment intent failed
- */
-async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
-  console.log(`Payment intent failed: ${paymentIntent.id}`);
-  // Find transaction by payment intent ID
-  const transaction = await transactionService.findByPayTransactionId(paymentIntent.id);
-  if (transaction) {
-    await transactionService.updateStatus(transaction.orderId, OrderStatus.FAILED, {
-      paymentStatus: PaymentStatus.UN_PAID,
-      payUpdatedAt: new Date(),
-    });
-  }
-}
 
-/**
- * Handle charge refunded
- */
 async function handleChargeRefunded(charge: Stripe.Charge) {
   console.log(`Charge refunded: ${charge.id}`);
 
@@ -745,14 +604,17 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     ? charge.payment_intent
     : charge.payment_intent?.id;
 
-  if (!paymentIntentId) return;
+  if (!paymentIntentId) {
+    throw new Error("PaymentId is illegal NULL");
+  };
 
   const transaction = await transactionService.findByPayTransactionId(paymentIntentId);
-  if (!transaction) return;
+  if (!transaction) {
+    throw new Error(`Transaction not found for paymentId: ${paymentIntentId}`);
+  };
 
   if (transaction.orderStatus === OrderStatus.REFUNDED) {
-    console.log(`Transaction already marked refunded: ${transaction.orderId}, skipping.`);
-    return;
+    throw new Error(`Transaction already marked refunded: ${transaction.orderId}, skipping.`);
   }
 
   if (transaction.type === TransactionType.SUBSCRIPTION) {
