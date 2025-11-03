@@ -3,6 +3,8 @@
 import { useMemo, type ComponentType } from 'react';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { Button } from '@windrun-huaiin/base-ui/ui';
+import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import type {
   CreditBucket,
   CreditBucketStatus,
@@ -104,51 +106,55 @@ export function CreditOverviewClient({
   return (
     <section
       className={cn(
-        'flex flex-col gap-6 rounded-2xl border border-[color:var(--color-fd-border)] bg-[var(--color-fd-background)] p-6 shadow-sm dark:shadow-none',
+        'flex flex-col gap-6 rounded-2xl border border-[color:var(--color-fd-border)] bg-[var(--color-fd-background)] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
         className,
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-br from-[var(--color-fd-primary)]/12 via-[color:var(--color-fd-muted)] to-[color:var(--color-fd-background)] p-6 shadow-inner">
+      <header className="relative rounded-2xl bg-linear-to-br from-indigo-100/80 via-white to-white p-6 shadow-inner dark:from-indigo-500/20 dark:via-slate-950 dark:to-slate-950">
         <div className="flex flex-col gap-6">
-          <div className="space-y-2 pr-12">
-            <div className="flex items-center gap-4 text-[var(--color-fd-primary)]">
-              <span className="flex h-9 w-9 items-center justify-start rounded-full">
+          <div className="space-y-3 pr-14">
+            <div className="flex items-center gap-4">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full ">
                 <icons.Gift aria-hidden className="h-6 w-6" />
               </span>
-              <div className="text-4xl font-semibold leading-tight text-[var(--color-fd-primary)]">
+              <div className="text-4xl font-semibold leading-tight text-[var(--color-fd-primary)] dark:text-[#dcd3ff]">
                 {formatNumber(locale, data.totalBalance)}
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/40 bg-white/60 p-4 backdrop-blur -mx-2">
-            <div className="flex w-full flex-col gap-2">
+          <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/70">
+            <div className="flex w-full flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
-                <h4 className="text-lg font-semibold text-[color:var(--color-fd-foreground)]">
+                <h4 className="text-lg font-semibold text-[color:var(--color-fd-foreground)] dark:text-slate-100">
                   {subscription ? subscription.planName : translations.subscriptionInactive}
                 </h4>
                 {subscription ? (
-                  <span className="inline-flex items-center rounded-full border border-transparent bg-[color:var(--color-fd-muted)] px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[color:var(--color-fd-foreground)]">
+                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 shadow-sm dark:bg-emerald-900/50 dark:text-emerald-200">
                     {translations.subscriptionActive}
                   </span>
                 ) : null}
               </div>
-              <p className="min-h-[1.25rem] text-sm text-[color:var(--color-fd-muted-foreground)]">
+              <p className="min-h-[1.25rem] text-sm text-[color:var(--color-fd-muted-foreground)] dark:text-slate-300">
                 {subscription ? formatRange(locale, subscription) : translations.subscriptionPeriodLabel}
               </p>
-              <div className="pt-2">
-                <a
-                  href={subscription ? subscription.manageUrl : data.subscribeUrl ?? '#'}
+              <div className="pt-1">
+                <Button
+                  asChild
+                  size="lg"
+                  variant={subscription ? 'outline' : 'default'}
                   className={cn(
-                    'inline-flex w-full items-center justify-center rounded-full border px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                    'w-full rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200',
                     subscription
-                      ? 'border-[var(--color-fd-primary)] text-[var(--color-fd-primary)] hover:bg-[color:var(--color-fd-muted)] focus-visible:ring-[color:var(--color-fd-primary)]'
-                      : 'border-[var(--color-fd-primary)] bg-[var(--color-fd-primary)] text-[var(--color-fd-primary-foreground)] hover:opacity-90 focus-visible:ring-[color:var(--color-fd-primary)]',
+                      ? 'border-purple-300 text-purple-600 hover:bg-purple-50 focus-visible:ring-purple-500 dark:border-purple-500/60 dark:text-purple-200 dark:hover:bg-purple-500/15'
+                      : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-500/95 hover:to-pink-600/95 focus-visible:ring-purple-500',
                   )}
                 >
-                  {subscription ? translations.subscriptionManage : translations.subscribePay}
-                </a>
+                  <a href={subscription ? subscription.manageUrl : data.subscribeUrl ?? '#'}>
+                    {subscription ? translations.subscriptionManage : translations.subscribePay}
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
@@ -182,11 +188,11 @@ export function CreditOverviewClient({
                 <li
                   key={bucket.kind}
                   data-credit-kind={bucket.kind}
-                  className="rounded-2xl border border-[color:var(--color-fd-border)]/60 bg-[color:var(--color-fd-muted)]/20 px-4 py-3"
+                  className="rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60"
                 >
-                  <div className="grid grid-cols-[minmax(0,_1.2fr)_110px_minmax(0,_0.8fr)] items-center gap-3 text-sm">
-                    <span className="flex min-w-0 items-center gap-2 -ml-3">
-                      <span className="max-w-[100%] truncate rounded-full bg-[color:var(--color-fd-popover)] px-3 py-1 text-xs font-semibold text-[color:var(--color-fd-foreground)]">
+                  <div className="grid grid-cols-[minmax(0,_1.2fr)_112px_minmax(0,_0.8fr)] items-center gap-3 text-sm">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100">
                         {bucket.computedLabel}
                       </span>
                       {bucket.description ? (
@@ -203,13 +209,13 @@ export function CreditOverviewClient({
                         <span
                           data-credit-status={bucket.computedStatus}
                           className={cn(
-                            'inline-flex w-full items-center justify-center truncate rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-colors',
+                            'inline-flex w-full items-center justify-center truncate rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide shadow-sm transition-colors',
                             bucket.computedStatus === 'active' &&
-                              'border-transparent bg-[color:var(--color-fd-muted)] text-[color:var(--color-fd-foreground)]',
+                              'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200',
                             bucket.computedStatus === 'expiringSoon' &&
-                              'border-transparent bg-[color:var(--color-fd-accent)] text-[color:var(--color-fd-accent-foreground)]',
+                              'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-200',
                             bucket.computedStatus === 'expired' &&
-                              'border-[var(--color-fd-primary)] text-[var(--color-fd-primary)]',
+                              'bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-200',
                           )}
                           title={translations.bucketStatus[bucket.computedStatus]}
                         >
@@ -219,21 +225,21 @@ export function CreditOverviewClient({
                     </span>
                     <span className="flex min-w-0 justify-end">
                       <span
-                        className="max-w-[160px] truncate text-right text-sm font-semibold text-[color:var(--color-fd-foreground)]"
+                        className="max-w-[160px] truncate text-right text-sm font-semibold text-[color:var(--color-fd-foreground)] dark:text-slate-100"
                         title={ratioDisplay}
                       >
                         {ratioDisplay}
                       </span>
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="h-1.5 flex-1 rounded-full bg-[color:var(--color-fd-muted)]">
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="h-1.5 flex-1 rounded-full bg-slate-200 dark:bg-slate-800">
                       <div
-                        className="h-full rounded-full bg-[var(--color-fd-primary)] transition-all"
+                        className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all dark:from-purple-400 dark:to-indigo-400"
                         style={{ width: `${bucket.progress}%` }}
                       />
                     </div>
-                    <span className="text-xs font-semibold text-[color:var(--color-fd-muted-foreground)]">
+                    <span className="text-xs font-semibold text-[color:var(--color-fd-muted-foreground)] dark:text-slate-300">
                       {bucket.progress}%
                     </span>
                   </div>
@@ -242,7 +248,7 @@ export function CreditOverviewClient({
             })}
           </ul>
         ) : (
-          <div className="rounded-2xl border border-dashed border-[color:var(--color-fd-border)] bg-[color:var(--color-fd-muted)] bg-opacity-40 p-6 text-sm text-[color:var(--color-fd-muted-foreground)]">
+          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/70 p-6 text-sm text-[color:var(--color-fd-muted-foreground)] dark:border-slate-800/60 dark:bg-slate-900/40 dark:text-slate-300">
             {translations.bucketsEmpty}
           </div>
         )}
@@ -250,14 +256,12 @@ export function CreditOverviewClient({
 
       {/* Action Buttons Section */}
       <footer className="flex flex-col gap-3">
-        {/* Buy One-Time Credits Button - Always show */}
-        <a
+        <GradientButton
+          title={translations.onetimeBuy}
           href={data.checkoutUrl}
-          className="inline-flex items-center justify-center rounded-full bg-[var(--color-fd-primary)] px-5 py-3 text-sm font-semibold text-[var(--color-fd-primary-foreground)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--color-fd-primary)]"
-        >
-          {translations.onetimeBuy}
-        </a>
-
+          align="center"
+          className="w-full rounded-full px-6 py-3 text-sm font-semibold"
+        />
       </footer>
     </section>
   );
@@ -309,22 +313,22 @@ function HoverInfo({ label, description, Icon, variant = 'default' }: HoverInfoP
         type="button"
         aria-label={label ? `${label}: ${description}` : description}
         className={cn(
-          'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--color-fd-primary)]',
+          'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500',
           variant === 'muted'
-            ? 'border-transparent bg-[color:var(--color-fd-muted)] text-[color:var(--color-fd-muted-foreground)] group-hover:text-[color:var(--color-fd-foreground)]'
-            : 'border-transparent bg-[color:var(--color-fd-popover)] text-[color:var(--color-fd-muted-foreground)] group-hover:text-[color:var(--color-fd-foreground)]',
+            ? 'border-transparent bg-slate-100 text-slate-500 hover:text-slate-700 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:text-slate-100'
+            : 'border-white/70 bg-white text-purple-600 shadow-sm hover:text-purple-700 dark:border-purple-500/50 dark:bg-slate-900/80 dark:text-purple-200 dark:hover:text-purple-100',
         )}
       >
         <Icon className="h-3.5 w-3.5" />
       </button>
       <span
         role="tooltip"
-        className="pointer-events-none absolute top-full right-full z-50 mt-3 w-max max-w-[260px] translate-x-4 rounded-xl border border-[color:var(--color-fd-border)] bg-[color:var(--color-fd-popover)] px-3 py-2 text-xs leading-relaxed text-[color:var(--color-fd-foreground)] opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-150 ease-out group-hover:-translate-y-1 group-hover:opacity-100 group-focus-within:-translate-y-1 group-focus-within:opacity-100"
+        className="pointer-events-none absolute top-full right-full z-50 mt-3 w-max max-w-[260px] translate-x-4 rounded-xl border border-slate-200/70 bg-slate-900/95 px-3 py-2 text-xs leading-relaxed text-white opacity-0 shadow-xl ring-1 ring-black/30 transition-all duration-150 ease-out group-hover:-translate-y-1 group-hover:opacity-100 group-focus-within:-translate-y-1 group-focus-within:opacity-100 dark:border-slate-700/60 dark:bg-slate-800/95"
       >
         {label ? (
-          <span className="block text-[color:var(--color-fd-muted-foreground)]">{label}</span>
+          <span className="block text-slate-200 dark:text-slate-300">{label}</span>
         ) : null}
-        <span className="mt-1 block text-[color:var(--color-fd-foreground)]">
+        <span className="mt-1 block text-white dark:text-slate-100">
           {description}
         </span>
       </span>
