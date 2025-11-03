@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client';
+import { createPrismaQueryEventHandler } from 'prisma-query-log';
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -30,13 +31,34 @@ const logConfig = getLogConfig();
 // ==================== 创建 Prisma 全局单例 ====================
 export const prisma =
   globalForPrisma.prisma ??
-  new PrismaClient({
+  new PrismaClient<Prisma.PrismaClientOptions, 'query' | 'info' | 'warn' | 'error'>({
     log: logConfig,
   });
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
+
+if (process.env.NODE_ENV === 'development') {
+  prisma.$on('query' as never, createPrismaQueryEventHandler({
+    format: false,
+    language: 'sql',
+    queryDuration: false, 
+    logger: (sql: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ms = (prisma.$on as any).lastEvent?.duration ?? 0;
+      const slow = ms >= 200 ? '🐌 SLOW QUERY! ' : '🚀 ';
+      const clean = sql
+        .replace(/"[^"]+"\./g, '')           // 去 "表".
+        .replace(/= "([^"]+)"/g, `= '$1'`)   // 值换单引号
+        .replace(/"/g, '');                  // ← 彻底灭双引号
+        console.log('─'.repeat(60));
+      console.log(`\n${clean}`);
+      console.log(`⏱  耗时: ${ms}ms, ${slow} `);
+      console.log('─'.repeat(60));
+    },
+  }))
+};
 
 // ==================== 便捷方法, 入参事务客户端不存在或者不传, 就返回全局非事务客户端 ====================
 export function checkAndFallbackWithNonTCClient(tx?: Prisma.TransactionClient): Prisma.TransactionClient | PrismaClient {
