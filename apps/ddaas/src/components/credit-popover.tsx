@@ -37,29 +37,50 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
     (credit.balancePaid ?? 0) +
     (credit.balanceOneTimePaid ?? 0);
 
+  // 根据是否订阅，动态调整 buckets 顺序
+  // 已订阅：subscription → onetime → free
+  // 未订阅：onetime → free
+  const buckets = subscription
+    ? [
+        {
+          kind: 'subscription',
+          balance: credit.balancePaid ?? 0,
+          limit: credit.totalPaidLimit ?? 0,
+          expiresAt: credit.paidEnd?.toISOString(),
+        },
+        {
+          kind: 'onetime',
+          balance: credit.balanceOneTimePaid ?? 0,
+          limit: credit.totalOneTimePaidLimit ?? 0,
+          expiresAt: credit.oneTimePaidEnd?.toISOString(),
+        },
+        {
+          kind: 'free',
+          balance: credit.balanceFree ?? 0,
+          limit: credit.totalFreeLimit ?? 0,
+          expiresAt: credit.freeEnd?.toISOString(),
+        },
+      ]
+    : [
+        {
+          kind: 'onetime',
+          balance: credit.balanceOneTimePaid ?? 0,
+          limit: credit.totalOneTimePaidLimit ?? 0,
+          expiresAt: credit.oneTimePaidEnd?.toISOString(),
+        },
+        {
+          kind: 'free',
+          balance: credit.balanceFree ?? 0,
+          limit: credit.totalFreeLimit ?? 0,
+          expiresAt: credit.freeEnd?.toISOString(),
+        },
+      ];
+
   const data: CreditOverviewData = {
     totalBalance,
     checkoutUrl: '#',
-    buckets: [
-      {
-        kind: 'free',
-        balance: credit.balanceFree ?? 0,
-        limit: credit.totalFreeLimit ?? 0,
-        expiresAt: credit.freeEnd?.toISOString(),
-      },
-      {
-        kind: 'subscription',
-        balance: credit.balancePaid ?? 0,
-        limit: credit.totalPaidLimit ?? 0,
-        expiresAt: credit.paidEnd?.toISOString(),
-      },
-      {
-        kind: 'onetime',
-        balance: credit.balanceOneTimePaid ?? 0,
-        limit: credit.totalOneTimePaidLimit ?? 0,
-        expiresAt: credit.oneTimePaidEnd?.toISOString(),
-      },
-    ],
+    subscribeUrl: '#',
+    buckets,
   };
 
   if (subscription) {
@@ -75,7 +96,6 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
     <CreditNavButton
       locale={locale}
       totalBalance={totalBalance}
-      title={t('summary.title')}
       totalLabel={t('summary.totalLabel')}
     >
       <CreditOverview locale={locale} data={data} />

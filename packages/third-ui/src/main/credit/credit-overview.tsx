@@ -19,25 +19,22 @@ export async function CreditOverview({
   const t = await getTranslations({ locale, namespace: 'credit' });
 
   const translations: CreditOverviewTranslations = {
-    summaryTitle: t('summary.title'),
     summaryDescription: t('summary.description'),
     totalLabel: t('summary.totalLabel'),
     bucketsTitle: t('buckets.title'),
     bucketsEmpty: t('buckets.empty'),
-    bucketsLimitLabel: t('buckets.limitLabel'),
-    bucketsUsedLabel: t('buckets.usedLabel'),
     bucketStatus: {
       active: t('buckets.status.active'),
       expiringSoon: t('buckets.status.expiringSoon'),
       expired: t('buckets.status.expired'),
     },
     bucketDefaultLabels: getBucketLabels(t),
-    subscriptionTitle: t('subscription.title'),
     subscriptionActive: t('subscription.active'),
     subscriptionPeriodLabel: t('subscription.periodLabel'),
     subscriptionManage: t('subscription.manage'),
     subscriptionInactive: t('subscription.inactive'),
-    buyCreditsLabel: t('actions.buyCredits'),
+    subscribePay: t('subscription.pay'),
+    onetimeBuy: t('onetime.buy'),
   };
 
   return (

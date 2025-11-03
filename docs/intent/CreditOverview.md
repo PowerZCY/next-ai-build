@@ -89,13 +89,13 @@ export async function homeNavLinks(locale: string) {
 }
 ```
 
-> 其中 `CreditNavButton` 为业务侧的客户端组件，负责导航按钮的交互外壳（触发器样式、展开/收起等），通过 `children` 渲染 `CreditOverview` 内容，可根据品牌需求自行美化。
+> 其中 `CreditNavButton` 为业务侧的客户端组件，负责导航按钮的交互外壳（触发器样式、展开/收起等），通过 `children` 渲染 `CreditOverview` 内容。最新版触发器仅展示积分图标与数字，详细文字信息会在弹层内或悬浮提示中体现，具体视觉可继续按品牌需求微调。
 
 ## 数据结构说明
 
 | 字段 | 说明 |
 | ---- | ---- |
-| `totalBalance: number` | 所有积分类型的总余额，顶部卡片大号展示。 |
+| `totalBalance: number` | 所有积分类型的总余额，顶部卡片大号展示（文字说明通过信息浮层展示）。 |
 | `checkoutUrl: string` | “购买一次性积分”按钮跳转地址。 |
 | `buckets: CreditBucket[]` | 积分明细数组，至少建议包含 `free`、`subscription`、`onetime` 三种类型。 |
 | `subscription?: SubscriptionInfo` | 仅在有有效订阅时提供，用于渲染订阅信息卡片。 |
@@ -106,7 +106,7 @@ export async function homeNavLinks(locale: string) {
 - `limit: number`：该类型积分额度上限。
 - `status?: 'active' | 'expiringSoon' | 'expired'`：可选状态标签。
 - `progressPercent?: number`：进度条百分比（0-100），不传则由组件根据 `balance/limit` 计算。
-- `description?: string`：额外说明，例如剩余天数。
+- `description?: string`：额外说明，例如剩余天数。为了保持布局紧凑，该信息会在卡片信息按钮上以悬浮提示展示。
 
 `SubscriptionInfo` 结构：
 - `planName: string`：订阅名称。
@@ -157,12 +157,12 @@ export async function homeNavLinks(locale: string) {
 
 可根据实际需要扩展 `credits.buckets.labels` 下的键名，以适配自定义的 `kind`。
 
+> 说明：`summary.description` 以及各桶的 `description` 会在界面中的信息提示按钮上展示，推荐保持文案精炼、避免换行。
+
 ## 附加组件
 
 - `CreditOverviewClient`：客户端层渲染逻辑，通常无需直接使用。
 
 以上即为积分组件的使用方式和数据契约。若后续需要更多扩展（例如附加操作按钮、状态色彩定制），可在保持数据结构不变的前提下，通过自定义样式覆盖或提交改进需求。
-
-
 
 

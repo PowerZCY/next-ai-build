@@ -220,15 +220,12 @@
   },
   "credit": {
     "summary": {
-      "title": "我的积分",
       "description": "展示当前所有渠道的剩余积分",
       "totalLabel": "积分总额"
     },
     "buckets": {
       "title": "积分明细",
       "empty": "当前暂未获得任何积分",
-      "limitLabel": "额度",
-      "usedLabel": "余额",
       "status": {
         "active": "使用中",
         "expiringSoon": "即将过期",
@@ -241,14 +238,14 @@
       }
     },
     "subscription": {
-      "title": "订阅信息",
       "active": "当前订阅",
       "periodLabel": "账期",
       "manage": "管理订阅",
-      "inactive": "暂无订阅"
+      "inactive": "暂无订阅",
+      "pay": "去订阅"
     },
-    "actions": {
-      "buyCredits": "购买积分包"
+    "onetime": {
+      "buy": "购买积分包"
     }
   },
   "features": {

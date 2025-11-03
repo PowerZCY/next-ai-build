@@ -31,4 +31,5 @@ export interface CreditOverviewData {
   buckets: CreditBucket[];
   subscription?: SubscriptionInfo;
   checkoutUrl: string;
+  subscribeUrl?: string;
 }
