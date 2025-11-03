@@ -47,14 +47,15 @@ if (process.env.NODE_ENV === 'development') {
     logger: (sql: string) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const ms = (prisma.$on as any).lastEvent?.duration ?? 0;
-      const slow = ms >= 200 ? '🐌 SLOW QUERY! ' : '🚀 ';
+      const slow = ms >= 200 ? '🐌 SLOW QUERY! ' : '🚀 QUERY';
       const clean = sql
         .replace(/"[^"]+"\./g, '')           // 去 "表".
         .replace(/= "([^"]+)"/g, `= '$1'`)   // 值换单引号
         .replace(/"/g, '');                  // ← 彻底灭双引号
-        console.log('─'.repeat(60));
-      console.log(`\n${clean}`);
-      console.log(`⏱  耗时: ${ms}ms, ${slow} `);
+      
+      console.log('─'.repeat(60));
+      console.log(`${clean};`);
+      console.log(`⏰ 耗时: ${ms}ms, ${slow} `);
       console.log('─'.repeat(60));
     },
   }))
