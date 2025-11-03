@@ -3,7 +3,6 @@
 import { useMemo, type ComponentType } from 'react';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
-import { Button } from '@windrun-huaiin/base-ui/ui';
 import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import type {
   CreditBucket,
@@ -101,12 +100,12 @@ export function CreditOverviewClient({
 
   const hasBuckets = buckets.length > 0;
   const subscription = data.subscription;
-  const InfoIcon = ( icons.Info ) as ComponentType<{ className?: string }>;
+  const InfoIcon = ( icons.CircleQuestionMark ) as ComponentType<{ className?: string }>;
 
   return (
     <section
       className={cn(
-        'flex flex-col gap-6 rounded-2xl border border-[color:var(--color-fd-border)] bg-[var(--color-fd-background)] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
+        'flex min-h-[calc(100vh-160px)] flex-col gap-6 rounded-2xl border border-[color:var(--color-fd-border)] bg-[var(--color-fd-background)] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
         className,
       )}
     >
@@ -118,7 +117,7 @@ export function CreditOverviewClient({
               <span className="flex h-10 w-10 items-center justify-center rounded-full ">
                 <icons.Gift aria-hidden className="h-6 w-6" />
               </span>
-              <div className="text-4xl font-semibold leading-tight text-[var(--color-fd-primary)] dark:text-[#dcd3ff]">
+              <div className="text-4xl font-semibold leading-tight">
                 {formatNumber(locale, data.totalBalance)}
               </div>
             </div>
@@ -140,21 +139,14 @@ export function CreditOverviewClient({
                 {subscription ? formatRange(locale, subscription) : translations.subscriptionPeriodLabel}
               </p>
               <div className="pt-1">
-                <Button
-                  asChild
-                  size="lg"
-                  variant={subscription ? 'outline' : 'default'}
-                  className={cn(
-                    'w-full rounded-full px-6 py-3 text-sm font-semibold transition-all duration-200',
-                    subscription
-                      ? 'border-purple-300 text-purple-600 hover:bg-purple-50 focus-visible:ring-purple-500 dark:border-purple-500/60 dark:text-purple-200 dark:hover:bg-purple-500/15'
-                      : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-500/95 hover:to-pink-600/95 focus-visible:ring-purple-500',
-                  )}
-                >
-                  <a href={subscription ? subscription.manageUrl : data.subscribeUrl ?? '#'}>
-                    {subscription ? translations.subscriptionManage : translations.subscribePay}
-                  </a>
-                </Button>
+                <GradientButton
+                  title={subscription ? translations.subscriptionManage : translations.subscribePay}
+                  href={subscription ? subscription.manageUrl : data.subscribeUrl ?? '#'}
+                  align="center"
+                  icon={<icons.Gift/>}
+                  openInNewTab={false}
+                  className='w-full px-6 py-3 text-sm font-semibold'
+                />
               </div>
             </div>
           </div>
@@ -259,8 +251,9 @@ export function CreditOverviewClient({
         <GradientButton
           title={translations.onetimeBuy}
           href={data.checkoutUrl}
+          icon={<icons.Gift/>}
           align="center"
-          className="w-full rounded-full px-6 py-3 text-sm font-semibold"
+          className="w-full rounded-full text-sm font-semibold"
         />
       </footer>
     </section>

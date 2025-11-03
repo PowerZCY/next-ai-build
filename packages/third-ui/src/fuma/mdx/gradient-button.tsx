@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from "@windrun-huaiin/base-ui/ui";
+import { cn } from '@windrun-huaiin/lib/utils';
 import { globalLucideIcons as icons } from "@windrun-huaiin/base-ui/components/server";
 import Link from "next/link";
 import React, { useState } from 'react';
@@ -100,18 +101,18 @@ export function GradientButton({
     </>
   );
 
-  const buttonClassName = `
-    bg-gradient-to-r 
-    from-purple-400 to-pink-500 
-    hover:from-purple-500 hover:to-pink-600
-    dark:from-purple-500 dark:to-pink-600 
-    dark:hover:from-purple-600 dark:hover:to-pink-700
-    text-white text-base font-bold shadow-lg hover:shadow-xl
-    transition-all duration-300
-    rounded-full
-    ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
-    ${className}
-  `;
+  const alignmentClass = align === 'right'
+    ? 'justify-end'
+    : align === 'center'
+      ? 'justify-center'
+      : 'justify-start';
+
+  const buttonClassName = cn(
+    'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
+    alignmentClass,
+    isDisabled && 'opacity-50 cursor-not-allowed',
+    className,
+  );
 
   return (
     <div className={`flex flex-col sm:flex-row gap-3 ${getAlignmentClass()}`}>
