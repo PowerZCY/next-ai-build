@@ -109,7 +109,7 @@ export function CreditOverviewClient({
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-50/80 to-purple-100/50 p-6 shadow-inner dark:from-[#0f0b27] dark:via-[#17123d] dark:to-[#5c4dff]/30">
+      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-400/90 to-purple-100/40 p-6 shadow-inner dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50">
         <div className="flex flex-col gap-6">
           <div className="space-y-3 pr-14">
             <div className="flex items-center gap-4">
@@ -305,7 +305,7 @@ function HoverInfo({ label, description, variant = 'default' }: HoverInfoProps) 
           'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500',
           variant === 'muted'
             ? 'border-transparent bg-slate-100 text-slate-500 hover:text-slate-700 dark:bg-slate-800/70 dark:text-slate-100 dark:hover:text-slate-100'
-            : 'border-white/80 bg-white text-purple-600 shadow-[0_6px_20px_rgba(99,102,241,0.25)] hover:text-purple-700 dark:border-purple-500/50 dark:bg-[#1b1541] dark:text-purple-100 dark:hover:text-purple-50 dark:shadow-[0_6px_22px_rgba(112,86,255,0.35)]',
+            : 'border-transparent bg-white text-purple-600 shadow-[0_6px_20px_rgba(99,102,241,0.25)] hover:text-purple-700 dark:bg-[#1b1541] dark:text-purple-100 dark:hover:text-purple-50 dark:shadow-[0_6px_22px_rgba(112,86,255,0.35)]',
         )}
       >
         <icons.CircleQuestionMark className="h-3.5 w-3.5" />
