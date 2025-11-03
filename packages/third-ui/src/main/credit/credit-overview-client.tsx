@@ -100,17 +100,16 @@ export function CreditOverviewClient({
 
   const hasBuckets = buckets.length > 0;
   const subscription = data.subscription;
-  const InfoIcon = ( icons.CircleQuestionMark ) as ComponentType<{ className?: string }>;
 
   return (
     <section
       className={cn(
-        'flex min-h-[calc(100vh-100px)] flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
+        'flex min-h-[calc(100vh-110px)] flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
         className,
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-br from-indigo-100/80 via-white to-white p-6 shadow-inner dark:from-indigo-500/20 dark:via-slate-950 dark:to-slate-950">
+      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-50/70 to-indigo-100/40 p-6 shadow-inner dark:from-[#1a1336] dark:via-[#0e0a1f] dark:to-[#493b99]/35">
         <div className="flex flex-col gap-6">
           <div className="space-y-3 pr-14">
             <div className="flex items-center gap-4">
@@ -123,7 +122,7 @@ export function CreditOverviewClient({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/70">
+          <div className="rounded-2xl border border-white/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/75">
             <div className="flex w-full flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
                 <h4 className="text-lg font-semibold text-gray-500 dark:text-slate-100">
@@ -155,7 +154,6 @@ export function CreditOverviewClient({
           <HoverInfo
             label={translations.totalLabel}
             description={translations.summaryDescription}
-            Icon={InfoIcon}
           />
         </div>
       </header>
@@ -191,7 +189,6 @@ export function CreditOverviewClient({
                         <HoverInfo
                           label={bucket.computedLabel}
                           description={bucket.description}
-                          Icon={InfoIcon}
                           variant="muted"
                         />
                       ) : null}
@@ -291,11 +288,10 @@ function differenceInDays(later: Date, earlier: Date): number {
 interface HoverInfoProps {
   label?: string;
   description?: string;
-  Icon: ComponentType<{ className?: string }>;
   variant?: 'default' | 'muted';
 }
 
-function HoverInfo({ label, description, Icon, variant = 'default' }: HoverInfoProps) {
+function HoverInfo({ label, description, variant = 'default' }: HoverInfoProps) {
   if (!description) {
     return null;
   }
@@ -312,7 +308,7 @@ function HoverInfo({ label, description, Icon, variant = 'default' }: HoverInfoP
             : 'border-white/70 bg-white text-purple-600 shadow-sm hover:text-purple-700 dark:border-purple-500/50 dark:bg-slate-900/80 dark:text-purple-200 dark:hover:text-purple-100',
         )}
       >
-        <Icon className="h-3.5 w-3.5" />
+        <icons.CircleQuestionMark className="h-3.5 w-3.5" />
       </button>
       <span
         role="tooltip"

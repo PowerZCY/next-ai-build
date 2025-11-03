@@ -32,7 +32,7 @@ export function CreditNavButton({
   );
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
@@ -42,7 +42,7 @@ export function CreditNavButton({
             'hover:border-transparent hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-pink-500/90 hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:hover:from-purple-500 dark:hover:to-pink-500',
           )}
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 dark:bg-white transition-transform group-hover:scale-105">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-purple-400/20 to-pink-500/20 text-purple-600 transition-transform group-hover:scale-105 dark:text-purple-200">
             <icons.Database className="h-3.5 w-3.5" />
           </span>
           <span className="relative flex items-center">
