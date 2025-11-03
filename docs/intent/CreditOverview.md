@@ -2,6 +2,13 @@
 
 本组件位于 `packages/third-ui/src/main/credit`，用于在应用中统一展示积分总览信息，包含总余额、积分桶明细、订阅信息与一次性购买入口。组件分为服务端与客户端两层，上层应用只需在服务端准备好数据对象后直接调用。
 
+当前实现遵循最新的视觉与交互规范：
+
+- 导航触发按钮（`CreditNavButton`）仅展示礼包图标与积分数值，浅色主题为白底+紫色渐变 hover，暗色主题为深色胶囊；弹层设置为 `modal={false}` 并限制内部 `max-height`，因此展开时主页面仍可滚动。
+- 总额卡片采用右上 → 左下的紫调渐变，并结合外突的信息按钮营造“缺口”效果；按钮在亮/暗模式下分别使用白底与深紫底，保持与背景的对比度。
+- 订阅区与所有 CTA 统一使用渐变体系，管理/订阅操作复用 `GradientButton`，`w-full` 下文字仍居中。
+- 积分桶列表为两行布局：首行展示类型、状态 Tag 与 `余额/上限` 比例，第二行展示渐变进度条和百分比。额外描述通过 hover/focus 提示呈现，文本过长时自动省略并提供 tooltip。
+
 ## 快速上手
 
 ```tsx
@@ -62,7 +69,6 @@ export async function CreditPopover({ locale }: { locale: string }) {
     <CreditNavButton
       locale={locale}
       totalBalance={data.totalBalance}
-      title={t('summary.title')}
       totalLabel={t('summary.totalLabel')}
     >
       <CreditOverview locale={locale} data={data} />
@@ -89,7 +95,7 @@ export async function homeNavLinks(locale: string) {
 }
 ```
 
-> 其中 `CreditNavButton` 为业务侧的客户端组件，负责导航按钮的交互外壳（触发器样式、展开/收起等），通过 `children` 渲染 `CreditOverview` 内容。最新版触发器仅展示积分图标与数字，详细文字信息会在弹层内或悬浮提示中体现，具体视觉可继续按品牌需求微调。
+> 其中 `CreditNavButton` 为业务侧的客户端组件，负责导航按钮的交互外壳（触发器样式、展开/收起等），通过 `children` 渲染 `CreditOverview` 内容。最新版触发器仅展示积分图标与数字，详细文字信息会在弹层内或悬浮提示中体现；可根据品牌需求覆盖渐变、描边等视觉细节。
 
 ## 数据结构说明
 
@@ -115,21 +121,18 @@ export async function homeNavLinks(locale: string) {
 
 ## 翻译键位
 
-`CreditOverview` 会在服务端调用 `getTranslations({ locale, namespace: 'credits' })`，请在业务应用对应语言文件中提供如下 JSON 结构（缺失时组件会使用英文兜底）：
+`CreditOverview` 会在服务端调用 `getTranslations({ locale, namespace: 'credit' })`，请在业务应用对应语言文件中提供如下 JSON 结构（缺失时组件会使用英文兜底）：
 
 ```json
 {
-  "credits": {
+  "credit": {
     "summary": {
-      "title": "积分总览",
       "description": "展示当前所有渠道的剩余积分",
       "totalLabel": "积分"
     },
     "buckets": {
       "title": "积分明细",
       "empty": "当前暂未获得任何积分",
-      "limitLabel": "额度",
-      "usedLabel": "余额",
       "status": {
         "active": "使用中",
         "expiringSoon": "即将过期",
@@ -146,23 +149,23 @@ export async function homeNavLinks(locale: string) {
       "active": "当前订阅",
       "periodLabel": "账期",
       "manage": "管理订阅",
-      "inactive": "暂无订阅"
+      "inactive": "暂无订阅",
+      "pay": "开启订阅"
     },
-    "actions": {
-      "buyCredits": "购买一次性积分"
+    "onetime": {
+      "buy": "购买一次性积分"
     }
   }
 }
 ```
 
-可根据实际需要扩展 `credits.buckets.labels` 下的键名，以适配自定义的 `kind`。
+可根据实际需要扩展 `credit.buckets.labels` 下的键名，以适配自定义的 `kind`。
 
 > 说明：`summary.description` 以及各桶的 `description` 会在界面中的信息提示按钮上展示，推荐保持文案精炼、避免换行。
 
 ## 附加组件
 
 - `CreditOverviewClient`：客户端层渲染逻辑，通常无需直接使用。
+- `GradientButton`：位于 `@third-ui/fuma/mdx/gradient-button`，积分弹层内的行动按钮复用该组件以维持渐变风格和文字对齐。
 
 以上即为积分组件的使用方式和数据契约。若后续需要更多扩展（例如附加操作按钮、状态色彩定制），可在保持数据结构不变的前提下，通过自定义样式覆盖或提交改进需求。
-
-
