@@ -224,7 +224,7 @@
       "totalLabel": "Total Credits"
     },
     "buckets": {
-      "title": "Credit Details",
+      "title": "Credit Remaining Details",
       "empty": "No credits have been acquired yet",
       "status": {
         "active": "In Use",
@@ -239,13 +239,13 @@
     },
     "subscription": {
       "active": "Active",
-      "periodLabel": "Billing Cycle",
+      "periodLabel": "Current Plan",
       "manage": "Manage Subscription",
-      "inactive": "No Active Subscription",
+      "inactive": "Free",
       "pay": "Subscription"
     },
     "onetime": {
-      "buy": "Buy Credits"
+      "buy": "Buy Credits Pack"
     }
   },
   "features": {

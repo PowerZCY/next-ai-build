@@ -224,7 +224,7 @@
       "totalLabel": "积分总额"
     },
     "buckets": {
-      "title": "积分明细",
+      "title": "积分余额明细",
       "empty": "当前暂未获得任何积分",
       "status": {
         "active": "使用中",
@@ -239,9 +239,9 @@
     },
     "subscription": {
       "active": "当前订阅",
-      "periodLabel": "账期",
+      "periodLabel": "当前订阅",
       "manage": "管理订阅",
-      "inactive": "暂无订阅",
+      "inactive": "免费计划",
       "pay": "去订阅"
     },
     "onetime": {

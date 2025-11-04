@@ -1,9 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
-import { getTranslations } from 'next-intl/server';
-import { CreditOverview } from '@third-ui/main/server';
-import type { CreditOverviewData } from '@third-ui/main/server';
 import { creditService, subscriptionService, userService } from '@/db/index';
+import { auth } from '@clerk/nextjs/server';
+import { formatTimestamp } from '@lib/utils';
 import { CreditNavButton } from '@third-ui/main';
+import type { CreditOverviewData } from '@third-ui/main/server';
+import { CreditOverview } from '@third-ui/main/server';
+import { getTranslations } from 'next-intl/server';
 
 interface CreditPopoverProps {
   locale: string;
@@ -40,41 +41,46 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
   // 根据是否订阅，动态调整 buckets 顺序
   // 已订阅：subscription → onetime → free
   // 未订阅：onetime → free
-  const buckets = subscription
-    ? [
-        {
-          kind: 'subscription',
-          balance: credit.balancePaid ?? 0,
-          limit: credit.totalPaidLimit ?? 0,
-          expiresAt: credit.paidEnd?.toISOString(),
-        },
-        {
-          kind: 'onetime',
-          balance: credit.balanceOneTimePaid ?? 0,
-          limit: credit.totalOneTimePaidLimit ?? 0,
-          expiresAt: credit.oneTimePaidEnd?.toISOString(),
-        },
-        {
-          kind: 'free',
-          balance: credit.balanceFree ?? 0,
-          limit: credit.totalFreeLimit ?? 0,
-          expiresAt: credit.freeEnd?.toISOString(),
-        },
-      ]
-    : [
-        {
-          kind: 'onetime',
-          balance: credit.balanceOneTimePaid ?? 0,
-          limit: credit.totalOneTimePaidLimit ?? 0,
-          expiresAt: credit.oneTimePaidEnd?.toISOString(),
-        },
-        {
-          kind: 'free',
-          balance: credit.balanceFree ?? 0,
-          limit: credit.totalFreeLimit ?? 0,
-          expiresAt: credit.freeEnd?.toISOString(),
-        },
-      ];
+  // 为0的类型积分不展示
+
+  // 直接基于 credit 对象生成 buckets，无需额外传参
+  const buckets = [
+    ...(credit.balancePaid > 0 
+      ? [{
+          kind: 'subscription' as const,
+          balance: credit.balancePaid,
+          limit: credit.totalPaidLimit,
+          expiresAt: formatTimestamp(
+            credit.paidEnd?.getTime().toString() ?? "",
+            'yyyy-MM-dd HH:mm:ss'
+          )
+        }] 
+      : []),
+
+    ...(credit.balanceOneTimePaid > 0 
+      ? [{
+          kind: 'onetime' as const,
+          balance: credit.balanceOneTimePaid,
+          limit: credit.totalOneTimePaidLimit,
+          expiresAt: formatTimestamp(
+            credit.oneTimePaidEnd?.getTime().toString() ?? "",
+            'yyyy-MM-dd HH:mm:ss'
+          )
+        }] 
+      : []),
+
+    ...(credit.balanceFree > 0 
+      ? [{
+          kind: 'free' as const,
+          balance: credit.balanceFree,
+          limit: credit.totalFreeLimit,
+          expiresAt: formatTimestamp(
+            credit.freeEnd?.getTime().toString() ?? "",
+            'yyyy-MM-dd HH:mm:ss'
+          )
+        }] 
+      : [])
+  ];
 
   const data: CreditOverviewData = {
     totalBalance,

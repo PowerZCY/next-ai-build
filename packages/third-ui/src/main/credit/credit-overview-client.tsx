@@ -104,50 +104,37 @@ export function CreditOverviewClient({
   return (
     <section
       className={cn(
-        'flex min-h-[calc(100vh-110px)] flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950',
-        className,
+        "flex min-h-[calc(100vh-110px)] flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950",
+        className
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-400/90 to-purple-100/40 p-6 shadow-inner dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50">
-        <div className="flex flex-col gap-6">
-          <div className="space-y-3 pr-14">
-            <div className="flex items-center gap-4">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full ">
-                <icons.Gift aria-hidden className="h-6 w-6" />
-              </span>
-              <div className="text-4xl font-semibold leading-tight">
-                {formatNumber(locale, data.totalBalance)}
-              </div>
-            </div>
+      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-400/90 to-purple-100/40 p-4 shadow-inner dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-start rounded-full ">
+            <icons.Gem aria-hidden className="h-8 w-8 mr-2" />
+            <span>{translations.totalLabel}</span>
           </div>
-
-          <div className="rounded-2xl border border-white/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/75">
-            <div className="flex w-full flex-col gap-3">
-              <div className="flex items-center justify-between gap-3">
-                <h4 className="text-lg font-semibold text-gray-500 dark:text-slate-100">
-                  {subscription ? subscription.planName : translations.subscriptionInactive}
-                </h4>
-                {subscription ? (
-                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 shadow-sm dark:bg-emerald-900/50 dark:text-emerald-200">
-                    {translations.subscriptionActive}
-                  </span>
-                ) : null}
-              </div>
-              <p className="min-h-[1.25rem] text-sm text-gray-500 dark:text-slate-100">
-                {subscription ? formatRange(locale, subscription) : translations.subscriptionPeriodLabel}
-              </p>
-              <div className="pt-1">
-                <GradientButton
-                  title={subscription ? translations.subscriptionManage : translations.subscribePay}
-                  href={subscription ? subscription.manageUrl : data.subscribeUrl ?? '#'}
-                  align="center"
-                  icon={<icons.Gift/>}
-                  openInNewTab={false}
-                  className='w-full px-6 py-3 text-sm font-semibold'
-                />
-              </div>
-            </div>
+          <div className="flex justify-center text-4xl font-semibold leading-tight">
+            {formatNumber(locale, data.totalBalance)}
+          </div>
+          <div className="flex-1 flex-col gap-1">
+            <p className="text-sm text-gray-500 dark:text-slate-100">
+              {translations.subscriptionPeriodLabel}
+            </p>
+            <h4 className="text-2xl font-semibold">
+              {subscription ? subscription.planName : translations.subscriptionInactive}
+            </h4>
+          </div>
+          <div className="pt-0">
+            <GradientButton
+              title={ subscription ? translations.subscriptionManage : translations.subscribePay }
+              href={ subscription ? subscription.manageUrl : data.subscribeUrl ?? "#" }
+              align="center"
+              icon={subscription ? <icons.Settings2/> : <icons.Bell/>}
+              openInNewTab={false}
+              className="w-full rounded-full text-sm font-semibold"
+            />
           </div>
         </div>
         <div className="absolute top-6 -right-[14px]">
@@ -159,77 +146,40 @@ export function CreditOverviewClient({
       </header>
 
       {/* Credit Details Section */}
-      <section className="space-y-4">
+      <section className="space-y-2 relative rounded-2xl border p-4 shadow-inner">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-500 dark:text-slate-100">
             {translations.bucketsTitle}
           </h3>
         </div>
         {hasBuckets ? (
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-3 mb-5">
             {buckets.map((bucket) => {
-              const hasLimit = bucket.limit > 0;
-              const limitDisplay = hasLimit ? formatNumber(locale, bucket.limit) : '—';
               const balanceDisplay = formatNumber(locale, bucket.balance);
-              const ratioDisplay = hasLimit
-                ? `${balanceDisplay}/${limitDisplay}`
-                : balanceDisplay;
               return (
                 <li
                   key={bucket.kind}
                   data-credit-kind={bucket.kind}
                   className="rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60"
                 >
-                  <div className="grid grid-cols-[minmax(0,_1.2fr)_112px_minmax(0,_0.8fr)] items-center gap-3 text-sm">
+                  <div className="grid grid-cols-2 items-center gap-3 text-sm">
                     <span className="flex min-w-0 items-center gap-2">
-                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100">
+                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-sm font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100">
                         {bucket.computedLabel}
                       </span>
-                      {bucket.description ? (
-                        <HoverInfo
-                          label={bucket.computedLabel}
-                          description={bucket.description}
-                          variant="muted"
-                        />
-                      ) : null}
-                    </span>
-                    <span className="flex h-full items-center justify-start">
-                      {bucket.computedStatus ? (
-                        <span
-                          data-credit-status={bucket.computedStatus}
-                          className={cn(
-                            'inline-flex w-full items-center justify-center truncate rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide shadow-sm transition-colors',
-                            bucket.computedStatus === 'active' &&
-                              'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200',
-                            bucket.computedStatus === 'expiringSoon' &&
-                              'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-200',
-                            bucket.computedStatus === 'expired' &&
-                              'bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-200',
-                          )}
-                          title={translations.bucketStatus[bucket.computedStatus]}
-                        >
-                          {translations.bucketStatus[bucket.computedStatus]}
-                        </span>
-                      ) : null}
                     </span>
                     <span className="flex min-w-0 justify-end">
                       <span
-                        className="max-w-[160px] truncate text-right text-sm font-semibold text-gray-500 dark:text-slate-100"
-                        title={ratioDisplay}
+                        className="text-right text-lg font-semibold leading-tight text-gray-500 dark:text-slate-100"
+                        title={balanceDisplay}
                       >
-                        {ratioDisplay}
+                        {balanceDisplay}
                       </span>
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    <div className="h-1.5 flex-1 rounded-full bg-slate-200 dark:bg-slate-800">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all dark:from-purple-400 dark:to-indigo-400"
-                        style={{ width: `${bucket.progress}%` }}
-                      />
-                    </div>
+                  <div className="mt-3 flex justify-end gap-2">
                     <span className="text-xs font-semibold text-gray-500 dark:text-slate-100">
-                      {bucket.progress}%
+                      Expires: {bucket.expiresAt}
                     </span>
                   </div>
                 </li>
@@ -241,18 +191,14 @@ export function CreditOverviewClient({
             {translations.bucketsEmpty}
           </div>
         )}
-      </section>
-
-      {/* Action Buttons Section */}
-      <footer className="flex flex-col gap-3">
         <GradientButton
           title={translations.onetimeBuy}
           href={data.checkoutUrl}
-          icon={<icons.Gift/>}
+          icon={<icons.ShoppingCart />}
           align="center"
           className="w-full rounded-full text-sm font-semibold"
         />
-      </footer>
+      </section>
     </section>
   );
 }
@@ -291,7 +237,7 @@ interface HoverInfoProps {
   variant?: 'default' | 'muted';
 }
 
-function HoverInfo({ label, description, variant = 'default' }: HoverInfoProps) {
+function HoverInfo({ description, variant = 'default' }: HoverInfoProps) {
   if (!description) {
     return null;
   }
@@ -300,7 +246,7 @@ function HoverInfo({ label, description, variant = 'default' }: HoverInfoProps) 
     <span className="group relative inline-flex shrink-0">
       <button
         type="button"
-        aria-label={label ? `${label}: ${description}` : description}
+        aria-label={description}
         className={cn(
           'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500',
           variant === 'muted'
@@ -314,9 +260,6 @@ function HoverInfo({ label, description, variant = 'default' }: HoverInfoProps) 
         role="tooltip"
         className="pointer-events-none absolute top-full right-full z-50 mt-3 w-max max-w-[260px] translate-x-4 rounded-xl border border-slate-200/70 bg-slate-900/95 px-3 py-2 text-xs leading-relaxed text-white opacity-0 shadow-xl ring-1 ring-black/30 transition-all duration-150 ease-out group-hover:-translate-y-1 group-hover:opacity-100 group-focus-within:-translate-y-1 group-focus-within:opacity-100 dark:border-slate-700/60 dark:bg-slate-800/95"
       >
-        {label ? (
-          <span className="block text-slate-200 dark:text-slate-100">{label}</span>
-        ) : null}
         <span className="mt-1 block text-white dark:text-slate-100">
           {description}
         </span>

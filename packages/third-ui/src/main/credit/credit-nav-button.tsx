@@ -43,7 +43,7 @@ export function CreditNavButton({
           )}
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-purple-400/20 to-pink-500/20 text-purple-600 transition-transform group-hover:scale-105 dark:text-purple-200">
-            <icons.Database className="h-3.5 w-3.5" />
+            <icons.Gem className="h-3.5 w-3.5" />
           </span>
           <span className="relative flex items-center">
             <span className="text-base font-semibold leading-none">
