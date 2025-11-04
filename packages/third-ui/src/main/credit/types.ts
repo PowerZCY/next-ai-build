@@ -11,7 +11,7 @@ export interface CreditBucket {
   limit: number;
   /** 可选状态标签，用于强调过期等状态 */
   status?: CreditBucketStatus;
-  /** 积分过期时间（ISO 字符串），用于组件内部推导状态 */
+  /** 积分过期时间（本地时区字符串），用于组件内部推导状态 */
   expiresAt?: string;
   /** 进度百分比（0-100）；未提供时组件按 balance/limit 计算 */
   progressPercent?: number;

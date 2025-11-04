@@ -226,11 +226,6 @@
     "buckets": {
       "title": "积分余额明细",
       "empty": "当前暂未获得任何积分",
-      "status": {
-        "active": "使用中",
-        "expiringSoon": "即将过期",
-        "expired": "已过期"
-      },
       "labels": {
         "free": "免费积分",
         "subscription": "订阅积分",
@@ -238,7 +233,6 @@
       }
     },
     "subscription": {
-      "active": "当前订阅",
       "periodLabel": "当前订阅",
       "manage": "管理订阅",
       "inactive": "免费计划",

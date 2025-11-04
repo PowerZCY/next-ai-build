@@ -16,13 +16,7 @@ export interface CreditOverviewTranslations {
   totalLabel: string;
   bucketsTitle: string;
   bucketsEmpty: string;
-  bucketStatus: {
-    active: string;
-    expiringSoon: string;
-    expired: string;
-  };
   bucketDefaultLabels: Record<string, string>;
-  subscriptionActive: string;
   subscriptionPeriodLabel: string;
   subscriptionManage: string;
   subscriptionInactive: string;

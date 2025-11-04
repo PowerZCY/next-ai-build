@@ -226,11 +226,6 @@
     "buckets": {
       "title": "Credit Remaining Details",
       "empty": "No credits have been acquired yet",
-      "status": {
-        "active": "In Use",
-        "expiringSoon": "Expiring Soon",
-        "expired": "Expired"
-      },
       "labels": {
         "free": "Free",
         "subscription": "Subscription",
@@ -238,7 +233,6 @@
       }
     },
     "subscription": {
-      "active": "Active",
       "periodLabel": "Current Plan",
       "manage": "Manage Subscription",
       "inactive": "Free",

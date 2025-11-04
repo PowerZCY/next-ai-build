@@ -23,13 +23,7 @@ export async function CreditOverview({
     totalLabel: t('summary.totalLabel'),
     bucketsTitle: t('buckets.title'),
     bucketsEmpty: t('buckets.empty'),
-    bucketStatus: {
-      active: t('buckets.status.active'),
-      expiringSoon: t('buckets.status.expiringSoon'),
-      expired: t('buckets.status.expired'),
-    },
     bucketDefaultLabels: getBucketLabels(t),
-    subscriptionActive: t('subscription.active'),
     subscriptionPeriodLabel: t('subscription.periodLabel'),
     subscriptionManage: t('subscription.manage'),
     subscriptionInactive: t('subscription.inactive'),
