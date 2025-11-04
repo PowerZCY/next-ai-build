@@ -79,25 +79,41 @@ export function GradientButton({
   const displayTitle = isLoading ? actualLoadingText : title;
 
   // icon
-  const displayIcon = isLoading ? (
-    <icons.Loader2 className="h-4 w-4 text-white animate-spin" />
-  ) : icon ? (
-    React.cloneElement(icon as React.ReactElement<{ className?: string }>, { 
-      className: "h-4 w-4 text-white" 
-    })
-  ) : (
-    <icons.ArrowRight className="h-4 w-4 text-white" />
-  );
+  const iconProvided = icon !== undefined;
+
+  const iconNode = (() => {
+    if (isLoading) {
+      return <icons.Loader2 className="h-4 w-4 text-white animate-spin" />;
+    }
+
+    if (iconProvided) {
+      if (icon === null || icon === false) {
+        return null;
+      }
+
+      if (React.isValidElement<{ className?: string }>(icon)) {
+        return React.cloneElement(icon, {
+          className: cn('h-4 w-4 text-white', icon.props.className),
+        });
+      }
+
+      return icon;
+    }
+
+    return <icons.ArrowRight className="h-4 w-4 text-white" />;
+  })();
+
+  const shouldRenderIcon = iconNode !== null && iconNode !== undefined;
 
   const buttonContent = onClick ? (
     <>
-      <span>{displayIcon}</span>
-      <span className="ml-1">{displayTitle}</span>
+      {shouldRenderIcon ? <span>{iconNode}</span> : null}
+      <span className={cn(shouldRenderIcon && 'ml-1')}>{displayTitle}</span>
     </>
   ) : (
     <>
       <span>{displayTitle}</span>
-      <span className="ml-1">{displayIcon}</span>
+      {shouldRenderIcon ? <span className="ml-1">{iconNode}</span> : null}
     </>
   );
 

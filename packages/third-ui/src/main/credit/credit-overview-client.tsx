@@ -257,7 +257,7 @@ export function CreditOverviewClient({
               align="center"
               icon={subscription ? <icons.Settings2 /> : <icons.Bell />}
               openInNewTab={false}
-              className="w-full rounded-full text-sm font-semibold"
+              className="w-full"
               onClick={
                 subscription
                   ? handleManageAction
@@ -334,7 +334,7 @@ export function CreditOverviewClient({
           href={pricingContext ? undefined : data.checkoutUrl}
           icon={<icons.ShoppingCart />}
           align="center"
-          className="w-full rounded-full text-sm font-semibold"
+          className="w-full"
           onClick={pricingContext ? handleOnetimeAction : undefined}
         />
       </section>
@@ -367,7 +367,7 @@ export function CreditOverviewClient({
               </AlertDialogTitle>
               <button
                 type="button"
-                className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="rounded-full p-2 text-gray-400 transition hover:bg-gray-400 hover:text-gray-400 dark:text-white/80 dark:hover:bg-white/80 dark:hover:text-white/80"
                 onClick={() =>
                   setPricingModal((prev) => ({
                     ...prev,
@@ -375,7 +375,7 @@ export function CreditOverviewClient({
                   }))
                 }
               >
-                <icons.X className="h-4 w-4" />
+                <icons.X className="h-6 w-6" />
               </button>
             </AlertDialogHeader>
             <div className="max-h-[80vh] overflow-y-auto px-4 py-6">

@@ -38,15 +38,15 @@ export const moneyPriceConfig: MoneyPriceConfig = {
               priceId: process.env.STRIPE_PRO_MONTHLY_PRICE_ID!,
               amount: Number(process.env.STRIPE_PRO_MONTHLY_AMOUNT!), // 10
               currency: process.env.STRIPE_PRO_MONTHLY_CURRENCY!,
-              credits: Number(process.env.STRIPE_PRO_MONTHLY_CREDITS!) // 100
+              credits: Number(process.env.STRIPE_PRO_MONTHLY_CREDITS!)
             },
             yearly: {
               priceId: process.env.STRIPE_PRO_YEARLY_PRICE_ID!,
-              amount: Number(process.env.STRIPE_PRO_YEARLY_AMOUNT!), // 8
-              originalAmount: 10, // 10*12
+              amount: Number(process.env.STRIPE_PRO_YEARLY_AMOUNT!),
+              originalAmount: 10,
               discountPercent: 20,
               currency: process.env.STRIPE_PRO_YEARLY_CURRENCY!,
-              credits: Number(process.env.STRIPE_PRO_YEARLY_CREDITS!) // 1200
+              credits: Number(process.env.STRIPE_PRO_YEARLY_CREDITS!) 
             }
           }
         },
@@ -55,17 +55,17 @@ export const moneyPriceConfig: MoneyPriceConfig = {
           plans: {
             monthly: {
               priceId: process.env.STRIPE_ULTRA_MONTHLY_PRICE_ID!,
-              amount: Number(process.env.STRIPE_ULTRA_MONTHLY_AMOUNT!), // 20
+              amount: Number(process.env.STRIPE_ULTRA_MONTHLY_AMOUNT!), 
               currency: process.env.STRIPE_ULTRA_MONTHLY_CURRENCY!,
-              credits: Number(process.env.STRIPE_ULTRA_MONTHLY_CREDITS!) // 250
+              credits: Number(process.env.STRIPE_ULTRA_MONTHLY_CREDITS!) 
             },
             yearly: {
               priceId: process.env.STRIPE_ULTRA_YEARLY_PRICE_ID!,
-              amount: Number(process.env.STRIPE_ULTRA_YEARLY_AMOUNT!), // 16
-              originalAmount: 20, // 20*12
+              amount: Number(process.env.STRIPE_ULTRA_YEARLY_AMOUNT!), 
+              originalAmount: 50,
               discountPercent: 20,
               currency: process.env.STRIPE_ULTRA_YEARLY_CURRENCY!,
-              credits: Number(process.env.STRIPE_ULTRA_YEARLY_CREDITS!) // 3000
+              credits: Number(process.env.STRIPE_ULTRA_YEARLY_CREDITS!) 
             }
           }
         }
