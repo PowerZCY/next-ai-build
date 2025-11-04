@@ -3,7 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { formatTimestamp } from '@lib/utils';
 import { CreditNavButton } from '@third-ui/main';
 import type { CreditOverviewData } from '@third-ui/main/server';
-import { CreditOverview } from '@third-ui/main/server';
+import { CreditOverview, buildMoneyPriceData } from '@third-ui/main/server';
+import { moneyPriceConfig } from '@/lib/money-price-config';
 import { getTranslations } from 'next-intl/server';
 
 interface CreditPopoverProps {
@@ -23,10 +24,17 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
     return null;
   }
 
-  const [credit, subscription, t] = await Promise.all([
+  const enableSubscriptionUpgrade = process.env.ENABLE_STRIPE_SUBSCRIPTION_UPGRADE !== 'false';
+
+  const [credit, subscription, t, moneyPriceData] = await Promise.all([
     creditService.getCredit(user.userId),
     subscriptionService.getActiveSubscription(user.userId),
     getTranslations({ locale, namespace: 'credit' }),
+    buildMoneyPriceData({
+      locale,
+      currency: moneyPriceConfig.display.currency,
+      enabledBillingTypes: ['monthly', 'yearly', 'onetime'],
+    }),
   ]);
 
   if (!credit) {
@@ -87,6 +95,14 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
     checkoutUrl: '#',
     subscribeUrl: '#',
     buckets,
+    pricingContext: {
+      moneyPriceData,
+      moneyPriceConfig,
+      checkoutApiEndpoint: '/api/stripe/checkout',
+      customerPortalApiEndpoint: '/api/stripe/customer-portal',
+      enableSubscriptionUpgrade,
+      signInPath: `${locale}/sign-in`,
+    },
   };
 
   if (subscription) {

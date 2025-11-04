@@ -18,6 +18,7 @@ import {
   type MoneyPriceInteractiveProps,
   type UserContext
 } from './money-price-types';
+import { redirectToCustomerPortal } from './customer-portal';
 
 type BillingType = string;
 
@@ -211,63 +212,13 @@ export function MoneyPriceInteractive({
 
       const shouldUsePortal = isSubscriptionFlow && hasActiveSubscription;
 
-      const attemptPortalRedirect = async (): Promise<boolean> => {
-        if (!customerPortalApiEndpoint) {
-          console.error('Customer portal endpoint is not configured.');
-          alert('Customer portal is temporarily unavailable. A new checkout flow will be attempted instead.');
-          return false;
-        }
-
-        try {
-          const response = await fetch(customerPortalApiEndpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              returnUrl: window.location.href,
-            }),
-          });
-
-          const contentType = response.headers.get('content-type');
-          if (!contentType || !contentType.includes('application/json')) {
-            console.error('Received non-JSON response from customer portal API');
-            return false;
-          }
-
-          const result = await response.json();
-
-          if (!response.ok) {
-            const errorMessage = result.error || `Request failed with status ${response.status}`;
-            console.error('Customer portal request failed:', errorMessage);
-
-            if (response.status === 401 || response.status === 403) {
-              if (signInPath) {
-                window.location.href = signInPath;
-              } else {
-                redirectToSignIn();
-              }
-              return true;
-            }
-            alert(`Operation failed: ${errorMessage}`);
-            return false;
-          }
-
-          if (result.success && result.data?.sessionUrl) {
-            window.location.href = result.data.sessionUrl;
-            return true;
-          }
-
-          console.error('Customer portal session response invalid', result);
-          return false;
-        } catch (error) {
-          console.error('Error creating customer portal session:', error);
-          return false;
-        }
-      };
-
       if (shouldUsePortal) {
-        const handled = await attemptPortalRedirect();
+        const handled = await redirectToCustomerPortal({
+          customerPortalApiEndpoint,
+          signInPath,
+          redirectToSignIn,
+          returnUrl: window.location.href,
+        });
         if (handled) {
           return;
         }

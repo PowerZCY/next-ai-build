@@ -1,3 +1,5 @@
+import type { MoneyPriceConfig, MoneyPriceData } from '../money-price/money-price-types';
+
 export type CreditBucketStatus = 'active' | 'expiringSoon' | 'expired';
 
 export interface CreditBucket {
@@ -32,4 +34,14 @@ export interface CreditOverviewData {
   subscription?: SubscriptionInfo;
   checkoutUrl: string;
   subscribeUrl?: string;
+  pricingContext?: CreditPricingContext;
+}
+
+export interface CreditPricingContext {
+  moneyPriceData: MoneyPriceData;
+  moneyPriceConfig: MoneyPriceConfig;
+  checkoutApiEndpoint?: string;
+  customerPortalApiEndpoint?: string;
+  signInPath?: string;
+  enableSubscriptionUpgrade?: boolean;
 }

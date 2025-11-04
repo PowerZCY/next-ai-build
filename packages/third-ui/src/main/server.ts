@@ -23,6 +23,7 @@ export {
   getCreditsFromPriceIdUtil,
   getPriceConfigUtil
 } from './money-price/money-price-config-util';
+export { buildMoneyPriceData } from './money-price/money-price-data';
 
 // Money Price Types (shared between server and client)
 export type {

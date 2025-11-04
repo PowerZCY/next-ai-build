@@ -5,20 +5,24 @@
 ```
 money-price/
 ├── money-price.tsx                        # 服务端组件，处理SSR、翻译、静态渲染
+├── money-price-data.ts                    # 服务端 helper，复用 Money Price 文案&配置
 ├── money-price-interactive.tsx  # 客户端组件，处理交互逻辑
 ├── money-price-config.ts            # 配置文件，包含价格和产品信息
 ├── money-price-types.ts              # 类型定义
 └── money-price-button.tsx         # 按钮组件，封装动态逻辑
 └── money-price-config-util.ts    # 工具方法，封装通用操作
+└── customer-portal.ts             # 客户端 helper，统一处理 Stripe Portal 跳转
 ```
 
 - **服务端组件 `money-price.tsx`**：在服务器端构造展示所需的文本与价格信息，支持动态模式选择（订阅/积分包/混合），负责渲染静态 DOM 结构和计费类型切换按钮。
+- **服务端 helper `money-price-data.ts`**：通过 `buildMoneyPriceData({ locale, currency, enabledBillingTypes? })` 生成完整的 `MoneyPriceData`，方便其它 Server Component（如积分弹窗）复用同一份翻译与配置。
 - **客户端组件 `money-price-interactive.tsx`**：注入交互行为（计费周期切换、动态价格更新、用户状态检测、工具提示等），支持配置驱动的计费类型过滤。
 - **按钮客户端组件 `money-price-button.tsx`**：独立封装按钮渲染与行为，支持订阅模式和OneTime模式的不同逻辑，依据 `UserContext` 与 `billingType` 决定按钮状态。
 - **配置与类型**：
   - `money-price-config-util.ts`：统一价格定位工具函数，支持订阅产品和积分包产品
   - `money-price-types.ts`：动态类型定义，支持任意计费类型扩展
   - `apps/ddaas/src/lib/money-price-config.ts`：业务层配置，分离订阅产品和积分包产品
+- **客户门户 helper `customer-portal.ts`**：暴露 `redirectToCustomerPortal({ customerPortalApiEndpoint, signInPath?, redirectToSignIn?, returnUrl? })`，页面与弹窗共享同一条跳转逻辑。
 
 ## 2. 数据来源与注入流程
 1. **国际化文案**：服务端组件通过 `getTranslations` 读取 `moneyPrice` 命名空间，支持分离的 `subscription` 和 `credits` 配置，获得标题、副标题、`billingSwitch`（支持 monthly/yearly/onetime）、各计划的特性列表、按钮文案。
@@ -31,6 +35,7 @@ money-price/
    - 根据选定的计费类型和计划渲染价格卡片结构
    - 支持 F1/P2/U3 统一产品键映射
    - 渲染计费类型切换按钮（monthly/yearly/onetime）
+   - 外部也可复用 `buildMoneyPriceData` 拿到同一份 `MoneyPriceData`；若需要默认切换到某个计费类型，只需在消费端覆盖 `billingSwitch.defaultKey`
 5. **客户端增强**：
    - `MoneyPriceInteractive` 接收服务端传入的 `data`、`config`、`enabledBillingTypes` 等参数
    - 配置驱动的计费类型过滤，移除硬编码约束
@@ -165,6 +170,7 @@ PaymentProviderConfig {
 - ✅ 新增 `enabledBillingTypes` 和 `mode` 属性支持灵活配置
 - ✅ 产品配置结构支持任意计费类型的 Record 结构
 - ✅ 分离 `SubscriptionProductConfig` 和 `CreditPackProductConfig` 类型
+- ✅ `buildMoneyPriceData` 可在任意 Server Component 中生成一致的 `MoneyPriceData`，避免重复拼接翻译
 
 #### 5.3.1 ✅ 场景化配置实现
 ```typescript
@@ -179,4 +185,18 @@ PaymentProviderConfig {
 
 // 自定义组合（如只支持年付和一次性）
 <MoneyPrice enabledBillingTypes={['yearly', 'onetime']} />
+
+// 模态弹窗：保留全部计费方式，仅调整默认选项
+const moneyPriceData = await buildMoneyPriceData({ locale, currency: '$' });
+<MoneyPriceInteractive
+  data={{ ...moneyPriceData, billingSwitch: { ...moneyPriceData.billingSwitch, defaultKey: 'onetime' } }}
+  config={moneyPriceConfig}
+  checkoutApiEndpoint="/api/stripe/checkout"
+  customerPortalApiEndpoint="/api/stripe/customer-portal"
+/>;
+
+### 5.4 ✅ 弹窗复用注意事项
+- 保持 `enabledBillingTypes` 未传或传入完整列表，确保弹窗里可以自由切换订阅 / 一次性视图。
+- 只需覆盖 `billingSwitch.defaultKey` 即可调整初始展示（如积分弹窗默认切到 `onetime`）。
+- `redirectToCustomerPortal` helper 已抽离，点击“管理订阅”时页面与弹窗都会走同一套 Portal 逻辑。
 ```

@@ -30,6 +30,7 @@ credit/                                                       # packages/third-u
 | `checkoutUrl: string` | “购买一次性积分”按钮跳转地址。 |
 | `buckets: CreditBucket[]` | 积分明细数组，至少建议包含 `free`、`subscription`、`onetime` 三种类型。 |
 | `subscription?: SubscriptionInfo` | 仅在有有效订阅时提供，用于渲染订阅信息卡片。 |
+| `pricingContext?: CreditPricingContext` | （可选）若提供则复用 Money Price 组件弹窗，按钮将不再使用纯跳转链接。 |
 
 `CreditBucket` 结构：
 - `kind: string`：积分类型标识，例如 `free`、`subscription`、`onetime`。组件会根据内置翻译自动展示标题，可通过 `label` 覆盖。
@@ -48,4 +49,10 @@ credit/                                                       # packages/third-u
 
 - credit-popover.tsx （业务侧 Server Component）
 - 翻译键位credit字段
-
+`CreditPricingContext` 结构：
+- `moneyPriceData: MoneyPriceData`：调用 `buildMoneyPriceData` 生成的多语言静态内容。
+- `moneyPriceConfig: MoneyPriceConfig`：与 Money Price 主区域共用的支付配置。
+- `checkoutApiEndpoint?: string`、`customerPortalApiEndpoint?: string`：Stripe 结算/门户接口。
+- `signInPath?: string`：若门户接口返回 401/403 时的 fallback 登录路径。
+- `enableSubscriptionUpgrade?: boolean`：沿用 Money Price 行为，用于控制订阅升级按钮是否可点击。
+- 若入口在积分弹窗中默认聚焦一次性计费，可在接入层通过 `moneyPriceData.billingSwitch.defaultKey = 'onetime'` 覆盖默认值，但不要过滤 `billingSwitch.options`，这样用户仍可切换订阅视图；弹窗会共用同一套 `redirectToCustomerPortal` 逻辑，并支持点击遮罩或按下 ESC 时关闭。

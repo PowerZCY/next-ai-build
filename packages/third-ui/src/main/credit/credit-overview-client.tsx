@@ -1,15 +1,24 @@
 'use client';
 
+import { useClerk } from '@clerk/nextjs';
 import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@windrun-huaiin/base-ui/ui';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   CreditBucket,
   CreditBucketStatus,
   CreditOverviewData,
   SubscriptionInfo,
 } from './types';
+import { MoneyPriceInteractive } from '../money-price/money-price-interactive';
+import { redirectToCustomerPortal } from '../money-price/customer-portal';
 
 export interface CreditOverviewTranslations {
   summaryDescription: string;
@@ -23,6 +32,8 @@ export interface CreditOverviewTranslations {
   subscribePay?: string;
   onetimeBuy: string;
 }
+
+type PricingModalMode = 'subscription' | 'onetime';
 
 interface CreditOverviewClientProps {
   data: CreditOverviewData;
@@ -63,6 +74,7 @@ export function CreditOverviewClient({
   className,
   expiringSoonThresholdDays = 7,
 }: CreditOverviewClientProps) {
+  const { redirectToSignIn } = useClerk();
   const buckets = useMemo<NormalizedBucket[]>(() => {
     return (data.buckets || []).map((bucket) => {
       const limit = Math.max(bucket.limit, 0);
@@ -94,6 +106,125 @@ export function CreditOverviewClient({
 
   const hasBuckets = buckets.length > 0;
   const subscription = data.subscription;
+  const pricingContext = data.pricingContext;
+  const [pricingModal, setPricingModal] = useState<{
+    open: boolean;
+    mode: PricingModalMode;
+  }>({
+    open: false,
+    mode: 'subscription',
+  });
+  const pricingContentRef = useRef<HTMLDivElement | null>(null);
+
+  const modalMoneyPriceData = useMemo(() => {
+    if (!pricingContext) {
+      return null;
+    }
+
+    if (pricingModal.mode !== 'onetime') {
+      return pricingContext.moneyPriceData;
+    }
+
+    const hasOnetimeOption = pricingContext.moneyPriceData.billingSwitch.options.some(
+      (option) => option.key === 'onetime',
+    );
+
+    if (!hasOnetimeOption) {
+      return pricingContext.moneyPriceData;
+    }
+
+    return {
+      ...pricingContext.moneyPriceData,
+      billingSwitch: {
+        ...pricingContext.moneyPriceData.billingSwitch,
+        defaultKey: 'onetime',
+      },
+    };
+  }, [pricingContext, pricingModal.mode]);
+
+  useEffect(() => {
+    if (!pricingModal.open) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!pricingContentRef.current) {
+        return;
+      }
+
+      const target = event.target as Node | null;
+      if (target && !pricingContentRef.current.contains(target)) {
+        setPricingModal((prev) => ({
+          ...prev,
+          open: false,
+        }));
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [pricingModal.open]);
+
+  const openPricingModal = useCallback(
+    (mode: PricingModalMode) => {
+      if (!pricingContext) {
+        return false;
+      }
+      setPricingModal({ open: true, mode });
+      return true;
+    },
+    [pricingContext],
+  );
+
+  const handleSubscribeAction = useCallback(() => {
+    if (subscription) {
+      return;
+    }
+
+    if (openPricingModal('subscription')) {
+      return;
+    }
+
+    if (data.subscribeUrl && data.subscribeUrl !== '#') {
+      window.location.href = data.subscribeUrl;
+    }
+  }, [data.subscribeUrl, openPricingModal, subscription]);
+
+  const handleManageAction = useCallback(async () => {
+    if (!subscription) {
+      return;
+    }
+
+    if (pricingContext) {
+      const handled = await redirectToCustomerPortal({
+        customerPortalApiEndpoint: pricingContext.customerPortalApiEndpoint,
+        signInPath: pricingContext.signInPath,
+        redirectToSignIn,
+      });
+      if (handled) {
+        return;
+      }
+    }
+
+    if (subscription.manageUrl && subscription.manageUrl !== '#') {
+      window.location.href = subscription.manageUrl;
+      return;
+    }
+
+    openPricingModal('subscription');
+  }, [openPricingModal, pricingContext, redirectToSignIn, subscription]);
+
+  const handleOnetimeAction = useCallback(() => {
+    if (openPricingModal('onetime')) {
+      return;
+    }
+
+    if (data.checkoutUrl && data.checkoutUrl !== '#') {
+      window.location.href = data.checkoutUrl;
+    }
+  }, [data.checkoutUrl, openPricingModal]);
 
   return (
     <section
@@ -122,12 +253,25 @@ export function CreditOverviewClient({
           </div>
           <div className="pt-0">
             <GradientButton
-              title={ subscription ? translations.subscriptionManage : translations.subscribePay }
-              href={ subscription ? subscription.manageUrl : data.subscribeUrl ?? "#" }
+              title={subscription ? translations.subscriptionManage : translations.subscribePay}
               align="center"
-              icon={subscription ? <icons.Settings2/> : <icons.Bell/>}
+              icon={subscription ? <icons.Settings2 /> : <icons.Bell />}
               openInNewTab={false}
               className="w-full rounded-full text-sm font-semibold"
+              onClick={
+                subscription
+                  ? handleManageAction
+                  : pricingContext
+                    ? handleSubscribeAction
+                    : undefined
+              }
+              href={
+                subscription
+                  ? subscription.manageUrl
+                  : pricingContext
+                    ? undefined
+                    : data.subscribeUrl ?? '#'
+              }
             />
           </div>
         </div>
@@ -187,12 +331,71 @@ export function CreditOverviewClient({
         )}
         <GradientButton
           title={translations.onetimeBuy}
-          href={data.checkoutUrl}
+          href={pricingContext ? undefined : data.checkoutUrl}
           icon={<icons.ShoppingCart />}
           align="center"
           className="w-full rounded-full text-sm font-semibold"
+          onClick={pricingContext ? handleOnetimeAction : undefined}
         />
       </section>
+      {pricingContext ? (
+        <AlertDialog
+          open={pricingModal.open}
+          onOpenChange={(open) =>
+            setPricingModal((prev) => ({
+              ...prev,
+              open,
+            }))
+          }
+        >
+          <AlertDialogContent
+            ref={pricingContentRef}
+            className="w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
+          >
+            <AlertDialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+              <AlertDialogTitle asChild>
+                <div className="flex flex-wrap items-baseline gap-3 text-slate-900 dark:text-white">
+                  <span className="text-2xl font-semibold leading-tight">
+                    {modalMoneyPriceData?.title}
+                  </span>
+                  {modalMoneyPriceData?.subtitle ? (
+                    <span className="text-sm font-medium text-slate-500 dark:text-slate-300">
+                      {modalMoneyPriceData.subtitle}
+                    </span>
+                  ) : null}
+                </div>
+              </AlertDialogTitle>
+              <button
+                type="button"
+                className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                onClick={() =>
+                  setPricingModal((prev) => ({
+                    ...prev,
+                    open: false,
+                  }))
+                }
+              >
+                <icons.X className="h-4 w-4" />
+              </button>
+            </AlertDialogHeader>
+            <div className="max-h-[80vh] overflow-y-auto px-4 py-6">
+              <div className="mx-auto w-full max-w-6xl px-2 sm:px-4 md:px-8">
+                {modalMoneyPriceData ? (
+                  <MoneyPriceInteractive
+                    key={pricingModal.mode}
+                    data={modalMoneyPriceData}
+                    config={pricingContext.moneyPriceConfig}
+                    checkoutApiEndpoint={pricingContext.checkoutApiEndpoint}
+                    customerPortalApiEndpoint={pricingContext.customerPortalApiEndpoint}
+                    signInPath={pricingContext.signInPath}
+                    enableSubscriptionUpgrade={pricingContext.enableSubscriptionUpgrade}
+                  />
+                ) : null}
+              </div>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : null}
     </section>
   );
 }
