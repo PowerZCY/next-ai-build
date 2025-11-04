@@ -103,7 +103,7 @@ export function CreditOverviewClient({
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-bl from-white via-indigo-400/90 to-purple-100/40 p-4 shadow-inner dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50">
+      <header className="relative rounded-2xl bg-gradient-to-bl from-indigo-200/60 via-slate-500/80 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-start rounded-full ">
             <icons.Gem aria-hidden className="h-8 w-8 mr-2" />
@@ -113,7 +113,7 @@ export function CreditOverviewClient({
             {formatNumber(locale, data.totalBalance)}
           </div>
           <div className="flex-1 flex-col gap-1">
-            <p className="text-sm text-gray-500 dark:text-slate-100">
+            <p className="text-sm text-gray-700 dark:text-slate-100">
               {translations.subscriptionPeriodLabel}
             </p>
             <h4 className="text-2xl font-semibold">
