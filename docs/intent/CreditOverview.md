@@ -9,93 +9,18 @@
 - 订阅区与所有 CTA 统一使用渐变体系，管理/订阅操作复用 `GradientButton`，`w-full` 下文字仍居中。
 - 积分桶列表为两行布局：首行展示类型、状态 Tag 与 `余额/上限` 比例，第二行展示渐变进度条和百分比。额外描述通过 hover/focus 提示呈现，文本过长时自动省略并提供 tooltip。
 
-## 快速上手
+## 组件分层总览
 
-```tsx
-// apps/ddaas/src/components/credit-popover.tsx （业务侧 Server Component）
-import { auth } from '@clerk/nextjs/server';
-import { getTranslations } from 'next-intl/server';
-import { CreditOverview } from '@third-ui/main/server';
-import type { CreditOverviewData } from '@third-ui/main/server';
-import { creditService, subscriptionService } from '@/services/database';
-import { CreditNavButton } from '@third-ui/main';
-
-export async function CreditPopover({ locale }: { locale: string }) {
-  const { userId } = await auth();
-  if (!userId) return null;
-
-  const [credit, subscription, t] = await Promise.all([
-    creditService.getCredit(userId),
-    subscriptionService.getActiveSubscription(userId),
-    getTranslations({ locale, namespace: 'credits' }),
-  ]);
-
-  if (!credit) return null;
-
-  const data: CreditOverviewData = {
-    totalBalance: credit.balanceFree + credit.balancePaid + credit.balanceOneTimePaid,
-    checkoutUrl: '#',
-    buckets: [
-      {
-        kind: 'free',
-        balance: credit.balanceFree,
-        limit: credit.totalFreeLimit,
-        expiresAt: credit.freeEnd?.toISOString(),
-      },
-      {
-        kind: 'subscription',
-        balance: credit.balancePaid,
-        limit: credit.totalPaidLimit,
-        expiresAt: (subscription?.subPeriodEnd ?? credit.paidEnd)?.toISOString(),
-      },
-      {
-        kind: 'onetime',
-        balance: credit.balanceOneTimePaid,
-        limit: credit.totalOneTimePaidLimit,
-        expiresAt: credit.oneTimePaidEnd?.toISOString(),
-      },
-    ],
-    subscription: subscription
-      ? {
-          planName: subscription.priceName ?? t('subscription.active'),
-          periodStart: (subscription.subPeriodStart ?? credit.paidStart ?? new Date()).toISOString(),
-          periodEnd: (subscription.subPeriodEnd ?? credit.paidEnd ?? new Date()).toISOString(),
-          manageUrl: '#',
-        }
-      : undefined,
-  };
-
-  return (
-    <CreditNavButton
-      locale={locale}
-      totalBalance={data.totalBalance}
-      totalLabel={t('summary.totalLabel')}
-    >
-      <CreditOverview locale={locale} data={data} />
-    </CreditNavButton>
-  );
-}
 ```
-
-```tsx
-// apps/ddaas/src/app/[locale]/layout.config.tsx
-import { CreditPopover } from '@/components/credit-popover';
-
-export async function homeNavLinks(locale: string) {
-  // ...
-  return [
-    // 其他导航项
-    {
-      type: 'custom',
-      secondary: true,
-      children: <CreditPopover locale={locale} />,
-    },
-    // ...
-  ];
-}
+components/                                         # apps/ddaas/src/components，业务侧组件目录
+├── credit-popover.tsx                         # 业务侧组件
+---------------------------------------
+credit/                                                       # packages/third-ui/src.main/credit目录，Credit通用封装组件目录
+├── credit-nav-button.tsx                    # 下拉组件按钮
+├── credit-overview-interactive.tsx  # 下拉详情客户端组件
+├── credit-overview.ts                          # 下拉详情服务端组件
+├── types.ts                                              # 类型定义  
 ```
-
-> 其中 `CreditNavButton` 为业务侧的客户端组件，负责导航按钮的交互外壳（触发器样式、展开/收起等），通过 `children` 渲染 `CreditOverview` 内容。最新版触发器仅展示积分图标与数字，详细文字信息会在弹层内或悬浮提示中体现；可根据品牌需求覆盖渐变、描边等视觉细节。
 
 ## 数据结构说明
 
@@ -119,53 +44,8 @@ export async function homeNavLinks(locale: string) {
 - `periodStart: string`、`periodEnd: string`：ISO 时间字符串，组件会按当前 locale 渲染。
 - `manageUrl: string`：管理订阅按钮跳转地址。
 
-## 翻译键位
+## 快速上手
 
-`CreditOverview` 会在服务端调用 `getTranslations({ locale, namespace: 'credit' })`，请在业务应用对应语言文件中提供如下 JSON 结构（缺失时组件会使用英文兜底）：
+- credit-popover.tsx （业务侧 Server Component）
+- 翻译键位credit字段
 
-```json
-{
-  "credit": {
-    "summary": {
-      "description": "展示当前所有渠道的剩余积分",
-      "totalLabel": "积分"
-    },
-    "buckets": {
-      "title": "积分明细",
-      "empty": "当前暂未获得任何积分",
-      "status": {
-        "active": "使用中",
-        "expiringSoon": "即将过期",
-        "expired": "已过期"
-      },
-      "labels": {
-        "free": "免费积分",
-        "subscription": "订阅积分",
-        "onetime": "一次性积分"
-      }
-    },
-    "subscription": {
-      "title": "订阅信息",
-      "active": "当前订阅",
-      "periodLabel": "账期",
-      "manage": "管理订阅",
-      "inactive": "暂无订阅",
-      "pay": "开启订阅"
-    },
-    "onetime": {
-      "buy": "购买一次性积分"
-    }
-  }
-}
-```
-
-可根据实际需要扩展 `credit.buckets.labels` 下的键名，以适配自定义的 `kind`。
-
-> 说明：`summary.description` 以及各桶的 `description` 会在界面中的信息提示按钮上展示，推荐保持文案精炼、避免换行。
-
-## 附加组件
-
-- `CreditOverviewClient`：客户端层渲染逻辑，通常无需直接使用。
-- `GradientButton`：位于 `@third-ui/fuma/mdx/gradient-button`，积分弹层内的行动按钮复用该组件以维持渐变风格和文字对齐。
-
-以上即为积分组件的使用方式和数据契约。若后续需要更多扩展（例如附加操作按钮、状态色彩定制），可在保持数据结构不变的前提下，通过自定义样式覆盖或提交改进需求。
