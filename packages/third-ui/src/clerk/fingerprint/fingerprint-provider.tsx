@@ -5,7 +5,7 @@ import { cn } from '@windrun-huaiin/lib/utils';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { FingerprintContextType, FingerprintProviderProps } from './types';
 import { useFingerprint } from './use-fingerprint';
-import { CopyableText } from '@base-ui/ui';
+import { CopyableText } from '@windrun-huaiin/base-ui/ui';
 
 const FingerprintContext = createContext<FingerprintContextType | undefined>(undefined);
 

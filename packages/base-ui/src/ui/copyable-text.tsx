@@ -15,7 +15,7 @@ export function CopyableText({ text, children }: { text: string; children?: Reac
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
-      console.error('复制失败:', err);
+      console.error('Copy failed:', err);
     }
   };
 
