@@ -1,13 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
-import { useFingerprint } from './use-fingerprint';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
-import { cn, viewLocalTime } from '@windrun-huaiin/lib/utils';
-import type { 
-  FingerprintContextType, 
-  FingerprintProviderProps 
-} from './types';
+import { cn } from '@windrun-huaiin/lib/utils';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { FingerprintContextType, FingerprintProviderProps } from './types';
+import { useFingerprint } from './use-fingerprint';
+import { CopyableText } from '@base-ui/ui';
 
 const FingerprintContext = createContext<FingerprintContextType | undefined>(undefined);
 
@@ -79,46 +77,26 @@ export function FingerprintStatus() {
 
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const [updatedAt, setUpdatedAt] = useState<string>('');
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+  const handleToggle = () => setIsOpen(prev => !prev);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      setIsOpen(false);
-    }
+    if (e.target === e.currentTarget) setIsOpen(false);
   };
 
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
+      if (e.key === 'Escape' && isOpen) setIsOpen(false);
     };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscKey);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
+    if (isOpen) document.addEventListener('keydown', handleEscKey);
+    return () => document.removeEventListener('keydown', handleEscKey);
   }, [isOpen]);
 
-  // 确保 xUser 更新后才渲染内容
   useEffect(() => {
     if (xUser && !xUser.fingerprintId) {
       console.warn('xUser.fingerprintId is missing:', xUser);
     }
   }, [xUser]);
-
-  useEffect(() => {
-    if (xUser || xCredit || xSubscription) {
-      setUpdatedAt(viewLocalTime(new Date()));
-    }
-  }, [xUser, xCredit, xSubscription]);
 
   const creditBuckets = useMemo(() => {
     if (!xCredit) return [];
@@ -162,7 +140,6 @@ export function FingerprintStatus() {
         period: '无记录',
       };
     }
-
     return {
       status: xSubscription.status ?? '--',
       priceName: xSubscription.priceName ?? '--',
@@ -173,84 +150,74 @@ export function FingerprintStatus() {
     };
   }, [xSubscription]);
 
+  const userStatus = xUser?.status || '--';
+  const totalCredits = formatNumber(xCredit?.totalBalance);
+  const subStatus = subscriptionStatus.status;
+
   return (
     <>
-      <button
-        onClick={handleToggle}
-        type="button"
-        aria-expanded={isOpen}
-        aria-label="切换 Fingerprint 调试面板"
-        className={cn(
-          'fixed left-6 top-6 z-[10000] inline-flex size-11 items-center justify-center rounded-full border border-white/40',
-          'bg-gradient-to-br from-purple-500 via-pink-500 to-rose-400 text-white shadow-lg transition-all duration-300',
-          'hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 dark:border-white/10',
-          'dark:from-purple-500 dark:via-pink-500 dark:to-rose-500'
-        )}
-      >
-        <icons.BTC
+      {/* 灯泡按钮 */}
+      {!isOpen && (
+        <button
+          onClick={handleToggle}
+          type="button"
+          aria-label="Fingerprint debug panel"
           className={cn(
-            'size-5 transition-transform duration-300',
-            isOpen ? 'rotate-180' : 'rotate-0'
+            'fixed left-3 top-3 z-[10000] inline-flex size-11 items-center justify-center rounded-full',
+            'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300',
           )}
-        />
-      </button>
+        >
+          <icons.Lightbulb className="size-6 text-white" />
+        </button>
+      )}
 
+      {/* 面板 */}
       {isOpen && (
         <>
-          <div
-            onClick={handleBackdropClick}
-            className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm"
-          />
+          <div onClick={handleBackdropClick} className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm" />
           <div
             ref={modalRef}
             className={cn(
-              'fixed left-6 z-[9999] w-[min(500px,95vw)] max-h-[95vh] overflow-y-auto rounded-2xl border',
+              'fixed left-3 top-1 z-[9999] w-[min(500px,95vw)] overflow-y-auto rounded-2xl border',
               'border-slate-200/70 bg-white/95 p-5 shadow-2xl backdrop-blur-sm',
               'font-sans text-sm text-slate-700',
               'dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200'
             )}
           >
-            <header className="mb-5 flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-xs tracking-wider text-slate-500 dark:text-slate-400">
+            <header className="mb-2 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2 text-base font-bold tracking-wider text-purple-600 dark:text-purple-500">
                 <icons.ShieldUser className="size-4" />
                 Fingerprint Debug Panel
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                数据面板时间：{updatedAt || '等待加载'}
-              </span>
             </header>
 
-            <section className="space-y-3">
+            <section className="space-y-1">
+              {/* 用户信息 */}
               <PanelSection
                 icon={<icons.Fingerprint className="size-4" />}
                 title="用户信息"
+                rightInfo={<StatusTag value={userStatus} />}
                 items={[
-                  { label: '用户 ID', value: xUser?.userId || '--' },
-                  { label: 'Fingerprint ID', value: xUser?.fingerprintId || fingerprintId || '--' },
-                  { label: '状态', value: xUser?.status || '--' },
-                  { label: 'Clerk 用户', value: xUser?.clerkUserId || '--' },
-                  { label: '邮箱', value: xUser?.email || '--' },
-                  { label: 'Stripe 客户', value: xUser?.stripeCusId || '--' },
+                  { label: '用户 ID', value: <CopyableText text={xUser?.userId || ''} /> },
+                  { label: 'Fingerprint ID', value: <CopyableText text={xUser?.fingerprintId || fingerprintId || ''} /> },
+                  { label: 'Clerk 用户', value: <CopyableText text={xUser?.clerkUserId || ''} /> },
+                  { label: '邮箱', value: <CopyableText text={xUser?.email || ''} /> },
+                  { label: 'Stripe 客户', value: <CopyableText text={xUser?.stripeCusId || ''} /> },
                   { label: '创建时间', value: xUser?.createdAt || '--' },
                 ]}
               />
+
+              {/* 积分信息 */}
               <div className="space-y-2 rounded-xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-white/12 dark:bg-slate-900/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-100">
-                    <span className="flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                      <icons.Gem className="size-4" />
-                    </span>
-                    <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-bold text-purple-600 dark:bg-purple-500/20 dark:text-purple-100">
-                      积分信息
-                    </span>
-                    <span>{formatNumber(xCredit?.totalBalance)}</span>
-                  </div>
-                </div>
+                <PanelHeader
+                  icon={<icons.Gem className="size-4" />}
+                  title="积分信息"
+                  rightInfo={<span className="text-purple-600 dark:text-purple-500 font-semibold">{totalCredits}</span>}
+                />
                 <div className="space-y-3">
                   {creditBuckets.length > 0 ? (
                     creditBuckets.map((bucket) => {
-                      const percentRaw = computeProgress(bucket.balance, bucket.total);
-                      const percent = Math.round(percentRaw * 100);
+                      const percent = Math.round(computeProgress(bucket.balance, bucket.total) * 100);
                       return (
                         <div key={bucket.key} className="rounded-lg border border-slate-200/70 bg-white/70 p-3 dark:border-white/10 dark:bg-slate-900/40">
                           <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-300">
@@ -281,17 +248,18 @@ export function FingerprintStatus() {
                 </div>
               </div>
 
+              {/* 订阅信息 */}
               <PanelSection
                 icon={<icons.Bell className="size-4" />}
                 title="订阅信息"
+                rightInfo={<StatusTag value={subStatus} />}
                 items={[
                   { label: '订阅方案', value: subscriptionStatus.priceName },
-                  { label: '订阅状态', value: subscriptionStatus.status },
                   { label: '有效期', value: subscriptionStatus.period },
                   { label: '分配额度', value: subscriptionStatus.creditsAllocated },
-                  { label: '订阅 ID', value: xSubscription?.paySubscriptionId || '--' },
-                  { label: 'Order ID', value: xSubscription?.orderId || '--' },
-                  { label: 'Price ID', value: xSubscription?.priceId || '--' },
+                  { label: '订阅 ID', value: <CopyableText text={xSubscription?.paySubscriptionId || ''} /> },
+                  { label: 'Order ID', value: <CopyableText text={xSubscription?.orderId || ''} /> },
+                  { label: 'Price ID', value: <CopyableText text={xSubscription?.priceId || ''} /> },
                 ]}
               />
 
@@ -309,16 +277,14 @@ export function FingerprintStatus() {
   );
 }
 
-interface PanelSectionProps {
-  icon: React.ReactNode;
-  title: string;
-  items: Array<{ label: string; value: React.ReactNode }>;
-}
 
-function PanelSection({ icon, title, items }: PanelSectionProps) {
+/* ==================== 新增辅助组件 ==================== */
+
+// 标题行：左侧图标+标题，右侧信息（右对齐）
+function PanelHeader({ icon, title, rightInfo }: { icon: React.ReactNode; title: string; rightInfo: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-slate-200/70 bg-white/85 p-4 shadow-sm dark:border-white/12 dark:bg-slate-900/45">
-      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-100">
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-100">
         <span className="flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           {icon}
         </span>
@@ -326,6 +292,25 @@ function PanelSection({ icon, title, items }: PanelSectionProps) {
           {title}
         </span>
       </div>
+      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+        {rightInfo}
+      </span>
+    </div>
+  );
+}
+
+// 复用：普通 PanelSection 支持右侧信息
+interface PanelSectionProps {
+  icon: React.ReactNode;
+  title: string;
+  rightInfo?: React.ReactNode;
+  items: Array<{ label: string; value: React.ReactNode }>;
+}
+
+function PanelSection({ icon, title, rightInfo, items }: PanelSectionProps) {
+  return (
+    <div className="rounded-xl border border-slate-200/70 bg-white/85 p-4 shadow-sm dark:border-white/12 dark:bg-slate-900/45">
+      <PanelHeader icon={icon} title={title} rightInfo={rightInfo} />
       <dl className="grid grid-cols-1 gap-y-1.5 text-xs text-slate-500 dark:text-slate-300">
         {items.map((item) => (
           <div key={item.label} className="flex items-center justify-between gap-3">
@@ -380,4 +365,42 @@ function formatRangeText(start: string | null | undefined, end: string | null | 
   }
 
   return `${safeStart} - ${safeEnd}`;
+}
+
+function StatusTag({ value }: { value: string | undefined | null }) {
+  if (!value) return <span className="text-slate-400">None</span>;
+
+  const normalized = value.toLowerCase();
+
+  const colorMap: Record<string, string> = {
+    // 绿色：正常/活跃
+    registered: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+    active: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+    trialing: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300',
+
+    // 灰色：失效/删除
+    canceled: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400',
+    frozen: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400',
+    deleted: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400',
+    expired: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400',
+    past_due: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400',
+
+    // 橙色：待处理/异常
+    pending: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    failed: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    unpaid: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+    incomplete: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+  };
+
+  const defaultColor = 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400';
+  const badgeClass = colorMap[normalized] || defaultColor;
+
+  return (
+    <span className={cn(
+      'inline-block rounded-full px-2 py-0.5 text-xs capitalize font-medium',
+      badgeClass
+    )}>
+      {value}
+    </span>
+  );
 }

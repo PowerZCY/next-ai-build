@@ -78,6 +78,7 @@ export {
   Layout,
   LayoutTemplate,
   LibraryIcon,
+  Lightbulb,
   Link,
   ListTodo,
   Loader2,
