@@ -234,7 +234,7 @@ export function CreditOverviewClient({
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-gradient-to-bl from-indigo-200/60 via-slate-500/80 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
+      <header className="relative rounded-2xl bg-gradient-to-bl from-indigo-200/60 via-indigo-400/90 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-start rounded-full ">
             <icons.Gem aria-hidden className="h-8 w-8 mr-2" />
