@@ -126,7 +126,7 @@ export function FingerprintStatus() {
       {
         key: 'paid',
         label: '订阅积分',
-        icon: <icons.Settings2 className="size-4 text-indigo-500 dark:text-indigo-300" />,
+        icon: <icons.Settings2 className="size-4 text-green-500 dark:text-green-300" />,
         balance: xCredit.balancePaid,
         total: xCredit.totalPaidLimit,
         start: xCredit.paidStart,
@@ -204,19 +204,19 @@ export function FingerprintStatus() {
           <div
             ref={modalRef}
             className={cn(
-              'fixed left-6 top-10 z-[9999] w-[min(500px,90vw)] max-h-[80vh] overflow-y-auto rounded-2xl border',
+              'fixed left-6 z-[9999] w-[min(500px,95vw)] max-h-[95vh] overflow-y-auto rounded-2xl border',
               'border-slate-200/70 bg-white/95 p-5 shadow-2xl backdrop-blur-sm',
               'font-sans text-sm text-slate-700',
               'dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200'
             )}
           >
             <header className="mb-5 flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-2 text-xs tracking-wider text-slate-500 dark:text-slate-400">
                 <icons.ShieldUser className="size-4" />
                 Fingerprint Debug Panel
               </div>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                数据更新：{updatedAt || '等待加载'}
+                数据面板时间：{updatedAt || '等待加载'}
               </span>
             </header>
 
