@@ -7,6 +7,7 @@ export interface XUser {
   userId: string;
   fingerprintId: string;
   clerkUserId: string,
+  stripeCusId: string,
   email: string,
   status: string;
   createdAt: string;
@@ -14,7 +15,20 @@ export interface XUser {
 
 export interface XCredit {
   balanceFree: number;
+  totalFreeLimit: number;
+  freeStart: string
+  freeEnd: string
+  
   balancePaid: number;
+  totalPaidLimit: number;
+  paidStart: string
+  paidEnd: string
+
+  balanceOneTimePaid: number;
+  totalOneTimePaidLimit: number;
+  oneTimePaidStart: string
+  oneTimePaidEnd: string
+
   totalBalance: number;
 }
 
@@ -22,6 +36,7 @@ export interface XSubscription {
   id: bigint
   userId: string
   paySubscriptionId: string | null
+  orderId: string | null
   priceId: string | null
   priceName: string | null
   status: string

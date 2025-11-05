@@ -12,6 +12,7 @@ import { userAggregateService }  from '@/agg/index';
 import { UserStatus } from '@/db/constants';
 import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';
 import { XUser, XCredit, XSubscription } from '@third-ui/clerk/fingerprint';
+import { viewLocalTime } from '@lib/utils';
 
 
 // ==================== 类型定义 ====================
@@ -40,6 +41,7 @@ function createUserInfo(user: User): XUser {
     userId: user.userId,
     fingerprintId: user.fingerprintId || '',
     clerkUserId: user.clerkUserId || '',
+    stripeCusId: user.stripeCusId || '',
     email: user.email || '',
     status: user.status,
     createdAt: user.createdAt?.toISOString() || '',
@@ -50,8 +52,18 @@ function createUserInfo(user: User): XUser {
 function createCreditsInfo(credit: Credit): XCredit {
   return {
     balanceFree: credit.balanceFree,
+    totalFreeLimit: credit.totalFreeLimit,
+    freeStart: viewLocalTime(credit.freeStart),
+    freeEnd: viewLocalTime(credit.freeEnd),
     balancePaid: credit.balancePaid,
-    totalBalance: credit.balanceFree + credit.balancePaid,
+    totalPaidLimit: credit.totalPaidLimit,
+    paidStart: viewLocalTime(credit.paidStart),
+    paidEnd: viewLocalTime(credit.paidEnd),
+    balanceOneTimePaid: credit.balanceOneTimePaid,
+    totalOneTimePaidLimit: credit.totalOneTimePaidLimit,
+    oneTimePaidStart: viewLocalTime(credit.oneTimePaidStart),
+    oneTimePaidEnd: viewLocalTime(credit.oneTimePaidEnd),
+    totalBalance: credit.balanceFree + credit.balancePaid + credit.balanceOneTimePaid,
   };
 }
 
@@ -65,12 +77,13 @@ function createSubscriptionInfo(subscription: Subscription | null): XSubscriptio
     id: subscription.id,
     userId: subscription.userId || '',
     paySubscriptionId: subscription.paySubscriptionId || '',
+    orderId: subscription.orderId || '',
     priceId: subscription.priceId || '',
     priceName: subscription.priceName || '',
     status: subscription.status || '',
     creditsAllocated: subscription.creditsAllocated,
-    subPeriodStart: subscription.subPeriodStart?.toISOString() || '',
-    subPeriodEnd: subscription.subPeriodEnd?.toISOString() || ''
+    subPeriodStart: viewLocalTime(subscription.subPeriodStart),
+    subPeriodEnd: viewLocalTime(subscription.subPeriodEnd)
   };
 }
 
@@ -103,7 +116,6 @@ function createErrorResponse(message: string, status = 400): NextResponse {
 
 /**
  * 根据fingerprint_id查询用户并返回响应数据
- * 共用逻辑：优先返回匿名用户，只有匿名用户才返回积分数据
  */
 async function getUserByFingerprintId(fingerprintId: string): Promise<XUserResponse | null> {
   const existingUsers = await userService.findListByFingerprintId(fingerprintId);
@@ -113,40 +125,21 @@ async function getUserByFingerprintId(fingerprintId: string): Promise<XUserRespo
   }
 
   // 查找最新的匿名用户
-  const anonymousUsers = existingUsers.filter(u => u.status === UserStatus.ANONYMOUS);
-  const latestAnonymousUser = anonymousUsers.length > 0 ? anonymousUsers[0] : null;
+  const latestAnonymousUser = existingUsers[0];
+  // 找到匿名用户，返回匿名用户信息和积分
+  const credit = await creditService.getCredit(latestAnonymousUser.userId);
+  const subscription = await subscriptionService.getActiveSubscription(latestAnonymousUser.userId);
   
-  if (latestAnonymousUser) {
-    // 找到匿名用户，返回匿名用户信息和积分
-    const credit = await creditService.getCredit(latestAnonymousUser.userId);
-    const subscription = await subscriptionService.getActiveSubscription(latestAnonymousUser.userId);
-    
-    return createSuccessResponse(
-      latestAnonymousUser,
-      credit,
-      subscription,
-      false,
-      {
-        totalUsersOnDevice: existingUsers.length,
-        hasAnonymousUser: true,
-      }
-    );
-  } else {
-    // 没有匿名用户，说明该设备用户都已注册，不返回积分数据
-    const latestUser = existingUsers[0];
-    const subscription = await subscriptionService.getActiveSubscription(latestUser.userId);
-    
-    return createSuccessResponse(
-      latestUser,
-      null, // 注册用户不返回积分数据
-      subscription,
-      false,
-      {
-        totalUsersOnDevice: existingUsers.length,
-        hasAnonymousUser: false,
-      }
-    );
-  }
+  return createSuccessResponse(
+    latestAnonymousUser,
+    credit,
+    subscription,
+    false,
+    {
+      totalUsersOnDevice: existingUsers.length,
+      hasAnonymousUser: true,
+    }
+  );
 }
 
 /**
@@ -212,6 +205,7 @@ function checkMock(existingUserResult: XUserResponse) {
           id: BigInt(99999),
           userId: existingUserResult.xUser.userId,
           paySubscriptionId: 'MOCK-PAY-SUB-ID',
+          orderId: '',
           priceId: '',
           priceName: 'MOCK-TEST',
           status: 'active',

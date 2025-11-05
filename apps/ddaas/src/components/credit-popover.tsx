@@ -1,6 +1,6 @@
 import { creditService, subscriptionService, userService } from '@/db/index';
 import { auth } from '@clerk/nextjs/server';
-import { formatTimestamp } from '@lib/utils';
+import { viewLocalTime } from '@lib/utils';
 import { CreditNavButton } from '@third-ui/main';
 import type { CreditOverviewData } from '@third-ui/main/server';
 import { CreditOverview, buildMoneyPriceData } from '@third-ui/main/server';
@@ -58,10 +58,7 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
           kind: 'subscription' as const,
           balance: credit.balancePaid,
           limit: credit.totalPaidLimit,
-          expiresAt: formatTimestamp(
-            credit.paidEnd?.getTime().toString() ?? "",
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          expiresAt: viewLocalTime(credit.paidEnd)
         }] 
       : []),
 
@@ -70,10 +67,7 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
           kind: 'onetime' as const,
           balance: credit.balanceOneTimePaid,
           limit: credit.totalOneTimePaidLimit,
-          expiresAt: formatTimestamp(
-            credit.oneTimePaidEnd?.getTime().toString() ?? "",
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          expiresAt: viewLocalTime(credit.oneTimePaidEnd)
         }] 
       : []),
 
@@ -82,11 +76,8 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
           kind: 'free' as const,
           balance: credit.balanceFree,
           limit: credit.totalFreeLimit,
-          expiresAt: formatTimestamp(
-            credit.freeEnd?.getTime().toString() ?? "",
-            'yyyy-MM-dd HH:mm:ss'
-          )
-        }] 
+          expiresAt: viewLocalTime(credit.freeEnd)
+         }] 
       : [])
   ];
 

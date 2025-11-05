@@ -7,6 +7,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function viewLocalTime(origin: Date | null) {
+  return formatTimestamp(origin?.getTime().toString() ?? "", 'yyyy-mm-dd HH:MM:SS');
+}
+
 export function formatTimestamp(timestamp: string, formatter: string) {
   const fail = "";
   if (!timestamp) {
