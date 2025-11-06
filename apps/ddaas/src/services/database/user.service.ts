@@ -13,6 +13,7 @@ export class UserService {
     clerkUserId?: string;
     stripeCusId?: string;
     email?: string;
+    userName?: string;
     status?: string;
   }, tx?: Prisma.TransactionClient): Promise<User> {
     const client = checkAndFallbackWithNonTCClient(tx);
@@ -23,6 +24,7 @@ export class UserService {
         clerkUserId: data.clerkUserId,
         stripeCusId: data.stripeCusId,
         email: data.email,
+        userName: data.userName,
         status: data.status || UserStatus.ANONYMOUS,
       },
     });
@@ -34,17 +36,6 @@ export class UserService {
 
     return await client.user.findUnique({
       where: { userId },
-      select: {
-        id: true,
-        userId: true,
-        fingerprintId: true,
-        clerkUserId: true,
-        stripeCusId: true,
-        email: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true
-      },
     });
   }
 
@@ -54,17 +45,6 @@ export class UserService {
 
     return await client.user.findFirst({
       where: { email },
-      select: {
-        id: true,
-        userId: true,
-        fingerprintId: true,
-        clerkUserId: true,
-        stripeCusId: true,
-        email: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true
-      },
     });
   }
 
@@ -73,17 +53,11 @@ export class UserService {
     const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.findMany({
-      where: { fingerprintId },
-      select: {
-        id: true,
-        userId: true,
-        fingerprintId: true,
-        clerkUserId: true,
-        stripeCusId: true,
-        email: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true
+      where: { 
+        fingerprintId, 
+        status: {
+          not: UserStatus.DELETED
+        }
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -93,19 +67,14 @@ export class UserService {
   async findByClerkUserId(clerkUserId: string, tx?: Prisma.TransactionClient): Promise<User | null> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
+    // DB的部分索引与这里的状态查询相对应，因而可以使用findUnique
     return await client.user.findUnique({
-      where: { clerkUserId },
-      select: {
-        id: true,
-        userId: true,
-        fingerprintId: true,
-        clerkUserId: true,
-        stripeCusId: true,
-        email: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true
-      },
+      where: { 
+        clerkUserId,
+        status: {
+          not: UserStatus.DELETED
+        }
+       }
     });
   }
 
@@ -142,6 +111,7 @@ export class UserService {
     data: {
       email: string;
       clerkUserId: string;
+      userName?: string;
     },
     tx?: Prisma.TransactionClient
   ): Promise<User> {
@@ -152,13 +122,13 @@ export class UserService {
       data: {
         email: data.email,
         clerkUserId: data.clerkUserId,
+        userName: data.userName || undefined,
         status: UserStatus.REGISTERED,
       },
     });
   }
 
-  // Soft delete user (mark as deleted)
-  async softDeleteUser(userId: string, tx?: Prisma.TransactionClient): Promise<User> {
+  async unregister(userId: string, tx?: Prisma.TransactionClient): Promise<User> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
     return await client.user.update({
@@ -187,17 +157,6 @@ export class UserService {
         skip,
         take,
         orderBy,
-        select: {
-          id: true,
-          userId: true,
-          fingerprintId: true,
-          clerkUserId: true,
-          stripeCusId: true,
-          email: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true
-        },
       }),
       client.user.count({ where }),
     ]);

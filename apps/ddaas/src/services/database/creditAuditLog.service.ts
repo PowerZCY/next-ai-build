@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Prisma } from '@/db/prisma-model-type';
-import type { CreditUsage } from '@/db/prisma-model-type';
+import type { CreditAuditLog } from '@/db/prisma-model-type';
 import { CreditType, OperationType } from '@/db/constants';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 
-export class CreditUsageService {
+export class CreditAuditLogService {
 
-  // Record Credit Usage
-  async recordUsage(data: {
+  // Record Credit Audit
+  async recordAuditLog(data: {
     userId: string;
     feature?: string;
-    orderId?: string;
+    operationReferId?: string;
     creditType: string;
     operationType: string;
-    creditsUsed: number;
-  }, tx?: Prisma.TransactionClient): Promise<CreditUsage> {
+    creditsChange: number;
+  }, tx?: Prisma.TransactionClient): Promise<CreditAuditLog> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.creditUsage.create({
+    return await client.creditAuditLog.create({
       data: {
         userId: data.userId,
         feature: data.feature,
-        orderId: data.orderId,
+        operationReferId: data.operationReferId,
         creditType: data.creditType,
         operationType: data.operationType,
-        creditsUsed: data.creditsUsed,
+        creditsChange: data.creditsChange,
       },
     });
   }
@@ -34,28 +34,28 @@ export class CreditUsageService {
   async recordCreditOperation(data: {
     userId: string;
     feature?: string;
-    orderId?: string;
+    operationReferId?: string;
     creditType: string;
     operationType: string;
-    creditsUsed: number;
-  }, tx?: Prisma.TransactionClient): Promise<CreditUsage> {
-    return this.recordUsage(data, tx);
+    creditsChange: number;
+  }, tx?: Prisma.TransactionClient): Promise<CreditAuditLog> {
+    return this.recordAuditLog(data, tx);
   }
 
-  // Batch Record Credit Usage
-  async recordBatchUsage(
-    usages: Prisma.CreditUsageCreateManyInput[],
+  // Batch Record Credit Audit
+  async recordBatchAudit(
+    auditLogs: Prisma.CreditAuditLogCreateManyInput[],
     tx?: Prisma.TransactionClient
   ): Promise<number> {
     const client = checkAndFallbackWithNonTCClient(tx);
-    const result = await client.creditUsage.createMany({
-      data: usages,
+    const result = await client.creditAuditLog.createMany({
+      data: auditLogs,
     });
     return result.count;
   }
 
-  // Get User Credit Usage History
-  async getUserUsageHistory(
+  // Get User Credit Audit History
+  async getUserCreditAuditHistory(
     userId: string,
     params?: {
       creditType?: string;
@@ -65,12 +65,12 @@ export class CreditUsageService {
       endDate?: Date;
       skip?: number;
       take?: number;
-      orderBy?: Prisma.CreditUsageOrderByWithRelationInput;
+      orderBy?: Prisma.CreditAuditLogOrderByWithRelationInput;
     },
     tx?: Prisma.TransactionClient
-  ): Promise<{ usage: CreditUsage[]; total: number }> {
+  ): Promise<{ creditAudit: CreditAuditLog[]; total: number }> {
     const client = checkAndFallbackWithNonTCClient(tx);
-    const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
+    const where: Prisma.CreditAuditLogWhereInput = { userId, deleted: 0 };
 
     if (params?.creditType) {
       where.creditType = params.creditType;
@@ -90,31 +90,31 @@ export class CreditUsageService {
       if (params.endDate) where.createdAt.lte = params.endDate;
     }
 
-    const [usage, total] = await Promise.all([
-      client.creditUsage.findMany({
+    const [creditAudit, total] = await Promise.all([
+      client.creditAuditLog.findMany({
         where,
         skip: params?.skip || 0,
         take: params?.take || 20,
         orderBy: params?.orderBy || { createdAt: 'desc' },
       }),
-      client.creditUsage.count({ where }),
+      client.creditAuditLog.count({ where }),
     ]);
 
-    return { usage, total };
+    return { creditAudit, total };
   }
 
-  // Get Credit Usage Record by Order ID
-  async getOrderUsage(orderId: string, tx?: Prisma.TransactionClient): Promise<CreditUsage[]> {
+  // Get Credit Audit Record by  operationReferId
+  async getCreditAuditList(operationReferId: string, tx?: Prisma.TransactionClient): Promise<CreditAuditLog[]> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.creditUsage.findMany({
-      where: { orderId, deleted: 0 },
+    return await client.creditAuditLog.findMany({
+      where: { operationReferId, deleted: 0 },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  // Get User Credit Usage Statistics
-  async getUserUsageStats(
+  // Get User Credit Audit Statistics
+  async getUserCreditAuditStats(
     userId: string,
     startDate?: Date,
     endDate?: Date,
@@ -129,7 +129,7 @@ export class CreditUsageService {
     featureUsage: { feature: string; credits: number }[];
   }> {
     const client = checkAndFallbackWithNonTCClient(tx);
-    const where: Prisma.CreditUsageWhereInput = { userId, deleted: 0 };
+    const where: Prisma.CreditAuditLogWhereInput = { userId, deleted: 0 };
 
     if (startDate || endDate) {
       where.createdAt = {};
@@ -137,13 +137,13 @@ export class CreditUsageService {
       if (endDate) where.createdAt.lte = endDate;
     }
 
-    // Get all usage records
-    const allUsage = await client.creditUsage.findMany({
+    // Get all creditAudit records
+    const allUsage = await client.creditAuditLog.findMany({
       where,
       select: {
         creditType: true,
         operationType: true,
-        creditsUsed: true,
+        creditsChange: true,
         feature: true,
       },
     });
@@ -159,35 +159,35 @@ export class CreditUsageService {
       featureUsage: [] as any[],
     };
 
-    // Calculate usage statistics by feature
+    // Calculate creditAudit statistics by feature
     const featureMap = new Map<string, number>();
 
-    allUsage.forEach((usage) => {
-      if (usage.operationType === OperationType.CONSUME) {
-        stats.totalConsumed += usage.creditsUsed;
-        if (usage.creditType === CreditType.FREE) {
-          stats.freeConsumed += usage.creditsUsed;
+    allUsage.forEach((creditAudit) => {
+      if (creditAudit.operationType === OperationType.CONSUME) {
+        stats.totalConsumed += creditAudit.creditsChange;
+        if (creditAudit.creditType === CreditType.FREE) {
+          stats.freeConsumed += creditAudit.creditsChange;
         } else {
-          stats.paidConsumed += usage.creditsUsed;
+          stats.paidConsumed += creditAudit.creditsChange;
         }
 
-        if (usage.feature) {
+        if (creditAudit.feature) {
           featureMap.set(
-            usage.feature,
-            (featureMap.get(usage.feature) || 0) + usage.creditsUsed
+            creditAudit.feature,
+            (featureMap.get(creditAudit.feature) || 0) + creditAudit.creditsChange
           );
         }
-      } else if (usage.operationType === OperationType.RECHARGE) {
-        stats.totalRecharged += usage.creditsUsed;
-        if (usage.creditType === CreditType.FREE) {
-          stats.freeRecharged += usage.creditsUsed;
+      } else if (creditAudit.operationType === OperationType.RECHARGE) {
+        stats.totalRecharged += creditAudit.creditsChange;
+        if (creditAudit.creditType === CreditType.FREE) {
+          stats.freeRecharged += creditAudit.creditsChange;
         } else {
-          stats.paidRecharged += usage.creditsUsed;
+          stats.paidRecharged += creditAudit.creditsChange;
         }
       }
     });
 
-    // Convert feature usage statistics to array
+    // Convert feature creditAudit statistics to array
     stats.featureUsage = Array.from(featureMap.entries())
       .map(([feature, credits]) => ({ feature, credits }))
       .sort((a, b) => b.credits - a.credits);
@@ -203,7 +203,7 @@ export class CreditUsageService {
     tx?: Prisma.TransactionClient
   ): Promise<{ feature: string | null; totalCredits: number; usageCount: number }[]> {
     const client = checkAndFallbackWithNonTCClient(tx);
-    const where: Prisma.CreditUsageWhereInput = {
+    const where: Prisma.CreditAuditLogWhereInput = {
       operationType: OperationType.CONSUME,
       feature: { not: null },
       deleted: 0,
@@ -215,16 +215,16 @@ export class CreditUsageService {
       if (endDate) where.createdAt.lte = endDate;
     }
 
-    const result = await client.creditUsage.groupBy({
+    const result = await client.creditAuditLog.groupBy({
       by: ['feature'],
       where,
       _sum: {
-        creditsUsed: true,
+        creditsChange: true,
       },
       _count: true,
       orderBy: {
         _sum: {
-          creditsUsed: 'desc',
+          creditsChange: 'desc',
         },
       },
       take: limit,
@@ -232,7 +232,7 @@ export class CreditUsageService {
 
     return result.map((item) => ({
       feature: item.feature,
-      totalCredits: item._sum.creditsUsed || 0,
+      totalCredits: item._sum.creditsChange || 0,
       usageCount: item._count,
     }));
   }
@@ -289,10 +289,10 @@ export class CreditUsageService {
     userId: string,
     limit: number = 10,
     tx?: Prisma.TransactionClient
-  ): Promise<CreditUsage[]> {
+  ): Promise<CreditAuditLog[]> {
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    return await client.creditUsage.findMany({
+    return await client.creditAuditLog.findMany({
       where: { userId, deleted: 0 },
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -306,7 +306,7 @@ export class CreditUsageService {
 
     const client = checkAndFallbackWithNonTCClient(tx);
 
-    const result = await client.creditUsage.updateMany({
+    const result = await client.creditAuditLog.updateMany({
       where: {
         createdAt: {
           lt: cutoffDate,
@@ -337,25 +337,25 @@ export class CreditUsageService {
       consumeStats,
       rechargeStats,
     ] = await Promise.all([
-      client.creditUsage.groupBy({
+      client.creditAuditLog.groupBy({
         by: ['userId'],
         where: { deleted: 0 },
       }).then((result) => result.length),
-      client.creditUsage.count({ where: { deleted: 0 } }),
-      client.creditUsage.aggregate({
+      client.creditAuditLog.count({ where: { deleted: 0 } }),
+      client.creditAuditLog.aggregate({
         where: { operationType: OperationType.CONSUME, deleted: 0 },
-        _sum: { creditsUsed: true },
+        _sum: { creditsChange: true },
         _count: true,
       }),
-      client.creditUsage.aggregate({
+      client.creditAuditLog.aggregate({
         where: { operationType: OperationType.RECHARGE, deleted: 0 },
-        _sum: { creditsUsed: true },
+        _sum: { creditsChange: true },
         _count: true,
       }),
     ]);
 
     // Calculate operating days (from first record to now)
-    const firstRecord = await client.creditUsage.findFirst({
+    const firstRecord = await client.creditAuditLog.findFirst({
       where: { deleted: 0 },
       orderBy: { createdAt: 'asc' },
       select: { createdAt: true },
@@ -365,8 +365,8 @@ export class CreditUsageService {
       ? Math.ceil((Date.now() - firstRecord.createdAt.getTime()) / (1000 * 60 * 60 * 24))
       : 1;
 
-    const totalConsumed = consumeStats._sum.creditsUsed || 0;
-    const totalRecharged = rechargeStats._sum.creditsUsed || 0;
+    const totalConsumed = consumeStats._sum.creditsChange || 0;
+    const totalRecharged = rechargeStats._sum.creditsChange || 0;
 
     return {
       totalUsers,
@@ -381,15 +381,15 @@ export class CreditUsageService {
   // Check for Duplicate Operations
   async isDuplicateOperation(
     userId: string,
-    orderId: string,
+    operationReferId: string,
     operationType: string,
     tx?: Prisma.TransactionClient
   ): Promise<boolean> {
     const client = checkAndFallbackWithNonTCClient(tx);
-    const count = await client.creditUsage.count({
+    const count = await client.creditAuditLog.count({
       where: {
         userId,
-        orderId,
+        operationReferId,
         operationType,
         deleted: 0,
       },
@@ -399,4 +399,4 @@ export class CreditUsageService {
   }
 }
 
-export const creditUsageService = new CreditUsageService();
+export const creditAuditLogService = new CreditAuditLogService();

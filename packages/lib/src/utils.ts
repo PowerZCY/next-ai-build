@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function viewLocalTime(origin: Date | null) {
-  return formatTimestamp(origin?.getTime().toString() ?? "", 'yyyy-mm-dd HH:MM:SS');
+  return formatTimestamp(origin?.getTime().toString() ?? "", 'yyyy-MM-dd HH:mm:ss');
 }
 
 export function formatTimestamp(timestamp: string, formatter: string) {

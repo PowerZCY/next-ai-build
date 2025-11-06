@@ -1,9 +1,9 @@
 import { Prisma } from '@/db/prisma-model-type';
-import type { Credit, CreditUsage } from '@/db/prisma-model-type';
+import type { Credit, CreditAuditLog } from '@/db/prisma-model-type';
 import { CreditType, OperationType } from '@/db/constants';
-import { freeAmount, freeExpiredDays } from '@/lib/appConfig';
+import { freeExpiredDays } from '@/lib/appConfig';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
-import { creditUsageService } from '@/db/index';
+import { creditAuditLogService } from '@/db/index';
 
 type CreditAmounts = {
   free?: number;
@@ -22,7 +22,7 @@ type CreditOperationOptions = {
   operationType: typeof OperationType[keyof typeof OperationType];
   updateMode: 'increment' | 'decrement';
   feature?: string;
-  orderId?: string;
+  operationReferId: string;
   limitAdjustments?: CreditLimitAdjustments;
   defaultLimitAdjustmentsToAmounts?: boolean;
   ensureSufficientBalance?: boolean;
@@ -171,7 +171,7 @@ export class CreditService {
     amounts: CreditAmounts,
     options: CreditOperationOptions,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     const normalized = this.normalizeAmounts(amounts);
     this.ensureNonNegative(normalized, options.context);
 
@@ -213,70 +213,70 @@ export class CreditService {
       data,
     });
 
-    const usage = await this.recordCreditUsage(client, userId, options.operationType, normalized, {
+    const usage = await this.recordCreditAuditLog(client, userId, options.operationType, normalized, {
       feature: options.feature,
-      orderId: options.orderId,
+      operationReferId: options.operationReferId,
     });
 
     return { credit, usage };
   }
 
-  private async recordCreditUsage(
+  private async recordCreditAuditLog(
     client: Prisma.TransactionClient,
     userId: string,
     operationType: string,
     amounts: Required<CreditAmounts>,
     options: {
       feature?: string;
-      orderId?: string;
-    } = {}
-  ): Promise<CreditUsage[]> {
-    const usagePayload: Prisma.CreditUsageUncheckedCreateInput[] = [];
+      operationReferId: string;
+    }
+  ): Promise<CreditAuditLog[]> {
+    const auditPayload: Prisma.CreditAuditLogUncheckedCreateInput[] = [];
 
     if (amounts.free > 0) {
-      usagePayload.push({
+      auditPayload.push({
         userId,
         feature: options.feature,
-        orderId: options.orderId,
+        operationReferId: options.operationReferId,
         creditType: CreditType.FREE,
         operationType,
-        creditsUsed: amounts.free,
+        creditsChange: amounts.free,
       });
     }
 
     if (amounts.paid > 0) {
-      usagePayload.push({
+      auditPayload.push({
         userId,
         feature: options.feature,
-        orderId: options.orderId,
+        operationReferId: options.operationReferId,
         creditType: CreditType.PAID,
         operationType,
-        creditsUsed: amounts.paid,
+        creditsChange: amounts.paid,
       });
     }
 
     if (amounts.oneTimePaid > 0) {
-      usagePayload.push({
+      auditPayload.push({
         userId,
         feature: options.feature,
-        orderId: options.orderId,
+        operationReferId: options.operationReferId,
         creditType: CreditType.ONE_TIME_PAID,
         operationType,
-        creditsUsed: amounts.oneTimePaid,
+        creditsChange: amounts.oneTimePaid,
       });
     }
 
-    if (usagePayload.length === 0) {
+    if (auditPayload.length === 0) {
       return [];
     }
 
-    const usages: CreditUsage[] = [];
-    for (const payload of usagePayload) {
-      const usage = await client.creditUsage.create({ data: payload });
-      usages.push(usage);
+    const audits: CreditAuditLog[] = [];
+    for (const payload of auditPayload) {
+      const auditlog = await client.creditAuditLog.create({ data: payload });
+      audits.push(auditlog);
     }
 
-    return usages;
+    return audits;
   }
 
   // Initialize User Credits, use upsert for easy handle anonymous upgrade to register
@@ -286,7 +286,8 @@ export class CreditService {
       feature: string,
       creditType: string,
       operationType: string,
-      creditsUsed: number,
+      operationReferId: string,
+      creditsChange: number,
     }, 
     tx?: Prisma.TransactionClient
   ): Promise<Credit> {
@@ -295,7 +296,7 @@ export class CreditService {
     const freeEnd = new Date(now);
     freeEnd.setDate(freeEnd.getDate() + freeExpiredDays);
     freeEnd.setHours(23, 59, 59, 999);
-    const normalized = this.normalizeAmounts({ free: init.creditsUsed });
+    const normalized = this.normalizeAmounts({ free: init.creditsChange });
     this.ensureNonNegative(normalized, 'initializeCredit');
     const client = checkAndFallbackWithNonTCClient(tx);
 
@@ -319,7 +320,7 @@ export class CreditService {
       },
     });
 
-    await creditUsageService.recordCreditOperation( init, tx );
+    await creditAuditLogService.recordCreditOperation( init, tx );
 
     return credit;
   }
@@ -328,14 +329,14 @@ export class CreditService {
     data: {
       userId: string,
       feature: string,
-      orderId: string
       creditType: string,
       operationType: string,
-      creditsUsed: number,
+      operationReferId: string
+      creditsChange: number,
     }, 
     tx?: Prisma.TransactionClient
   ): Promise<void> {
-    await creditUsageService.recordUsage( data, tx );
+    await creditAuditLogService.recordAuditLog( data, tx );
     console.warn('payFailedWatcher completed');
   }
 
@@ -383,12 +384,12 @@ export class CreditService {
     userId: string,
     amounts: CreditAmounts,
     options: {
-      orderId?: string;
+      operationReferId: string;
       feature?: string;
       limitAdjustments?: CreditLimitAdjustments;
-    } = {},
+    },
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.executeCreditOperation(
       userId,
       amounts,
@@ -397,7 +398,7 @@ export class CreditService {
         operationType: OperationType.RECHARGE,
         updateMode: 'increment',
         feature: options.feature,
-        orderId: options.orderId,
+        operationReferId: options.operationReferId,
         limitAdjustments: options.limitAdjustments,
         defaultLimitAdjustmentsToAmounts: options.limitAdjustments === undefined,
       },
@@ -411,10 +412,10 @@ export class CreditService {
     amounts: CreditAmounts,
     options: {
       feature: string;
-      orderId?: string;
+      operationReferId: string;
     },
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.executeCreditOperation(
       userId,
       amounts,
@@ -423,7 +424,7 @@ export class CreditService {
         operationType: OperationType.CONSUME,
         updateMode: 'decrement',
         feature: options.feature,
-        orderId: options.orderId,
+        operationReferId: options.operationReferId,
         ensureSufficientBalance: true,
       },
       tx
@@ -435,14 +436,16 @@ export class CreditService {
     userId: string,
     amounts: CreditAmounts,
     reason: string,
+    operationReferId: string,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.executeCreditOperation(
       userId,
       amounts,
       {
         context: 'freezeCredit',
         operationType: OperationType.FREEZE,
+        operationReferId,
         updateMode: 'decrement',
         feature: reason,
         ensureSufficientBalance: true,
@@ -456,14 +459,16 @@ export class CreditService {
     userId: string,
     amounts: CreditAmounts,
     reason: string,
+    operationReferId: string,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.executeCreditOperation(
       userId,
       amounts,
       {
         context: 'unfreezeCredit',
         operationType: OperationType.UNFREEZE,
+        operationReferId,
         updateMode: 'increment',
         feature: reason,
       },
@@ -475,13 +480,13 @@ export class CreditService {
   async refundCredit(
     userId: string,
     amounts: CreditAmounts,
-    orderId: string,
+    operationReferId: string,
     options: {
       feature?: string;
       limitAdjustments?: CreditLimitAdjustments;
     } = {},
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.executeCreditOperation(
       userId,
       amounts,
@@ -490,7 +495,7 @@ export class CreditService {
         operationType: OperationType.CONSUME,
         updateMode: 'decrement',
         feature: options.feature ?? 'Refund',
-        orderId,
+        operationReferId,
         limitAdjustments: options.limitAdjustments,
         defaultLimitAdjustmentsToAmounts: options.limitAdjustments === undefined,
         ensureSufficientBalance: true,
@@ -500,22 +505,10 @@ export class CreditService {
     );
   }
 
-  // Reset Free Credits 
-  async resetFreeCredit(userId: string, newLimit: number = freeAmount, tx?: Prisma.TransactionClient): Promise<Credit> {
-    const client = checkAndFallbackWithNonTCClient(tx);
-
-    return await client.credit.update({
-      where: { userId },
-      data: {
-        balanceFree: newLimit,
-        totalFreeLimit: newLimit,
-      },
-    });
-  }
-
   // Batch Update Credits (Admin Operation)
   async adjustCredit(
     userId: string,
+    operationReferId: string,
     adjustments: {
       balanceFree?: number;
       balancePaid?: number;
@@ -585,14 +578,16 @@ export class CreditService {
     });
 
     if (this.hasAnyChange(increaseDiff)) {
-      await this.recordCreditUsage(client, userId, OperationType.ADJUST_INCREASE, increaseDiff, {
+      await this.recordCreditAuditLog(client, userId, OperationType.ADJUST_INCREASE, increaseDiff, {
         feature: 'admin_adjust',
+        operationReferId
       });
     }
 
     if (this.hasAnyChange(decreaseDiff)) {
-      await this.recordCreditUsage(client, userId, OperationType.ADJUST_DECREASE, decreaseDiff, {
+      await this.recordCreditAuditLog(client, userId, OperationType.ADJUST_DECREASE, decreaseDiff, {
         feature: 'admin_adjust',
+        operationReferId
       });
     }
 
@@ -602,9 +597,10 @@ export class CreditService {
   private async purgeCreditsByTypes(
     userId: string,
     reason: string,
+    operationReferId: string,
     types: Array<typeof CreditType[keyof typeof CreditType]>,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     const uniqueTypes = Array.from(new Set(types));
     if (uniqueTypes.length === 0) {
       throw new Error('purgeCreditsByTypes: no credit types specified');
@@ -641,7 +637,7 @@ export class CreditService {
     });
 
     // 强制留痕，即使是积分变化为0也记录，操作留痕
-    const usage = await this.recordCreditUsage(client, userId, OperationType.PURGE, normalizedDeduction, { feature: reason, })
+    const usage = await this.recordCreditAuditLog(client, userId, OperationType.PURGE, normalizedDeduction, { feature: reason, operationReferId })
 
     return { credit, usage };
   }
@@ -649,27 +645,31 @@ export class CreditService {
   async purgePaidCredit(
     userId: string,
     reason: string,
+    operationReferId: string,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    return this.purgeCreditsByTypes(userId, reason, [CreditType.PAID], tx);
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
+    return this.purgeCreditsByTypes(userId, reason, operationReferId, [CreditType.PAID], tx);
   }
 
   async purgeFreeCredit(
     userId: string,
     reason: string,
+    operationReferId: string,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
-    return this.purgeCreditsByTypes(userId, reason, [CreditType.FREE], tx);
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
+    return this.purgeCreditsByTypes(userId, reason, operationReferId, [CreditType.FREE], tx);
   }
 
   async purgeCredit(
     userId: string,
     reason: string,
+    operationReferId:string,
     tx?: Prisma.TransactionClient
-  ): Promise<{ credit: Credit; usage: CreditUsage[] }> {
+  ): Promise<{ credit: Credit; usage: CreditAuditLog[] }> {
     return this.purgeCreditsByTypes(
       userId,
       reason,
+      operationReferId,
       [CreditType.FREE, CreditType.PAID, CreditType.ONE_TIME_PAID],
       tx
     );

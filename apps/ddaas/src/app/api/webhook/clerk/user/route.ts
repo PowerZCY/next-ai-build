@@ -18,6 +18,9 @@ interface ClerkWebhookEvent {
     email_addresses?: Array<{
       email_address: string;
     }>;
+    first_name?: string;
+    last_name?: string,
+    username?: string,
     unsafe_metadata?: {
       user_id?: string;
       fingerprint_id?: string;
@@ -160,11 +163,15 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
   const email = data.email_addresses?.[0]?.email_address;
   const unsafeMetadata = data.unsafe_metadata;
   const fingerprintId = unsafeMetadata?.fingerprint_id;
+  const userName = data.username 
+    ? data.username 
+    : [data.first_name, data.last_name].filter(Boolean).join(' ') || undefined;
 
   console.log('Processing user.created event:', {
     clerkUserId,
     email,
-    fingerprintId
+    fingerprintId,
+    userName
   });
 
   // 检查必要参数
@@ -179,7 +186,7 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
   }
 
   try {
-    // 按fingerprintId查询该设备的所有用户记录
+    // 按fingerprintId查询该设备的所有未注销过的用户记录，注销过的记录相当于是死数据
     const existingUsers = await userService.findListByFingerprintId(fingerprintId);
     if (!existingUsers || existingUsers.length === 0) {
       console.error('Invalid fingerprintId in webhook data, process flow error');
@@ -191,7 +198,7 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
     if (sameEmailUser) {
       // 同一账号，检查是否需要更新clerkUserId
       if (sameEmailUser.clerkUserId !== clerkUserId) {
-        await userService.updateUser(sameEmailUser.userId, { clerkUserId });
+        await userService.updateUser(sameEmailUser.userId, { clerkUserId, userName: userName, status: UserStatus.REGISTERED });
         console.log(`Updated clerkUserId for user ${sameEmailUser.userId}`);
       } else {
         console.log(`User with email ${email} already exists, skipping duplicate message`);
@@ -200,18 +207,16 @@ async function handleUserCreated(event: ClerkWebhookEvent) {
     }
 
     // 查找匿名用户（email为空且clerkUserId为空）
-    const anonymousUser = existingUsers.find(user => 
-      !user.email && !user.clerkUserId && user.status === UserStatus.ANONYMOUS
-    );
+    const anonymousUser = existingUsers.find(user => !user.email && !user.clerkUserId && user.status === UserStatus.ANONYMOUS );
     if (anonymousUser) {
       // 匿名用户升级
-      await userAggregateService.upgradeToRegistered(anonymousUser.userId, email, clerkUserId);
+      await userAggregateService.upgradeToRegistered(anonymousUser.userId, email, clerkUserId, userName);
       console.log(`Successfully upgraded anonymous user ${anonymousUser.userId} to registered user`);
       return;
     }
 
     // 同设备新账号，创建新用户
-    await userAggregateService.createNewRegisteredUser(clerkUserId, email, fingerprintId);
+    await userAggregateService.createNewRegisteredUser(clerkUserId, email, fingerprintId, userName);
     console.log(`Created new user for device ${fingerprintId} with email ${email}`);
     
   } catch (error) {
@@ -230,8 +235,7 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
   console.log('Processing user.deleted event:', { clerkUserId });
 
   try {
-    // 备份用户数据并硬删除用户
-    const userId = await userAggregateService.hardDeleteUserByClerkId(clerkUserId);
+    const userId = await userAggregateService.handleUserUnregister(clerkUserId);
     if (!userId) {
       console.warn(`User not found, skipping oprate , (clerkUserId: ${clerkUserId})`);
     } else {

@@ -4,7 +4,7 @@ TRUNCATE TABLE
   users, 
   subscriptions, 
   credits, 
-  credit_usage, 
+  credit_audit_log, 
   transactions,
   user_backup,
   apilog
@@ -18,7 +18,7 @@ SELECT 'subscriptions' AS table_name, COUNT(*) AS row_count FROM subscriptions
 UNION ALL
 SELECT 'credits' AS table_name, COUNT(*) AS row_count FROM credits
 UNION ALL
-SELECT 'credit_usage' AS table_name, COUNT(*) AS row_count FROM credit_usage
+SELECT 'credit_audit_log' AS table_name, COUNT(*) AS row_count FROM credit_usage
 UNION ALL
 SELECT 'transactions' AS table_name, COUNT(*) AS row_count FROM transactions
 UNION ALL

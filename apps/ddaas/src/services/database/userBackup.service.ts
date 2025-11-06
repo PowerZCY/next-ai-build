@@ -11,7 +11,9 @@ export class UserBackupService {
     originalUserId: string;
     fingerprintId?: string;
     clerkUserId?: string;
+    stripeCusId?: string,
     email?: string;
+    userName?: string,
     status?: string;
     backupData?: any;
   }, tx?: Prisma.TransactionClient): Promise<UserBackup> {
@@ -22,7 +24,9 @@ export class UserBackupService {
         originalUserId: data.originalUserId,
         fingerprintId: data.fingerprintId,
         clerkUserId: data.clerkUserId,
+        stripeCusId: data.stripeCusId,
         email: data.email,
+        userName: data.userName,
         status: data.status,
         backupData: data.backupData,
       },
@@ -172,18 +176,6 @@ export class UserBackupService {
         skip: params.skip || 0,
         take: params.take || 20,
         orderBy: params.orderBy || { deletedAt: 'desc' },
-        select: {
-          id: true,
-          originalUserId: true,
-          fingerprintId: true,
-          clerkUserId: true,
-          email: true,
-          status: true,
-          backupData: true,
-          deletedAt: true,
-          createdAt: true,
-          deleted: true,
-        },
       }),
       client.userBackup.count({ where }),
     ]);

@@ -38,12 +38,13 @@ interface ErrorResponse {
 function createUserInfo(user: User): XUser {
   return {
     userId: user.userId,
+    userName: user.userName || '',
     fingerprintId: user.fingerprintId || '',
     clerkUserId: user.clerkUserId || '',
     stripeCusId: user.stripeCusId || '',
     email: user.email || '',
     status: user.status,
-    createdAt: user.createdAt?.toISOString() || '',
+    createdAt: viewLocalTime(user.createdAt),
   };
 }
 
@@ -209,8 +210,8 @@ function checkMock(existingUserResult: XUserResponse) {
           priceName: 'MOCK-TEST',
           status: 'active',
           creditsAllocated: 0,
-          subPeriodStart: now.toISOString(),
-          subPeriodEnd: now.toISOString()
+          subPeriodStart: viewLocalTime(now),
+          subPeriodEnd: viewLocalTime(now)
         };
       }
       return existingUserResult.xSubscription;

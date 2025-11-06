@@ -1,6 +1,5 @@
 import { CreditType, OperationType, UserStatus } from '@/db/constants';
 import { creditService, subscriptionService, userService } from '@/db/index';
-import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 import type { Credit, Prisma, User } from '@/db/prisma-model-type';
 import { freeAmount, freeRegisterAmount } from '@/lib/appConfig';
 import { runInTransaction } from '../database/prisma-transaction-util';
@@ -25,8 +24,9 @@ export class UserAggregateService {
           userId: newUser.userId,
           feature: 'anonymous_user_init',
           creditType: CreditType.FREE,
-          operationType: OperationType.RECHARGE,
-          creditsUsed: freeAmount,
+          operationType: OperationType.SYS_GIFT,
+          operationReferId: newUser.userId,
+          creditsChange: freeAmount,
         },
         tx
       );
@@ -53,7 +53,8 @@ export class UserAggregateService {
   async createNewRegisteredUser(
     clerkUserId: string,
     email?: string,
-    fingerprintId?: string
+    fingerprintId?: string,
+    userName?: string
   ): Promise<{ newUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const newUser = await userService.createUser(
@@ -61,6 +62,7 @@ export class UserAggregateService {
           clerkUserId,
           email,
           fingerprintId,
+          userName,
           status: UserStatus.REGISTERED,
         },
         tx
@@ -71,8 +73,9 @@ export class UserAggregateService {
           userId: newUser.userId,
           feature: 'user_registration_init',
           creditType: CreditType.FREE,
-          operationType: OperationType.RECHARGE,
-          creditsUsed: freeRegisterAmount,
+          operationType: OperationType.SYS_GIFT,
+          operationReferId: newUser.userId,
+          creditsChange: freeRegisterAmount,
         },
       );
 
@@ -85,28 +88,31 @@ export class UserAggregateService {
   async upgradeToRegistered(
     userId: string,
     email: string,
-    clerkUserId: string
+    clerkUserId: string,
+    userName?: string,
   ): Promise<{ updateUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const updateUser = await userService.upgradeToRegistered(
         userId,
         {
           email,
-          clerkUserId
+          clerkUserId,
+          userName
         },
         tx
       );
 
       // 先清空匿名积分并审计日志留痕
-      await creditService.purgeFreeCredit(userId, 'user_registered_purge', tx);
+      await creditService.purgeFreeCredit(userId, 'user_registered_purge', userId, tx);
       // 再初始化完成注册获得免费积分
       const credit = await creditService.initializeCreditWithFree(
         {
           userId: updateUser.userId,
           feature: 'user_registration_init',
           creditType: CreditType.FREE,
-          operationType: OperationType.RECHARGE,
-          creditsUsed: freeRegisterAmount,
+          operationType: OperationType.SYS_GIFT,
+          operationReferId: userId,
+          creditsChange: freeRegisterAmount,
         }, 
         tx
       );
@@ -115,7 +121,7 @@ export class UserAggregateService {
     });
   }
 
-  async hardDeleteUserByClerkId(clerkUserId: string): Promise<string | null> { 
+  async handleUserUnregister(clerkUserId: string): Promise<string | null> { 
     return runInTransaction(async (tx) => {
       // 根据clerkUserId查找用户
       const user = await userService.findByClerkUserId(clerkUserId, tx);
@@ -123,26 +129,20 @@ export class UserAggregateService {
         console.log(`User with clerkUserId ${clerkUserId} not found`);
         return null;
       }
-      await this.handleUserUnregister(user.userId, tx);
+      const userId = user.userId;
+      // 更改用户状态，保留user信息尤其是FingerprintId，防止反复注册薅羊毛
+      await userService.unregister(user.userId);
+      // 清空积分
+      await creditService.purgeCredit(userId, 'soft_delete_user', userId, tx);
+      
+      const subscription = await subscriptionService.getActiveSubscription(userId, tx);
+      if (subscription) {
+        // 如果有订阅信息，则要更新
+        await subscriptionService.cancelSubscription(subscription.id, true, tx);
+      }
+
       return user.userId;
     });
-  }
-
-  async handleUserUnregister(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
-    const client =  checkAndFallbackWithNonTCClient(tx)
-    const user = await userService.findByUserId(userId, client);
-    if (!user) {
-      return;
-    }
-
-    await userService.softDeleteUser(user.userId);
-
-    await creditService.purgeCredit(userId, 'soft_delete_user', client);
-    
-    const subscription = await subscriptionService.getActiveSubscription(userId, client);
-    if (subscription) {
-      await subscriptionService.cancelSubscription(subscription.id, true, client);
-    }
   }
 
   private async findUserWithRelations(
@@ -152,10 +152,10 @@ export class UserAggregateService {
     return tx.user.findUnique({
       where: { userId },
       include: {
-        credits: true,
+        credit: true,
         subscription: true,
         transactions: true,
-        creditUsage: true,
+        creditAuditLogs: true,
       },
     });
   }

@@ -197,7 +197,7 @@ export class SubscriptionService {
 
     await client.subscription.update({
       where: { id },
-      data: { deleted: 1 },
+      data: { deleted: 1, status: SubscriptionStatus.INCOMPLETE },
     });
   }
 

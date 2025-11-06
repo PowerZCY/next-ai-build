@@ -5,6 +5,7 @@
 
 export interface XUser {
   userId: string;
+  userName: string,
   fingerprintId: string;
   clerkUserId: string,
   stripeCusId: string,

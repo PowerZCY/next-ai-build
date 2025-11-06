@@ -94,6 +94,7 @@ class BillingAggregateService {
           invoicePdf: context.invoicePdf ?? undefined,
           billingReason: context.billingReason ?? undefined,
           payTransactionId: context.paymentIntentId ?? undefined,
+          paidEmail: context.paidEmail ?? undefined,
           paidAt: context.paidAt,
           payUpdatedAt: now,
         },
@@ -106,7 +107,7 @@ class BillingAggregateService {
           { paid: context.creditsGranted },
           {
             feature: TransactionType.SUBSCRIPTION,
-            orderId: context.orderId,
+            operationReferId: context.orderId,
           },
           tx
         );
@@ -159,7 +160,7 @@ class BillingAggregateService {
           { oneTimePaid: params.creditsGranted },
           {
             feature: TransactionType.ONE_TIME,
-            orderId: params.orderId,
+            operationReferId: params.orderId,
           },
           tx
         );
@@ -251,7 +252,7 @@ class BillingAggregateService {
           { paid: context.creditsGranted },
           {
             feature: `${TransactionType.SUBSCRIPTION}_renewal`,
-            orderId: context.orderId,
+            operationReferId: context.orderId,
           },
           tx
         );
@@ -325,10 +326,10 @@ class BillingAggregateService {
         {
           userId: context.userId,
           feature: `${TransactionType.SUBSCRIPTION}_renewal_failed`,
-          orderId: context.orderId,
+          operationReferId: context.orderId,
           creditType: CreditType.PAID,
           operationType: OperationType.RECHARGE,
-          creditsUsed: 0,
+          creditsChange: 0,
         },
         tx
       );
@@ -396,7 +397,7 @@ class BillingAggregateService {
       await subscriptionService.updateStatus(context.subIdKey, SubscriptionStatus.CANCELED, tx);
 
       // 清理积分并留痕
-      await creditService.purgePaidCredit(context.userId, 'cancel_subscription_purge', tx);
+      await creditService.purgePaidCredit(context.userId, 'cancel_subscription_purge', context.orderId, tx);
     })
   }
   
@@ -443,7 +444,7 @@ class BillingAggregateService {
           { paid: paidBalance },
           {
             feature: OrderStatus.REFUNDED,
-            orderId: context.transaction.orderId,
+            operationReferId: context.transaction.orderId,
           },
           tx
         );
@@ -478,7 +479,7 @@ class BillingAggregateService {
           { oneTimePaid: amountToConsume },
           {
             feature: OrderStatus.REFUNDED,
-            orderId: context.transaction.orderId,
+            operationReferId: context.transaction.orderId,
           },
           tx
         );

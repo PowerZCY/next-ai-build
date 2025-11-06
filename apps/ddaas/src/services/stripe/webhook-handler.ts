@@ -15,6 +15,7 @@ import { oneTimeExpiredDays } from '@/lib/appConfig';
 import { getCreditsFromPriceId } from '@/lib/money-price-config';
 import { fetchPaymentId, stripe } from '@/lib/stripe-config';
 import Stripe from 'stripe';
+import { viewLocalTime } from '@lib/utils';
 
 const mapPaymentStatus = (
   status?: Stripe.Checkout.Session.PaymentStatus | null
@@ -171,10 +172,6 @@ async function handleSubscriptionCheckoutInit(
   const subPeriodStart = new Date(currentPeriodStart * 1000);
   const subPeriodEnd = new Date(currentPeriodEnd * 1000);
 
-  // Validate dates
-  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
-    throw new Error( `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}` );
-  }
   // Log the Stripe API response with correct data structure
   const logId = await Apilogger.logStripeOutgoing(
     'stripe.subscriptions.retrieve',
@@ -193,8 +190,8 @@ async function handleSubscriptionCheckoutInit(
     id: subscriptionId,
     orderId: transaction.orderId,
     status: stripeSubscription.status,
-    periodStart: subPeriodStart.toISOString(),
-    periodEnd: subPeriodEnd.toISOString(),
+    periodStart: viewLocalTime(subPeriodStart),
+    periodEnd: viewLocalTime(subPeriodEnd),
   });
 }
 
@@ -260,11 +257,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   }
   const subPeriodStart = new Date(periodStart * 1000);
   const subPeriodEnd = new Date(periodEnd * 1000);
-  // Validate dates
-  if (isNaN(subPeriodStart.getTime()) || isNaN(subPeriodEnd.getTime())) {
-    throw new Error( `Invalid date conversion: start=${subPeriodStart.toISOString()}, end=${subPeriodEnd.toISOString()}`
-    );
-  }
   
   const subscriptionMetadata = parentDetails.metadata || {};
   const orderId = subscriptionMetadata.order_id;
@@ -281,19 +273,23 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const userId = transaction.userId;
   const paymentIntentId = await fetchPaymentId(invoice.id)
   
+  
+  
+  const invoicePaidAt = invoice.status_transitions?.paid_at;
+  const paidAt = invoicePaidAt ? new Date(invoicePaidAt * 1000) : new Date();
+  const paidEmail = invoice.customer_email;
+
   console.log('Invoice paid event key-info:', {
     invoiceId: invoice.id,
     subscriptionId,
     paymentIntentId,
     billingReason: invoice.billing_reason,
     isInitialPayment,
-    periodStart: subPeriodStart.toISOString(),
-    periodEnd: subPeriodEnd.toISOString(),
+    paidEmail,
+    paidAt: viewLocalTime(paidAt),
+    periodStart: viewLocalTime(subPeriodStart),
+    periodEnd: viewLocalTime(subPeriodEnd),
   });
-  
-  const invoicePaidAt = invoice.status_transitions?.paid_at;
-  const paidAt = invoicePaidAt ? new Date(invoicePaidAt * 1000) : new Date();
-  const paidEmail = invoice.customer_email;
 
   if (isInitialPayment) {
     // 首次订阅校验

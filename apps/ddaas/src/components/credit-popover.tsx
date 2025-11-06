@@ -99,8 +99,8 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
   if (subscription) {
     data.subscription = {
       planName: subscription.priceName || t('subscription.active'),
-      periodStart: subscription.subPeriodStart?.toISOString(),
-      periodEnd: subscription.subPeriodEnd?.toISOString(),
+      periodStart: viewLocalTime(subscription.subPeriodStart),
+      periodEnd: viewLocalTime(subscription.subPeriodEnd),
       manageUrl: '#',
     };
   }

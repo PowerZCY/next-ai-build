@@ -7,13 +7,20 @@ CREATE TABLE IF NOT EXISTS public.users (
     clerk_user_id     VARCHAR(255),
     stripe_cus_id     VARCHAR(255),
     email             VARCHAR(255),
+    user_name             VARCHAR(255),
     created_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT users_user_id_key UNIQUE (user_id),
-    CONSTRAINT users_clerk_user_id_key UNIQUE (clerk_user_id),
-    CONSTRAINT users_stripe_cus_id_key UNIQUE (stripe_cus_id),
     CONSTRAINT users_status_check CHECK (status::text = ANY (ARRAY['anonymous'::character varying, 'registered'::character varying, 'frozen'::character varying, 'deleted'::character varying]::text[]))
 );
+-- 创建用户表的部分索引
+CREATE UNIQUE INDEX IF NOT EXISTS users_clerk_user_id_key 
+ON public.users (clerk_user_id) 
+WHERE status <> 'deleted'; 
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_stripe_cus_id_key 
+ON public.users (stripe_cus_id) 
+WHERE status <> 'deleted';
 
 CREATE INDEX IF NOT EXISTS idx_users_fingerprint_id ON public.users (fingerprint_id);
 
@@ -114,22 +121,22 @@ CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions (user
 
 
 -- 积分使用审计表
-CREATE TABLE IF NOT EXISTS public.credit_usage (
+CREATE TABLE IF NOT EXISTS public.credit_audit_log (
     id               BIGSERIAL PRIMARY KEY,
     user_id          UUID         NOT NULL,
+    credits_change     INTEGER      NOT NULL,
     feature          VARCHAR(255),
     credit_type      VARCHAR(50)  NOT NULL,
     operation_type   VARCHAR(100)  NOT NULL,
-    credits_used     INTEGER      NOT NULL,
-    order_id         VARCHAR(255),
+    operation_refer_id         VARCHAR(255),
     created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
     deleted          INTEGER      NOT NULL DEFAULT 0,
-    CONSTRAINT credit_usage_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
+    CONSTRAINT credit_audit_log_deleted_check CHECK (deleted = ANY (ARRAY[0, 1]))
 );
 
-CREATE INDEX IF NOT EXISTS idx_credit_usage_credit_type ON public.credit_usage (credit_type);
-CREATE INDEX IF NOT EXISTS idx_credit_usage_operation_type ON public.credit_usage (operation_type);
-CREATE INDEX IF NOT EXISTS idx_credit_usage_user_id ON public.credit_usage (user_id);
+CREATE INDEX IF NOT EXISTS idx_credit_audit_log_credit_type ON public.credit_audit_log (credit_type);
+CREATE INDEX IF NOT EXISTS idx_credit_audit_log_operation_type ON public.credit_audit_log (operation_type);
+CREATE INDEX IF NOT EXISTS idx_credit_audit_log_user_id ON public.credit_audit_log (user_id);
 
 
 -- 用户信息备份表
@@ -139,7 +146,9 @@ CREATE TABLE IF NOT EXISTS public.user_backup (
     status            VARCHAR(50),
     fingerprint_id    VARCHAR(255),
     clerk_user_id     VARCHAR(255),
+    stripe_cus_id     VARCHAR(255),
     email             VARCHAR(255),
+    user_name             VARCHAR(255),
     backup_data       JSONB,
     deleted_at        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
     created_at        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,

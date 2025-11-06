@@ -2,7 +2,7 @@ export { userService } from './user.service';
 export { subscriptionService } from './subscription.service';
 export { creditService } from './credit.service';
 export { transactionService } from './transaction.service';
-export { creditUsageService } from './creditUsage.service';
+export { creditAuditLogService } from './creditAuditLog.service';
 export { userBackupService } from './userBackup.service';
 export { apilogService, Apilogger } from './apilog.service';
 

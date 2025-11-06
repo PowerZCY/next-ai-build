@@ -199,6 +199,7 @@ export function FingerprintStatus() {
                 rightInfo={<StatusTag value={userStatus} />}
                 items={[
                   { label: '用户 ID', value: <CopyableText text={xUser?.userId || ''} /> },
+                  { label: '用户昵称', value: <CopyableText text={xUser?.userName || ''} /> },
                   { label: 'Fingerprint ID', value: <CopyableText text={xUser?.fingerprintId || fingerprintId || ''} /> },
                   { label: 'Clerk 用户', value: <CopyableText text={xUser?.clerkUserId || ''} /> },
                   { label: '邮箱', value: <CopyableText text={xUser?.email || ''} /> },
