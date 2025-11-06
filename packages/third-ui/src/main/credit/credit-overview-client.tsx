@@ -350,9 +350,9 @@ export function CreditOverviewClient({
         >
           <AlertDialogContent
             ref={pricingContentRef}
-            className="mt-4 w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
+            className="mt-8 w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
           >
-            <AlertDialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+            <AlertDialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 px-6 pt-4 pb-1 dark:border-slate-800">
               <AlertDialogTitle asChild>
                 <div className="flex flex-wrap items-baseline gap-3 text-slate-900 dark:text-white">
                   <span className="text-2xl font-semibold leading-tight">
@@ -378,7 +378,7 @@ export function CreditOverviewClient({
                 <icons.X className="h-6 w-6" />
               </button>
             </AlertDialogHeader>
-            <div className="max-h-[80vh] overflow-y-auto px-4 py-6">
+            <div className="max-h-[80vh] overflow-y-auto px-4 pt-2 pb-6">
               <div className="mx-auto w-full max-w-6xl px-2 sm:px-4 md:px-8">
                 {modalMoneyPriceData ? (
                   <MoneyPriceInteractive
