@@ -29,22 +29,10 @@ type CreditOperationOptions = {
   ensureSufficientLimits?: boolean;
 };
 
-type CreditBalanceField = Extract<
-  keyof Credit,
-  'balanceFree' | 'balancePaid' | 'balanceOneTimePaid'
->;
-type CreditLimitField = Extract<
-  keyof Credit,
-  'totalFreeLimit' | 'totalPaidLimit' | 'totalOneTimePaidLimit'
->;
-type CreditWindowStartField = Extract<
-  keyof Credit,
-  'freeStart' | 'paidStart' | 'oneTimePaidStart'
->;
-type CreditWindowEndField = Extract<
-  keyof Credit,
-  'freeEnd' | 'paidEnd' | 'oneTimePaidEnd'
->;
+type CreditBalanceField = 'balanceFree' | 'balancePaid' | 'balanceOneTimePaid';
+type CreditLimitField = 'totalFreeLimit' | 'totalPaidLimit' | 'totalOneTimePaidLimit';
+type CreditWindowStartField = 'freeStart' | 'paidStart' | 'oneTimePaidStart';
+type CreditWindowEndField = 'freeEnd' | 'paidEnd' | 'oneTimePaidEnd';
 
 type CreditPurgeConfig = {
   amountKey: keyof Required<CreditAmounts>;
