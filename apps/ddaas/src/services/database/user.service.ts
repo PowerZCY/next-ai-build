@@ -165,9 +165,6 @@ export class UserService {
       where: { userId },
       data: {
         status: UserStatus.DELETED,
-        email: null,
-        clerkUserId: null,
-        stripeCusId: null,
       },
     });
   }

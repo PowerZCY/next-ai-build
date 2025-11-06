@@ -1,5 +1,5 @@
 import { CreditType, OperationType, UserStatus } from '@/db/constants';
-import { creditService, subscriptionService, userBackupService, userService } from '@/db/index';
+import { creditService, subscriptionService, userService } from '@/db/index';
 import { checkAndFallbackWithNonTCClient } from '@/db/prisma';
 import type { Credit, Prisma, User } from '@/db/prisma-model-type';
 import { freeAmount, freeRegisterAmount } from '@/lib/appConfig';
@@ -123,34 +123,21 @@ export class UserAggregateService {
         console.log(`User with clerkUserId ${clerkUserId} not found`);
         return null;
       }
-      await this.hardDeleteUser(user.userId, tx);
+      await this.handleUserUnregister(user.userId, tx);
       return user.userId;
     });
   }
 
-  async hardDeleteUser(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
+  async handleUserUnregister(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
     const client =  checkAndFallbackWithNonTCClient(tx)
-    const user = await this.findUserWithRelations(userId, client);
+    const user = await userService.findByUserId(userId, client);
     if (!user) {
       return;
     }
-    await userBackupService.createBackup(
-      {
-        originalUserId: user.userId,
-        fingerprintId: user.fingerprintId || undefined,
-        clerkUserId: user.clerkUserId || undefined,
-        email: user.email || undefined,
-        status: user.status,
-        backupData: user,
-      },
-      client
-    );
 
-    await client.user.delete({
-      where: { userId },
-    });
+    await userService.softDeleteUser(user.userId);
 
-    await creditService.purgeCredit(userId, 'hard_delete_user', client);
+    await creditService.purgeCredit(userId, 'soft_delete_user', client);
     
     const subscription = await subscriptionService.getActiveSubscription(userId, client);
     if (subscription) {
