@@ -229,7 +229,7 @@ export function CreditOverviewClient({
   return (
     <section
       className={cn(
-        "flex min-h-[calc(100vh-110px)] flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950",
+        "flex flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950",
         className
       )}
     >
