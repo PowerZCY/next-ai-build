@@ -50,7 +50,7 @@ export default async function RootLayout({
           <FumaBannerSuit locale={locale} showBanner={clerkPageBanner}/>
           {children}
         </HomeLayout>
-        </FingerprintProvider>
+      </FingerprintProvider>
     </ClerkProviderClient>
   );
 }

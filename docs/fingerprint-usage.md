@@ -753,3 +753,61 @@ flowchart TD
 - 中间件只在必要时处理fingerprint逻辑
 - React Context提供缓存的用户数据，避免重复API调用
 - 懒加载用户数据，只在需要时初始化
+
+
+
+## Clerk组件竞态问题(未解决-未找到根因)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant HP as 首页 (FingerprintProvider)
+    participant FH as useFingerprint Hook
+    participant FC as Fingerprint Client (FPJS)
+    participant BE as 后端 API
+    participant Clerk as Clerk 系统
+    participant CMC as Clerk 注册组件 (Modal/Custom)
+
+    title 用户极快操作下的匿名ID流程 (Race Condition Prevention)
+
+    Note over User, HP: 用户访问首页
+    HP->>FH: 1. 渲染 Provider & Hook 初始化
+    FH->>FH: 2. 状态初始化: isLoading=true, fpId=null
+    
+    Note over FH, FC: Stage 1: 异步指纹ID生成
+    FH->>FC: 3. (useEffect) 异步调用 getOrGenerateFingerprintId()
+    activate FC
+    FC-->FC: 3.1. **[慢路径]** 生成浏览器指纹ID (耗时)
+    
+    par 用户快速点击注册按钮
+        User->>HP: 4. 看到按钮并点击 <SignUpButton mode="modal">
+        HP->>Clerk: 5. Clerk 弹出模态框 (内部加载 /sign-up 路由)
+        Clerk->>CMC: 6. 加载自定义 SignUp 组件 (signup-with-fingerprint-client.tsx)
+        
+        CMC->>FH: 7. 获取 Context 状态
+        Note over FH: 此时状态: isLoading=true, fpId=null
+        CMC-->CMC: 8. **[条件渲染生效]** if (isLoading) { ... }
+        CMC->>User: 9. 显示 "正在加载用户会话..." (阻塞 UI)
+    and 异步指纹ID生成和初始化完成
+        FC-->>FH: 10. **fpId 生成完成并返回** ('fp_...')
+        deactivate FC
+        FH-->FH: 11. setFingerprintIdState('fp_...') & setIsLoading(false)
+        
+        Note over CMC: Context 状态更新: isLoading=false, fpId='fp_...'
+        CMC->>CMC: 12. 重新渲染 (isLoading=false)
+        CMC->>CMC: 13. 渲染 <SignUp unsafeMetadata={fpId: 'fp_...'} />
+        CMC->>User: 14. 模态框内容切换为 Clerk 注册表单 (带fpId)
+        
+        Note over FH, BE: Stage 2: 匿名用户初始化
+        FH->>BE: 15. (useEffect) initializeAnonymousUser() POST API
+        activate BE
+        BE-->>FH: 16. API 响应成功 (创建/更新匿名用户)
+        deactivate BE
+    end
+
+    User->>CMC: 17. 填写表单并点击 "注册"
+    CMC->>Clerk: 18. 提交注册请求
+    Clerk->>BE: 19. **[Clerk]** 注册用户 & 携带 unsafeMetadata{fpId: 'fp_...'}
+    BE-->>Clerk: 20. 注册成功
+    Clerk-->>User: 21. 注册成功/关闭模态框
+```
