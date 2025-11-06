@@ -257,9 +257,6 @@ importers:
       prisma:
         specifier: ^6.15.0
         version: 6.19.0(typescript@5.9.3)
-      prisma-query-log:
-        specifier: ^3.2.1
-        version: 3.2.1
       remark-frontmatter:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1933,9 +1930,6 @@ packages:
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
-
-  '@sqltools/formatter@1.2.5':
-    resolution: {integrity: sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==}
 
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
@@ -4485,9 +4479,6 @@ packages:
     resolution: {integrity: sha512-66hKPCr+72mlfiSjlEB1+45IjXSqvVAIy6mocupoww4tBFE9R9IhwwUGoI4G++Tc9Aq+2rxOt0RFU6gPcrte0A==}
     engines: {node: '>= 0.8'}
 
-  prisma-query-log@3.2.1:
-    resolution: {integrity: sha512-xupR53tiMXOHwgsD/Afx0BpX5b6qCFpfy8LBeSIpW9vwKYp1EcPkhFtQpqajfOiNDkGOaB44p9Y0Y8kk4U4ziA==}
-
   prisma@6.19.0:
     resolution: {integrity: sha512-F3eX7K+tWpkbhl3l4+VkFtrwJlLXbAM+f9jolgoUZbFcm1DgHZ4cq9AgVEgUym2au5Ad/TDLN8lg83D+M10ycw==}
     engines: {node: '>=18.18'}
@@ -6674,8 +6665,6 @@ snapshots:
       '@types/hast': 3.0.4
 
   '@shikijs/vscode-textmate@10.0.2': {}
-
-  '@sqltools/formatter@1.2.5': {}
 
   '@stablelib/base64@1.0.1': {}
 
@@ -9861,10 +9850,6 @@ snapshots:
   prettier@2.8.8: {}
 
   pretty-hrtime@1.0.3: {}
-
-  prisma-query-log@3.2.1:
-    dependencies:
-      '@sqltools/formatter': 1.2.5
 
   prisma@6.19.0(typescript@5.9.3):
     dependencies:
