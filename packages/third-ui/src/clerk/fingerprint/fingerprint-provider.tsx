@@ -198,12 +198,12 @@ export function FingerprintStatus() {
                 title="用户信息"
                 rightInfo={<StatusTag value={userStatus} />}
                 items={[
-                  { label: '用户 ID', value: <CopyableText text={xUser?.userId || ''} /> },
+                  { label: '用户ID', value: <CopyableText text={xUser?.userId || ''} /> },
                   { label: '用户昵称', value: <CopyableText text={xUser?.userName || ''} /> },
-                  { label: 'Fingerprint ID', value: <CopyableText text={xUser?.fingerprintId || fingerprintId || ''} /> },
-                  { label: 'Clerk 用户', value: <CopyableText text={xUser?.clerkUserId || ''} /> },
+                  { label: 'FingerprintID', value: <CopyableText text={xUser?.fingerprintId || fingerprintId || ''} /> },
+                  { label: 'Clerk用户', value: <CopyableText text={xUser?.clerkUserId || ''} /> },
                   { label: '邮箱', value: <CopyableText text={xUser?.email || ''} /> },
-                  { label: 'Stripe 客户', value: <CopyableText text={xUser?.stripeCusId || ''} /> },
+                  { label: 'Stripe客户', value: <CopyableText text={xUser?.stripeCusId || ''} /> },
                   { label: '创建时间', value: xUser?.createdAt || '--' },
                 ]}
               />
@@ -258,8 +258,8 @@ export function FingerprintStatus() {
                   { label: '订阅方案', value: subscriptionStatus.priceName },
                   { label: '有效期', value: subscriptionStatus.period },
                   { label: '分配额度', value: subscriptionStatus.creditsAllocated },
-                  { label: '订阅 ID', value: <CopyableText text={xSubscription?.paySubscriptionId || ''} /> },
-                  { label: 'Order ID', value: <CopyableText text={xSubscription?.orderId || ''} /> },
+                  { label: '订阅ID', value: <CopyableText text={xSubscription?.paySubscriptionId || ''} /> },
+                  { label: 'OrderID', value: <CopyableText text={xSubscription?.orderId || ''} /> },
                   { label: 'Price ID', value: <CopyableText text={xSubscription?.priceId || ''} /> },
                 ]}
               />
