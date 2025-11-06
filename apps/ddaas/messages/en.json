@@ -220,12 +220,12 @@
   },
   "credit": {
     "summary": {
-      "description": "Displays remaining credits from all current channels",
+      "description": "Sum of all available credits",
       "totalLabel": "Total Credits"
     },
     "buckets": {
-      "title": "Credit Remaining Details",
-      "empty": "No credits have been acquired yet",
+      "title": "Credit Breakdown",
+      "empty": "No credits yet",
       "labels": {
         "free": "Free",
         "subscription": "Subscription",
@@ -236,10 +236,10 @@
       "periodLabel": "Current Plan",
       "manage": "Manage Subscription",
       "inactive": "Free",
-      "pay": "Subscription"
+      "pay": "Subscribe Now"
     },
     "onetime": {
-      "buy": "Buy Credits Pack"
+      "buy": "Buy Credit Pack"
     }
   },
   "features": {
