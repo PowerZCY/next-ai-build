@@ -59,7 +59,7 @@ export async function Usage({
             const Icon = getGlobalIcon(step.iconKey);
             return (
               <div key={step.id} data-usage-step={step.id} className="flex items-start">
-                <div className="flex-shrink-0 mr-4">
+                <div className="shrink-0 mr-4">
                   <Icon className="w-8 h-8 text-purple-500" />
                 </div>
                 <div>

@@ -37,7 +37,7 @@ export function NotFoundPage({ siteIcon }: NotFoundPageProps) {
         {/* 404 number - glitch effect */}
         <div className="relative flex justify-center">
           <h1
-            className="text-8xl md:text-9xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-purple-700 bg-clip-text text-transparent select-none"
+            className="text-8xl md:text-9xl font-bold bg-linear-to-r from-purple-600 via-pink-500 to-purple-700 bg-clip-text text-transparent select-none"
             style={{
               fontFamily: "Montserrat, monospace",
               textShadow: "0 0 30px rgba(172, 98, 253, 0.3)",
@@ -48,7 +48,7 @@ export function NotFoundPage({ siteIcon }: NotFoundPageProps) {
           </h1>
           {/* scan line effect */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="h-full w-full bg-gradient-to-b from-transparent via-purple-500/10 to-transparent animate-pulse" />
+            <div className="h-full w-full bg-linear-to-b from-transparent via-purple-500/10 to-transparent animate-pulse" />
           </div>
         </div>
 

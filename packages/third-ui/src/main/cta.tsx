@@ -33,10 +33,10 @@ export async function CTA({
   return (
     <section id="cta" className={cn("px-16 py-20 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
       <div className="
-        bg-gradient-to-r from-[#f7f8fa] via-[#e0c3fc] to-[#b2fefa]
-        dark:bg-gradient-to-r dark:from-[#2d0b4e] dark:via-[#6a3fa0] dark:to-[#3a185a]
+        bg-linear-to-r from-[#f7f8fa] via-[#e0c3fc] to-[#b2fefa]
+        dark:bg-linear-to-r dark:from-[#2d0b4e] dark:via-[#6a3fa0] dark:to-[#3a185a]
         rounded-2xl p-12 text-center
-        bg-[length:200%_auto] animate-cta-gradient-wave
+        bg-size[200%_auto] animate-cta-gradient-wave
         ">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           {data.title} <span className="text-purple-400">{data.eyesOn}</span>?

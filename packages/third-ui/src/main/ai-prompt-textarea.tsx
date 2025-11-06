@@ -246,7 +246,7 @@ export function AIPromptTextarea({
           <div className="p-4 pb-2">
             {renderTitle()}
           </div>
-          <hr className="border-t-1 border-border" />
+          <hr className="border-t border-border" />
           <div className="p-1">
             {renderTextarea(true)}
           </div>

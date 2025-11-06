@@ -14,7 +14,7 @@ export async function FumaBannerSuit({ locale, showBanner }: { locale: string, s
         </Banner>
       ) : (
         <div
-          className="fixed top-0 left-0 w-screen z-[1001] m-0 rounded-none bg-neutral-100 dark:bg-neutral-900"
+          className="fixed top-0 left-0 w-screen z-1001 m-0 rounded-none bg-neutral-100 dark:bg-neutral-900"
           style={{
             height: height,
             minHeight: height,

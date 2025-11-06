@@ -243,7 +243,7 @@ export function MoneyPriceButton({
       'w-full h-11 px-8 mt-auto inline-flex items-center justify-center text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
       isDisabled
         ? 'bg-gray-400 cursor-not-allowed'
-        : 'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
+        : 'bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
     )}
       disabled={isDisabled}
       onClick={handleClick}

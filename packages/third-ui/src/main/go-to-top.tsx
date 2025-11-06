@@ -33,7 +33,7 @@ export function GoToTop() {
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 p-3 bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
+          className="fixed bottom-6 right-6 p-3 bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
           aria-label="Go to top"
         >
           <icons.ArrowUp size={20} className="text-white" />

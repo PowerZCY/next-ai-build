@@ -33,11 +33,11 @@ export function ZiaCard({ icon, title, description, ...props }: ZiaCardProps) {
         <div className="not-prose mb-2 w-fit rounded-md border bg-fd-muted p-1.5 text-fd-muted-foreground [&_svg]:size-4">
           {icon ? icon : <icons.CircleSmall />}
         </div>
-        <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-[2.5rem]">{title}</h3>
+        <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-10">{title}</h3>
         {validDescription ? (
-          <p className="!my-0 text-sm text-fd-muted-foreground">{description}</p>
+          <p className="my-0! text-sm text-fd-muted-foreground">{description}</p>
         ) : (
-          <p className="!my-0 text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
+          <p className="my-0! text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
         )}
         {props.children ? (
           <div className="text-sm text-fd-muted-foreground prose-no-margin">
@@ -59,11 +59,11 @@ export function ZiaCard({ icon, title, description, ...props }: ZiaCardProps) {
       <div className="not-prose mb-2 w-fit rounded-md border bg-fd-muted p-1.5 text-fd-muted-foreground [&_svg]:size-4">
         {icon ? icon : <icons.CircleSmall />}
       </div>
-      <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-[2.5rem]">{title}</h3>
+      <h3 className="not-prose mb-1 text-sm font-medium line-clamp-2 min-h-10">{title}</h3>
       {validDescription ? (
-        <p className="!my-0 text-sm text-fd-muted-foreground">{description}</p>
+        <p className="my-0! text-sm text-fd-muted-foreground">{description}</p>
       ) : (
-        <p className="!my-0 text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
+        <p className="my-0! text-sm text-fd-muted-foreground opacity-0 select-none">&nbsp;</p>
       )}
       {props.children ? (
         <div className="text-sm text-fd-muted-foreground prose-no-margin">

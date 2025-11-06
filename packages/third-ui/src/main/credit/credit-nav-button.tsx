@@ -39,10 +39,10 @@ export function CreditNavButton({
           aria-label={`${formattedBalance} ${totalLabel}`}
           className={cn(
             'group ml-1 mr-2 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white pl-2 pr-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
-            'hover:border-transparent hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-pink-500/90 hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:hover:from-purple-500 dark:hover:to-pink-500',
+            'hover:border-transparent hover:bg-linear-to-r hover:from-purple-500/90 hover:to-pink-500/90 hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:hover:from-purple-500 dark:hover:to-pink-500',
           )}
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-purple-400/20 to-pink-500/20 text-purple-600 transition-transform group-hover:scale-105 dark:text-purple-200">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-purple-400/20 to-pink-500/20 text-purple-600 transition-transform group-hover:scale-105 dark:text-purple-200">
             <icons.Gem className="h-3.5 w-3.5" />
           </span>
           <span className="relative flex items-center">

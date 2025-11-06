@@ -24,7 +24,7 @@ export async function Footer({ locale }: { locale: string }) {
   };
 
   return (
-    <div className="mb-10 w-full mx-auto border-t-purple-700/80 border-t-1">
+    <div className="mb-10 w-full mx-auto border-t-purple-700/80 border-t">
       <footer>
         <div className="w-full flex flex-col items-center justify-center px-4 py-8 space-y-3">
           <div className="flex items-center justify-center space-x-6 text-xs">

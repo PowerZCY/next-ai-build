@@ -176,7 +176,7 @@ export async function PricePlan({
               className={cn(
                 'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
                 data.billingSwitch.defaultKey === 'monthly'
-                  ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+                  ? 'text-white bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
                   : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full'
               )}
               data-billing-button="monthly"
@@ -188,7 +188,7 @@ export async function PricePlan({
               className={cn(
                 'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
                 data.billingSwitch.defaultKey === 'yearly'
-                  ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+                  ? 'text-white bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
                   : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full'
               )}
               data-billing-button="yearly"
@@ -285,7 +285,7 @@ export async function PricePlan({
                 'w-full py-2 mt-auto text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
                 plan.button?.disabled
                   ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
+                  : 'bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
               )}
               disabled={plan.button?.disabled}
               type="button"

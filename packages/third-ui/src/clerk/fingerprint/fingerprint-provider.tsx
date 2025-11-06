@@ -163,8 +163,8 @@ export function FingerprintStatus() {
           type="button"
           aria-label="Fingerprint debug panel"
           className={cn(
-            'fixed left-3 top-3 z-[10000] inline-flex size-11 items-center justify-center rounded-full',
-            'bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300',
+            'fixed left-3 top-3 z-10000 inline-flex size-11 items-center justify-center rounded-full',
+            'bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300',
           )}
         >
           <icons.Lightbulb className="size-6 text-white" />
@@ -174,11 +174,11 @@ export function FingerprintStatus() {
       {/* 面板 */}
       {isOpen && (
         <>
-          <div onClick={handleBackdropClick} className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm" />
+          <div onClick={handleBackdropClick} className="fixed inset-0 z-9998 bg-black/60 backdrop-blur-sm" />
           <div
             ref={modalRef}
             className={cn(
-              'fixed left-3 top-1 z-[9999] w-[min(500px,95vw)] overflow-y-auto rounded-2xl border',
+              'fixed left-3 top-1 z-9999 w-[min(500px,95vw)] overflow-y-auto rounded-2xl border',
               'border-slate-200/70 bg-white/95 p-5 shadow-2xl backdrop-blur-sm',
               'font-sans text-sm text-slate-700',
               'dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200'
@@ -231,7 +231,7 @@ export function FingerprintStatus() {
                           </div>
                           <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 transition-[width]"
+                              className="h-full rounded-full bg-linear-to-r from-purple-500 via-pink-500 to-rose-400 transition-[width]"
                               style={{ width: `${percent}%` }}
                             />
                           </div>

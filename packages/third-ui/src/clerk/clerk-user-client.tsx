@@ -45,12 +45,12 @@ export function ClerkUserClient({ data }: { data: ClerkUserData }) {
             <UserButton.MenuItems>
               <UserButton.Action label="manageAccount" />
               {<UserButton.Link
-                labelIcon={<icons.ReceiptText className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
+                labelIcon={<icons.ReceiptText className="size-4 fill-none stroke-(--clerk-icon-stroke-color)" />}
                 label={data.terms}
                 href={`/${data.locale}/legal/terms`}>
               </UserButton.Link>}
               {<UserButton.Link
-                labelIcon={<icons.ShieldUser className="size-4 fill-none stroke-[var(--clerk-icon-stroke-color)]" />}
+                labelIcon={<icons.ShieldUser className="size-4 fill-none stroke-(--clerk-icon-stroke-color)" />}
                 label={data.privacy}
                 href={`/${data.locale}/legal/privacy`}>
               </UserButton.Link>}

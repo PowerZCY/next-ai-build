@@ -216,7 +216,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
           role="dialog"
           aria-modal="true"
           aria-label={typeof title === 'string' ? title : 'Mermaid Preview'}
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          className="fixed inset-0 z-9999 flex items-center justify-center"
         >
           <div
             className="absolute inset-0 bg-black/60"
@@ -224,7 +224,7 @@ export function Mermaid({ chart, title, watermarkEnabled, watermarkText, enableP
             onWheel={(e) => { e.preventDefault(); e.stopPropagation(); }}
             onTouchMove={(e) => { e.preventDefault(); e.stopPropagation(); }}
           />
-          <div className="relative z-[1] max-w-[95vw] w-[95vw] h-[88vh] p-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-2xl overflow-hidden">
+          <div className="relative z-1 max-w-[95vw] w-[95vw] h-[88vh] p-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md shadow-2xl overflow-hidden">
             {/* Top bar */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">

@@ -234,7 +234,7 @@ export function CreditOverviewClient({
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-gradient-to-bl from-indigo-200/60 via-indigo-400/90 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
+      <header className="relative rounded-2xl bg-linear-to-bl from-indigo-200/60 via-indigo-400/90 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-start rounded-full ">
             <icons.Gem aria-hidden className="h-8 w-8 mr-2" />
@@ -350,7 +350,7 @@ export function CreditOverviewClient({
         >
           <AlertDialogContent
             ref={pricingContentRef}
-            className="w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
+            className="mt-4 w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
           >
             <AlertDialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
               <AlertDialogTitle asChild>

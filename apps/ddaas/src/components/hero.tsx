@@ -12,7 +12,7 @@ export async function Hero({ locale }: { locale: string }) {
       <div className="flex-[1.6] space-y-6">
         <h1 className="text-4xl md:text-6xl font-bold leading-tight">
           {t('mainTitle')}<br />{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{t('mainEyesOn')}</span>
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-600">{t('mainEyesOn')}</span>
         </h1>
         <p className="text-lg text-gray-400 max-w-2xl">
           {t('description')}
@@ -26,7 +26,7 @@ export async function Hero({ locale }: { locale: string }) {
           <span>{t('about')}</span>
         </div>
       </div>
-      <div className="flex-[1] relative flex justify-center md:justify-end">
+      <div className="flex-1 relative flex justify-center md:justify-end">
         <div className="rounded-lg overflow-hidden shadow-purple-500/20 group">
           <Image
             src={t('heroImageUrl')}
