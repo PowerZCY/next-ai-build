@@ -55,10 +55,12 @@
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/base-ui#build": {
+      "dependsOn": ["@windrun-huaiin/lib#build"],
       "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/third-ui#build": {
+      "dependsOn": ["@windrun-huaiin/base-ui#build"],
       "outputs": ["dist/**"],
       "env": [
         "NODE_ENV",
@@ -76,6 +78,7 @@
       "env": ["NODE_ENV"]
     },
     "@windrun-huaiin/base-ui#build:prod": {
+      "dependsOn": ["@windrun-huaiin/lib#build:prod"],
       "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
@@ -113,4 +116,4 @@
       "env": ["NODE_ENV"]
     }
   }
-} 
+}
