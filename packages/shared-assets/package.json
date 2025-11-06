@@ -14,7 +14,7 @@
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.15.18",
+    "@types/node": "22.17.2",
     "chokidar": "^3.5.3",
     "tsx": "^4.1.0"
   }

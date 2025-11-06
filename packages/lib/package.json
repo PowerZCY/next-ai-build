@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "@types/node": "^22.15.18",
+    "@types/node": "22.17.2",
     "@types/react": "19.1.2"
   },
   "peerDependencies": {
