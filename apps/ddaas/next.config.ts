@@ -14,12 +14,6 @@ const nextConfig: NextConfig = {
     '@windrun-huaiin/third-ui',
     '@windrun-huaiin/lib',
   ],
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
   
   // mdx config
   reactStrictMode: true,
@@ -42,12 +36,6 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // experimental: {
-  //   webpackBuildWorker: true,
-  //   parallelServerBuildTraces: true,
-  //   parallelServerCompiles: true,
-  // },
-
   // Ensuring outputFileTracingIncludes is a top-level property
   outputFileTracingIncludes: {
     // Ensure MDX files for the llm-content API route are included in the serverless function
