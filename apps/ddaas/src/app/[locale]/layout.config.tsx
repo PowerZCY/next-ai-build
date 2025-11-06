@@ -126,7 +126,7 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
       title: (
         <>
           <SiteIcon />
-          <span className="font-medium [.uwu_&]:hidden [header_&]:text-[15px]">
+          <span className="font-medium in-[.uwu]:hidden in-[header]:text-[15px]">
             {t('title')}
           </span>
         </>
