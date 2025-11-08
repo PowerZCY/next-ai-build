@@ -1,11 +1,9 @@
 
 import { Hero } from "@/components/hero";
-import { moneyPriceConfig } from '@/lib/money-price-config';
 import { FingerprintStatus } from "@third-ui/clerk/fingerprint";
 import { GradientButton } from "@third-ui/fuma/mdx/gradient-button";
-import { CTA, FAQ, Features, Gallery, MoneyPrice, SeoContent, Tips, Usage } from "@third-ui/main/server";
+import { CTA, FAQ, Features, Gallery, SeoContent, Tips, Usage } from "@third-ui/main/server";
 import { getTranslations } from "next-intl/server";
-import { appConfig } from '@/lib/appConfig';
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const isDev = process.env.NODE_ENV !== 'production';
@@ -16,15 +14,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   return (
     <>
       { (forceShow || isDev) && <FingerprintStatus />}
-      <MoneyPrice
-        locale={locale}
-        config={moneyPriceConfig}
-        checkoutApiEndpoint="/api/stripe/checkout"
-        customerPortalApiEndpoint="/api/stripe/customer-portal"
-        enableClerkModal={appConfig.style.clerkAuthInModal}
-        enabledBillingTypes={['monthly', 'yearly', 'onetime']}
-        enableSubscriptionUpgrade={enableSubscriptionUpgrade}
-      />
       <Hero locale={locale}/>
       <Gallery
         locale={locale}
