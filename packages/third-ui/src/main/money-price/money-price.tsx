@@ -8,7 +8,7 @@ export async function MoneyPrice({
   config,
   checkoutApiEndpoint,
   customerPortalApiEndpoint,
-  signInPath,
+  enableClerkModal = false,
   sectionClassName,
   enabledBillingTypes,
   enableSubscriptionUpgrade = true,
@@ -32,7 +32,7 @@ export async function MoneyPrice({
         config={config}
         checkoutApiEndpoint={checkoutApiEndpoint}
         customerPortalApiEndpoint={customerPortalApiEndpoint}
-        signInPath={signInPath}
+        enableClerkModal={enableClerkModal}
         enabledBillingTypes={enabledBillingTypes}
         enableSubscriptionUpgrade={enableSubscriptionUpgrade}
       />

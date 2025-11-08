@@ -51,8 +51,6 @@ export interface FingerprintConfig {
   apiEndpoint: string;
   /** Whether to automatically initialize the user on load */
   autoInitialize?: boolean;
-  /** Initial credits for new users */
-  initialCredits?: number;
 }
 
 export interface UseFingerprintResult {

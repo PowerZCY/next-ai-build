@@ -37,12 +37,12 @@ export function MoneyPriceInteractive({
   config,
   checkoutApiEndpoint,
   customerPortalApiEndpoint,
-  signInPath,
+  enableClerkModal = false,
   enabledBillingTypes,
   enableSubscriptionUpgrade = true,
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
-  const { redirectToSignIn, user } = useClerk();
+  const { redirectToSignIn, redirectToSignUp, user: clerkUser, openSignIn, openSignUp } = useClerk();
   const router = useRouter();
 
   const providerConfig = useMemo(() => getActiveProviderConfigUtil(config), [config]);
@@ -103,7 +103,7 @@ export function MoneyPriceInteractive({
     return priceIds;
   }, [providerConfig, billingOptions]);
 
-  const isClerkAuthenticated = !!user?.id;
+  const isClerkAuthenticated = !!clerkUser?.id;
 
   const detectBillingType = useCallback((): BillingType | null => {
     if (!isClerkAuthenticated) return null;
@@ -186,15 +186,37 @@ export function MoneyPriceInteractive({
       subscriptionType: detectedType ?? undefined,
       subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
     };
-  }, [user, getUserState, detectBillingType, fingerprintContext]);
+  }, [clerkUser, getUserState, detectBillingType, fingerprintContext]);
 
-  const handleLogin = useCallback(() => {
-    if (signInPath) {
-      router.push(signInPath);
-    } else {
-      redirectToSignIn();
+  const handleAuth = useCallback(() => {
+    if (!fingerprintContext) {
+      return;
     }
-  }, [signInPath, redirectToSignIn, router]);
+    const { fingerprintId, xUser } = fingerprintContext;
+    const isRegistered = !!xUser?.clerkUserId;
+
+    console.log('PriceButton auth DEBUG:', {
+      enableClerkModal,
+      fingerprintId,
+      userId: xUser?.userId,
+      clerkUserId: xUser?.clerkUserId,
+      isRegistered
+    });
+
+    if (!enableClerkModal) {
+      // 跳转处理
+      isRegistered ? redirectToSignIn() : redirectToSignUp();
+    }  else {
+      // 弹窗处理
+      const userId = xUser?.userId || null;
+      const unsafeMetadata = {
+        user_id: userId,
+        fingerprint_id: fingerprintId || null,
+      };
+      isRegistered ? openSignIn({unsafeMetadata}) : openSignUp({unsafeMetadata});
+    }
+    return;
+  }, [redirectToSignIn, redirectToSignUp, openSignIn, openSignUp]);
 
   const handleAction = useCallback(async (plan: string, billing: string) => {
     const isSubscriptionFlow = billing !== 'onetime';
@@ -215,7 +237,6 @@ export function MoneyPriceInteractive({
       if (shouldUsePortal) {
         const handled = await redirectToCustomerPortal({
           customerPortalApiEndpoint,
-          signInPath,
           redirectToSignIn,
           returnUrl: window.location.href,
         });
@@ -257,11 +278,7 @@ export function MoneyPriceInteractive({
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error('Received non-JSON response, user may need to login');
-        if (signInPath) {
-          window.location.href = signInPath;
-        } else {
-          redirectToSignIn();
-        }
+        redirectToSignIn();
         return;
       }
 
@@ -272,11 +289,7 @@ export function MoneyPriceInteractive({
         console.error('Upgrade request failed:', errorMessage);
 
         if (response.status === 401 || response.status === 403) {
-          if (signInPath) {
-            window.location.href = signInPath;
-          } else {
-            redirectToSignIn();
-          }
+          redirectToSignIn();
         } else {
           alert(`Operation failed: ${errorMessage}`);
         }
@@ -298,7 +311,6 @@ export function MoneyPriceInteractive({
     checkoutApiEndpoint,
     config,
     router,
-    signInPath,
     redirectToSignIn,
     userContext,
     enableSubscriptionUpgrade,
@@ -570,7 +582,7 @@ export function MoneyPriceInteractive({
                 planKey={planKey}
                 userContext={userContext}
                 billingType={billingType}
-                onLogin={handleLogin}
+                onAuth={handleAuth}
                 onAction={handleAction}
                 texts={data.buttonTexts}
                 isProcessing={isProcessing}

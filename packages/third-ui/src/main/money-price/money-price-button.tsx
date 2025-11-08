@@ -9,7 +9,7 @@ export function MoneyPriceButton({
   planKey,
   userContext,
   billingType,
-  onLogin,
+  onAuth,
   onAction,
   texts,
   isProcessing = false,
@@ -34,10 +34,16 @@ export function MoneyPriceButton({
     if (!isAuthenticated) {
       return {
         text: texts.getStarted,
-        onClick: onLogin,
+        onClick: onAuth,
         disabled: false,
         hidden: false
       };
+    }
+
+    if (subscriptionStatus === UserState.Anonymous) {
+        // 已登录但状态未知 → 视为 FreeUser
+        console.warn('Clerk is authed OK but user is anonymous!');
+        return { text: '', disabled: true, hidden: true };
     }
 
     // 登录用户：OneTime 模式下所有卡片都显示购买积分按钮
@@ -68,7 +74,7 @@ export function MoneyPriceButton({
 
       return {
         text: getButtonText(),
-        onClick: onLogin,
+        onClick: onAuth,
         disabled: false,
         hidden: false
       };
@@ -187,6 +193,8 @@ export function MoneyPriceButton({
       }
 
       default:
+        // 已登录但状态未知 → 视为 FreeUser
+        console.warn('Clerk is authed OK but user is anonymous!');
         return { text: '', disabled: true, hidden: true };
     }
   };

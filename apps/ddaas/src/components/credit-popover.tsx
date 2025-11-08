@@ -92,7 +92,6 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
       checkoutApiEndpoint: '/api/stripe/checkout',
       customerPortalApiEndpoint: '/api/stripe/customer-portal',
       enableSubscriptionUpgrade,
-      signInPath: `${locale}/sign-in`,
     },
   };
 

@@ -56,16 +56,6 @@ const formatNumber = (locale: string, value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const formatRange = (locale: string, info: SubscriptionInfo) => {
-  const formatter = new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-  const start = info.periodStart ? formatter.format(new Date(info.periodStart)) : '';
-  const end = info.periodEnd ? formatter.format(new Date(info.periodEnd)) : '';
-  return `${start} - ${end}`;
-};
 
 export function CreditOverviewClient({
   data,
@@ -200,7 +190,6 @@ export function CreditOverviewClient({
     if (pricingContext) {
       const handled = await redirectToCustomerPortal({
         customerPortalApiEndpoint: pricingContext.customerPortalApiEndpoint,
-        signInPath: pricingContext.signInPath,
         redirectToSignIn,
       });
       if (handled) {
@@ -387,7 +376,6 @@ export function CreditOverviewClient({
                     config={pricingContext.moneyPriceConfig}
                     checkoutApiEndpoint={pricingContext.checkoutApiEndpoint}
                     customerPortalApiEndpoint={pricingContext.customerPortalApiEndpoint}
-                    signInPath={pricingContext.signInPath}
                     enableSubscriptionUpgrade={pricingContext.enableSubscriptionUpgrade}
                   />
                 ) : null}

@@ -42,6 +42,5 @@ export interface CreditPricingContext {
   moneyPriceConfig: MoneyPriceConfig;
   checkoutApiEndpoint?: string;
   customerPortalApiEndpoint?: string;
-  signInPath?: string;
   enableSubscriptionUpgrade?: boolean;
 }

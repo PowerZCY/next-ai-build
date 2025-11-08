@@ -89,7 +89,7 @@ export interface MoneyPriceProps {
   className?: string;
   checkoutApiEndpoint?: string;
   customerPortalApiEndpoint?: string;
-  signInPath?: string;
+  enableClerkModal?: boolean;
   sectionClassName?: string;
   enabledBillingTypes?: string[];
   enableSubscriptionUpgrade?: boolean;
@@ -101,7 +101,7 @@ export interface MoneyPriceInteractiveProps {
   config: MoneyPriceConfig;
   checkoutApiEndpoint?: string;
   customerPortalApiEndpoint?: string;
-  signInPath?: string;
+  enableClerkModal?: boolean;
   enabledBillingTypes?: string[];
   enableSubscriptionUpgrade?: boolean;
 }
@@ -111,7 +111,7 @@ export interface MoneyPriceButtonProps {
   planKey: 'F1' | 'P2' | 'U3';
   userContext: UserContext;
   billingType: string;
-  onLogin: () => void;
+  onAuth: () => void;
   onAction: (plan: string, billingType: string) => void | Promise<void>;
   texts: {
     buyCredits: string;

@@ -2,14 +2,12 @@
 
 interface RedirectToCustomerPortalOptions {
   customerPortalApiEndpoint?: string;
-  signInPath?: string;
-  redirectToSignIn?: () => void;
+  redirectToSignIn: () => void;
   returnUrl?: string;
 }
 
 export async function redirectToCustomerPortal({
   customerPortalApiEndpoint,
-  signInPath,
   redirectToSignIn,
   returnUrl = window.location.href,
 }: RedirectToCustomerPortalOptions): Promise<boolean> {
@@ -43,11 +41,7 @@ export async function redirectToCustomerPortal({
       console.error('Customer portal request failed:', errorMessage);
 
       if (response.status === 401 || response.status === 403) {
-        if (signInPath) {
-          window.location.href = signInPath;
-        } else if (redirectToSignIn) {
-          redirectToSignIn();
-        }
+        redirectToSignIn();
         return true;
       }
 
