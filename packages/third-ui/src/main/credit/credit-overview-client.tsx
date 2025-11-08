@@ -103,6 +103,7 @@ export function CreditOverviewClient({
     open: false,
     mode: 'subscription',
   });
+  const isOnetimeModal = pricingModal.mode === 'onetime';
   const pricingContentRef = useRef<HTMLDivElement | null>(null);
 
   const modalMoneyPriceData = useMemo(() => {
@@ -110,7 +111,7 @@ export function CreditOverviewClient({
       return null;
     }
 
-    if (pricingModal.mode !== 'onetime') {
+    if (!isOnetimeModal) {
       return pricingContext.moneyPriceData;
     }
 
@@ -129,7 +130,7 @@ export function CreditOverviewClient({
         defaultKey: 'onetime',
       },
     };
-  }, [pricingContext, pricingModal.mode]);
+  }, [pricingContext, isOnetimeModal]);
 
   useEffect(() => {
     if (!pricingModal.open) {
@@ -376,6 +377,8 @@ export function CreditOverviewClient({
                     checkoutApiEndpoint={pricingContext.checkoutApiEndpoint}
                     customerPortalApiEndpoint={pricingContext.customerPortalApiEndpoint}
                     enableSubscriptionUpgrade={pricingContext.enableSubscriptionUpgrade}
+                    initialBillingType={isOnetimeModal ? 'onetime' : undefined}
+                    disableAutoDetectBilling={isOnetimeModal}
                   />
                 ) : null}
               </div>

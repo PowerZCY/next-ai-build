@@ -104,6 +104,8 @@ export interface MoneyPriceInteractiveProps {
   enableClerkModal?: boolean;
   enabledBillingTypes?: string[];
   enableSubscriptionUpgrade?: boolean;
+  initialBillingType?: string;
+  disableAutoDetectBilling?: boolean;
 }
 
 // 按钮组件属性

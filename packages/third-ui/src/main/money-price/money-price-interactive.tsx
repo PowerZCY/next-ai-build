@@ -40,6 +40,8 @@ export function MoneyPriceInteractive({
   enableClerkModal = false,
   enabledBillingTypes,
   enableSubscriptionUpgrade = true,
+  initialBillingType,
+  disableAutoDetectBilling = false,
 }: MoneyPriceInteractiveProps) {
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, redirectToSignUp, user: clerkUser, openSignIn, openSignUp } = useClerk();
@@ -79,6 +81,16 @@ export function MoneyPriceInteractive({
     // 否则使用第一个可用选项
     return billingOptions[0]?.key || 'monthly';
   }, [data.billingSwitch.defaultKey, billingOptions]);
+
+  const resolvedInitialBilling = useMemo<BillingType>(() => {
+    if (
+      initialBillingType &&
+      billingOptions.some(option => option.key === initialBillingType)
+    ) {
+      return initialBillingType;
+    }
+    return defaultBilling;
+  }, [initialBillingType, billingOptions, defaultBilling]);
 
   const priceIdsByCycle = useMemo(() => {
     const priceIds: Record<string, string[]> = {};
@@ -125,11 +137,19 @@ export function MoneyPriceInteractive({
     return null;
   }, [fingerprintContext, priceIdsByCycle, isClerkAuthenticated]);
 
-  const [billingType, setBillingType] = useState<BillingType>(defaultBilling);
+  const [billingType, setBillingType] = useState<BillingType>(resolvedInitialBilling);
   const contextSignatureRef = useRef<string | null>(null);
   const navigationLockRef = useRef(false);
 
   useEffect(() => {
+    setBillingType(prev => (prev === resolvedInitialBilling ? prev : resolvedInitialBilling));
+  }, [resolvedInitialBilling]);
+
+  useEffect(() => {
+    if (disableAutoDetectBilling) {
+      return;
+    }
+
     const priceId = fingerprintContext?.xSubscription?.priceId ?? '';
     const signature = `${isClerkAuthenticated ? '1' : '0'}:${priceId}`;
     if (contextSignatureRef.current !== signature) {
@@ -142,7 +162,8 @@ export function MoneyPriceInteractive({
     detectBillingType,
     fingerprintContext?.xSubscription?.priceId,
     defaultBilling,
-    isClerkAuthenticated
+    isClerkAuthenticated,
+    disableAutoDetectBilling
   ]);
 
   const [isProcessing, setIsProcessing] = useState(false);
