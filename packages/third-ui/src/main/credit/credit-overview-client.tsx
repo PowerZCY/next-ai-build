@@ -11,14 +11,13 @@ import {
 } from '@windrun-huaiin/base-ui/ui';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { redirectToCustomerPortal } from '../money-price/customer-portal';
+import { MoneyPriceInteractive } from '../money-price/money-price-interactive';
 import type {
   CreditBucket,
   CreditBucketStatus,
-  CreditOverviewData,
-  SubscriptionInfo,
+  CreditOverviewData
 } from './types';
-import { MoneyPriceInteractive } from '../money-price/money-price-interactive';
-import { redirectToCustomerPortal } from '../money-price/customer-portal';
 
 export interface CreditOverviewTranslations {
   summaryDescription: string;
