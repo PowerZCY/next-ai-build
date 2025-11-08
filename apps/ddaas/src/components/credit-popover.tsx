@@ -20,7 +20,7 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
 
   const user = await userService.findByClerkUserId(clerkUserId);
   if (!user) {
-    console.error('User not found!');
+    console.warn('User not found!');
     return null;
   }
 
