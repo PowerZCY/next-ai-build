@@ -2,7 +2,7 @@
 
 import { cn } from '@windrun-huaiin/lib/utils';
 import { UserState, type MoneyPriceButtonProps } from './money-price-types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 
 export function MoneyPriceButton({
@@ -17,22 +17,21 @@ export function MoneyPriceButton({
   enableSubscriptionUpgrade = true
 }: MoneyPriceButtonProps) {
 
+  if (isInitLoading) {
+    return (
+      <div
+        className="w-full h-11 mt-auto rounded-full bg-transparent"
+        aria-hidden="true"
+        data-plan-button-placeholder={planKey}
+      />
+    );
+  }
+
   const { isAuthenticated, subscriptionStatus } = userContext;
   const [isLoading, setIsLoading] = useState(false);
-  const [showInitLoadingIndicator, setShowInitLoadingIndicator] = useState(false);
   const subscriptionBilling = userContext.subscriptionType;
   const planTier = planKey;
   const planBilling = billingType;
-
-  useEffect(() => {
-    if (!isInitLoading) {
-      setShowInitLoadingIndicator(false);
-      return;
-    }
-
-    const timeoutId = setTimeout(() => setShowInitLoadingIndicator(true), 200);
-    return () => clearTimeout(timeoutId);
-  }, [isInitLoading]);
 
   const getPlanRank = (tier: 'F1' | 'P2' | 'U3', billing: string) => {
     if (tier === 'F1') return 0;
@@ -233,10 +232,9 @@ export function MoneyPriceButton({
     return null;
   }
 
-  const isBusy = isLoading || isProcessing || isInitLoading;
-  const shouldShowInitProcessingText = isInitLoading && showInitLoadingIndicator;
+  const isBusy = isLoading || isProcessing;
   const isDisabled = config.disabled || isBusy;
-  const displayText = (isLoading || isProcessing || shouldShowInitProcessingText) ? 'Processing...' : config.text;
+  const displayText = isBusy ? 'Processing...' : config.text;
   const isDisabledByConfigOnly = config.disabled && !isBusy;
 
   const handleClick = async (e: React.MouseEvent) => {

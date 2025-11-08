@@ -121,6 +121,12 @@ export function MoneyPriceInteractive({
   }, [providerConfig, billingOptions]);
 
   const isClerkAuthenticated = !!clerkUser?.id;
+  const shouldHideInitUi =
+    hasMounted &&
+    isClerkAuthenticated &&
+    (!fingerprintContext || fingerprintContext.isLoading);
+    
+  console.log({isClerkAuthenticated, hasMounted, hasContext: !fingerprintContext, isLoading: fingerprintContext?.isLoading})
 
   const detectBillingType = useCallback((): BillingType | null => {
     if (!isClerkAuthenticated) return null;
@@ -451,7 +457,12 @@ export function MoneyPriceInteractive({
   return (
     <>
       <div className="flex flex-col items-center">
-        <div className="flex items-center relative mb-3">
+        <div
+          className={cn(
+            'flex items-center relative mb-3',
+            shouldHideInitUi && 'opacity-0 pointer-events-none select-none'
+          )}
+        >
           <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
             {billingOptions.map(option => {
               const isActive = option.key === billingType;
@@ -477,7 +488,13 @@ export function MoneyPriceInteractive({
           </div>
         </div>
 
-        <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
+        <div
+          className={cn(
+            'h-8 flex items-center justify-center mb-3',
+            shouldHideInitUi && 'opacity-0 pointer-events-none select-none'
+          )}
+          data-discount-info
+        >
           {discountBadgeText ? (
             <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
               {discountBadgeText}
@@ -626,7 +643,7 @@ export function MoneyPriceInteractive({
                 onAction={handleAction}
                 texts={data.buttonTexts}
                 isProcessing={isProcessing}
-                isInitLoading={hasMounted ? (fingerprintContext?.isLoading ?? false) : false}
+                isInitLoading={shouldHideInitUi}
                 enableSubscriptionUpgrade={enableSubscriptionUpgrade}
               />
             </div>
