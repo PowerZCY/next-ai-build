@@ -11,6 +11,7 @@ import { Credit, Subscription, User } from '@/db/prisma-model-type';
 import { viewLocalTime } from '@lib/utils';
 import { XCredit, XSubscription, XUser } from '@third-ui/clerk/fingerprint';
 import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';
+import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 
@@ -114,6 +115,30 @@ function createErrorResponse(message: string, status = 400): NextResponse {
   return NextResponse.json(errorResponse, { status });
 }
 
+
+/**
+ * 根据fingerprint_id查询用户并返回响应数据
+ */
+async function getUserByClerkId(clerkUserId: string): Promise<XUserResponse | null> {
+  const existingUser = await userService.findByClerkUserId(clerkUserId);
+  
+  if (!existingUser) {
+    return null;
+  }
+
+  // 查找最新的匿名用户
+  // 找到匿名用户，返回匿名用户信息和积分
+  const credit = await creditService.getCredit(existingUser.userId);
+  const subscription = await subscriptionService.getActiveSubscription(existingUser.userId);
+  
+  return createSuccessResponse(
+    existingUser,
+    credit,
+    subscription,
+    false
+  );
+}
+
 /**
  * 根据fingerprint_id查询用户并返回响应数据
  */
@@ -146,20 +171,32 @@ async function getUserByFingerprintId(fingerprintId: string): Promise<XUserRespo
  * 通用的fingerprint处理逻辑
  */
 async function handleFingerprintRequest(request: NextRequest, options: { createIfNotExists?: boolean; } = {}) {
+  // 从请求中提取fingerprint ID
+  const fingerprintId = extractFingerprintFromNextRequest(request);
+  // 验证fingerprint ID
+  if (!fingerprintId) {
+    return createErrorResponse('Invalid or missing fingerprint ID');
+  }
+  console.log('Received fingerprintId:', fingerprintId);
+
+  const { userId: clerkUserId } = await auth();
   try {
-    // 从请求中提取fingerprint ID
-    const fingerprintId = extractFingerprintFromNextRequest(request);
-
-    // 验证fingerprint ID
-    if (!fingerprintId) {
-      return createErrorResponse('Invalid or missing fingerprint ID');
+    // 优先根据 Clerk ID 查询（如果已登录）
+    let existingUserResult: XUserResponse | null = null;
+    if (clerkUserId) {
+      // 已登录一律按照clerkUserId去查
+      existingUserResult = await getUserByClerkId(clerkUserId);
+      if (existingUserResult && existingUserResult.xUser.fingerprintId !== fingerprintId) {
+        // 说明当前用户的指纹ID发生了改变，为什么呢？因为它使用同一账号去注册Clerk，Clerk判定是同一用户！
+        // 这个时候一定以登录用户clerkUserId为准
+        // 但是考虑到同一指纹ID本身可以绑定多个账号，所以这里什么都不做
+        // 就是以当前登录用户去查他自己的数据就行！
+        console.warn(`Current login user used diff fp_ids: ${clerkUserId}, db_fp_id=${existingUserResult.xUser.fingerprintId}, req_fp_id=${fingerprintId}`);
+      }
+    } else {
+      // 其次才是检查是否已存在该fingerprint的用户
+      existingUserResult = await getUserByFingerprintId(fingerprintId);
     }
-
-    console.log('Received fingerprintId:', fingerprintId);
-
-    // 检查是否已存在该fingerprint的用户
-    const existingUserResult = await getUserByFingerprintId(fingerprintId);
-    
     if (existingUserResult) {
       checkMock(existingUserResult);
       return NextResponse.json(existingUserResult);
