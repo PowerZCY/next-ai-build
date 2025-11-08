@@ -201,7 +201,7 @@ async function handleOneTimeCheckout(
   paymentStatus: PaymentStatus
 ) {
   console.log(`Processing one-time payment checkout: ${session.id}`);
-  // 1. Calculate one-time credit expiration (1 year from purchase)
+  // 1. Calculate one-time credit expiration
   const now = new Date();
   const oneTimePaidStart = now;
   const oneTimePaidEnd = new Date(now);
@@ -216,6 +216,7 @@ async function handleOneTimeCheckout(
       paymentStatus,
       payTransactionId: session.payment_intent as string,
       paidEmail: session.customer_details?.email,
+      paidAt: oneTimePaidStart,
       oneTimePaidStart,
       oneTimePaidEnd,
     }
@@ -272,8 +273,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   
   const userId = transaction.userId;
   const paymentIntentId = await fetchPaymentId(invoice.id)
-  
-  
   
   const invoicePaidAt = invoice.status_transitions?.paid_at;
   const paidAt = invoicePaidAt ? new Date(invoicePaidAt * 1000) : new Date();

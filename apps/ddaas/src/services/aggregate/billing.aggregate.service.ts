@@ -64,6 +64,9 @@ class BillingAggregateService {
   ): Promise<void> {
     await runInTransaction(async (tx) => {
       const now = new Date();
+      // 订阅截止时间统一为到期日最后1s
+      const originSubPeriodEnd = context.periodEnd;
+      const specialEnd = originSubPeriodEnd ? new Date(originSubPeriodEnd.setHours(23, 59, 59, 999)) : originSubPeriodEnd;
       const updatedSubscription = await subscriptionService.updateSubscription(
         context.subIdKey,
         {
@@ -74,7 +77,7 @@ class BillingAggregateService {
           priceName: context.priceName ?? undefined,
           creditsAllocated: context.creditsGranted || 0,
           subPeriodStart: context.periodStart,
-          subPeriodEnd: context.periodEnd,
+          subPeriodEnd: specialEnd,
           updatedAt: now,
         },
         tx
@@ -133,6 +136,7 @@ class BillingAggregateService {
       creditsGranted: number;
       paymentStatus: PaymentStatus;
       payTransactionId: string;
+      paidAt: Date;
       paidEmail?: NullableString;
       oneTimePaidStart: Date;
       oneTimePaidEnd: Date;
@@ -233,6 +237,9 @@ class BillingAggregateService {
         },
         tx
       );
+      // 订阅截止时间统一为到期日最后1s
+      const originSubPeriodEnd = context.periodEnd;
+      const specialEnd = originSubPeriodEnd ? new Date(originSubPeriodEnd.setHours(23, 59, 59, 999)) : originSubPeriodEnd;
 
       await subscriptionService.updateSubscription(
         context.subIdKey,
@@ -240,7 +247,7 @@ class BillingAggregateService {
           status: SubscriptionStatus.ACTIVE,
           orderId: context.orderId,
           subPeriodStart: context.periodStart,
-          subPeriodEnd: context.periodEnd,
+          subPeriodEnd: specialEnd,
           updatedAt: new Date(),
         },
         tx
