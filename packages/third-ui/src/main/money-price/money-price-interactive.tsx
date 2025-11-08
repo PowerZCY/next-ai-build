@@ -44,6 +44,11 @@ export function MoneyPriceInteractive({
   const fingerprintContext = useFingerprintContextSafe();
   const { redirectToSignIn, redirectToSignUp, user: clerkUser, openSignIn, openSignUp } = useClerk();
   const router = useRouter();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   const providerConfig = useMemo(() => getActiveProviderConfigUtil(config), [config]);
   const billingOptions = useMemo(() => {
@@ -122,6 +127,7 @@ export function MoneyPriceInteractive({
 
   const [billingType, setBillingType] = useState<BillingType>(defaultBilling);
   const contextSignatureRef = useRef<string | null>(null);
+  const navigationLockRef = useRef(false);
 
   useEffect(() => {
     const priceId = fingerprintContext?.xSubscription?.priceId ?? '';
@@ -225,7 +231,12 @@ export function MoneyPriceInteractive({
       return;
     }
 
+    navigationLockRef.current = false;
     setIsProcessing(true);
+    const markNavigating = () => {
+      navigationLockRef.current = true;
+    };
+
     try {
       const hasActiveSubscription =
         userContext.isAuthenticated &&
@@ -241,11 +252,13 @@ export function MoneyPriceInteractive({
           returnUrl: window.location.href,
         });
         if (handled) {
+          markNavigating();
           return;
         }
       }
 
       if (!checkoutApiEndpoint) {
+        markNavigating();
         router.push('/');
         return;
       }
@@ -271,6 +284,7 @@ export function MoneyPriceInteractive({
       });
 
       if (response.redirected || response.status === 302 || response.status === 301) {
+        markNavigating();
         window.location.href = response.url;
         return;
       }
@@ -278,6 +292,7 @@ export function MoneyPriceInteractive({
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error('Received non-JSON response, user may need to login');
+        markNavigating();
         redirectToSignIn();
         return;
       }
@@ -289,6 +304,7 @@ export function MoneyPriceInteractive({
         console.error('Upgrade request failed:', errorMessage);
 
         if (response.status === 401 || response.status === 403) {
+          markNavigating();
           redirectToSignIn();
         } else {
           alert(`Operation failed: ${errorMessage}`);
@@ -297,6 +313,7 @@ export function MoneyPriceInteractive({
       }
 
       if (result.success && result.data?.sessionUrl) {
+        markNavigating();
         window.location.href = result.data.sessionUrl;
       } else {
         console.error('Failed to create checkout session:', result.error || 'Unknown error');
@@ -304,7 +321,9 @@ export function MoneyPriceInteractive({
     } catch (error) {
       console.error('Error during upgrade:', error);
     } finally {
-      setIsProcessing(false);
+      if (!navigationLockRef.current) {
+        setIsProcessing(false);
+      }
     }
   }, [
     customerPortalApiEndpoint,
@@ -313,7 +332,7 @@ export function MoneyPriceInteractive({
     router,
     redirectToSignIn,
     userContext,
-    enableSubscriptionUpgrade,
+    enableSubscriptionUpgrade
   ]);
 
   // 根据当前计费类型动态选择要显示的 plans
@@ -586,6 +605,7 @@ export function MoneyPriceInteractive({
                 onAction={handleAction}
                 texts={data.buttonTexts}
                 isProcessing={isProcessing}
+                isInitLoading={hasMounted ? (fingerprintContext?.isLoading ?? false) : false}
                 enableSubscriptionUpgrade={enableSubscriptionUpgrade}
               />
             </div>

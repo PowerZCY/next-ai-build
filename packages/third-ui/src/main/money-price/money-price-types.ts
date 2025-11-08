@@ -122,6 +122,7 @@ export interface MoneyPriceButtonProps {
     upgrade: string;
   };
   isProcessing?: boolean;
+  isInitLoading: boolean;
   enableSubscriptionUpgrade?: boolean;
 }
 

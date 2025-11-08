@@ -2,7 +2,7 @@
 
 import { cn } from '@windrun-huaiin/lib/utils';
 import { UserState, type MoneyPriceButtonProps } from './money-price-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 
 export function MoneyPriceButton({
@@ -13,13 +13,26 @@ export function MoneyPriceButton({
   onAction,
   texts,
   isProcessing = false,
+  isInitLoading = false,
   enableSubscriptionUpgrade = true
 }: MoneyPriceButtonProps) {
+
   const { isAuthenticated, subscriptionStatus } = userContext;
   const [isLoading, setIsLoading] = useState(false);
+  const [showInitLoadingIndicator, setShowInitLoadingIndicator] = useState(false);
   const subscriptionBilling = userContext.subscriptionType;
   const planTier = planKey;
   const planBilling = billingType;
+
+  useEffect(() => {
+    if (!isInitLoading) {
+      setShowInitLoadingIndicator(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => setShowInitLoadingIndicator(true), 200);
+    return () => clearTimeout(timeoutId);
+  }, [isInitLoading]);
 
   const getPlanRank = (tier: 'F1' | 'P2' | 'U3', billing: string) => {
     if (tier === 'F1') return 0;
@@ -220,8 +233,14 @@ export function MoneyPriceButton({
     return null;
   }
 
+  const isBusy = isLoading || isProcessing || isInitLoading;
+  const shouldShowInitProcessingText = isInitLoading && showInitLoadingIndicator;
+  const isDisabled = config.disabled || isBusy;
+  const displayText = (isLoading || isProcessing || shouldShowInitProcessingText) ? 'Processing...' : config.text;
+  const isDisabledByConfigOnly = config.disabled && !isBusy;
+
   const handleClick = async (e: React.MouseEvent) => {
-    if (config.disabled || isLoading || isProcessing) {
+    if (isDisabled) {
       e.preventDefault();
       return;
     }
@@ -242,17 +261,19 @@ export function MoneyPriceButton({
     }
   };
 
-  const isDisabled = config.disabled || isLoading || isProcessing;
-  const displayText = isLoading ? 'Processing...' : config.text;
-  
+  const buttonClassName = cn(
+    'w-full h-11 px-8 mt-auto inline-flex items-center justify-center text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
+    isDisabledByConfigOnly
+      ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-linear-to-r from-purple-400 to-pink-500 dark:from-purple-500 dark:to-pink-600',
+    !isDisabledByConfigOnly && !isBusy &&
+      'hover:from-purple-500 hover:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700',
+    isBusy && !isDisabledByConfigOnly && 'opacity-70 cursor-not-allowed'
+  );
+
   return (
     <button
-    className={cn(
-      'w-full h-11 px-8 mt-auto inline-flex items-center justify-center text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
-      isDisabled
-        ? 'bg-gray-400 cursor-not-allowed'
-        : 'bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700'
-    )}
+      className={buttonClassName}
       disabled={isDisabled}
       onClick={handleClick}
       type="button"
