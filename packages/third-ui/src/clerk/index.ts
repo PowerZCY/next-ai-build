@@ -5,6 +5,7 @@ export * from './clerk-provider-client';
 // Fingerprint-enhanced Clerk components (client-side)
 export * from './signup-with-fingerprint-client';
 export * from './signin-with-fingerprint-client';
+export * from './signup-button-with-fingerprint-client';
 
 // Client-side page generators
-export * from './clerk-page-generator-client';
+export * from './clerk-page-context-generator';

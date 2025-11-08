@@ -157,7 +157,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
   useEffect(() => {
     const initFingerprint = async () => {
       setIsLoading(true);
-      const currentFingerprintId = await initializeFingerprintId();
+      await initializeFingerprintId();
       setIsLoading(false);
     };
 

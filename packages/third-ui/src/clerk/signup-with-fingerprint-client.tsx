@@ -22,8 +22,8 @@ export function SignUpWithFingerprint() {
 
   // 准备传递给Clerk的metadata，包含匿名用户信息
   const unsafeMetadata = {
-    user_id: xUser?.userId || null,        // 数据库中的user_id
-    fingerprint_id: fingerprintId || null,        // 浏览器指纹ID
+    user_id: xUser?.userId || null,
+    fingerprint_id: fingerprintId || null,
   };
 
   // 确保匿名用户已初始化
@@ -35,20 +35,12 @@ export function SignUpWithFingerprint() {
 
   // 调试日志和处理注册逻辑
   useEffect(() => {
-    console.log('SignUpWithFingerprint Debug:', {
+    console.log('SignUpWithFingerprint on [redirect] DEBUG:', {
       fingerprintProvider: fingerprintContext ? 'Available' : 'Not found',
       fingerprintId: fingerprintId || 'Not generated',
       xUser: xUser ? 'Initialized' : 'Not initialized',
       clerkMetadata: unsafeMetadata
     });
-
-    if (xUser && fingerprintId) {
-      console.log('User signed up with existing anonymous data:', {
-        userId: xUser.userId,
-        fingerprintId,
-      });
-      // TODO: 实现数据迁移逻辑
-    }
   }, [xUser, fingerprintId, fingerprintContext, unsafeMetadata]);
 
   return <SignUp unsafeMetadata={unsafeMetadata} />;

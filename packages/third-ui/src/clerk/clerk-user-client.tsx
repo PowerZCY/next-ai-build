@@ -1,7 +1,8 @@
 'use client';
 
+import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignUpButtonWithFingerprint } from './signup-button-with-fingerprint-client';
 
 interface ClerkUserData {
   signIn: string;
@@ -26,13 +27,7 @@ export function ClerkUserClient({ data }: { data: ClerkUserData }) {
               {data.signIn}
             </button>
           </SignInButton>
-          {data.showSignUp && (
-            <SignUpButton mode={data.clerkAuthInModal ? 'modal' : 'redirect'}>
-              <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
-                {data.signUp}
-              </button>
-            </SignUpButton>
-          )}
+          {data.showSignUp && ( <SignUpButtonWithFingerprint mode={data.clerkAuthInModal ? 'modal' : 'redirect'} signUp={data.signUp}/> )}
         </SignedOut>
         <SignedIn>
           <UserButton
