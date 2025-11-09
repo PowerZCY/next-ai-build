@@ -194,9 +194,75 @@ const moneyPriceData = await buildMoneyPriceData({ locale, currency: '$' });
   checkoutApiEndpoint="/api/stripe/checkout"
   customerPortalApiEndpoint="/api/stripe/customer-portal"
 />;
+```
 
 ### 5.4 ✅ 弹窗复用注意事项
 - 保持 `enabledBillingTypes` 未传或传入完整列表，确保弹窗里可以自由切换订阅 / 一次性视图。
 - 只需覆盖 `billingSwitch.defaultKey` 即可调整初始展示（如积分弹窗默认切到 `onetime`）。
+
+## 6. 组件渲染逻辑
+
+### 6.1 旧版：客户端 Fingerprint Context 流程
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Server as MoneyPrice (Server Component)
+    participant Browser as Browser
+    participant Clerk as Clerk Provider
+    participant FPProvider as FingerprintProvider (Client)
+    participant Hook as useFingerprint Hook
+    participant MoneyPrice as MoneyPriceInteractive
+
+    Server->>Browser: SSR HTML（无用户上下文）
+    Browser->>Clerk: hydrate Clerk，判断登录
+    Browser->>FPProvider: hydrate FingerprintProvider
+    FPProvider->>Hook: run useFingerprint()
+    Hook->>Hook: generate fingerprintId (localStorage/cookie)
+    Hook->>/api/user/anonymous/init: fetch xUser/xSubscription
+    /api/user/anonymous/init-->>Hook: returns context
+    Hook-->>FPProvider: context ready (loading=false)
+    FPProvider-->>MoneyPrice: broadcast context
+    MoneyPrice->>MoneyPrice: useEffect 检测 priceId → setBillingType
+    MoneyPrice->>MoneyPrice: re-render按钮（由 Anonymous 切换到订阅态）
+```
+
+**核心特点**
+- 首屏完全依赖客户端 hook：UI 先按匿名态渲染，再等待指纹接口返回后 setState。
+- Clerk hydrate 与 fingerprint fetch 顺序无法保证，已登录用户仍会短暂看到匿名按钮（FOUC）。
+- 指纹接口承载匿名/注册并存逻辑，渲染时机难以控制。
+
+### 6.2 新版：服务端 InitUserContext 流程
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Server as RSC Pipeline
+    participant Helper as MoneyPriceServerHelper
+    participant Clerk as Clerk Auth (Server)
+    participant DB as user/credit/subscription services
+    participant MoneyPrice as MoneyPriceInteractive
+    participant Browser as Browser
+    participant ClerkClient as Clerk (Client)
+
+    RSC Pipeline->>Helper: getMoneyPriceInitUserContext
+    Helper->>Clerk: auth
+    alt 已登录
+        Helper->>DB: user/credit/subscription lookup
+        DB-->>Helper: returns snapshot
+    else 未登录
+        Helper->>Helper: only read fingerprint cookie
+    end
+    Helper-->>RSC Pipeline: { fingerprintId, snapshot?, isClerkAuthenticated }
+    RSC Pipeline-->>Browser: HTML + initUserContext props
+    Browser->>MoneyPrice: hydrate（直接使用 props 渲染真实按钮）
+    Browser->>ClerkClient: hydrate Clerk（仅用于后续交互）
+    MoneyPrice->>MoneyPrice: 无需再等待 fingerprint hook，避免状态跳变
+```
+
+**核心特点**
+- SSR 阶段就能确定“是否登录 + 对应订阅状态”，首屏按钮/计费选项稳定。
+- 未登录场景仅传递指纹 ID 和 auth 状态，避免同一 `fp_id` 渲染出其它账号的数据。
+- 客户端只负责交互（计费切换、按钮点击、Clerk 弹窗），去掉 fingerprint context 依赖，彻底消除闪烁。
 - `redirectToCustomerPortal` helper 已抽离，点击“管理订阅”时页面与弹窗都会走同一套 Portal 逻辑。
 ```

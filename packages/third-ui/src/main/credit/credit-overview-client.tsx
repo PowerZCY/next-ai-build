@@ -379,6 +379,7 @@ export function CreditOverviewClient({
                     enableSubscriptionUpgrade={pricingContext.enableSubscriptionUpgrade}
                     initialBillingType={isOnetimeModal ? 'onetime' : undefined}
                     disableAutoDetectBilling={isOnetimeModal}
+                    initUserContext={pricingContext.initUserContext}
                   />
                 ) : null}
               </div>

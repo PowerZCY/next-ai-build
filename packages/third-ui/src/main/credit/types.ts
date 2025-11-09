@@ -1,4 +1,4 @@
-import type { MoneyPriceConfig, MoneyPriceData } from '../money-price/money-price-types';
+import type { InitUserContext, MoneyPriceConfig, MoneyPriceData } from '../money-price/money-price-types';
 
 export type CreditBucketStatus = 'active' | 'expiringSoon' | 'expired';
 
@@ -43,4 +43,5 @@ export interface CreditPricingContext {
   checkoutApiEndpoint?: string;
   customerPortalApiEndpoint?: string;
   enableSubscriptionUpgrade?: boolean;
+  initUserContext?: InitUserContext;
 }

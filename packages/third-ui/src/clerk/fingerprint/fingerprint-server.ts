@@ -4,10 +4,10 @@
  * 可以安全地在服务端使用，不依赖浏览器API或FingerprintJS
  */
 
-import { 
-  FINGERPRINT_HEADER_NAME, 
-  FINGERPRINT_COOKIE_NAME, 
-  isValidFingerprintId 
+import {
+  FINGERPRINT_HEADER_NAME,
+  FINGERPRINT_COOKIE_NAME,
+  isValidFingerprintId,
 } from './fingerprint-shared';
 
 /**
@@ -85,4 +85,32 @@ export function extractFingerprintFromNextRequest(request: Request): string | nu
   });
 
   return extractFingerprintId(headers, cookies, query);
+}
+
+type NextHeadersLike = Pick<Headers, 'forEach'>;
+type NextCookiesLike = {
+  getAll(): Array<{ name: string; value: string }>;
+};
+
+/**
+ * 从Next.js runtime提供的headers/cookies实例里提取fingerprint ID
+ * 供App Router服务端组件和Server Actions直接复用
+ */
+export function extractFingerprintFromNextStores(params: {
+  headers: NextHeadersLike;
+  cookies: NextCookiesLike;
+}): string | null {
+  const cookieMap = params.cookies
+    .getAll()
+    .reduce<Record<string, string>>((acc, cookie) => {
+      acc[cookie.name] = cookie.value;
+      return acc;
+    }, {});
+
+  const headerMap: Record<string, string> = {};
+  params.headers.forEach((value, key) => {
+    headerMap[key] = value;
+  });
+
+  return extractFingerprintId(headerMap, cookieMap);
 }

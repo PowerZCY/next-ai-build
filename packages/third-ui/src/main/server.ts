@@ -32,6 +32,7 @@ export type {
   MoneyPriceInteractiveProps,
   MoneyPriceButtonProps,
   MoneyPriceData,
+  InitUserContext,
   PaymentProvider,
   PaymentProviderConfig,
   EnhancePricePlan,

@@ -1,7 +1,6 @@
 'use client';
 
 import { useClerk } from '@clerk/nextjs';
-import { useFingerprintContextSafe } from '@third-ui/clerk/fingerprint';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { useRouter } from 'next/navigation';
 import React, {
@@ -42,15 +41,10 @@ export function MoneyPriceInteractive({
   enableSubscriptionUpgrade = true,
   initialBillingType,
   disableAutoDetectBilling = false,
+  initUserContext,
 }: MoneyPriceInteractiveProps) {
-  const fingerprintContext = useFingerprintContextSafe();
-  const { redirectToSignIn, redirectToSignUp, user: clerkUser, openSignIn, openSignUp } = useClerk();
+  const { redirectToSignIn, redirectToSignUp, user: clerkUser, openSignUp } = useClerk();
   const router = useRouter();
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
 
   const providerConfig = useMemo(() => getActiveProviderConfigUtil(config), [config]);
   const billingOptions = useMemo(() => {
@@ -120,57 +114,51 @@ export function MoneyPriceInteractive({
     return priceIds;
   }, [providerConfig, billingOptions]);
 
-  const isClerkAuthenticated = !!clerkUser?.id;
-  const shouldHideInitUi =
-    hasMounted &&
-    isClerkAuthenticated &&
-    (!fingerprintContext || fingerprintContext.isLoading);
-    
-  console.log({isClerkAuthenticated, hasMounted, hasContext: !fingerprintContext, isLoading: fingerprintContext?.isLoading})
+  const serverAuthenticated = !!initUserContext?.isClerkAuthenticated && !!initUserContext?.xUser?.clerkUserId;
+  const clientAuthenticated = !!clerkUser?.id;
+  const isAuthenticated = serverAuthenticated || clientAuthenticated;
+  const subscriptionSnapshot = initUserContext?.isClerkAuthenticated ? initUserContext?.xSubscription : null;
 
-  const detectBillingType = useCallback((): BillingType | null => {
-    if (!isClerkAuthenticated) return null;
-    if (fingerprintContext?.xSubscription?.status !== 'active') return null;
-    const priceId = fingerprintContext.xSubscription?.priceId;
-    if (!priceId) return null;
-
-    // 动态检测匹配的计费类型
+  const detectedBillingType = useMemo<BillingType | null>(() => {
+    if (disableAutoDetectBilling) {
+      return null;
+    }
+    if (!subscriptionSnapshot || subscriptionSnapshot.status !== 'active') {
+      return null;
+    }
+    const priceId = subscriptionSnapshot.priceId;
+    if (!priceId) {
+      return null;
+    }
     for (const [cycle, priceIds] of Object.entries(priceIdsByCycle)) {
       if (priceIds.includes(priceId)) {
         return cycle;
       }
     }
     return null;
-  }, [fingerprintContext, priceIdsByCycle, isClerkAuthenticated]);
+  }, [
+    disableAutoDetectBilling,
+    subscriptionSnapshot?.status,
+    subscriptionSnapshot?.priceId,
+    priceIdsByCycle,
+  ]);
 
-  const [billingType, setBillingType] = useState<BillingType>(resolvedInitialBilling);
-  const contextSignatureRef = useRef<string | null>(null);
+  const initialBillingCandidate = useMemo(() => {
+    if (initialBillingType) {
+      return resolvedInitialBilling;
+    }
+    if (detectedBillingType) {
+      return detectedBillingType;
+    }
+    return resolvedInitialBilling;
+  }, [initialBillingType, resolvedInitialBilling, detectedBillingType]);
+
+  const [billingType, setBillingType] = useState<BillingType>(initialBillingCandidate);
   const navigationLockRef = useRef(false);
 
   useEffect(() => {
-    setBillingType(prev => (prev === resolvedInitialBilling ? prev : resolvedInitialBilling));
-  }, [resolvedInitialBilling]);
-
-  useEffect(() => {
-    if (disableAutoDetectBilling) {
-      return;
-    }
-
-    const priceId = fingerprintContext?.xSubscription?.priceId ?? '';
-    const signature = `${isClerkAuthenticated ? '1' : '0'}:${priceId}`;
-    if (contextSignatureRef.current !== signature) {
-      contextSignatureRef.current = signature;
-      const detected = detectBillingType();
-      const nextBilling = detected ?? defaultBilling;
-      setBillingType(prev => (prev === nextBilling ? prev : nextBilling));
-    }
-  }, [
-    detectBillingType,
-    fingerprintContext?.xSubscription?.priceId,
-    defaultBilling,
-    isClerkAuthenticated,
-    disableAutoDetectBilling
-  ]);
+    setBillingType(prev => (prev === initialBillingCandidate ? prev : initialBillingCandidate));
+  }, [initialBillingCandidate]);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [tooltip, setTooltip] = useState<{
@@ -181,16 +169,13 @@ export function MoneyPriceInteractive({
   }>({ show: false, content: '', x: 0, y: 0 });
 
   const getUserState = useCallback((): UserState => {
-    if (!fingerprintContext) return UserState.Anonymous;
-    const { xUser, xSubscription } = fingerprintContext;
+    if (!subscriptionSnapshot || subscriptionSnapshot.status !== 'active') {
+      return UserState.FreeUser;
+    }
 
-    if (!xUser?.clerkUserId) return UserState.Anonymous;
-    if (!xSubscription?.status || xSubscription.status !== 'active') return UserState.FreeUser;
-
-    const userPriceId = xSubscription.priceId;
+    const userPriceId = subscriptionSnapshot.priceId;
     if (!userPriceId) return UserState.FreeUser;
 
-    // 获取订阅产品配置
     const products = providerConfig.subscriptionProducts || providerConfig.products || {};
 
     const proPlans = (products as any).P2?.plans || {};
@@ -206,50 +191,43 @@ export function MoneyPriceInteractive({
     }
 
     return UserState.FreeUser;
-  }, [fingerprintContext, providerConfig]);
+  }, [subscriptionSnapshot, providerConfig]);
 
   const userContext = useMemo<UserContext>(() => {
-    const isAuth = isClerkAuthenticated;
-    const userState = getUserState();
-    const detectedType = detectBillingType();
-
     return {
-      isAuthenticated: isAuth,
-      subscriptionStatus: isAuth ? userState : UserState.Anonymous,
-      subscriptionType: detectedType ?? undefined,
-      subscriptionEndDate: fingerprintContext?.xSubscription?.subPeriodEnd
+      isAuthenticated,
+      subscriptionStatus: isAuthenticated ? getUserState() : UserState.Anonymous,
+      subscriptionType: isAuthenticated ? detectedBillingType ?? undefined : undefined,
+      subscriptionEndDate: isAuthenticated ? subscriptionSnapshot?.subPeriodEnd : undefined
     };
-  }, [clerkUser, getUserState, detectBillingType, fingerprintContext]);
+  }, [
+    isAuthenticated,
+    getUserState,
+    detectedBillingType,
+    subscriptionSnapshot?.subPeriodEnd
+  ]);
+
+  const fingerprintId = initUserContext?.fingerprintId ?? null;
+  const initUserId = initUserContext?.xUser?.userId ?? null;
 
   const handleAuth = useCallback(() => {
-    if (!fingerprintContext) {
+    if (!enableClerkModal) {
+      redirectToSignUp();
       return;
     }
-    const { fingerprintId, xUser } = fingerprintContext;
-    const isRegistered = !!xUser?.clerkUserId;
 
-    console.log('PriceButton auth DEBUG:', {
-      enableClerkModal,
-      fingerprintId,
-      userId: xUser?.userId,
-      clerkUserId: xUser?.clerkUserId,
-      isRegistered
-    });
-
-    if (!enableClerkModal) {
-      // 跳转处理
-      isRegistered ? redirectToSignIn() : redirectToSignUp();
-    }  else {
-      // 弹窗处理
-      const userId = xUser?.userId || null;
-      const unsafeMetadata = {
-        user_id: userId,
-        fingerprint_id: fingerprintId || null,
-      };
-      isRegistered ? openSignIn({unsafeMetadata}) : openSignUp({unsafeMetadata});
+    if (!fingerprintId) {
+      console.warn('Not found fingerprintId! NEED CHECK!');
+      
     }
-    return;
-  }, [redirectToSignIn, redirectToSignUp, openSignIn, openSignUp]);
+
+    const unsafeMetadata = {
+      user_id: initUserId,
+      fingerprint_id: fingerprintId,
+    };
+
+    openSignUp({ unsafeMetadata });
+  }, [enableClerkModal, redirectToSignUp, openSignUp, initUserId, fingerprintId]);
 
   const handleAction = useCallback(async (plan: string, billing: string) => {
     const isSubscriptionFlow = billing !== 'onetime';
@@ -457,12 +435,7 @@ export function MoneyPriceInteractive({
   return (
     <>
       <div className="flex flex-col items-center">
-        <div
-          className={cn(
-            'flex items-center relative mb-3',
-            shouldHideInitUi && 'opacity-0 pointer-events-none select-none'
-          )}
-        >
+        <div className="flex items-center relative mb-3">
           <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
             {billingOptions.map(option => {
               const isActive = option.key === billingType;
@@ -488,13 +461,7 @@ export function MoneyPriceInteractive({
           </div>
         </div>
 
-        <div
-          className={cn(
-            'h-8 flex items-center justify-center mb-3',
-            shouldHideInitUi && 'opacity-0 pointer-events-none select-none'
-          )}
-          data-discount-info
-        >
+        <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
           {discountBadgeText ? (
             <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
               {discountBadgeText}
@@ -643,7 +610,7 @@ export function MoneyPriceInteractive({
                 onAction={handleAction}
                 texts={data.buttonTexts}
                 isProcessing={isProcessing}
-                isInitLoading={shouldHideInitUi}
+                isInitLoading={false}
                 enableSubscriptionUpgrade={enableSubscriptionUpgrade}
               />
             </div>

@@ -6,13 +6,19 @@
 };
 
 import { userAggregateService } from '@/agg/index';
-import { creditService, subscriptionService, userService } from '@/db/index';
-import { Credit, Subscription, User } from '@/db/prisma-model-type';
-import { viewLocalTime } from '@lib/utils';
 import { XCredit, XSubscription, XUser } from '@third-ui/clerk/fingerprint';
 import { extractFingerprintFromNextRequest } from '@third-ui/clerk/fingerprint/server';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  applyUserMockContext,
+  fetchLatestUserContextByFingerprintId,
+  fetchUserContextByClerkUserId,
+  mapCreditToXCredit,
+  mapSubscriptionToXSubscription,
+  mapUserToXUser,
+  type UserContextEntities,
+} from '@/context/user-context-service';
 
 
 // ==================== 类型定义 ====================
@@ -35,78 +41,25 @@ interface ErrorResponse {
 
 // ==================== 工具函数 ====================
 
-/** 创建用户信息对象 */
-function createUserInfo(user: User): XUser {
-  return {
-    userId: user.userId,
-    userName: user.userName || '',
-    fingerprintId: user.fingerprintId || '',
-    clerkUserId: user.clerkUserId || '',
-    stripeCusId: user.stripeCusId || '',
-    email: user.email || '',
-    status: user.status,
-    createdAt: viewLocalTime(user.createdAt),
-  };
-}
-
-/** 创建积分信息对象 */
-function createCreditsInfo(credit: Credit): XCredit {
-  return {
-    balanceFree: credit.balanceFree,
-    totalFreeLimit: credit.totalFreeLimit,
-    freeStart: viewLocalTime(credit.freeStart),
-    freeEnd: viewLocalTime(credit.freeEnd),
-    balancePaid: credit.balancePaid,
-    totalPaidLimit: credit.totalPaidLimit,
-    paidStart: viewLocalTime(credit.paidStart),
-    paidEnd: viewLocalTime(credit.paidEnd),
-    balanceOneTimePaid: credit.balanceOneTimePaid,
-    totalOneTimePaidLimit: credit.totalOneTimePaidLimit,
-    oneTimePaidStart: viewLocalTime(credit.oneTimePaidStart),
-    oneTimePaidEnd: viewLocalTime(credit.oneTimePaidEnd),
-    totalBalance: credit.balanceFree + credit.balancePaid + credit.balanceOneTimePaid,
-  };
-}
-
-/** 创建订阅信息对象 */
-function createSubscriptionInfo(subscription: Subscription | null): XSubscription | null {
-  if (!subscription) {
-    return null;
-  }
-
-  return {
-    id: subscription.id,
-    userId: subscription.userId || '',
-    paySubscriptionId: subscription.paySubscriptionId || '',
-    orderId: subscription.orderId || '',
-    priceId: subscription.priceId || '',
-    priceName: subscription.priceName || '',
-    status: subscription.status || '',
-    creditsAllocated: subscription.creditsAllocated,
-    subPeriodStart: viewLocalTime(subscription.subPeriodStart),
-    subPeriodEnd: viewLocalTime(subscription.subPeriodEnd)
-  };
-}
-
 /** 创建成功响应对象 */
-function createSuccessResponse(
-  user: User,
-  credit: Credit | null,
-  subscription: Subscription | null,
-  isNewUser: boolean,
-  options: {
+function createSuccessResponse(params: {
+  entities: UserContextEntities;
+  isNewUser: boolean;
+  options?: {
     totalUsersOnDevice?: number;
     hasAnonymousUser?: boolean;
-  } = {}
-): XUserResponse {
-  return {
-    success: true,
-    xUser: createUserInfo(user),
-    xCredit: credit ? createCreditsInfo(credit) : null,
-    xSubscription: createSubscriptionInfo(subscription),
-    isNewUser,
-    ...options,
   };
+}): XUserResponse {
+  const response: XUserResponse = {
+    success: true,
+    xUser: mapUserToXUser(params.entities.user),
+    xCredit: params.entities.credit ? mapCreditToXCredit(params.entities.credit) : null,
+    xSubscription: mapSubscriptionToXSubscription(params.entities.subscription),
+    isNewUser: params.isNewUser,
+    ...params.options,
+  };
+
+  return applyUserMockContext(response);
 }
 
 /** 创建错误响应 */
@@ -120,51 +73,36 @@ function createErrorResponse(message: string, status = 400): NextResponse {
  * 根据fingerprint_id查询用户并返回响应数据
  */
 async function getUserByClerkId(clerkUserId: string): Promise<XUserResponse | null> {
-  const existingUser = await userService.findByClerkUserId(clerkUserId);
-  
-  if (!existingUser) {
+  const entities = await fetchUserContextByClerkUserId(clerkUserId);
+  if (!entities) {
     return null;
   }
 
-  // 查找最新的匿名用户
-  // 找到匿名用户，返回匿名用户信息和积分
-  const credit = await creditService.getCredit(existingUser.userId);
-  const subscription = await subscriptionService.getActiveSubscription(existingUser.userId);
-  
-  return createSuccessResponse(
-    existingUser,
-    credit,
-    subscription,
-    false
-  );
+  return createSuccessResponse({
+    entities,
+    isNewUser: false,
+  });
 }
 
 /**
  * 根据fingerprint_id查询用户并返回响应数据
  */
 async function getUserByFingerprintId(fingerprintId: string): Promise<XUserResponse | null> {
-  const existingUsers = await userService.findListByFingerprintId(fingerprintId);
-  
-  if (existingUsers.length === 0) {
+  const result = await fetchLatestUserContextByFingerprintId(fingerprintId);
+  if (!result) {
     return null;
   }
 
-  // 查找最新的匿名用户
-  const latestAnonymousUser = existingUsers[0];
-  // 找到匿名用户，返回匿名用户信息和积分
-  const credit = await creditService.getCredit(latestAnonymousUser.userId);
-  const subscription = await subscriptionService.getActiveSubscription(latestAnonymousUser.userId);
-  
-  return createSuccessResponse(
-    latestAnonymousUser,
-    credit,
-    subscription,
-    false,
-    {
-      totalUsersOnDevice: existingUsers.length,
-      hasAnonymousUser: true,
-    }
-  );
+  const { totalUsersOnDevice, hasAnonymousUser, ...entities } = result;
+
+  return createSuccessResponse({
+    entities,
+    isNewUser: false,
+    options: {
+      totalUsersOnDevice,
+      hasAnonymousUser,
+    },
+  });
 }
 
 /**
@@ -198,7 +136,6 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
       existingUserResult = await getUserByFingerprintId(fingerprintId);
     }
     if (existingUserResult) {
-      checkMock(existingUserResult);
       return NextResponse.json(existingUserResult);
     }
 
@@ -213,7 +150,14 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
     console.log(`Created new anonymous user ${newUser.userId} with fingerprint ${fingerprintId}`);
 
     // 返回创建结果
-    const response = createSuccessResponse(newUser, credit, null, true);
+    const response = createSuccessResponse({
+      entities: {
+        user: newUser,
+        credit,
+        subscription: null,
+      },
+      isNewUser: true,
+    });
     return NextResponse.json(response);
 
   } catch (error) {
@@ -228,61 +172,4 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
  */
 export async function POST(request: NextRequest) {
   return handleFingerprintRequest(request, { createIfNotExists: true });
-}
-
-function checkMock(existingUserResult: XUserResponse) {
-  const mockEnabled = process.env.MONEY_PRICE_MOCK_USER_ENABLED === 'true';
-  const mockType = Number(process.env.MONEY_PRICE_MOCK_USER_TYPE ?? NaN);
-
-  if (mockEnabled && Number.isInteger(mockType) && mockType >= 0 && mockType <= 4) {
-    const ensureSubscription = () => {
-      if (!existingUserResult.xSubscription) {
-        const now = new Date();
-        existingUserResult.xSubscription = {
-          id: BigInt(99999),
-          userId: existingUserResult.xUser.userId,
-          paySubscriptionId: 'MOCK-PAY-SUB-ID',
-          orderId: '',
-          priceId: '',
-          priceName: 'MOCK-TEST',
-          status: 'active',
-          creditsAllocated: 0,
-          subPeriodStart: viewLocalTime(now),
-          subPeriodEnd: viewLocalTime(now)
-        };
-      }
-      return existingUserResult.xSubscription;
-    };
-
-    switch (mockType) {
-      case 0: {
-        const subscription = ensureSubscription();
-        subscription.status = '';
-        subscription.priceId = '';
-        break;
-      }
-      case 1: {
-        const subscription = ensureSubscription();
-        subscription.priceId = process.env.STRIPE_PRO_MONTHLY_PRICE_ID || subscription.priceId;
-        break;
-      }
-      case 2: {
-        const subscription = ensureSubscription();
-        subscription.priceId = process.env.STRIPE_ULTRA_MONTHLY_PRICE_ID || subscription.priceId;
-        break;
-      }
-      case 3: {
-        const subscription = ensureSubscription();
-        subscription.priceId = process.env.STRIPE_PRO_YEARLY_PRICE_ID || subscription.priceId;
-        break;
-      }
-      case 4: {
-        const subscription = ensureSubscription();
-        subscription.priceId = process.env.STRIPE_ULTRA_YEARLY_PRICE_ID || subscription.priceId;
-        break;
-      }
-      default:
-        break;
-    }
-  }
 }

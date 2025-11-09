@@ -5,6 +5,7 @@ import { CreditNavButton } from '@third-ui/main';
 import type { CreditOverviewData } from '@third-ui/main/server';
 import { CreditOverview, buildMoneyPriceData } from '@third-ui/main/server';
 import { moneyPriceConfig } from '@/lib/money-price-config';
+import { buildInitUserContextFromEntities } from '@/context/user-context-service';
 import { getTranslations } from 'next-intl/server';
 
 interface CreditPopoverProps {
@@ -40,6 +41,12 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
   if (!credit) {
     return null;
   }
+
+  const initUserContext = buildInitUserContextFromEntities({
+    user,
+    credit,
+    subscription,
+  });
 
   const totalBalance =
     (credit.balanceFree ?? 0) +
@@ -92,6 +99,7 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
       checkoutApiEndpoint: '/api/stripe/checkout',
       customerPortalApiEndpoint: '/api/stripe/customer-portal',
       enableSubscriptionUpgrade,
+      initUserContext,
     },
   };
 

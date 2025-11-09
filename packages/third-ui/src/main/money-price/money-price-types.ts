@@ -1,3 +1,5 @@
+import type { XCredit, XSubscription, XUser } from '../../clerk/fingerprint/types';
+
 /**
  * Money Price Component Types
  * 价格组件类型定义
@@ -17,6 +19,14 @@ export interface UserContext {
   subscriptionStatus: UserState;
   subscriptionType?: string;
   subscriptionEndDate?: string;
+}
+
+export interface InitUserContext {
+  fingerprintId: string | null;
+  xUser: XUser | null;
+  xCredit: XCredit | null;
+  xSubscription: XSubscription | null;
+  isClerkAuthenticated?: boolean;
 }
 
 // 支付供应商类型
@@ -93,6 +103,7 @@ export interface MoneyPriceProps {
   sectionClassName?: string;
   enabledBillingTypes?: string[];
   enableSubscriptionUpgrade?: boolean;
+  initUserContext?: InitUserContext;
 }
 
 // 交互组件属性
@@ -106,6 +117,7 @@ export interface MoneyPriceInteractiveProps {
   enableSubscriptionUpgrade?: boolean;
   initialBillingType?: string;
   disableAutoDetectBilling?: boolean;
+  initUserContext?: InitUserContext;
 }
 
 // 按钮组件属性
