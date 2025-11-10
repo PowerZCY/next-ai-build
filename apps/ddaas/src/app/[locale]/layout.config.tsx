@@ -16,12 +16,10 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
   const t1 = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
-      icon: <icons.AlbumIcon />,
       text: t1('blog'),
       url: `/${locale}/blog`,
     },
     {
-      icon: <icons.BTC />,
       text: t1('pricing'),
       url: `/${locale}/pricing`,
     },
@@ -138,6 +136,6 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
     // 导航Header, 语言切换
     i18n,
     // 导航Header, Github链接
-    githubUrl: appConfig.github,
+    // githubUrl: appConfig.github,
   };
 }

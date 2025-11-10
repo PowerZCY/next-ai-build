@@ -63,3 +63,130 @@
 body {
   font-family: 'Montserrat', "STKaiti", "STKaiti", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
 }
+
+/* =============== 移动端样式 =================  */
+
+/* 修复移动端导航栏横向滚动条问题 */
+@layer base {
+  /* 确保 body 和 html 不会产生横向滚动 */
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* 修复 Fumadocs HomeLayout 导航栏溢出 */
+  header,
+  [data-fd-nav],
+  nav {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 导航栏容器响应式处理 - 覆盖 Fumadocs 的 max-w-fd-container */
+  .max-w-fd-container,
+  header.max-w-fd-container {
+    max-width: 1400px !important;
+  }
+
+  /* 导航链接容器在移动端自适应 */
+  [data-fd-nav-links],
+  [data-fd-nav] a,
+  [data-fd-nav] button {
+    white-space: nowrap;
+  }
+
+  /* 移动端导航栏优化（< lg，即 < 1024px） */
+  @media (max-width: 1023px) {
+    /* 在移动端隐藏导航栏上的 Blog/Pricing/Activity 链接 */
+    /* 它们会保留在汉堡菜单中 */
+    header nav > ul:first-of-type {
+      display: none !important;
+    }
+
+    /* 或者更精准：隐藏非 secondary 的导航链接 */
+    header nav > ul:not(:last-child) {
+      display: none !important;
+    }
+  }
+
+  /* 移动端导航栏内边距优化 */
+  @media (max-width: 768px) {
+    header {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    /* 导航栏标题在移动端缩短 */
+    [data-fd-nav] [class*="title"] {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* 强制在所有屏幕尺寸显示用户区域（积分+登录按钮/头像） */
+  /* Fumadocs 默认在 lg 以下隐藏 secondary 项（使用 max-lg:hidden class），这里强制覆盖 */
+
+  /* 方案1: 使用精准的 data 属性选择器 */
+  [data-user-area-wrapper],
+  [data-clerk-user-area] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* 方案2: 覆盖 Fumadocs 添加的 max-lg:hidden class */
+  /* 祖父元素有 -me-1.5 max-lg:hidden 这两个 class */
+  nav .-me-1\.5.max-lg\:hidden,
+  header nav .-me-1\.5.max-lg\:hidden {
+    display: flex !important;
+  }
+
+  /* 方案3: 更通用的覆盖 - 包含用户区域的任何 max-lg:hidden 容器 */
+  .max-lg\:hidden:has([data-user-area-wrapper]),
+  .max-lg\:hidden:has([data-clerk-user-area]) {
+    display: flex !important;
+  }
+
+  /* 方案4: 确保包含用户区域的父容器也可见 */
+  nav > :has([data-user-area-wrapper]),
+  nav > :has([data-clerk-user-area]),
+  header nav > ul:has([data-user-area-wrapper]),
+  header nav > ul:has([data-clerk-user-area]) {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* 兜底方案：通过位置选择器 */
+  @media (max-width: 1024px) {
+    /* 导航栏最后一个子元素（通常是用户区域） */
+    header nav > ul:last-child,
+    header nav > div:last-child {
+      display: flex !important;
+      visibility: visible !important;
+    }
+  }
+
+  /* 极小屏幕优化（< 640px）*/
+  @media (max-width: 640px) {
+    /* 积分按钮在小屏幕缩小 */
+    header button[aria-label="Credit balance"] {
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
+      gap: 0.25rem !important;
+    }
+
+    header button[aria-label="Credit balance"] span {
+      font-size: 0.75rem !important;
+    }
+
+    /* 登录按钮在小屏幕优化 */
+    header button[class*="w-20"] {
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
+      font-size: 0.75rem !important;
+    }
+  }
+}

@@ -16,14 +16,14 @@ interface ClerkUserData {
 
 export function ClerkUserClient({ data }: { data: ClerkUserData }) {
   return (
-    <div className="ms-1.5 flex items-center gap-2 h-10 me-3">
+    <div className="ms-1.5 flex! items-center gap-2 h-10 me-3" data-clerk-user-area>
       <ClerkLoading>
           <div className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm"></div>
       </ClerkLoading>
       <ClerkLoaded>
         <SignedOut>
           <SignInButton mode={data.clerkAuthInModal ? 'modal' : 'redirect'}>
-            <button className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm">
+          <button className="w-16 sm:w-20 h-8 sm:h-9 px-1.5 sm:px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-xs sm:text-sm whitespace-nowrap">
               {data.signIn}
             </button>
           </SignInButton>
