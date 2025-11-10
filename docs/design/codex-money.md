@@ -12,10 +12,16 @@ money-price/
 └── money-price-button.tsx         # 按钮组件，封装动态逻辑
 └── money-price-config-util.ts    # 工具方法，封装通用操作
 └── customer-portal.ts             # 客户端 helper，统一处理 Stripe Portal 跳转
+context/                                        # 应用层 apps/ddaas/src/services/context
+├── user-context-service.ts                       # 应用层，统一查询用户信息，为money组件和初始化用户FingerprintContext提供一致的数据来源
+lib/                                                  # 应用层 apps/ddaas/src/lib
+├── money-price-helper.ts                       # 应用层，数据包装器，封装好money-price组件需要的服务端渲染数据
 ```
 
 - **服务端组件 `money-price.tsx`**：在服务器端构造展示所需的文本与价格信息，支持动态模式选择（订阅/积分包/混合），负责渲染静态 DOM 结构和计费类型切换按钮。
 - **服务端 helper `money-price-data.ts`**：通过 `buildMoneyPriceData({ locale, currency, enabledBillingTypes? })` 生成完整的 `MoneyPriceData`，方便其它 Server Component（如积分弹窗）复用同一份翻译与配置。
+- **服务端 helper `money-price-helper`**：应用层，数据包装器，封装好money-price组件需要的服务端渲染数据。
+- **服务端DB service`user-context-service.ts`**：应用层，统一查询用户信息，为money组件和初始化用户FingerprintContext提供一致的数据来源。
 - **客户端组件 `money-price-interactive.tsx`**：注入交互行为（计费周期切换、动态价格更新、用户状态检测、工具提示等），支持配置驱动的计费类型过滤。
 - **按钮客户端组件 `money-price-button.tsx`**：独立封装按钮渲染与行为，支持订阅模式和OneTime模式的不同逻辑，依据 `UserContext` 与 `billingType` 决定按钮状态。
 - **配置与类型**：
@@ -36,12 +42,17 @@ money-price/
    - 支持 F1/P2/U3 统一产品键映射
    - 渲染计费类型切换按钮（monthly/yearly/onetime）
    - 外部也可复用 `buildMoneyPriceData` 拿到同一份 `MoneyPriceData`；若需要默认切换到某个计费类型，只需在消费端覆盖 `billingSwitch.defaultKey`
+   - 获取用户数据封装为context，直接服务端渲染
 5. **客户端增强**：
    - `MoneyPriceInteractive` 接收服务端传入的 `data`、`config`、`enabledBillingTypes` 等参数
    - 配置驱动的计费类型过滤，移除硬编码约束
    - 支持订阅产品和积分包产品的统一价格检测
-   - 动态用户状态判断和按钮渲染
-
+   - 用户状态根据服务端context数据渲染按钮
+6. **按钮行为配置**
+   - 跳转Stripe Checkout
+   - 跳转Stripe Portal
+   - 弹窗Clerk Signup Modal获重定向
+   
 ## 3. 用户态与按钮行为
 
 ### 3.1 用户态判定
@@ -202,6 +213,49 @@ const moneyPriceData = await buildMoneyPriceData({ locale, currency: '$' });
 
 ## 6. 组件渲染逻辑
 
+### FOUC问题产生原因
+> 因为SSR渲染以及性能考虑，并不能在首屏渲染时就把Context数据就准备好，所以首屏服务端渲染的结果是没有Context的
+> 这导致浏览器侧首先会渲染出空context数据的结果，然后再有客户端组件初始化
+
+```mermaid
+sequenceDiagram
+      autonumber
+      participant Server as Next.js Server (RSC/SSR)
+      participant Browser as Browser
+      participant Layout as Layout Component
+      participant FPProvider as FingerprintProvider (Client)
+      participant MoneyPrice as MoneyPriceInteractive (Client)
+      participant Hook as useFingerprint Hook
+      participant API as Fingerprint API
+
+      Server->>Layout: render layout.tsx (async)
+      Layout->>Server: returns tree wrapped with FingerprintProvider & HomeLayout
+      Server->>Browser: sends HTML + hydration data (fingerprint context empty)
+
+      Browser->>Layout: hydrate Client Components
+      Layout->>FPProvider: create client instance (state: fingerprintId=null,\nxSubscription=null,isLoading=true)
+      FPProvider->>MoneyPrice: renders children with empty context
+      MoneyPrice->>MoneyPrice: useState(defaultBilling) → renders default switch selection
+
+      Note over Browser,Hook: Hydration finished <br/>now useEffect tasks can run
+      Browser->>Hook: useEffect(() => initializeFingerprintId(), [])
+      Hook->>Hook: setIsLoading(true)
+      Hook->>API: getOrGenerateFingerprintId()
+      API-->>Hook: fingerprintId
+      Hook->>Hook: setFingerprintId(fingerprintId)
+
+      Browser->>Hook: second useEffect runs when fingerprintId ready
+      Hook->>API: POST /fingerprint (fetch user/subscription)
+      API-->>Hook: { success, xSubscription, ... }
+      Hook->>Hook: setXSubscription(xSubscription), setIsLoading(false)
+
+      FPProvider->>MoneyPrice: context update (xSubscription now active)
+      MoneyPrice->>MoneyPrice: useEffect detects subscription priceId
+      MoneyPrice->>MoneyPrice: setBillingType(detectedBilling) (overrides default)
+
+      Note over MoneyPrice: UI now switches from default (Yearly) to real (Monthly)
+```
+
 ### 6.1 旧版：客户端 Fingerprint Context 流程
 
 ```mermaid
@@ -219,12 +273,12 @@ sequenceDiagram
     Browser->>FPProvider: hydrate FingerprintProvider
     FPProvider->>Hook: run useFingerprint()
     Hook->>Hook: generate fingerprintId (localStorage/cookie)
-    Hook->>/api/user/anonymous/init: fetch xUser/xSubscription
+    Hook->>/api/user/anonymous/init: fetch xUser/xSubscription/xCredit
     /api/user/anonymous/init-->>Hook: returns context
     Hook-->>FPProvider: context ready (loading=false)
     FPProvider-->>MoneyPrice: broadcast context
     MoneyPrice->>MoneyPrice: useEffect 检测 priceId → setBillingType
-    MoneyPrice->>MoneyPrice: re-render按钮（由 Anonymous 切换到订阅态）
+    MoneyPrice->>MoneyPrice: re-render按钮（由 Anonymous 切换到订阅态）<br/> 于是会出现FOUC抖动现象
 ```
 
 **核心特点**
@@ -238,7 +292,7 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     participant Server as RSC Pipeline
-    participant Helper as MoneyPriceServerHelper
+    participant Helper as MoneyPriceHelper
     participant Clerk as Clerk Auth (Server)
     participant DB as user/credit/subscription services
     participant MoneyPrice as MoneyPriceInteractive
@@ -256,8 +310,8 @@ sequenceDiagram
     Helper-->>RSC Pipeline: { fingerprintId, snapshot?, isClerkAuthenticated }
     RSC Pipeline-->>Browser: HTML + initUserContext props
     Browser->>MoneyPrice: hydrate（直接使用 props 渲染真实按钮）
-    Browser->>ClerkClient: hydrate Clerk（仅用于后续交互）
-    MoneyPrice->>MoneyPrice: 无需再等待 fingerprint hook，避免状态跳变
+    Browser->>ClerkClient: hydrate Clerk（仅用于后续注册弹窗交互）
+    MoneyPrice->>MoneyPrice: 无需再等待 fingerprint hook，避免FOUC状态跳变
 ```
 
 **核心特点**
@@ -265,4 +319,4 @@ sequenceDiagram
 - 未登录场景仅传递指纹 ID 和 auth 状态，避免同一 `fp_id` 渲染出其它账号的数据。
 - 客户端只负责交互（计费切换、按钮点击、Clerk 弹窗），去掉 fingerprint context 依赖，彻底消除闪烁。
 - `redirectToCustomerPortal` helper 已抽离，点击“管理订阅”时页面与弹窗都会走同一套 Portal 逻辑。
-```
+

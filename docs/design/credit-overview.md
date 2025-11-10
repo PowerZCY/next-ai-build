@@ -55,4 +55,5 @@ credit/                                                       # packages/third-u
 - `checkoutApiEndpoint?: string`、`customerPortalApiEndpoint?: string`：Stripe 结算/门户接口。
 - `signInPath?: string`：若门户接口返回 401/403 时的 fallback 登录路径。
 - `enableSubscriptionUpgrade?: boolean`：沿用 Money Price 行为，用于控制订阅升级按钮是否可点击。
+- 用户context，用户进行服务端渲染money price组件。
 - 若入口在积分弹窗中默认聚焦一次性计费，可在接入层通过 `moneyPriceData.billingSwitch.defaultKey = 'onetime'` 覆盖默认值，但不要过滤 `billingSwitch.options`，这样用户仍可切换订阅视图；弹窗会共用同一套 `redirectToCustomerPortal` 逻辑，并支持点击遮罩或按下 ESC 时关闭。

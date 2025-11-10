@@ -648,58 +648,6 @@ flowchart TD
     style users表 fill:#fff3e0
 ```
 
-## 遗留问题
-> 因为SSR渲染以及性能考虑，并不能在首屏渲染时就把Context数据就准备好，所以首屏服务端渲染的结果是没有Context的
-> 这导致浏览器侧首先会渲染出空context数据的结果，然后再有客户端组件初始化
-
-```
-是的。Next.js App Router 里 (home) 和 (clerk) 都是 [locale] 路由下的并行 segment，它们各自有自己的 layout.tsx。你在这两个 layout 里都包了 FingerprintProvider，意味着进入 (home) 这一支会创建一个
-  Provider 实例，切到 (clerk) 时会卸载前一个、再新建另一个实例。两个实例的内部状态互不共享，各自都会重新执行 useFingerprint 的初始化流程（生成 fingerprintId、调用后端等），因此会看到重复请求和“重新初始
-  化”的现象。
-
-  如果希望 fingerprint 上下文在整个 [locale] 下共享（无论是 home 页还是 clerk 页），应当把 FingerprintProvider 往上提升到更高一级（比如 [locale]/layout.tsx 或应用根 layout.tsx），让所有 segment 共用同一
-  个 Provider。这样在客户端只会有一个 useFingerprint 实例，多个子组件通过 useFingerprintContextSafe() 读取同一套状态，也就不会出现“两个傻瓜各自初始化”的情况了。
-```
-
-```mermaid
-sequenceDiagram
-      autonumber
-      participant Server as Next.js Server (RSC/SSR)
-      participant Browser as Browser
-      participant Layout as Layout Component
-      participant FPProvider as FingerprintProvider (Client)
-      participant MoneyPrice as MoneyPriceInteractive (Client)
-      participant Hook as useFingerprint Hook
-      participant API as Fingerprint API
-
-      Server->>Layout: render layout.tsx (async)
-      Layout->>Server: returns tree wrapped with FingerprintProvider & HomeLayout
-      Server->>Browser: sends HTML + hydration data (fingerprint context empty)
-
-      Browser->>Layout: hydrate Client Components
-      Layout->>FPProvider: create client instance (state: fingerprintId=null,\nxSubscription=null,isLoading=true)
-      FPProvider->>MoneyPrice: renders children with empty context
-      MoneyPrice->>MoneyPrice: useState(defaultBilling) → renders default switch selection
-
-      Note over Browser,Hook: Hydration finished <br/>now useEffect tasks can run
-      Browser->>Hook: useEffect(() => initializeFingerprintId(), [])
-      Hook->>Hook: setIsLoading(true)
-      Hook->>API: getOrGenerateFingerprintId()
-      API-->>Hook: fingerprintId
-      Hook->>Hook: setFingerprintId(fingerprintId)
-
-      Browser->>Hook: second useEffect runs when fingerprintId ready
-      Hook->>API: POST /fingerprint (fetch user/subscription)
-      API-->>Hook: { success, xSubscription, ... }
-      Hook->>Hook: setXSubscription(xSubscription), setIsLoading(false)
-
-      FPProvider->>MoneyPrice: context update (xSubscription now active)
-      MoneyPrice->>MoneyPrice: useEffect detects subscription priceId
-      MoneyPrice->>MoneyPrice: setBillingType(detectedBilling) (overrides default)
-
-      Note over MoneyPrice: UI now switches from default (Yearly) to real (Monthly)
-```
-
 ## 数据流程总结
 
 1. **首次访问**：
