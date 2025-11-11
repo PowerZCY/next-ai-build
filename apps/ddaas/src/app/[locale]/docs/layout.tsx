@@ -36,7 +36,7 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
             ...option,
             icon: (
               <div
-                className="rounded-md p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 [&_svg]:size-5"
+                className="rounded-md shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20"
               >
                 {node.icon}
               </div>

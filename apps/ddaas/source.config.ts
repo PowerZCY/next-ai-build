@@ -1,6 +1,6 @@
 import { appConfig } from '@/lib/appConfig';
 import { createCommonDocsSchema, createCommonMetaSchema, remarkInstallOptions } from '@third-ui/lib/fuma-schema-check-util';
-import { rehypeCodeDefaultOptions, remarkSteps, remarkNpm } from 'fumadocs-core/mdx-plugins';
+import { rehypeCodeDefaultOptions, remarkSteps, remarkNpm, remarkMdxMermaid } from 'fumadocs-core/mdx-plugins';
 import { fileGenerator, remarkDocGen } from 'fumadocs-docgen';
 import { remarkTypeScriptToJavaScript } from 'fumadocs-docgen/remark-ts2js';
 import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
@@ -113,6 +113,7 @@ export default defineConfig({
       [remarkNpm, remarkInstallOptions],
       [remarkDocGen, { generators: [fileGenerator()] }],
       remarkTypeScriptToJavaScript,
+      remarkMdxMermaid
     ],
     rehypePlugins: (v) => [rehypeKatex, ...v],
   },
