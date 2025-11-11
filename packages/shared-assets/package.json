@@ -11,11 +11,11 @@
     "build:prod": "echo 'shared-assets: No build output needed - resources copied at build time'"
   },
   "devDependencies": {
-    "fs-extra": "^11.2.0",
-    "glob": "^10.3.10",
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "22.17.2",
-    "chokidar": "^3.5.3",
-    "tsx": "^4.1.0"
+    "fs-extra": "catalog:",
+    "glob": "catalog:",
+    "@types/fs-extra": "catalog:",
+    "@types/node": "catalog:",
+    "chokidar": "catalog:",
+    "tsx": "catalog:"
   }
 }
