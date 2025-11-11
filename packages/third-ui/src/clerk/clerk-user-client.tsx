@@ -16,7 +16,7 @@ interface ClerkUserData {
 
 export function ClerkUserClient({ data }: { data: ClerkUserData }) {
   return (
-    <div className="ms-1.5 flex! items-center gap-2 h-10 me-3" data-clerk-user-area>
+    <div className="flex! items-center gap-2 h-10" data-clerk-user-area>
       <ClerkLoading>
           <div className="w-20 h-9 px-2 border border-gray-300 rounded-full hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-center text-sm"></div>
       </ClerkLoading>

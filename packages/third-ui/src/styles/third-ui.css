@@ -54,13 +54,6 @@
   --fd-page-width: 1800px;
 } */
 
-:root {
-  --fd-layout-width: 100vw;
-  --fd-banner-height: 48px;       /* 如果有 banner，可换成真实高度 */
-  --fd-nav-height: 32px;         /* 这里写你的 Header 实际高度 */
-  --fd-tocnav-height: 0px;      /* 可选：移动端 TOC 顶栏高度 */
-}
-
 /* Icon stroke colors for light/dark themes */
 :root {
   --clerk-icon-stroke-color: #616161; /* Light theme */
@@ -72,5 +65,5 @@
 
 /* English and numeric characters use Montserrat font, Chinese use STKaiti */
 body {
-  font-family: "STKaiti", "STKaiti", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
+  font-family: "Montserrat", "STKaiti", "STKaiti", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
 }

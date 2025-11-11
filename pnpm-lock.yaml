@@ -246,7 +246,7 @@ overrides:
 
 patchedDependencies:
   fumadocs-ui@16.0.9:
-    hash: fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5
+    hash: bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68
     path: patches/fumadocs-ui@16.0.9.patch
 
 importers:
@@ -366,10 +366,10 @@ importers:
         version: 13.0.6(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
       fumadocs-typescript:
         specifier: 'catalog:'
-        version: 4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3)
+        version: 4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3)
       fumadocs-ui:
         specifier: 'catalog:'
-        version: 16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
+        version: 16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
       katex:
         specifier: 'catalog:'
         version: 0.16.25
@@ -688,10 +688,10 @@ importers:
         version: 13.0.6(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
       fumadocs-typescript:
         specifier: 'catalog:'
-        version: 4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3)
+        version: 4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3)
       fumadocs-ui:
         specifier: 'catalog:'
-        version: 16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
+        version: 16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
       katex:
         specifier: 'catalog:'
         version: 0.16.25
@@ -9013,7 +9013,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  fumadocs-typescript@4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3):
+  fumadocs-typescript@4.0.13(@types/react@19.1.2)(fumadocs-core@16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(fumadocs-ui@16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17))(typescript@5.9.3):
     dependencies:
       estree-util-value-to-estree: 3.5.0
       fumadocs-core: 16.0.9(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -9027,11 +9027,11 @@ snapshots:
       unist-util-visit: 5.0.0
     optionalDependencies:
       '@types/react': 19.1.2
-      fumadocs-ui: 16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
+      fumadocs-ui: 16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
     transitivePeerDependencies:
       - supports-color
 
-  fumadocs-ui@16.0.9(patch_hash=fc8f16aff8fa46242ea0940e689280dcf4bb66bcdb1076e95d5a42f4db798da5)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17):
+  fumadocs-ui@16.0.9(patch_hash=bee91e5142e58e477ecd0299de389875951eb2cc811007a8db1da5e52213bb68)(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(lucide-react@0.525.0(react@19.2.0))(next@16.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17):
     dependencies:
       '@radix-ui/react-accordion': 1.2.12(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@radix-ui/react-collapsible': 1.1.12(@types/react-dom@19.1.3(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
