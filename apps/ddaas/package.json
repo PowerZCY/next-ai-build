@@ -3,7 +3,6 @@
   "version": "6.1.2",
   "private": true,
   "scripts": {
-    "predev": "pnpm run lint",
     "dev": "next dev",
     "build": "pnpm generate-blog-index && next build",
     "build:dev": "pnpm generate-blog-index && next build",

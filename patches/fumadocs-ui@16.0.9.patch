@@ -1,14 +1,14 @@
 diff --git a/dist/components/layout/toc-clerk.d.ts.map b/dist/components/layout/toc-clerk.d.ts.map
-index 9156ea92f045791b8600661d8dac7ef17e8659bc..ab7a16a4611881078fc8cead822eef611d6d99c2 100644
+index 9156ea92f045791b8600661d8dac7ef17e8659bc..3db82544265fa3828745878e560bc70c38568c0d 100644
 --- a/dist/components/layout/toc-clerk.d.ts.map
 +++ b/dist/components/layout/toc-clerk.d.ts.map
 @@ -1 +1 @@
 -{"version":3,"file":"toc-clerk.d.ts","sourceRoot":"","sources":["../../../src/components/layout/toc-clerk.tsx"],"names":[],"mappings":"AAEA,OAAO,EAAE,KAAK,cAAc,EAA+B,MAAM,OAAO,CAAC;AAOzE,MAAM,CAAC,OAAO,UAAU,aAAa,CAAC,EACpC,GAAG,EACH,SAAS,EACT,GAAG,KAAK,EACT,EAAE,cAAc,CAAC,KAAK,CAAC,2CAsGvB"}
 \ No newline at end of file
-+{"version":3,"file":"toc-clerk.d.ts","sourceRoot":"","sources":["../../../src/components/layout/toc-clerk.tsx"],"names":[],"mappings":"AAEA,OAAO,EACL,KAAK,cAAc,EAKpB,MAAM,OAAO,CAAC;AAOf,MAAM,CAAC,OAAO,UAAU,aAAa,CAAC,EACpC,GAAG,EACH,SAAS,EACT,GAAG,KAAK,EACT,EAAE,cAAc,CAAC,KAAK,CAAC,2CAuGvB"}
++{"version":3,"file":"toc-clerk.d.ts","sourceRoot":"","sources":["../../../src/components/layout/toc-clerk.tsx"],"names":[],"mappings":"AAEA,OAAO,EACL,KAAK,cAAc,EAKpB,MAAM,OAAO,CAAC;AAOf,MAAM,CAAC,OAAO,UAAU,aAAa,CAAC,EACpC,GAAG,EACH,SAAS,EACT,GAAG,KAAK,EACT,EAAE,cAAc,CAAC,KAAK,CAAC,2CAqGvB"}
 \ No newline at end of file
 diff --git a/dist/components/layout/toc-clerk.js b/dist/components/layout/toc-clerk.js
-index 40f8b2b191cd2817a51de0aaf9c492a3077aac60..a23dd1dc77a4d2dcaf89de20195e6e31d950ca5d 100644
+index 40f8b2b191cd2817a51de0aaf9c492a3077aac60..ca4dbf156ad79fa63e53c7bb513a5e49e01bc539 100644
 --- a/dist/components/layout/toc-clerk.js
 +++ b/dist/components/layout/toc-clerk.js
 @@ -1,7 +1,7 @@
@@ -66,17 +66,17 @@ index 40f8b2b191cd2817a51de0aaf9c492a3077aac60..a23dd1dc77a4d2dcaf89de20195e6e31
 -                    encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="black" stroke-width="1" fill="none" /></svg>`)}")`,
 -                }, children: _jsx(TocThumb, { containerRef: containerRef, className: "mt-(--fd-top) h-(--fd-height) bg-fd-primary transition-all" }) })) : null, _jsx("div", { ref: mergeRefs(containerRef, ref), className: cn('flex flex-col', className), ...props, children: items.map((item, i) => (_jsx(TOCItem, { item: item, upper: items[i - 1]?.depth, lower: items[i + 1]?.depth }, item.url))) })] }));
 +                    maskImage: `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" /></svg>`)}")`,
-+                }, children: _jsx(TocThumb, { containerRef: containerRef, className: "mt-(--fd-top) h-(--fd-height) bg-fd-primary transition-all duration-500 ease-in-out" }) })) : null, _jsx("div", { ref: mergeRefs(containerRef, ref), className: cn('flex flex-col', className), ...props, children: items.map((item, i) => (_jsx(EnhancedClerkTOCItemInternal, { item: item, upperDepth: items[i - 1]?.depth, lowerDepth: items[i + 1]?.depth }, item.url))) })] }));
++                }, children: _jsx(TocThumb, { containerRef: containerRef, className: "mt-(--fd-top) h-(--fd-height) bg-fd-primary transition-all duration-500 ease-in-out" }) })) : null, _jsx("div", { ref: mergeRefs(containerRef, ref), className: cn('flex flex-col', className), ...props, children: items.map((item) => (_jsx(EnhancedClerkTOCItemInternal, { item: item }, item.url))) })] }));
  }
  function getItemOffset(depth) {
      if (depth <= 2)
-@@ -67,11 +69,70 @@ function getItemOffset(depth) {
+@@ -67,11 +69,62 @@ function getItemOffset(depth) {
  function getLineOffset(depth) {
      return depth >= 3 ? 10 : 0;
  }
 -function TOCItem({ item, upper = item.depth, lower = item.depth, }) {
 -    const offset = getLineOffset(item.depth), upperOffset = getLineOffset(upper), lowerOffset = getLineOffset(lower);
-+function EnhancedClerkTOCItemInternal({ item, upperDepth = item.depth, lowerDepth = item.depth, }) {
++function EnhancedClerkTOCItemInternal({ item, }) {
 +    const isH3 = item.depth === 3;
 +    const rawTitle = typeof item.title === 'string' ? item.title : '';
 +    const { isStep, displayStep, content } = getStepInfoFromTitle(rawTitle);
@@ -100,25 +100,18 @@ index 40f8b2b191cd2817a51de0aaf9c492a3077aac60..a23dd1dc77a4d2dcaf89de20195e6e31
 +    }
 +    const shouldRenderCircle = isH3 && stepNumber !== null;
 +    const lineOffsetWithinItem = getLineOffset(item.depth);
-+    const upperLineOffsetWithinItem = getLineOffset(upperDepth);
-+    const lowerLineOffsetWithinItem = getLineOffset(lowerDepth);
++    const itemPadding = getItemOffset(item.depth);
++    const visualElementX = itemPadding + lineOffsetWithinItem;
 +    const CIRCLE_DIAMETER_PX = 14;
 +    const CIRCLE_RADIUS_PX = CIRCLE_DIAMETER_PX / 2;
      return (_jsxs(Primitive.TOCItem, { href: item.url, style: {
-             paddingInlineStart: getItemOffset(item.depth),
+-            paddingInlineStart: getItemOffset(item.depth),
 -        }, className: "prose relative py-1.5 text-sm text-fd-muted-foreground hover:text-fd-accent-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary", children: [offset !== upperOffset ? (_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 16 16", className: "absolute -top-1.5 start-0 size-4 rtl:-scale-x-100", children: _jsx("line", { x1: upperOffset, y1: "0", x2: offset, y2: "12", className: "stroke-fd-foreground/10", strokeWidth: "1" }) })) : null, _jsx("div", { className: cn('absolute inset-y-0 w-px bg-fd-foreground/10', offset !== upperOffset && 'top-1.5', offset !== lowerOffset && 'bottom-1.5'), style: {
 -                    insetInlineStart: offset,
 -                } }), item.title] }));
-+        }, className: "prose group relative py-1.5 text-sm text-fd-muted-foreground hover:text-fd-accent-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary", children: [lineOffsetWithinItem !== upperLineOffsetWithinItem ? (_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 16 16", className: "absolute -top-1.5 size-4 pointer-events-none rtl:-scale-x-100", style: {
-+                    insetInlineStart: Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem),
-+                    zIndex: 1,
-+                }, children: _jsx("line", { x1: upperLineOffsetWithinItem -
-+                        Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem), y1: "0", x2: lineOffsetWithinItem -
-+                        Math.min(lineOffsetWithinItem, upperLineOffsetWithinItem), y2: "12", className: cn('stroke-fd-foreground/10', 'group-data-[active=true]:stroke-fd-primary'), strokeWidth: "1", strokeLinecap: "round" }) })) : null, _jsx("div", { className: cn('absolute inset-y-0 w-px pointer-events-none', 'bg-fd-foreground/10 group-data-[active=true]:bg-fd-primary', lineOffsetWithinItem !== upperLineOffsetWithinItem && 'top-1.5', lineOffsetWithinItem !== lowerLineOffsetWithinItem && 'bottom-1.5'), style: {
-+                    insetInlineStart: lineOffsetWithinItem,
-+                    zIndex: 1,
-+                } }), shouldRenderCircle && stepNumber ? (_jsx("span", { className: cn('absolute z-10 flex size-[14px] -translate-y-1/2 items-center justify-center rounded-full', 'bg-black text-white dark:bg-white dark:text-black', 'group-data-[active=true]:bg-fd-primary group-data-[active=true]:text-white dark:group-data-[active=true]:text-black', 'font-medium text-xs'), style: {
-+                    left: lineOffsetWithinItem - CIRCLE_RADIUS_PX,
++            paddingInlineStart: itemPadding,
++        }, className: "prose group relative py-1.5 text-sm text-fd-muted-foreground hover:text-fd-accent-foreground transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-fd-primary", children: [shouldRenderCircle && stepNumber ? (_jsx("span", { className: cn('absolute z-10 flex size-[14px] -translate-y-1/2 items-center justify-center rounded-full', 'bg-black text-white dark:bg-white dark:text-black', 'group-data-[active=true]:bg-fd-primary group-data-[active=true]:text-white dark:group-data-[active=true]:text-black', 'font-medium text-xs'), style: {
++                    left: visualElementX - CIRCLE_RADIUS_PX,
 +                    top: '50%',
 +                }, children: stepNumber })) : null, _jsx("span", { style: { position: 'relative', zIndex: 1 }, children: resolvedContent })] }));
 +}

@@ -60,7 +60,7 @@ export function createFumaPage({
       return <FallbackPage siteIcon={siteIcon} />;
     }
 
-    const path = githubBaseUrl ? `${mdxSourceDir}/${page.file.path}` : undefined;
+    const path = githubBaseUrl ? `${mdxSourceDir}/${page.path}` : undefined;
     const tocFooterElement = (
       <TocFooterWrapper
         lastModified={page.data.date}
@@ -77,14 +77,14 @@ export function createFumaPage({
     const MDX = page.data.body;
     return (
       <DocsPage
+        // breadcrumb={{ enabled: false }}
         tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement }}
         tableOfContentPopover={{ footer: tocFooterElement }}
         toc={page.data.toc}
-        full={page.data.full}
         article={{ className: 'max-sm:pb-16' }}
       >
-        <DocsTitle>{page.data.title}</DocsTitle>
-        <DocsDescription className="mb-2">{page.data.description}</DocsDescription>
+        <DocsTitle>{page.title}</DocsTitle>
+        <DocsDescription className="mb-2">{page.description}</DocsDescription>
         <DocsBody className="text-fd-foreground/80">
           <MDX components={getMDXComponents()} />
         </DocsBody>
@@ -121,8 +121,8 @@ export function createFumaPage({
 
     return {
       metadataBase: new URL(baseUrl),
-      title: page.data.title,
-      description: page.data.description,
+      title: page.title,
+      description: page.description,
       alternates: {
         canonical: currentUrl,
         languages: seoLanguageMap

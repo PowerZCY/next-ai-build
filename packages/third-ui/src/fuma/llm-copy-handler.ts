@@ -30,20 +30,21 @@ export async function LLMCopyHandler(options: LLMCopyHandlerOptions): Promise<{ 
   try {
     console.log('[LLMCopy] Attempting to call getPage()');
     const page = dataSource.getPage(slug, locale);
+    // console.log(page);
     console.log('[LLMCopy] Call to getPage() completed.');
 
-    if (!page || !page.data) {
-      console.error(`[LLMCopy] Page or page.data not found for locale=${locale}, path=${requestedPath}`);
+    if (!page) {
+      console.error(`[LLMCopy] Page or page data not found for locale=${locale}, path=${requestedPath}`);
       return { error: 'Page data not found', status: 404 };
     }
-    if (!page.data._file || !page.data._file.path) {
-      console.error(`[LLMCopy] _file path information missing in page.data for locale=${locale}, path=${requestedPath}`);
+    if (!page.path) {
+      console.error(`[LLMCopy] file path information missing in page data for locale=${locale}, path=${requestedPath}`);
       return { error: 'Page file path information missing', status: 500 };
     }
 
-    const title = page.data.title;
-    const description = page.data.description;
-    const relativeMdxFilePath = page.data._file.path;
+    const title = page.title;
+    const description = page.description;
+    const relativeMdxFilePath = page.path;
     const absoluteFilePath = nodePath.join(process.cwd(), sourceDir, relativeMdxFilePath);
     console.log(`[LLMCopy] Attempting to read MDX content from: ${absoluteFilePath}`);
 

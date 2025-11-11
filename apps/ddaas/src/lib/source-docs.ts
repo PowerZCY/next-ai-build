@@ -1,4 +1,4 @@
-import { docs } from '.source';
+import { docs } from '@/.source';
 import { getIconElement } from '@base-ui/components/global-icon';
 import { i18n } from '@/i18n';
 import { InferMetaType, InferPageType, loader } from 'fumadocs-core/source';

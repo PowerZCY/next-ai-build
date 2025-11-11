@@ -1,34 +1,5 @@
-import { z } from 'zod';
+import { z, ZodObject } from 'zod';
 import { frontmatterSchema, metaSchema } from 'fumadocs-mdx/config';
-
-
-// Reusable schema for title
-export const createTitleSchema = () =>
-  z.string({
-    required_error: "Title is required",
-    invalid_type_error: "Title must be a string and cannot be null",
-  })
-  .trim()
-  .min(1, { message: "Title cannot be empty or consist only of whitespace" });
-
-// Reusable schema for description
-export const createDescriptionSchema = () =>
-  z.preprocess(
-    (val: any) => {
-      if (typeof val === 'string') {
-        return val.trim() === "" || val === null ? undefined : val.trim();
-      }
-      return val === null ? undefined : val;
-    },
-    z.string().optional()
-  );
-
-// Reusable schema for icon
-export const createIconSchema = () =>
-  z.preprocess(
-    (val: any) => (val === "" || val === null ? undefined : val),
-    z.string().optional()
-  );
 
 // Reusable schema for date
 export const createDateSchema = () =>
@@ -52,18 +23,18 @@ export const createDateSchema = () =>
   );
 
 // common docs frontmatter  schema
-export const createCommonDocsSchema = () => frontmatterSchema.extend({
-  title: createTitleSchema(),
-  description: createDescriptionSchema(),
-  icon: createIconSchema(),
-  date: createDateSchema(),
-  author: z.string().optional(),
-  keywords: z.array(z.string()).optional(),
-});
+// @ts-ignore
+export const createCommonDocsSchema = (): ZodObject<any> => frontmatterSchema
+  .extend({
+    date: createDateSchema(),
+    author: z.string().optional(),
+    keywords: z.array(z.string()).optional(),
+  });
 
 // common meta schema
-export const createCommonMetaSchema = () => metaSchema.extend({
-  description: z.string().optional(),
+// @ts-ignore
+export const createCommonMetaSchema = (): ZodObject<any> => metaSchema.extend({
+  
 });
 
 export const remarkInstallOptions = {

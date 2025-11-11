@@ -32,18 +32,11 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
           const meta = docsSource.getNodeMeta(node);
           if (!meta || !node.icon) return option;
 
-          const color = `var(--${meta.file.dirname}-color, var(--color-fd-foreground))`;
-
           return {
             ...option,
             icon: (
               <div
                 className="rounded-md p-1 shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20 [&_svg]:size-5"
-                style={
-                  {
-                    color,
-                  } as object
-                }
               >
                 {node.icon}
               </div>
@@ -72,11 +65,6 @@ export default async function Layout({
  
   return (
     <DocsLayout {...customeOptions} 
-      searchToggle={{
-        // https://docs.orama.com/open-source/supported-languages/using-chinese-with-orama
-        // Not support zh for it's huge tokenizers and stopwords
-        enabled: locale === appConfig.i18n.defaultLocale
-      }}
       themeSwitch={{
         enabled: true,
         mode: 'light-dark-system',

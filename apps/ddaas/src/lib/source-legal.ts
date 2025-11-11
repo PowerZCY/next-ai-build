@@ -1,4 +1,4 @@
-import { legal } from '.source';
+import { legal } from '@/.source';
 import { i18n } from '@/i18n';
 import { getIconElement } from '@base-ui/components/global-icon';
 import { loader } from 'fumadocs-core/source';

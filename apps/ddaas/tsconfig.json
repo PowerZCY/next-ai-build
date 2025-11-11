@@ -15,7 +15,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -24,21 +24,41 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [ "./src/*" ],
-      ".source/*": ["./.source/*"],
-      "@/db/*": [ "./src/services/database/*" ],
-      "@/agg/*": [ "./src/services/aggregate/*" ],
-      "@/context/*": [ "./src/services/context/*" ],
-      "@third-ui/*": ["../../packages/third-ui/src/*"],
-      "@base-ui/*": ["../../packages/base-ui/src/*"],
-      "@lib/*": ["../../packages/lib/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/.source": [
+        ".source"
+      ],
+      "@/db/*": [
+        "./src/services/database/*"
+      ],
+      "@/agg/*": [
+        "./src/services/aggregate/*"
+      ],
+      "@/context/*": [
+        "./src/services/context/*"
+      ],
+      "@third-ui/*": [
+        "../../packages/third-ui/src/*"
+      ],
+      "@base-ui/*": [
+        "../../packages/base-ui/src/*"
+      ],
+      "@lib/*": [
+        "../../packages/lib/src/*"
+      ]
     }
   },
   "include": [
     "apps/ddaas/next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "eslint.config.mjs"]
+  "exclude": [
+    "node_modules",
+    "eslint.config.mjs"
+  ]
 }

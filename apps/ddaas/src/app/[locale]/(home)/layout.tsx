@@ -37,6 +37,7 @@ export default async function Layout({
   return (
     <ClerkProviderClient locale={locale}>
       <FingerprintProvider config={fingerprintConfig}>
+        <FumaBannerSuit locale={locale} showBanner={showBanner}/>
         <HomeLayout
           {...customeOptions}
           searchToggle={{
@@ -48,7 +49,6 @@ export default async function Layout({
           }}
           className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${showBanner ? 'pt-30 has-banner' : 'pt-15 no-banner'}`}
           >
-          <FumaBannerSuit locale={locale} showBanner={showBanner}/>
           {children}
           <Footer locale={locale}  />
           <GoToTop />
