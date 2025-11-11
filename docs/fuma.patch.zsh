@@ -7,7 +7,6 @@ FUMA_BASE_DIR="/Users/funeye/IdeaProjects/fumadocs/packages/ui"
 FUMADOCS_BUILD_DIR="${FUMA_BASE_DIR}/dist/components/layout"
 REQUIRED_FILES=("toc-clerk.d.ts" "toc-clerk.d.ts.map" "toc-clerk.js")
 
-echo "\n=== 构建Fumadocs源项目 ==="
 cd "${FUMA_BASE_DIR}" || {
   echo "错误：Fumadocs源目录${FUMA_BASE_DIR}不存在"
   exit 1
@@ -16,42 +15,38 @@ pnpm build || {
   echo "错误：Fumadocs原目录${FUMA_BASE_DIR}构建失败"
   exit 1
 }
+echo "\n=== ✅ 构建Fumadocs源项目 ==="
 
 # ==============================================
 # 2. 验证源产物
 # ==============================================
-echo "\n=== 验证补丁文件完整性 ==="
 for file in "${REQUIRED_FILES[@]}"; do
   if [ ! -f "${FUMADOCS_BUILD_DIR}/${file}" ]; then
     echo "错误：缺失必要补丁文件 ${file}"
     exit 1
   fi
 done
-echo "✅ 所有补丁文件准备就绪"
+echo ""
+echo "\n=== ✅ 所有补丁文件已就绪 ==="
 
 # ==============================================
-# 3. 获取版本号
+# 3. 版本号安全审查
 # ==============================================
 DEP_NAME="fumadocs-ui"
 DDAAS_DEPEND_PACKAGE_FILE="/Users/funeye/IdeaProjects/next-ai-build/apps/ddaas/node_modules/${DEP_NAME}/package.json"
 
-echo "\n=== 获取版本号 ==="
 if [ ! -f "${DDAAS_DEPEND_PACKAGE_FILE}" ]; then
   echo "错误：子项目中未找到 ${DDAAS_DEPEND_PACKAGE_FILE}"
   exit 1
 fi
 PATCH_VERSION=$(cat "${DDAAS_DEPEND_PACKAGE_FILE}" | jq -r '.version')
 DEP_FULL_NAME="${DEP_NAME}@${PATCH_VERSION}"
-echo "✅ 版本：${DEP_FULL_NAME}"
 
 
 MONO_REPO_ROOT="/Users/funeye/IdeaProjects/next-ai-build"
 PATCH_DIR="${MONO_REPO_ROOT}/node_modules/.pnpm_patches/${DEP_FULL_NAME}"
 TARGET_DIR="${PATCH_DIR}/dist/components/layout"
 
-# ==============================================
-# 4. 打补丁安全检查
-# ==============================================
 # 1. 检查 MONO_REPO_ROOT 是否存在（避免基础路径无效）
 if [ ! -d "${MONO_REPO_ROOT}" ]; then
   echo "错误：MONO_REPO_ROOT 不存在或不是目录：${MONO_REPO_ROOT}"
@@ -77,6 +72,8 @@ if [ ! -d "${PATCH_DIR}" ]; then
   # exit 0
 fi
 
+echo "\n=== ✅ 获取版本号: ${DEP_FULL_NAME}, 目录审查OK==="
+
 # ==============================================
 # 4. 打补丁准备工作
 # ==============================================
@@ -87,7 +84,8 @@ cd "${MONO_REPO_ROOT}" || {
 }
 
 # 先清理之前的补丁（仅在通过所有安全检查后执行）
-echo "清理补丁目录：${PATCH_DIR}"
+echo ">>>>>>将清理补丁目录: '${PATCH_DIR}'"
+# 回到monorepo根目录
 rm -rf "${PATCH_DIR}"
 
 # 确认删除结果
@@ -97,19 +95,18 @@ else
   echo "补丁目录已成功清理"
 fi
 
-# 回到monorepo根目录
-cd ${MONO_REPO_ROOT}
 
 # 先清理之前的补丁
-rm -rf "${PATCH_DIR}"
-echo "将运行pnpm patch "${DEP_FULL_NAME}" --edit-dir"
-
-# 再开始打补丁
-pnpm patch ${DEP_FULL_NAME}--edit-dir
+echo "\n=== ✅ 打补丁准备工作完成==="
 
 # ==============================================
-# 5. 复制补丁文件
+# 5. 打补丁文件
 # ==============================================
+echo ">>>>>>将运行pnpm patch "${DEP_FULL_NAME}" --edit-dir"
+# 回到monorepo根目录
+cd ${MONO_REPO_ROOT}
+pnpm patch ${DEP_FULL_NAME} --edit-dir
+
 for file in "${REQUIRED_FILES[@]}"; do
   cp "${FUMADOCS_BUILD_DIR}/${file}" "${TARGET_DIR}/" || {
     echo "错误：复制 ${file} 失败"
@@ -118,10 +115,13 @@ for file in "${REQUIRED_FILES[@]}"; do
   echo "${file} 补丁文件已复制"
 done
 echo "✅ 所有补丁文件已从${FUMADOCS_BUILD_DIR}/复制到${TARGET_DIR}/"
+echo "\n=== ✅ 补丁文件覆写完成==="
 
 # ==============================================
 # 5. 提交补丁文件
 # ==============================================
-echo "将提交补丁:  pnpm patch-commit  ${PATCH_DIR}"
+echo ">>>>>>将提交补丁:  pnpm patch-commit  ${PATCH_DIR}"
 
 pnpm patch-commit  ${PATCH_DIR}
+
+echo "\n=== ✅ 补丁${DEP_FULL_NAME}已应用==="
