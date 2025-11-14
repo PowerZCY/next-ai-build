@@ -50,6 +50,7 @@ export default async function Layout({
           locale={locale}
           options={homeLayoutOptions}
           showBanner={showBanner}
+          floatingNav={false}
         >
           {children}
         </CustomHomeLayout>

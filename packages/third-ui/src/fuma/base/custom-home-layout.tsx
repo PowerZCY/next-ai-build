@@ -16,7 +16,7 @@ export interface CustomHomeLayoutProps {
   /**
    * Toggle the banner rendered above the navbar.
    *
-   * @defaultValue true
+   * @defaultValue false
    */
   showBanner?: boolean;
   /**
@@ -39,6 +39,12 @@ export interface CustomHomeLayoutProps {
    * Extra classes for the navbar surface.
    */
   navbarClassName?: string;
+  /**
+   * Whether the header floats independently of the page flow.
+   *
+   * @defaultValue false
+   */
+  floatingNav?: boolean;
   /**
    * Custom banner component. Pass `null` to render nothing.
    */
@@ -74,7 +80,7 @@ export function CustomHomeLayout({
   locale,
   options,
   children,
-  showBanner = true,
+  showBanner = false,
   bannerHeight,
   headerHeight = 2.5,
   headerPaddingTop,
@@ -85,6 +91,7 @@ export function CustomHomeLayout({
   showFooter = true,
   showGoToTop = true,
   style,
+  floatingNav = false,
 }: CustomHomeLayoutProps) {
   const resolvedBannerHeight = bannerHeight ?? (showBanner ? 3 : 0.5);
   const resolvedPaddingTop =
@@ -93,7 +100,9 @@ export function CustomHomeLayout({
   const layoutStyle: NavbarCSSVars = {
     '--fd-banner-height': `${resolvedBannerHeight}rem`,
     '--fd-nav-height': `${headerHeight}rem`,
-    paddingTop: `calc(var(--fd-banner-height) + ${resolvedPaddingTop}rem)`,
+    paddingTop: floatingNav
+      ? `calc(var(--fd-banner-height) + ${resolvedPaddingTop}rem)`
+      : `${resolvedPaddingTop}rem`,
     ...style,
   };
 
@@ -106,12 +115,19 @@ export function CustomHomeLayout({
       bannerHeight={resolvedBannerHeight}
       headerHeight={headerHeight}
       navbarClassName={navbarClassName}
+      floating={floatingNav}
     />
   );
 
   return (
     <>
-      {banner ?? <FumaBannerSuit locale={locale} showBanner={showBanner} />}
+      {banner ?? (
+        <FumaBannerSuit
+          locale={locale}
+          showBanner={showBanner}
+          floating={floatingNav}
+        />
+      )}
       <HomeLayout
         {...homeLayoutProps}
         nav={{

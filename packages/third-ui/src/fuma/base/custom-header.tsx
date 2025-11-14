@@ -72,6 +72,13 @@ export interface CustomHomeHeaderProps extends HomeLayoutProps {
    * Extra classes for the navbar surface.
    */
   navbarClassName?: string;
+
+  /**
+   * Whether the navbar floats above the page content.
+   *
+   * @defaultValue true
+   */
+  floating?: boolean;
 }
 
 export function CustomHomeHeader({
@@ -85,6 +92,7 @@ export function CustomHomeHeader({
   headerHeight = 2.5,
   maxContentWidth = 1400,
   navbarClassName,
+  floating = false,
 }: CustomHomeHeaderProps) {
   const finalLinks = useMemo(
     () => getLinks(links, githubUrl),
@@ -104,6 +112,7 @@ export function CustomHomeHeader({
       headerHeight={headerHeight}
       maxContentWidth={maxContentWidth}
       className={navbarClassName}
+      floating={floating}
     >
       <Link
         href={nav.url ?? '/'}
@@ -203,6 +212,7 @@ interface CustomNavbarProps extends ComponentProps<'div'> {
   bannerHeight?: number;
   headerHeight?: number;
   maxContentWidth?: number | string;
+  floating?: boolean;
 }
 
 function CustomNavbar({
@@ -211,6 +221,7 @@ function CustomNavbar({
   maxContentWidth = 1400,
   className,
   style,
+  floating = false,
   ...props
 }: CustomNavbarProps) {
   const [value, setValue] = useState('');
@@ -236,7 +247,10 @@ function CustomNavbar({
         {...props}
         style={cssVars}
         className={cn(
-          'fixed left-1/2 top-[--fd-banner-height] z-1001 w-[min(100%-1.5rem,var(--fd-nav-max-width,88rem))] -translate-x-1/2 rounded-2xl border px-4 py-1 transition-[background-color,box-shadow,transform] duration-300 backdrop-blur-xl shadow-lg shadow-black/5',
+          'rounded-2xl border px-4 py-1 transition-[background-color,box-shadow,transform] duration-300 backdrop-blur-xl shadow-lg shadow-black/5',
+          floating
+            ? 'fixed left-1/2 top-[--fd-banner-height] z-1001 w-[min(100%-1.5rem,var(--fd-nav-max-width,88rem))] -translate-x-1/2'
+            : 'relative mx-auto w-full max-w-(--fd-nav-max-width,88rem)',
           isTransparent
             ? 'border-transparent bg-transparent shadow-transparent'
             : 'border border-fd-border/60 bg-white/85 dark:border-white/20 dark:bg-neutral-900/75',

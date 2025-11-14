@@ -82,6 +82,9 @@ export function Banner({
   variant = 'rainbow',
   changeLayout = true,
   height = 3,
+  floating = true,
+  className,
+  style,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   /**
@@ -100,6 +103,12 @@ export function Banner({
    * @defaultValue true
    */
   changeLayout?: boolean;
+  /**
+   * Render the banner as a floating fixed element.
+   *
+   * @defaultValue true
+   */
+  floating?: boolean;
 }) {
   const [open, setOpen] = useState(true);
   const globalKey = id ? `nd-banner-${id}` : null;
@@ -119,20 +128,29 @@ export function Banner({
         'flex flex-row items-center justify-center px-4 text-center text-sm font-medium',
         'bg-neutral-100 dark:bg-neutral-900',
         !open && 'hidden',
-        props.className,
+        className,
       )}
       style={{
-        // 将 fuma.css 中的 .sticky.top-0.z-40 样式完全移到这里
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        zIndex: 1001,
         height: bannerHeight,
         minHeight: bannerHeight,
         maxHeight: bannerHeight,
         margin: 0,
         borderRadius: 0,
+        overflow: 'hidden',
+        ...(floating
+          ? {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              zIndex: 1001,
+            }
+          : {
+              position: 'relative',
+              width: '100%',
+              zIndex: 0,
+            }),
+        ...style,
       }}
     >
       
