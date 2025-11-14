@@ -1,56 +1,4 @@
 
-/* Has Banner */
-.has-banner header#nd-nav {
-  top: 2.5rem !important;
-}
-
-/* No Banner */
-.no-banner header#nd-nav {
-  top: 0rem !important;
-}
-
-#nd-nav {
-  box-sizing: content-box !important; /* box-content */
-  left: calc(50% - var(--removed-body-scroll-bar-size, 0px) / 2) !important;
-  right: auto !important;
-  width: calc(100% - var(--fd-padding, 0px) - var(--removed-body-scroll-bar-size, 0px)) !important;
-  max-width: 1400px !important;
-  transform: translateX(-50%) !important;
-  padding-left: var(--fd-padding, 0px) !important;
-  padding-right: var(--fd-padding, 0px) !important;
-  margin-top: 0 !important;
-  background-color: var(--nd-nav-bg, rgba(255, 255, 255, 0.85)) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-bottom: 1px solid var(--nd-nav-border, rgba(0,0,0,0.08)) !important;
-  box-shadow: var(--nd-nav-shadow, 0 1px 2px rgba(0, 0, 0, 0.05)) !important;
-}
-
-@media (min-width: 1024px) {
-  #nd-nav {
-    --fd-padding: 1rem;
-    margin-top: 0.5rem !important; /* lg:mt-2 */
-    border-radius: 1rem !important; /* lg:rounded-2xl */
-    border-width: 1px !important;
-    border-style: solid !important;
-    border-color: var(--nd-nav-border, rgba(0,0,0,0.08)) !important;
-  }
-}
-
-.light,
-:root:not(.dark) {
-  --nd-nav-bg: rgba(245, 245, 245, 0.95); /* neutral-100 */
-  --nd-nav-border: rgba(0, 0, 0, 0.08);
-  --nd-nav-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.dark {
-  --nd-nav-bg: rgba(23, 23, 23, 0.88); /* neutral-900 */
-  --nd-nav-border: rgba(255, 255, 255, 0.18);
-  --nd-nav-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-}
-
-
 
 /* Fuma  16.x 制定了toc的计算逻辑，这里强制覆盖*/
 #nd-toc {
@@ -154,9 +102,3 @@
     transition-duration: 0.01ms !important;
   }
 } 
-
-/* i18n language width */
-div[role="dialog"].rounded-xl.border.text-fd-popover-foreground.shadow-lg {
-  min-width: 150px !important;
-  /* max-width: 150px !important; */
-}

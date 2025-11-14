@@ -1,0 +1,523 @@
+'use client';
+
+import {
+  type ComponentProps,
+  type CSSProperties,
+  Fragment,
+  useMemo,
+  useState,
+} from 'react';
+import { cva } from 'class-variance-authority';
+import Link from 'fumadocs-core/link';
+import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
+import { HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import {
+  BaseLinkItem,
+  type LinkItemType,
+  getLinks,
+} from 'fumadocs-ui/layouts/shared';
+import { cn } from 'fumadocs-ui/utils/cn';
+import {
+  LargeSearchToggle,
+  SearchToggle,
+} from 'fumadocs-ui/components/layout/search-toggle';
+import { ThemeToggle } from 'fumadocs-ui/components/layout/theme-toggle';
+import {
+  LanguageToggleText,
+  type LanguageSelectProps,
+} from 'fumadocs-ui/components/layout/language-toggle';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from 'fumadocs-ui/components/ui/navigation-menu';
+import { Popover, PopoverContent, PopoverTrigger } from 'fumadocs-ui/components/ui/popover';
+import { buttonVariants } from 'fumadocs-ui/components/ui/button';
+import { useNav } from 'fumadocs-ui/contexts/layout';
+import { useI18n } from 'fumadocs-ui/contexts/i18n';
+
+export type NavbarCSSVars = CSSProperties & {
+  '--fd-banner-height'?: string;
+  '--fd-nav-height'?: string;
+  '--fd-nav-max-width'?: string;
+};
+
+export interface CustomHomeHeaderProps extends HomeLayoutProps {
+  /**
+   * Banner height in rem units
+   *
+   * @defaultValue 0
+   */
+  bannerHeight?: number;
+
+  /**
+   * Header height in rem units
+   *
+   * @defaultValue 4
+   */
+  headerHeight?: number;
+
+  /**
+   * Max width for the navbar content area.
+   *
+   * @defaultValue 1400
+   */
+  maxContentWidth?: number | string;
+
+  /**
+   * Extra classes for the navbar surface.
+   */
+  navbarClassName?: string;
+}
+
+export function CustomHomeHeader({
+  nav = {},
+  i18n = false,
+  links,
+  githubUrl,
+  themeSwitch = {},
+  searchToggle = {},
+  bannerHeight = 0,
+  headerHeight = 2.5,
+  maxContentWidth = 1400,
+  navbarClassName,
+}: CustomHomeHeaderProps) {
+  const finalLinks = useMemo(
+    () => getLinks(links, githubUrl),
+    [links, githubUrl],
+  );
+
+  const navItems = finalLinks.filter((item) =>
+    ['nav', 'all'].includes(item.on ?? 'all'),
+  );
+  const menuItems = finalLinks.filter((item) =>
+    ['menu', 'all'].includes(item.on ?? 'all'),
+  );
+
+  return (
+    <CustomNavbar
+      bannerHeight={bannerHeight}
+      headerHeight={headerHeight}
+      maxContentWidth={maxContentWidth}
+      className={navbarClassName}
+    >
+      <Link
+        href={nav.url ?? '/'}
+        className="inline-flex items-center gap-2.5 font-semibold"
+      >
+        {nav.title}
+      </Link>
+      {nav.children}
+      <ul className="flex flex-row items-center gap-2 px-6 max-sm:hidden">
+        {navItems
+          .filter((item) => !isSecondary(item))
+          .map((item, i) => (
+            <NavbarLinkItem key={i} item={item} className="text-sm" />
+          ))}
+      </ul>
+      <div className="flex flex-row items-center justify-end gap-1.5 flex-1 max-lg:hidden">
+        {searchToggle.enabled !== false &&
+          (searchToggle.components?.lg ?? (
+            <LargeSearchToggle
+              className="w-full rounded-full ps-2.5 max-w-[240px]"
+              hideIfDisabled
+            />
+          ))}
+        {themeSwitch.enabled !== false &&
+          (themeSwitch.component ?? <ThemeToggle mode={themeSwitch?.mode} />)}
+        {i18n && (
+          <CompactLanguageToggle>
+            <icons.Languages className="size-5" />
+          </CompactLanguageToggle>
+        )}
+        <ul className="flex flex-row gap-2 items-center empty:hidden">
+          {navItems.filter(isSecondary).map((item, i) => (
+            <NavbarLinkItem
+              key={i}
+              item={item}
+              className={cn(
+                item.type === 'icon' && [
+                  '-mx-1',
+                  i === 0 && 'ms-0',
+                  i === navItems.length - 1 && 'me-0',
+                ],
+              )}
+            />
+          ))}
+        </ul>
+      </div>
+      <ul className="flex flex-row items-center ms-auto -me-1.5 lg:hidden">
+        {searchToggle.enabled !== false &&
+          (searchToggle.components?.sm ?? (
+            <SearchToggle className="p-2" hideIfDisabled />
+          ))}
+        <Menu>
+          <MenuTrigger
+            aria-label="Toggle Menu"
+            className={cn(
+              buttonVariants({
+                size: 'icon',
+                color: 'ghost',
+                className: 'group [&_svg]:size-5.5',
+              }),
+            )}
+            enableHover={nav.enableHoverToOpen}
+          >
+            <icons.ChevronDown className="transition-transform duration-300 group-data-[state=open]:rotate-180" />
+          </MenuTrigger>
+          <MenuContent className="sm:flex-row sm:items-center sm:justify-end">
+            {menuItems
+              .filter((item) => !isSecondary(item))
+              .map((item, i) => (
+                <MenuLinkItem key={i} item={item} className="sm:hidden" />
+              ))}
+            <div className="-ms-1.5 flex flex-row items-center gap-1.5 max-sm:mt-2">
+              {menuItems.filter(isSecondary).map((item, i) => (
+                <MenuLinkItem key={i} item={item} className="-me-1.5" />
+              ))}
+              <div role="separator" className="flex-1" />
+              {i18n ? (
+                <CompactLanguageToggle>
+                  <icons.Languages className="size-5" />
+                  <LanguageToggleText />
+                  <icons.ChevronDown className="size-3 text-fd-muted-foreground" />
+                </CompactLanguageToggle>
+              ) : null}
+              {themeSwitch.enabled !== false &&
+                (themeSwitch.component ?? (
+                  <ThemeToggle mode={themeSwitch?.mode} />
+                ))}
+            </div>
+          </MenuContent>
+        </Menu>
+      </ul>
+    </CustomNavbar>
+  );
+}
+
+interface CustomNavbarProps extends ComponentProps<'div'> {
+  bannerHeight?: number;
+  headerHeight?: number;
+  maxContentWidth?: number | string;
+}
+
+function CustomNavbar({
+  bannerHeight = 0,
+  headerHeight = 2.5,
+  maxContentWidth = 1400,
+  className,
+  style,
+  ...props
+}: CustomNavbarProps) {
+  const [value, setValue] = useState('');
+  const { isTransparent } = useNav();
+
+  const cssVars: NavbarCSSVars = {
+    '--fd-banner-height': `${bannerHeight}rem`,
+    '--fd-nav-height': `${headerHeight}rem`,
+    ...(maxContentWidth
+      ? {
+          '--fd-nav-max-width':
+            typeof maxContentWidth === 'number'
+              ? `${maxContentWidth}px`
+              : maxContentWidth,
+        }
+      : {}),
+    ...style,
+  };
+
+  return (
+    <NavigationMenu value={value} onValueChange={setValue} asChild>
+      <header
+        {...props}
+        style={cssVars}
+        className={cn(
+          'fixed left-1/2 top-[--fd-banner-height] z-1001 w-[min(100%-1.5rem,var(--fd-nav-max-width,88rem))] -translate-x-1/2 rounded-2xl border px-4 py-1 transition-[background-color,box-shadow,transform] duration-300 backdrop-blur-xl shadow-lg shadow-black/5',
+          isTransparent
+            ? 'border-transparent bg-transparent shadow-transparent'
+            : 'border border-fd-border/60 bg-white/85 dark:border-white/20 dark:bg-neutral-900/75',
+          value.length > 0 &&
+            'max-lg:rounded-b-3xl border-fd-border/60 bg-white dark:border-white/20 dark:bg-neutral-900',
+          className,
+        )}
+      >
+        <NavigationMenuList
+          className="flex w-full items-center gap-4 px-1"
+          style={{ height: 'var(--fd-nav-height)' }}
+          asChild
+        >
+          <nav>{props.children}</nav>
+        </NavigationMenuList>
+
+        <NavigationMenuViewport />
+      </header>
+    </NavigationMenu>
+  );
+}
+
+const navItemVariants = cva('[&_svg]:size-4', {
+  variants: {
+    variant: {
+      main: 'inline-flex items-center gap-1 p-2 text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground data-[active=true]:text-fd-primary',
+      button: buttonVariants({
+        color: 'secondary',
+        className: 'gap-1.5',
+      }),
+      icon: buttonVariants({
+        color: 'ghost',
+        size: 'icon',
+      }),
+    },
+  },
+  defaultVariants: {
+    variant: 'main',
+  },
+});
+
+function NavbarLinkItem({
+  item,
+  ...props
+}: {
+  item: LinkItemType;
+  className?: string;
+}) {
+  if (item.type === 'custom') return <div {...props}>{item.children}</div>;
+
+  if (item.type === 'menu') {
+    const children = item.items.map((child, j) => {
+      if (child.type === 'custom') {
+        return <Fragment key={j}>{child.children}</Fragment>;
+      }
+
+      const {
+        banner = child.icon ? (
+          <div className="w-fit rounded-md border bg-fd-muted p-1 [&_svg]:size-4">
+            {child.icon}
+          </div>
+        ) : null,
+        ...rest
+      } = child.menu ?? {};
+
+      return (
+        <NavigationMenuLink key={`${j}-${child.url}`} asChild>
+          <Link
+            href={child.url}
+            external={child.external}
+            {...rest}
+            className={cn(
+              'flex flex-col gap-2 rounded-lg border bg-fd-card p-3 transition-colors hover:bg-fd-accent/80 hover:text-fd-accent-foreground',
+              rest.className,
+            )}
+          >
+            {rest.children ?? (
+              <>
+                {banner}
+                <p className="text-[15px] font-medium">{child.text}</p>
+                <p className="text-sm text-fd-muted-foreground empty:hidden">
+                  {child.description}
+                </p>
+              </>
+            )}
+          </Link>
+        </NavigationMenuLink>
+      );
+    });
+
+    return (
+      <NavigationMenuItem>
+        <NavigationMenuTrigger
+          {...props}
+          className={cn(navItemVariants(), 'rounded-md', props.className)}
+        >
+          {item.url ? (
+            <Link href={item.url} external={item.external}>
+              {item.text}
+            </Link>
+          ) : (
+            item.text
+          )}
+        </NavigationMenuTrigger>
+        <NavigationMenuContent className="grid grid-cols-1 gap-2 p-4 md:grid-cols-2 lg:grid-cols-3">
+          {children}
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    );
+  }
+
+  return (
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild>
+        <BaseLinkItem
+          item={item}
+          aria-label={item.type === 'icon' ? item.label : undefined}
+          {...props}
+          className={cn(
+            navItemVariants({ variant: item.type }),
+            props.className,
+          )}
+        >
+          {item.type === 'icon' ? item.icon : item.text}
+        </BaseLinkItem>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}
+
+const Menu = NavigationMenuItem;
+
+function MenuLinkItem({
+  item,
+  ...props
+}: {
+  item: LinkItemType;
+  className?: string;
+}) {
+  if (item.type === 'custom')
+    return <div className={cn('grid', props.className)}>{item.children}</div>;
+
+  if (item.type === 'menu') {
+    const header = (
+      <>
+        {item.icon}
+        {item.text}
+      </>
+    );
+
+    return (
+      <div className={cn('mb-4 flex flex-col', props.className)}>
+        <p className="mb-1 text-sm text-fd-muted-foreground">
+          {item.url ? (
+            <NavigationMenuLink asChild>
+              <Link href={item.url} external={item.external}>
+                {header}
+              </Link>
+            </NavigationMenuLink>
+          ) : (
+            header
+          )}
+        </p>
+        {item.items.map((child, i) => (
+          <MenuLinkItem key={i} item={child} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <NavigationMenuLink asChild>
+      <BaseLinkItem
+        item={item}
+        className={cn(
+          {
+            main: 'inline-flex items-center gap-2 py-1.5 transition-colors hover:text-fd-popover-foreground/50 data-[active=true]:font-medium data-[active=true]:text-fd-primary [&_svg]:size-4',
+            icon: buttonVariants({
+              size: 'icon',
+              color: 'ghost',
+            }),
+            button: buttonVariants({
+              color: 'secondary',
+              className: 'gap-1.5 [&_svg]:size-4',
+            }),
+          }[item.type ?? 'main'],
+          props.className,
+        )}
+        aria-label={item.type === 'icon' ? item.label : undefined}
+      >
+        {item.icon}
+        {item.type === 'icon' ? undefined : item.text}
+      </BaseLinkItem>
+    </NavigationMenuLink>
+  );
+}
+
+function MenuTrigger({
+  enableHover = false,
+  ...props
+}: ComponentProps<typeof NavigationMenuTrigger> & {
+  enableHover?: boolean;
+}) {
+  return (
+    <NavigationMenuTrigger
+      {...props}
+      onPointerMove={enableHover ? undefined : (e) => e.preventDefault()}
+    >
+      {props.children}
+    </NavigationMenuTrigger>
+  );
+}
+
+function MenuContent(
+  props: ComponentProps<typeof NavigationMenuContent>,
+) {
+  return (
+    <NavigationMenuContent
+      {...props}
+      className={cn('flex flex-col p-4', props.className)}
+    >
+      {props.children}
+    </NavigationMenuContent>
+  );
+}
+
+function CompactLanguageToggle({
+  contentClassName,
+  ...props
+}: LanguageSelectProps & { contentClassName?: string }) {
+  const context = useI18n();
+  if (!context.locales) throw new Error('Missing `<I18nProvider />`');
+
+  return (
+    <Popover>
+      <PopoverTrigger
+        aria-label={context.text.chooseLanguage}
+        {...props}
+        className={cn(
+          buttonVariants({
+            color: 'ghost',
+            className: 'gap-1.5 py-1.5 pl-2 pr-0.5',
+          }),
+          props.className,
+        )}
+      >
+        {props.children}
+      </PopoverTrigger>
+      <PopoverContent
+        className={cn(
+          'flex min-w-[150px] flex-col overflow-x-hidden rounded-xl border bg-fd-popover/60 p-0 text-fd-popover-foreground backdrop-blur-lg',
+          contentClassName,
+        )}
+      >
+        <p className="mb-1 p-2 text-xs font-medium text-fd-muted-foreground">
+          {context.text.chooseLanguage}
+        </p>
+        {context.locales.map((item) => (
+          <button
+            key={item.locale}
+            type="button"
+            className={cn(
+              'p-2 text-start text-sm',
+              item.locale === context.locale
+                ? 'bg-fd-primary/10 font-medium text-fd-primary'
+                : 'hover:bg-fd-accent hover:text-fd-accent-foreground',
+            )}
+            onClick={() => {
+              context.onChange?.(item.locale);
+            }}
+          >
+            {item.name}
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function isSecondary(item: LinkItemType): boolean {
+  if ('secondary' in item && item.secondary != null) return item.secondary;
+
+  return item.type === 'icon';
+}

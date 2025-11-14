@@ -1,13 +1,11 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
-import { GoToTop } from '@third-ui/main';
-import { Footer } from '@third-ui/main/server';
-import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@third-ui/fuma/server';
+import type { HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import type { ReactNode } from 'react';
 import { showBanner } from '@/lib/appConfig';
 import { ClerkProviderClient } from '@third-ui/clerk';
 import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
 import { fingerprintConfig } from '@/lib/fingerprint-config';
+import { CustomHomeLayout } from '@third-ui/fuma/base';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   return {
@@ -34,27 +32,28 @@ export default async function Layout({
   // await new Promise(resolve => setTimeout(resolve, 5000)); // 5秒延迟
   // console.log('Delay finished. Rendering page.');
   
+  const homeLayoutOptions: HomeLayoutProps = {
+    ...customeOptions,
+    searchToggle: {
+      enabled: false,
+    },
+    themeSwitch: {
+      enabled: true,
+      mode: 'light-dark-system',
+    },
+  };
+
   return (
     <ClerkProviderClient locale={locale}>
       <FingerprintProvider config={fingerprintConfig}>
-        <FumaBannerSuit locale={locale} showBanner={showBanner}/>
-        <HomeLayout
-          {...customeOptions}
-          searchToggle={{
-            enabled: false,
-          }}
-          themeSwitch={{
-            enabled: true,
-            mode: 'light-dark-system',
-          }}
-          className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${showBanner ? 'pt-30 has-banner' : 'pt-15 no-banner'}`}
-          >
+        <CustomHomeLayout
+          locale={locale}
+          options={homeLayoutOptions}
+          showBanner={showBanner}
+        >
           {children}
-          <Footer locale={locale}  />
-          <GoToTop />
-        </HomeLayout>
+        </CustomHomeLayout>
         </FingerprintProvider>
     </ClerkProviderClient>
   );
 }
-

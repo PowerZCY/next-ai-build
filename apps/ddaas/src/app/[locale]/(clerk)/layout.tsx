@@ -8,13 +8,13 @@
  */
 
 import { baseOptions } from '@/app/[locale]/layout.config';
-import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@third-ui/fuma/server';
-import { ReactNode } from 'react';
-import { clerkPageBanner } from '@/lib/appConfig';
+import { fingerprintConfig } from '@/lib/fingerprint-config';
 import { ClerkProviderClient } from '@third-ui/clerk';
 import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
-import { fingerprintConfig } from '@/lib/fingerprint-config';
+import { CustomHomeLayout } from '@third-ui/fuma/base';
+import { type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
+import { ReactNode } from 'react';
+import { clerkPageBanner } from '@/lib/appConfig';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps>{
   const resolvedBaseOptions = await baseOptions(locale);
@@ -33,23 +33,28 @@ export default async function RootLayout({
   const { locale } = await params;
   const customeOptions = await homeOptions(locale);
 
+  const homeLayoutOptions: HomeLayoutProps = {
+    ...customeOptions,
+    searchToggle: {
+      enabled: false,
+    },
+    themeSwitch: {
+      enabled: true,
+      mode: 'light-dark-system',
+    },
+  };
   return (
     <ClerkProviderClient locale={locale}>
       <FingerprintProvider config={fingerprintConfig}>
-        <FumaBannerSuit locale={locale} showBanner={clerkPageBanner}/>
-        <HomeLayout
-          {...customeOptions}
-          searchToggle={{
-            enabled: false,
-          }}
-          themeSwitch={{
-            enabled: true,
-            mode: 'light-dark-system',
-          }}
-          className={`min-h-screen flex flex-col bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300 ${clerkPageBanner ? 'pt-30 has-banner' : 'pt-20 no-banner'}`}
+        <CustomHomeLayout
+            locale={locale}
+            options={homeLayoutOptions}
+            showBanner={clerkPageBanner}
+            showFooter={false}
+            showGoToTop={false}
           >
-          {children}
-        </HomeLayout>
+            {children}
+          </CustomHomeLayout>
       </FingerprintProvider>
     </ClerkProviderClient>
   );

@@ -15,6 +15,7 @@ const entries = [
   'src/main/server.ts',
   'src/fuma/server.ts',
   'src/fuma/mdx/index.ts',
+  'src/fuma/base/index.ts',
   'src/lib/server.ts'
 ];
 

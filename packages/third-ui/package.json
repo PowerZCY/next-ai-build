@@ -46,6 +46,11 @@
       "import": "./dist/fuma/mdx/index.mjs",
       "require": "./dist/fuma/mdx/index.js"
     },
+    "./fuma/base": {
+      "types": "./dist/fuma/base/index.d.ts",
+      "import": "./dist/fuma/base/index.mjs",
+      "require": "./dist/fuma/base/index.js"
+    },
     "./lib/server": {
       "types": "./dist/lib/server.d.ts",
       "import": "./dist/lib/server.mjs",
