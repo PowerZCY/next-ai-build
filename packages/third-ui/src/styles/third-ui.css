@@ -12,6 +12,10 @@
  @import 'fumadocs-ui/css/vitepress.css';
  @import 'fumadocs-ui/css/preset.css';
  @import 'katex/dist/katex.css';
+
+@import 'swiper/css';
+@import 'swiper/css/pagination';
+
  /* Special Magic */
  @import './fuma.css';
  
@@ -66,4 +70,25 @@
 /* English and numeric characters use Montserrat font, Chinese use STKaiti */
 body {
   font-family: "Montserrat", "STKaiti", "STKaiti", "Kaiti SC", "KaiTi", "楷体", "PingFang SC", "Microsoft YaHei", Arial, sans-serif !important;
+}
+
+/* Gallery swiper polish for mobile */
+.gallery-mobile-swiper {
+  --swiper-theme-color: #ac62fd;
+}
+
+.gallery-mobile-swiper .swiper-pagination {
+  bottom: 12px;
+}
+
+.gallery-mobile-swiper .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  margin: 0 0.25rem;
+  background-color: rgba(255, 255, 255, 0.65);
+  opacity: 1;
+}
+
+.gallery-mobile-swiper .swiper-pagination-bullet-active {
+  background-color: #ffffff;
 }

@@ -40,6 +40,15 @@ interface FumaPageParams {
    * Supported locales for generating alternates metadata, defaults to ['en']
    */
   supportedLocales?: string[];
+
+  // default true
+  showBreadcrumb?: boolean;
+
+  // default true
+  showTableOfContent?: boolean;
+
+  // default false, for mobile style can cause issue
+  showTableOfContentPopover?: boolean;
 }
 
 export function createFumaPage({
@@ -52,6 +61,9 @@ export function createFumaPage({
   siteIcon,
   FallbackPage,
   supportedLocales = ['en'],
+  showBreadcrumb = true,
+  showTableOfContent = true,
+  showTableOfContentPopover = false,
 }: FumaPageParams) {
   const Page = async function Page({ params }: { params: Promise<{ locale: string; slug?: string[] }> }) {
     const { slug, locale } = await params;
@@ -77,9 +89,9 @@ export function createFumaPage({
     const MDX = page.data.body;
     return (
       <DocsPage
-        // breadcrumb={{ enabled: false }}
-        tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement }}
-        tableOfContentPopover={{ footer: tocFooterElement }}
+        breadcrumb={{ enabled: showBreadcrumb }}
+        tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement, enabled: showTableOfContent }}
+        tableOfContentPopover={{ footer: tocFooterElement, enabled: showTableOfContentPopover }}
         toc={page.data.toc}
         article={{ className: 'max-sm:pb-16' }}
       >

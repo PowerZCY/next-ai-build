@@ -1,5 +1,5 @@
 // Main application Server components
-export * from './gallery';
+export * from './gallery/gallery-server';
 export * from './usage';
 export * from './features';
 export * from './tips'; 

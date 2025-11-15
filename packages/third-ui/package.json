@@ -88,6 +88,7 @@
     "katex": "catalog:",
     "mermaid": "catalog:",
     "react-medium-image-zoom": "catalog:",
+    "swiper": "catalog:",
     "zod": "catalog:"
   },
   "peerDependencies": {
