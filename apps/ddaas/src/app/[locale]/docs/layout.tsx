@@ -27,23 +27,6 @@ async function docsOptions(locale: string): Promise<DocsLayoutProps> {
     sidebar: {
       // 禁用侧边栏Link组件预加载, 降低服务端负荷, 并尽可能降低触发云平台限流规则的概率
       prefetch: false,
-      tabs: {
-        transform(option, node) {
-          const meta = docsSource.getNodeMeta(node);
-          if (!meta || !node.icon) return option;
-
-          return {
-            ...option,
-            icon: (
-              <div
-                className="rounded-md shadow-lg ring-0.5 border border-purple-500 ring-purple-500/20"
-              >
-                {node.icon}
-              </div>
-            ),
-          };
-        },
-      },
     },
   };
 }
@@ -69,6 +52,7 @@ export default async function Layout({
         enabled: true,
         mode: 'light-dark-system',
       }}
+      searchToggle={{enabled: false}}
     >
       {children}
     </DocsLayout>
