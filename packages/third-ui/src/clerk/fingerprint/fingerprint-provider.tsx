@@ -178,16 +178,26 @@ export function FingerprintStatus() {
           <div
             ref={modalRef}
             className={cn(
-              'fixed left-3 top-1 z-9999 w-[min(500px,95vw)] overflow-y-auto rounded-2xl border',
-              'border-slate-200/70 bg-white/95 p-5 shadow-2xl backdrop-blur-sm',
-              'font-sans text-sm text-slate-700',
-              'dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200'
+              'fixed inset-3 z-9999 mx-auto w-[min(95vw,520px)] max-h-[90vh] overflow-y-auto rounded-2xl border',
+              'border-slate-200/70 bg-white/95 p-4 shadow-2xl backdrop-blur-sm',
+              'font-sans text-sm text-slate-700 dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200',
+              'sm:inset-auto sm:left-3 sm:top-1 sm:right-auto sm:w-[min(520px,95vw)] sm:p-5'
             )}
           >
-            <header className="mb-2 flex flex-col gap-1.5">
-              <div className="flex items-center gap-2 text-base font-bold tracking-wider text-purple-600 dark:text-purple-500">
-                <icons.ShieldUser className="size-4" />
-                Fingerprint Debug Panel
+            <header className="mb-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2 text-base font-bold tracking-wider text-purple-600 dark:text-purple-500">
+                  <icons.ShieldUser className="size-4" />
+                  Fingerprint Debug Panel
+                </div>
+                <button
+                  type="button"
+                  aria-label="Close fingerprint panel"
+                  className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <icons.X className="size-4" />
+                </button>
               </div>
             </header>
 
