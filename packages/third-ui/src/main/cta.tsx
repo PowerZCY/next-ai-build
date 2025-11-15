@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { GradientButton } from "@third-ui/fuma/mdx/gradient-button";
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
-import { responsiveSection } from './section-layout';
+import { responsiveSection } from '@third-ui/main/server';
 
 interface CTAData {
   title: string;

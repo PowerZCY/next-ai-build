@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
-import { responsiveSection } from './section-layout';
+import { responsiveSection } from '@third-ui/main/server';
 
 interface TipSection {
   id: string;

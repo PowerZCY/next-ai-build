@@ -42,3 +42,5 @@ export type {
 } from './money-price/money-price-types';
 
 export { UserState } from './money-price/money-price-types';
+
+export { responsiveSection } from './section-layout';

@@ -2,6 +2,8 @@ import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils'
 import Image from "next/image"
 import { GalleryInteractive } from '@third-ui/main';
+import { responsiveSection } from '@third-ui/main/server';
+
 
 interface GalleryItem {
   id: string;
@@ -49,7 +51,7 @@ export async function Gallery({ locale, sectionClassName, button }: GalleryProps
   };
 
   return (
-    <section id="gallery" className={cn("container mx-auto px-4 py-20 scroll-mt-20", sectionClassName)}>
+    <section id="gallery" className={cn(responsiveSection, sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
         {data.titleL} <span className="text-purple-500">{data.eyesOn}</span> {data.titleR}
       </h2>

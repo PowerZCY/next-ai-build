@@ -3,7 +3,7 @@ import { getGlobalIcon } from '@windrun-huaiin/base-ui/components/server';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
-import { responsiveSection } from './section-layout';
+import { responsiveSection } from '@third-ui/main/server';
 
 interface FeaturesData {
   title: string;

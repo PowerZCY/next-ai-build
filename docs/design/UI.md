@@ -13,6 +13,7 @@
 - **卡片栅格**：三列时保持每卡最小宽度 350px，左右留白通过 `max-w-6xl` 容器 + `px-4/px-8` 控制；移动端自动折行为单列。
 - **模态宽度**：弹窗 `w-[95vw]`、`max-w-[1200px]`，内层内容容器限定 `max-w-6xl`，避免卡片被拉扁。
 - **内边距与分隔**：卡片内部使用 24px 级别间距，标题/副标题之间 12px，列表条目 8–12px，保留呼吸感。
+- **响应式分段**：所有全页板块应落入统一的 `max-w-6xl` 容器并搭配 `"px-4 py-10 sm:px-6 md:px-8 lg:px-10"` 级别的横向留白，移动端默认 `max-w-full` 自动塞满可用宽度；强调型内容（如 `CTA`、`FAQ`）可选用稍微加宽的 `wideResponsiveSection` 变体，但仍需保留四周间距。
 
 ## 3. 文字层级
 - **主标题**：32–40px，粗体；弹窗标题可 28px 加粗，下方副标题 14–16px 中等字重并弱化色彩。
@@ -30,6 +31,8 @@
 - **模态行为**：支持 ESC、点击遮罩关闭；滚动区域限制在 `max-h-[80vh]` 内，确保长列表可滚动。
 - **默认视图**：积分弹窗默认聚焦一次性计费，可通过调整 `billingSwitch.defaultKey` 完成，但保留全部选项供用户切换。
 - **门户跳转**：统一通过 `redirectToCustomerPortal` helper 处理 Stripe Portal 逻辑（含登录 fallback），避免各处重复实现。
+- **调试面板**：FingerptintStatus 等内部面板也需遵循移动端，限定 `max-h-[90vh]`、`w-[min(95vw,520px)]`，后顶层加固遮罩并在右上角提供关闭按钮，便于小屏操作。
+- **菜单折叠**：当移动端导航下拉展开时，点击积分类卡片或按钮应该主动折叠主菜单以避免遮挡；可通过监听 `DropdownMenu` 的 open 状态并触发导航 Toggle 关闭。
 
 ## 6. 复用实践提示
 - **数据构建**：服务端统一调用 `buildMoneyPriceData({ locale, currency, enabledBillingTypes? })`，在不同场景按需覆写 `billingSwitch.defaultKey` 即可；勿就地硬编码文案。
