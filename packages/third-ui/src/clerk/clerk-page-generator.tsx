@@ -13,7 +13,7 @@ import { SignIn, SignUp, Waitlist } from '@clerk/nextjs';
 export function createSignInPage() {
   return function SignInPage() {
     return (
-      <div className="flex-1 flex justify-center m-32">
+      <div className="flex-1 flex justify-center m-16">
         <SignIn />
       </div>
     );
@@ -23,7 +23,7 @@ export function createSignInPage() {
 export function createSignUpPage() {
   return function SignUpPage() {
     return (
-      <div className="flex-1 flex justify-center m-32">
+      <div className="flex-1 flex justify-center m-16">
         <SignUp />
       </div>
     );
@@ -33,7 +33,7 @@ export function createSignUpPage() {
 export function createWaitlistPage() {
   return function WaitlistPage() {
     return (
-      <div className="flex-1 flex justify-center m-32">
+      <div className="flex-1 flex justify-center m-16">
         <Waitlist />
       </div>
     );

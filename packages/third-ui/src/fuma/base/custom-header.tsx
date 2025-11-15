@@ -518,7 +518,7 @@ function CompactLanguageToggle({
       </PopoverTrigger>
       <PopoverContent
         className={cn(
-          'flex min-w-[150px] flex-col overflow-x-hidden rounded-xl border bg-fd-popover/60 p-0 text-fd-popover-foreground backdrop-blur-lg',
+          'flex min-w-[150px] z-1001 flex-col overflow-x-hidden rounded-xl border bg-fd-popover/60 p-0 text-fd-popover-foreground backdrop-blur-lg',
           contentClassName,
         )}
       >

@@ -8,8 +8,8 @@ export async function Hero({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: 'hero' });
 
   return (
-    <section className="container mt-16 mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-12">
-      <div className="flex-[1.6] space-y-6">
+    <section className="mx-auto mt-12 max-w-6xl flex flex-col gap-10 px-4 py-8 md:flex-row md:items-center md:gap-12">
+      <div className="flex-1 space-y-6">
         <h1 className="text-4xl md:text-6xl font-bold leading-tight">
           {t('mainTitle')}<br />{" "}
           <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-600">{t('mainEyesOn')}</span>
@@ -20,6 +20,8 @@ export async function Hero({ locale }: { locale: string }) {
         <GradientButton
           title={t('button')}
           href="https://preview.reve.art/"
+          align="center"
+          className="w-full"
         />
         <div className="flex items-center gap-2 text-sm text-gray-400">
           <icons.Zap className="h-4 w-4" />
@@ -34,11 +36,11 @@ export async function Hero({ locale }: { locale: string }) {
             width={500}
             height={500}
             priority
-            className="rounded-lg transition duration-300 group-hover:scale-105"
+            className="h-auto w-full rounded-lg transition duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 35vw"
           />
         </div>
       </div>
     </section>
   )
 }
-

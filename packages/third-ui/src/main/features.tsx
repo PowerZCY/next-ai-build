@@ -3,6 +3,7 @@ import { getGlobalIcon } from '@windrun-huaiin/base-ui/components/server';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
+import { responsiveSection } from './section-layout';
 
 interface FeaturesData {
   title: string;
@@ -45,11 +46,11 @@ export async function Features({
   };
 
   return (
-    <section id="features" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-18", sectionClassName)}>
+    <section id="features" className={cn(responsiveSection, sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
         {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
-      <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto whitespace-nowrap">
+      <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base sm:text-lg mx-auto max-w-3xl">
         {data.description}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gap-y-12">
@@ -73,4 +74,3 @@ export async function Features({
     </section>
   )
 }
-

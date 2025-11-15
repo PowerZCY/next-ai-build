@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
+import { responsiveSection } from './section-layout';
 
 interface TipSection {
   id: string;
@@ -48,7 +49,7 @@ export async function Tips({
   };
 
   return (
-    <section id="tips" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
+    <section id="tips" className={cn(responsiveSection, sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
         {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
@@ -67,4 +68,3 @@ export async function Tips({
     </section>
   )
 }
-

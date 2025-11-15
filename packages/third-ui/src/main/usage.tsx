@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { globalLucideIcons as icons, getGlobalIcon } from '@windrun-huaiin/base-ui/components/server'
 import { richText } from '@third-ui/main/rich-text-expert';
+import { responsiveSection } from './section-layout';
 
 interface UsageData {
   title: string;
@@ -46,11 +47,11 @@ export async function Usage({
   };
 
   return (
-    <section id="usage" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
+    <section id="usage" className={cn(responsiveSection, sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
         {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
-      <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base md:text-lg mx-auto whitespace-nowrap">
+      <p className="text-center text-gray-600 dark:text-gray-400 mb-12 text-base sm:text-lg mx-auto max-w-3xl">
         {data.description}
       </p>
       <div className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 md:p-12 shadow-sm dark:shadow-none">
@@ -76,4 +77,3 @@ export async function Usage({
     </section>
   )
 }
-

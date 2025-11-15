@@ -2,6 +2,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
 import { richText } from '@third-ui/main/rich-text-expert';
+import { responsiveSection } from './section-layout';
 
 interface SeoSection {
   id: string;
@@ -47,7 +48,7 @@ export async function SeoContent({
   };
 
   return (
-    <section id="seo" className={cn("px-16 py-10 mx-16 md:mx-32 scroll-mt-20", sectionClassName)}>
+    <section id="seo" className={cn(responsiveSection, sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
         {data.title} <span className="text-purple-500">{data.eyesOn}</span>
       </h2>
@@ -75,4 +76,3 @@ export async function SeoContent({
     </section>
   )
 }
-

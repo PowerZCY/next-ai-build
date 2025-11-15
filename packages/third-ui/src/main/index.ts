@@ -16,4 +16,6 @@ export { MoneyPriceInteractive } from './money-price/money-price-interactive';
 export { MoneyPriceButton } from './money-price/money-price-button';
 
 export { CreditOverviewClient } from './credit/credit-overview-client';
-export { CreditNavButton } from './credit/credit-nav-button'
+export { CreditNavButton } from './credit/credit-nav-button';
+
+export { responsiveSection } from './section-layout';
