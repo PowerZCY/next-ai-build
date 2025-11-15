@@ -246,7 +246,7 @@ function CustomNavbar({
         ? `${maxContentWidth}px`
         : maxContentWidth
       : '88rem';
-  const minNavWidth = '20rem';
+  const minNavWidth = '15rem';
   const floatingWidth = `clamp(${minNavWidth}, 100vw, ${resolvedMaxWidth})`;
   const widthStyle = floating
     ? { width: floatingWidth }

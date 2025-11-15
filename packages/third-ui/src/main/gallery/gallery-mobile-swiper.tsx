@@ -20,7 +20,7 @@ export function GalleryMobileSwiper({ items }: Props) {
         loop={true}
         grabCursor={true}
         className="gallery-mobile-swiper w-full mx-auto rounded-2xl overflow-hidden"
-        style={{ maxWidth: "min(calc(100vw - 32px), 450px)" }}
+        style={{ maxWidth: "min(calc(100vw - 48px), 350px)" }}
       >
         {items.map((item) => (
           <SwiperSlide key={item.id}>
