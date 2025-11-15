@@ -21,7 +21,7 @@ export async function MoneyPrice({
   });
 
   return (
-    <section id="money-pricing" className={cn("px-4 pb-4 md:px-16 md:pb-8 mx-auto max-w-7xl scroll-mt-10", sectionClassName)}>
+    <section id="money-pricing" className={cn("px-4 py-4 md:px-16 md:py-8 mx-auto max-w-7xl scroll-mt-10", sectionClassName)}>
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">
         {data.title}
       </h2>

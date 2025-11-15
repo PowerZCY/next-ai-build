@@ -238,6 +238,23 @@ function CustomNavbar({
               : maxContentWidth,
         }
       : {}),
+  };
+
+  const resolvedMaxWidth =
+    maxContentWidth && maxContentWidth !== 0
+      ? typeof maxContentWidth === 'number'
+        ? `${maxContentWidth}px`
+        : maxContentWidth
+      : '88rem';
+  const minNavWidth = '20rem';
+  const preferredFloatingWidth = `min(calc(100vw - 1.5rem), ${resolvedMaxWidth})`;
+  const floatingWidth = `clamp(${minNavWidth}, ${preferredFloatingWidth}, ${resolvedMaxWidth})`;
+  const widthStyle = floating
+    ? { width: floatingWidth }
+    : { width: '100%', maxWidth: resolvedMaxWidth, minWidth: minNavWidth };
+  const headerStyle = {
+    ...cssVars,
+    ...widthStyle,
     ...style,
   };
 
@@ -245,12 +262,12 @@ function CustomNavbar({
     <NavigationMenu value={value} onValueChange={setValue} asChild>
       <header
         {...props}
-        style={cssVars}
+        style={headerStyle}
         className={cn(
           'rounded-2xl border px-4 py-1 transition-[background-color,box-shadow,transform] duration-300 backdrop-blur-xl shadow-lg shadow-black/5',
           floating
-            ? 'fixed left-1/2 top-[--fd-banner-height] z-1001 w-[min(100%-1.5rem,var(--fd-nav-max-width,88rem))] -translate-x-1/2'
-            : 'relative mx-auto w-full max-w-(--fd-nav-max-width,88rem)',
+            ? 'fixed left-1/2 top-[--fd-banner-height] z-1001 -translate-x-1/2'
+            : 'relative mx-auto w-full',
           isTransparent
             ? 'border-transparent bg-transparent shadow-transparent'
             : 'border border-fd-border/60 bg-white/85 dark:border-white/20 dark:bg-neutral-900/75',
