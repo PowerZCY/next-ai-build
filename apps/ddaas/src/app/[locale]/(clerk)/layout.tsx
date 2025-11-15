@@ -9,7 +9,6 @@
 
 import { baseOptions } from '@/app/[locale]/layout.config';
 import { fingerprintConfig } from '@/lib/fingerprint-config';
-import { ClerkProviderClient } from '@third-ui/clerk';
 import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
 import { CustomHomeLayout } from '@third-ui/fuma/base';
 import { type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
@@ -44,19 +43,17 @@ export default async function RootLayout({
     },
   };
   return (
-    <ClerkProviderClient locale={locale}>
-      <FingerprintProvider config={fingerprintConfig}>
-        <CustomHomeLayout
-            locale={locale}
-            options={homeLayoutOptions}
-            showBanner={clerkPageBanner}
-            showFooter={false}
-            showGoToTop={false}
-            floatingNav={true}
-          >
-            {children}
-          </CustomHomeLayout>
-      </FingerprintProvider>
-    </ClerkProviderClient>
+    <FingerprintProvider config={fingerprintConfig}>
+      <CustomHomeLayout
+          locale={locale}
+          options={homeLayoutOptions}
+          showBanner={clerkPageBanner}
+          showFooter={false}
+          showGoToTop={false}
+          floatingNav={true}
+        >
+          {children}
+        </CustomHomeLayout>
+    </FingerprintProvider>
   );
 }

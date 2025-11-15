@@ -15,6 +15,9 @@ const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   siteIcon: <SiteIcon />,
   FallbackPage: NotFoundPage,
   supportedLocales: appConfig.i18n.locales as string[],
+  showBreadcrumb: false,
+  showTableOfContent: true,
+  showTableOfContentPopover: false
 });
 
 export default Page;

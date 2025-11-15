@@ -12,7 +12,7 @@ export default async function Layout({
   const { locale } = await params;
  
   return (
-    <DocsLayout sidebar={{enabled: false}} tree={legalSource.pageTree[locale]}>
+    <DocsLayout sidebar={{enabled: false}} searchToggle={{enabled: false}} tree={legalSource.pageTree[locale]}>
       {children}
     </DocsLayout>
   );

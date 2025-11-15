@@ -2,6 +2,7 @@ import { appConfig, generatedLocales } from "@/lib/appConfig";
 import { getFumaTranslations } from '@third-ui/fuma/server';
 import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { RootProvider } from "fumadocs-ui/provider/next";
+import { ClerkProviderClient } from '@third-ui/clerk';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Montserrat } from "next/font/google";
@@ -74,17 +75,19 @@ export default async function RootLayout({
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
-          <RootProvider
-              i18n={{
-                locale: locale,
-                // available languages
-                locales: generatedLocales,
-                // translations for UI
-                translations: fumaTranslations,
-              }}
-          >
-            {children}
-          </RootProvider>
+          <ClerkProviderClient locale={locale}>
+            <RootProvider
+                i18n={{
+                  locale: locale,
+                  // available languages
+                  locales: generatedLocales,
+                  // translations for UI
+                  translations: fumaTranslations,
+                }}
+            >
+              {children}
+            </RootProvider>
+          </ClerkProviderClient>
         </body>
       </NextIntlClientProvider>
     </html>

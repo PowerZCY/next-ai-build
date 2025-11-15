@@ -89,9 +89,17 @@ export function createFumaPage({
     const MDX = page.data.body;
     return (
       <DocsPage
-        breadcrumb={{ enabled: showBreadcrumb }}
-        tableOfContent={{ style: 'clerk', single: false, footer: tocFooterElement, enabled: showTableOfContent }}
-        tableOfContentPopover={{ footer: tocFooterElement, enabled: showTableOfContentPopover }}
+        breadcrumb={{enabled: showBreadcrumb}}
+        tableOfContent={{
+          enabled: showTableOfContent,
+          style: 'clerk',
+          single: false,
+          footer: tocFooterElement,
+        }}
+        tableOfContentPopover={{
+          enabled: showTableOfContentPopover,
+          footer: tocFooterElement,
+        }}
         toc={page.data.toc}
         article={{ className: 'max-sm:pb-16' }}
       >

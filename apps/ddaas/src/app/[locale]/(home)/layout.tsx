@@ -1,11 +1,10 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
+import { showBanner } from '@/lib/appConfig';
+import { fingerprintConfig } from '@/lib/fingerprint-config';
+import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
+import { CustomHomeLayout } from '@third-ui/fuma/base';
 import type { HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import type { ReactNode } from 'react';
-import { showBanner } from '@/lib/appConfig';
-import { ClerkProviderClient } from '@third-ui/clerk';
-import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
-import { fingerprintConfig } from '@/lib/fingerprint-config';
-import { CustomHomeLayout } from '@third-ui/fuma/base';
 
 async function homeOptions(locale: string): Promise<HomeLayoutProps> {
   return {
@@ -44,17 +43,15 @@ export default async function Layout({
   };
 
   return (
-    <ClerkProviderClient locale={locale}>
-      <FingerprintProvider config={fingerprintConfig}>
-        <CustomHomeLayout
-          locale={locale}
-          options={homeLayoutOptions}
-          showBanner={showBanner}
-          floatingNav={true}
-        >
-          {children}
-        </CustomHomeLayout>
-        </FingerprintProvider>
-    </ClerkProviderClient>
+    <FingerprintProvider config={fingerprintConfig}>
+      <CustomHomeLayout
+        locale={locale}
+        options={homeLayoutOptions}
+        showBanner={showBanner}
+        floatingNav={true}
+      >
+        {children}
+      </CustomHomeLayout>
+      </FingerprintProvider>
   );
 }
