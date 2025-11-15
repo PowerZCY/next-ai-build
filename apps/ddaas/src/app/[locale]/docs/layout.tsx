@@ -52,6 +52,7 @@ export default async function Layout({
         enabled: true,
         mode: 'light-dark-system',
       }}
+      sidebar={{ enabled: true }}
       searchToggle={{enabled: false}}
     >
       {children}

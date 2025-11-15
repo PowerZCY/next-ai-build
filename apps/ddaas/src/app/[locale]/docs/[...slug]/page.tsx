@@ -16,6 +16,7 @@ const { Page, generateStaticParams, generateMetadata } = createFumaPage({
   copyButtonComponent: <LLMCopyButton />,
   siteIcon: <SiteIcon />,
   FallbackPage: NotFoundPage,
+  showBreadcrumb: false
 });
 
 export default Page;
