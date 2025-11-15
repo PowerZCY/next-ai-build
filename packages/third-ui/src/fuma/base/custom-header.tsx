@@ -247,8 +247,7 @@ function CustomNavbar({
         : maxContentWidth
       : '88rem';
   const minNavWidth = '20rem';
-  const preferredFloatingWidth = `min(calc(100vw - 1.5rem), ${resolvedMaxWidth})`;
-  const floatingWidth = `clamp(${minNavWidth}, ${preferredFloatingWidth}, ${resolvedMaxWidth})`;
+  const floatingWidth = `clamp(${minNavWidth}, 100vw, ${resolvedMaxWidth})`;
   const widthStyle = floating
     ? { width: floatingWidth }
     : { width: '100%', maxWidth: resolvedMaxWidth, minWidth: minNavWidth };
@@ -487,7 +486,11 @@ function MenuContent(
   return (
     <NavigationMenuContent
       {...props}
-      className={cn('flex flex-col p-4', props.className)}
+      className={cn(
+        'flex flex-col p-4 w-full max-w-full min-w-0',
+        props.className,
+      )}
+      style={{ minWidth: 0, width: '100%', maxWidth: '100%', ...props.style }}
     >
       {props.children}
     </NavigationMenuContent>
