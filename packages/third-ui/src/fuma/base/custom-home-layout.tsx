@@ -134,6 +134,7 @@ export function CustomHomeLayout({
           ...navOptions,
           component: header,
         }}
+        className='bg-neutral-100 dark:bg-neutral-900'
         style={layoutStyle}
       >
         {children}
