@@ -63,7 +63,8 @@
       "@rollup/plugin-typescript": "catalog:"
     },
     "patchedDependencies": {
-      "fumadocs-ui@16.0.9": "patches/fumadocs-ui@16.0.9.patch"
+      "fumadocs-ui@16.0.9": "patches/fumadocs-ui@16.0.9.patch",
+      "fumadocs-core@16.0.9": "patches/fumadocs-core@16.0.9.patch"
     }
   }
 }
