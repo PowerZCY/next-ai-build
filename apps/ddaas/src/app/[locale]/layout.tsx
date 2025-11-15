@@ -1,5 +1,5 @@
 import { appConfig, generatedLocales } from "@/lib/appConfig";
-import { fumaI18nCn } from '@third-ui/lib/server';
+import { getFumaTranslations } from '@third-ui/fuma/server';
 import { NProgressBar } from '@third-ui/main/nprogress-bar';
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { NextIntlClientProvider } from 'next-intl';
@@ -68,19 +68,20 @@ export default async function RootLayout({
   const { locale } = await paramsPromise;  // 使用新名称
   setRequestLocale(locale);
   const messages = await getMessages();
+  const fumaTranslations = await getFumaTranslations(locale);
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
         <body>
           <NProgressBar />
           <RootProvider
-            i18n={{
-              locale: locale,
-              // available languages
-              locales: generatedLocales,
-              // translations for UI
-              translations: { fumaI18nCn }[locale],
-            }}
+              i18n={{
+                locale: locale,
+                // available languages
+                locales: generatedLocales,
+                // translations for UI
+                translations: fumaTranslations,
+              }}
           >
             {children}
           </RootProvider>

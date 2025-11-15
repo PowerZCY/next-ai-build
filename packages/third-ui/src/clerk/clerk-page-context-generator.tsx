@@ -15,7 +15,7 @@ import { SignInWithFingerprint } from './signin-with-fingerprint-client';
 export function createSignUpPageWithFingerprint() {
   return function SignUpPage() {
     return (
-      <div className="flex-1 flex justify-center mt-0 mb-32">
+      <div className="flex-1 flex justify-center m-32">
         <SignUpWithFingerprint />
       </div>
     );
@@ -29,7 +29,7 @@ export function createSignUpPageWithFingerprint() {
 export function createSignInPageWithFingerprint() {
   return function SignInPage() {
     return (
-      <div className="flex-1 flex justify-center mb-64">
+      <div className="flex-1 flex justify-center m-32">
         <SignInWithFingerprint />
       </div>
     );

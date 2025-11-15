@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import Link from 'fumadocs-core/link';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
@@ -15,6 +16,7 @@ export interface LLMCopyButtonProps {
 }
 
 export function LLMCopyButton({ llmApiUrl, sourceKey }: LLMCopyButtonProps = {}) {
+  const t = useTranslations('fuma');
   const [isLoading, setLoading] = useState(false);
   const params = useParams();
   const locale = params.locale as string;
@@ -68,12 +70,12 @@ export function LLMCopyButton({ llmApiUrl, sourceKey }: LLMCopyButtonProps = {})
       {checked ? (
         <>
           <icons.Check/>
-          Copied!
+          {t('copyMarkdownDone')}
         </>
       ) : (
         <>
           <icons.Markdown/>
-          Copy page as Markdown
+          {t('copyMarkdown')}
         </>
       )}
     </Button>
@@ -81,23 +83,26 @@ export function LLMCopyButton({ llmApiUrl, sourceKey }: LLMCopyButtonProps = {})
 }
 
 export function EditOnGitHub({ url }: { url: string }) {
+  const t = useTranslations('fuma');
   return (
     <Link
       className="flex items-center gap-x-2 text-stone-600 hover:text-stone-500 dark:text-stone-400 dark:hover:text-stone-300 text-sm"
       href={url}
     >
       <icons.GitHub/>
-      Edit this page on GitHub
+      {t('editOnGithub')}
     </Link>
   );
 }
 
 // New component for displaying the last updated date with an icon
 export function LastUpdatedDate({ date }: { date: string | undefined }) {
+  const t = useTranslations('fuma');
+  const viewDate = date ? `${t('lastUpdate')} ${date}` : `${t('emptyLastUpdate')}`
   return (
     <div className="flex items-center gap-x-2 text-stone-600 dark:text-stone-400 text-sm">
       <icons.LastUpdated/>
-      Latest on {date ? date : "Ages ago"}
+      {viewDate}
     </div>
   );
 }

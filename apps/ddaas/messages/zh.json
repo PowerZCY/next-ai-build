@@ -396,5 +396,20 @@
     "pricing": "价格方案",
     "legal": "法务声明",
     "docs": "产品说明"
+  },
+  "fuma": {
+    "search": "搜索",
+    "searchNoResult": "没有搜索结果",
+    "toc": "目录",
+    "tocNoHeadings": "暂无标题",
+    "lastUpdate": "最后更新  ",
+    "emptyLastUpdate": "年代久远",
+    "chooseLanguage": "请选择语言",
+    "nextPage": "下一页",
+    "previousPage": "上一页",
+    "chooseTheme": "主题",
+    "copyMarkdown": "复制Markdown源码",
+    "copyMarkdownDone": "已复制",
+    "editOnGithub": "在GitHub上编辑"
   }
 }

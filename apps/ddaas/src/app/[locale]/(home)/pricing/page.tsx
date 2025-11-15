@@ -23,6 +23,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         enabledBillingTypes={['monthly', 'yearly', 'onetime']}
         enableSubscriptionUpgrade={enableSubscriptionUpgrade}
         initUserContext={initUserContext}
+        sectionClassName='mt-12'
       />
     </>
   );

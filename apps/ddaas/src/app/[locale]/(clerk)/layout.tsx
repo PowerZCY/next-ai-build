@@ -52,7 +52,7 @@ export default async function RootLayout({
             showBanner={clerkPageBanner}
             showFooter={false}
             showGoToTop={false}
-            floatingNav={false}
+            floatingNav={true}
           >
             {children}
           </CustomHomeLayout>

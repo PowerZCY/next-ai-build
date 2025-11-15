@@ -2,7 +2,7 @@
 
 /* Fuma  16.x 制定了toc的计算逻辑，这里强制覆盖*/
 #nd-toc {
-  top: 120px !important;
+  top: 80px !important;
 }
 
 
