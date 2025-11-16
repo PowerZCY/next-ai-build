@@ -394,24 +394,25 @@ export function MoneyPriceInteractive({
 
   return (
     <>
-      <div className="flex flex-col items-center w-full">
-        <div className="flex items-center relative mb-3 w-full md:w-auto md:justify-center">
-          <div
-            className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1 w-full max-w-[360px] md:max-w-none md:w-auto"
-            data-billing-switch
-          >
-            {billingOptions.map(option => {
-              const isActive = option.key === billingType;
-              const buttonClasses = isActive
-                ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
-                : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full';
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full px-2 py-2 sm:px-3 sm:py-3" data-billing-switch>
+          {billingOptions.map(option => {
+            const isActive = option.key === billingType;
+            const buttonClasses = isActive
+              ? 'text-white bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 rounded-full shadow-sm'
+              : 'text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 rounded-full';
+            const showBadge = option.key === billingType && !!discountBadgeText;
 
-              return (
+            return (
+              <div key={option.key} className="relative flex items-center justify-center mx-1">
+                {showBadge && (
+                  <span className="absolute z-99 left-1/2 -translate-x-1/2 -top-3 sm:-top-4 translate-y-[-50%] px-3 py-0.5  text-[0.625rem] sm:text-xs rounded-md bg-yellow-100 text-yellow-800 font-semibold shadow-sm whitespace-nowrap">
+                    {discountBadgeText}
+                  </span>
+                )}
                 <button
-                  key={option.key}
                   className={cn(
-                    'flex-1 basis-1/3 text-sm px-3 py-1.5 font-medium transition relative text-center min-w-0',
-                    'md:text-lg md:px-6 md:py-2 md:min-w-[120px] md:flex-none',
+                    'text-sm md:text-base font-medium transition relative text-center z-10 px-2 sm:px-4 py-2 min-w-[100px] sm:min-w-[120px]',
                     buttonClasses
                   )}
                   type="button"
@@ -420,17 +421,9 @@ export function MoneyPriceInteractive({
                 >
                   {option.name}
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="min-h-[32px] flex items-center justify-center mb-3 w-full px-4" data-discount-info>
-          {discountBadgeText ? (
-            <span className="px-2 py-1 text-[11px] md:text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
-              {discountBadgeText}
-            </span>
-          ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
 
