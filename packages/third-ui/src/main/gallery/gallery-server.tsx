@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { responsiveSection } from '@third-ui/main/server';
+import { responsiveSection } from '../section-layout';
 import { GalleryInteractive } from '@third-ui/main';
 import { GalleryDesktopGrid } from './gallery-desktop-grid';
 import { GalleryMobileSwiper } from './gallery-mobile-swiper';
