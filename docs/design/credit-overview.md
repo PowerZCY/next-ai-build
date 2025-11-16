@@ -151,3 +151,37 @@ ctaBehaviors: {
 ```
 
 若某个动作需要调用自定义 handler，可配置 `custom` 并在业务侧直接渲染 `CreditOverviewClient` 时传入 `customActionHandlers`（Server Component `CreditOverview` 默认不注入，可在自定义封装中扩展）。
+
+
+## CTA交互流程图
+
+```mermaid
+flowchart TD
+    A[用户点击头部积分按钮] --> B{检测设备类型}
+    
+    %% ==================== PC 端（蓝色系） ====================
+    B -->|PC 端| PC1[展开下拉卡片<br/>背景仍可滚动<br/>modal=false]:::pc
+    PC1 --> PC_Q{点击哪个按钮?}
+    PC_Q -->|订阅 Subscribe| PC_S1[延迟折叠下拉]:::pc --> PC_S2[打开 Money Price 弹窗<br/>默认订阅模式]:::pcModal
+    PC_Q -->|一次性购买 Onetime| PC_O1[延迟折叠下拉]:::pc --> PC_O2[打开 Money Price 弹窗<br/>默认一次性模式]:::pcModal
+    PC_Q -->|管理订阅 Manage| PC_M1[立即折叠下拉]:::pc --> PC_M2[调用 customer-portal API]:::pc --> PC_M3[跳转 Stripe Portal]:::pcJump
+    
+    %% ==================== 移动端（绿色系） ====================
+    B -->|移动端| MOB1[展开下拉 + 锁定 body 滚动<br/>overflow=hidden]:::mobile
+    MOB1 --> MOB_Q{点击哪个按钮?}
+    MOB_Q -->|订阅 Subscribe| MOB_S1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_S2[跳转 /pricing?initialBillingType=subscription]:::mobileJump
+    MOB_Q -->|一次性购买 Onetime| MOB_O1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_O2[跳转 /pricing?initialBillingType=onetime]:::mobileJump
+    MOB_Q -->|管理订阅 Manage| MOB_M1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_M2[调用 customer-portal API]:::mobile --> MOB_M3[跳转 Stripe Portal]:::mobileJump
+    
+    %% ==================== 关闭方式 ====================
+    PC1 -->|外部点击| PC_CLOSE[关闭下拉]:::pc
+    MOB1 -->|外部点击/上滑| MOB_CLOSE[关闭下拉 + 恢复滚动]:::mobile
+    
+    %% ==================== 颜色类定义 ====================
+    classDef pc fill:#e6f7ff,stroke:#91d5ff,stroke-width:3px,color:#1c3d5a
+    classDef pcModal fill:#d6f4ff,stroke:#40a9ff,stroke-width:4px,stroke-dasharray: 5 5,color:#003a8c
+    classDef pcJump fill:#fff2e8,stroke:#ffbb96,stroke-width:3px,color:#872b00
+    
+    classDef mobile fill:#f6ffed,stroke:#95de64,stroke-width:3px,color:#135200
+    classDef mobileJump fill:#d9f7be,stroke:#52c41a,stroke-width:4px,color:#092b00
+```
