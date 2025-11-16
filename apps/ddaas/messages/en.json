@@ -226,6 +226,9 @@
     "buckets": {
       "title": "Credit Breakdown",
       "empty": "No credits yet",
+      "expiredAtLabel": "Expires",
+      "expandDetail": "Click to show credit details",
+      "hiddenDetail": "Click to hide credit details",
       "labels": {
         "free": "Free",
         "subscription": "Subscription",

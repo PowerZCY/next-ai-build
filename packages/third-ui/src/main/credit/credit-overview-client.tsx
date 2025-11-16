@@ -4,7 +4,7 @@ import { useClerk } from '@clerk/nextjs';
 import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { redirectToCustomerPortal } from '../money-price/customer-portal';
 import type {
   CreditBucket,
@@ -23,6 +23,9 @@ export interface CreditOverviewTranslations {
   totalLabel: string;
   bucketsTitle: string;
   bucketsEmpty: string;
+  expiredAtLabel: string;
+  expandDetail: string;
+  hiddenDetail: string;
   bucketDefaultLabels: Record<string, string>;
   subscriptionPeriodLabel: string;
   subscriptionManage: string;
@@ -65,6 +68,7 @@ export function CreditOverviewClient({
   const { redirectToSignIn } = useClerk();
   const navPopover = useCreditNavPopover();
   const isMobile = navPopover?.isMobile ?? false;
+  const [bucketExpanded, setBucketExpanded] = useState(false);
   const closeNavPopover = useCallback(
     (options?: { defer?: boolean }) => {
       if (!navPopover) {
@@ -372,7 +376,7 @@ export function CreditOverviewClient({
             />
           </div>
         </div>
-        <div className="absolute right-3 top-3 sm:-right-[14px] sm:top-6">
+        <div className="absolute right-3 top-3 sm:right-6 sm:top-6">
           <HoverInfo
             label={translations.totalLabel}
             description={translations.summaryDescription}
@@ -381,48 +385,74 @@ export function CreditOverviewClient({
       </header>
 
       {/* Credit Details Section */}
-      <section className="relative space-y-3 rounded-2xl border p-4 shadow-inner sm:space-y-2 sm:p-5">
+      <section className="relative flex flex-col gap-3 rounded-2xl border p-4 shadow-inner sm:gap-2 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-base font-semibold text-gray-500 dark:text-slate-100 sm:text-lg">
             {translations.bucketsTitle}
           </h3>
+          {hasBuckets ? (
+            <button
+              type="button"
+              aria-expanded={bucketExpanded}
+              aria-label={bucketExpanded ? translations.hiddenDetail : translations.expandDetail}
+              onClick={() => setBucketExpanded((prev) => !prev)}
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-transparent bg-white text-purple-600 shadow-[0_6px_20px_rgba(99,102,241,0.25)] transition-colors hover:text-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:bg-[#1b1541] dark:text-purple-100 dark:hover:text-purple-50 dark:shadow-[0_6px_22px_rgba(112,86,255,0.35)]"
+            >
+              {bucketExpanded ? (
+                <icons.ChevronUp className="h-4 w-4" />
+              ) : (
+                <icons.ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+          ) : null}
         </div>
         {hasBuckets ? (
-          <ul className="mb-4 flex flex-col gap-3 sm:mb-5">
-            {buckets.map((bucket) => {
-              const balanceDisplay = formatNumber(locale, bucket.balance);
-              return (
-                <li
-                  key={bucket.kind}
-                  data-credit-kind={bucket.kind}
-                  className="rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-3 text-sm shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60 sm:px-4"
-                >
-                  <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-xs sm:text-sm">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100 sm:text-sm">
-                        {bucket.computedLabel}
+          bucketExpanded ? (
+            <ul className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200/70 bg-white/70 p-3 sm:p-4">
+              {buckets.map((bucket) => {
+                const balanceDisplay = formatNumber(locale, bucket.balance);
+                return (
+                  <li
+                    key={bucket.kind}
+                    data-credit-kind={bucket.kind}
+                    className="rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-3 text-sm shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60 sm:px-4"
+                  >
+                    <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-xs sm:text-sm">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100 sm:text-sm">
+                          {bucket.computedLabel}
+                        </span>
                       </span>
-                    </span>
-                    <span className="flex min-w-0 justify-end">
-                      <span
-                        className="text-right text-base font-semibold leading-tight text-gray-500 dark:text-slate-100 sm:text-lg"
-                        title={balanceDisplay}
-                      >
-                        {balanceDisplay}
+                      <span className="flex min-w-0 justify-end">
+                        <span
+                          className="text-right text-base font-semibold leading-tight text-gray-500 dark:text-slate-100 sm:text-lg"
+                          title={balanceDisplay}
+                        >
+                          {balanceDisplay}
+                        </span>
                       </span>
-                    </span>
-                  </div>
-                  <div className="mt-3 flex justify-end gap-2">
-                    <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-100 sm:text-xs">
-                      Expires: {bucket.expiresAt}
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                    </div>
+                    <div className="mt-3 flex justify-end gap-2">
+                      <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-100 sm:text-xs">
+                      {translations.expiredAtLabel}: {bucket.expiresAt}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setBucketExpanded(true)}
+              
+              className="w-full rounded-2xl border border-slate-200/70 bg-white/85 p-6 sm:px-4 text-sm shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60 hover:text-purple-500"
+            >
+              {translations.expandDetail}
+            </button>
+          )
         ) : (
-          <div className="rounded-2xl border border-dashed border-slate-200/70 bg-white/70 p-6 text-sm text-gray-500 dark:border-slate-800/60 dark:bg-slate-900/40 dark:text-slate-100">
+          <div className="w-full rounded-2xl border border-slate-200/70 bg-white/85 p-6 sm:px-4 text-sm shadow-sm transition-transform dark:border-slate-800/60 dark:bg-slate-900/60 text-center">
             {translations.bucketsEmpty}
           </div>
         )}

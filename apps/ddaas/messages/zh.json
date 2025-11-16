@@ -226,6 +226,9 @@
     "buckets": {
       "title": "积分余额明细",
       "empty": "当前暂未获得任何积分",
+      "expiredAtLabel": "到期时间",
+      "expandDetail": "点击查看积分详情",
+      "hiddenDetail": "点击隐藏积分详情",
       "labels": {
         "free": "免费积分",
         "subscription": "订阅积分",
