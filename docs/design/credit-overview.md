@@ -4,10 +4,10 @@
 
 当前实现遵循最新的视觉与交互规范：
 
-- 导航触发按钮（`CreditNavButton`）仅展示礼包图标与积分数值，浅色主题为白底+紫色渐变 hover，暗色主题为深色胶囊；弹层设置为 `modal={false}` 并限制内部 `max-height`，因此展开时主页面仍可滚动。
-- 总额卡片采用右上 → 左下的紫调渐变，并结合外突的信息按钮营造“缺口”效果；按钮在亮/暗模式下分别使用白底与深紫底，保持与背景的对比度。
-- 订阅区与所有 CTA 统一使用渐变体系，管理/订阅操作复用 `GradientButton`，`w-full` 下文字仍居中。
-- 积分桶列表为两行布局：首行展示类型、状态 Tag 与 `余额/上限` 比例，第二行展示渐变进度条和百分比。额外描述通过 hover/focus 提示呈现，文本过长时自动省略并提供 tooltip。
+- 导航触发按钮（`CreditNavButton`）仅展示礼包图标与积分数值，浅色主题为白底+紫色渐变 hover，暗色主题为深色胶囊。
+- PC 端下拉设置 `modal={false}`，展开后页面仍可滚动；移动端会在下拉展开时锁定 `body`/`html` 滚动，确保视口只聚焦积分内容。
+- 订阅区与 CTA 统一使用渐变体系，管理/订阅操作复用 `GradientButton`，`w-full` 下文字居中。
+- 积分桶列表为两行布局：首行展示类型和余额，第二行展示过期信息。额外描述通过 hover/focus 提示呈现。
 
 ## 组件分层总览
 
@@ -17,20 +17,51 @@ components/                                         # apps/ddaas/src/components�
 ---------------------------------------
 credit/                                                       # packages/third-ui/src.main/credit目录，Credit通用封装组件目录
 ├── credit-nav-button.tsx                    # 下拉组件按钮
-├── credit-overview-interactive.tsx  # 下拉详情客户端组件
+├── credit-overview-client.tsx        # 下拉详情客户端组件
 ├── credit-overview.ts                          # 下拉详情服务端组件
 ├── types.ts                                              # 类型定义  
 ```
+
+### 关键角色与职责
+
+| 组件 | 主要职责 |
+| ---- | ---- |
+| `CreditNavButton` | 统一管理下拉展开/折叠、移动端滚动锁定、全局价格弹窗的生命周期，并通过 Context 让内部组件在需要时折叠下拉或唤起弹窗。 |
+| `CreditOverviewClient` | 纯展示逻辑 + 行为编排。内部只需调用 `useCreditNavPopover()` 暴露的 `close`/`openPricingModal` 等方法，而不再直接渲染弹窗。 |
+| `CreditOverview` | Server Component，负责获取翻译和拼装 `CreditOverviewClient` 所需的 props。 |
+
+> ⚠️ 价格弹窗的 UI 现在由 `CreditNavButton` 统一渲染，通过 `MoneyPriceInteractive` 复用计费模块视觉；`CreditOverviewClient` 调用 `navPopover.openPricingModal` 时需传入 `pricingContext` 和按模式处理后的 `moneyPriceData`。
+
+## 交互流程
+
+### PC 端
+
+1. 用户点击头部积分按钮 → `DropdownMenu` 展开下拉卡片。由于 `modal={false}`，主页面仍能滚动。
+2. 卡片内部按钮：
+   - **弹窗类（订阅/一次性）**：调用 `openPricingModal` 打开价格弹窗，再在下一帧折叠下拉，体验无闪烁。
+   - **跳转类（管理订阅、fallback URL）**：先折叠下拉，再执行 `window.location.href`。
+3. 弹窗与下拉的生命周期解耦：即使下拉已经折叠，弹窗仍挂载在 `CreditNavButton` 下，直到用户点击关闭或 ESC。
+
+### 移动端
+
+1. 点击积分按钮展开下拉时，`credit-nav-button` 会将 `body` 与 `html` 的 `overflow` 改为 `hidden`，禁止背景页面滑动。
+2. 外部点击或手势（包括滑动页面空白区域）被监听，一旦触发立即折叠下拉并恢复滚动。
+3. 卡片内部按钮行为：
+   - **弹窗类**：与 PC 一致，先唤起弹窗，再通过 `requestAnimationFrame` 延迟折叠下拉，避免弹窗闪烁。
+   - **跳转类**：折叠后才进行跳转，确保进入新页面/第三方前视图干净。
+4. 弹窗本身不锁定页面，仍由 Radix `AlertDialog` 控制，关闭时会恢复滚动；其内容同样可滚动，按钮点击只影响弹窗，不会重新展开下拉。
+
+> 通过 Context 将“折叠 + 弹窗”能力上提到 `CreditNavButton`，任何新增按钮只要调用 `navPopover.close()` 或 `navPopover.openPricingModal(...)` 就能遵循一致的交互规范。
 
 ## 数据结构说明
 
 | 字段 | 说明 |
 | ---- | ---- |
-| `totalBalance: number` | 所有积分类型的总余额，顶部卡片大号展示（文字说明通过信息浮层展示）。 |
-| `checkoutUrl: string` | “购买一次性积分”按钮跳转地址。 |
-| `buckets: CreditBucket[]` | 积分明细数组，至少建议包含 `free`、`subscription`、`onetime` 三种类型。 |
-| `subscription?: SubscriptionInfo` | 仅在有有效订阅时提供，用于渲染订阅信息卡片。 |
-| `pricingContext?: CreditPricingContext` | （可选）若提供则复用 Money Price 组件弹窗，按钮将不再使用纯跳转链接。 |
+| `totalBalance: number` | 所有积分类型的总余额，顶部卡片大号展示。 |
+| `checkoutUrl: string` | “购买一次性积分”按钮跳转地址（当没有 `pricingContext` 时使用）。 |
+| `buckets: CreditBucket[]` | 积分明细数组。 |
+| `subscription?: SubscriptionInfo` | 有有效订阅时提供，用于渲染订阅信息卡片。 |
+| `pricingContext?: CreditPricingContext` | 提供后优先使用 Money Price 弹窗，所有 CTA 改为 `onClick` 控制，不再依赖 `href`。 |
 
 `CreditBucket` 结构：
 - `kind: string`：积分类型标识，例如 `free`、`subscription`、`onetime`。组件会根据内置翻译自动展示标题，可通过 `label` 覆盖。
@@ -50,10 +81,14 @@ credit/                                                       # packages/third-u
 - credit-popover.tsx （业务侧 Server Component）
 - 翻译键位credit字段
 `CreditPricingContext` 结构：
-- `moneyPriceData: MoneyPriceData`：调用 `buildMoneyPriceData` 生成的多语言静态内容。
+- `moneyPriceData: MoneyPriceData`：调用 `buildMoneyPriceData` 生成的多语言静态内容；`CreditOverviewClient` 会根据按钮模式（订阅 / 一次性）动态设置 `billingSwitch.defaultKey`。
 - `moneyPriceConfig: MoneyPriceConfig`：与 Money Price 主区域共用的支付配置。
 - `checkoutApiEndpoint?: string`、`customerPortalApiEndpoint?: string`：Stripe 结算/门户接口。
-- `signInPath?: string`：若门户接口返回 401/403 时的 fallback 登录路径。
 - `enableSubscriptionUpgrade?: boolean`：沿用 Money Price 行为，用于控制订阅升级按钮是否可点击。
-- 用户context，用户进行服务端渲染money price组件。
-- 若入口在积分弹窗中默认聚焦一次性计费，可在接入层通过 `moneyPriceData.billingSwitch.defaultKey = 'onetime'` 覆盖默认值，但不要过滤 `billingSwitch.options`，这样用户仍可切换订阅视图；弹窗会共用同一套 `redirectToCustomerPortal` 逻辑，并支持点击遮罩或按下 ESC 时关闭。
+- `initUserContext?: InitUserContext`：透传给 `MoneyPriceInteractive`，避免重复请求用户上下文。
+
+提供 `pricingContext` 时请注意：
+
+1. 入口在积分弹窗中默认聚焦一次性计费，可通过 `moneyPriceData.billingSwitch.defaultKey = 'onetime'` 覆盖默认值，但不要过滤 `billingSwitch.options`，这样用户仍可切换订阅视图。
+2. CTA 不再走 `<a href>`，全部通过 `onClick` 调用 `requestPricingModal` 或直接跳转，以便在移动端先折叠菜单再进入下一步。
+3. 弹窗使用与 Money Price 主区域完全相同的 `MoneyPriceInteractive`，继续复用 `redirectToCustomerPortal` 等逻辑，支持点击遮罩/ESC 关闭。

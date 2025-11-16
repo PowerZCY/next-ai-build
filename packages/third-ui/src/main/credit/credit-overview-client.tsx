@@ -3,21 +3,15 @@
 import { useClerk } from '@clerk/nextjs';
 import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@windrun-huaiin/base-ui/ui';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { redirectToCustomerPortal } from '../money-price/customer-portal';
-import { MoneyPriceInteractive } from '../money-price/money-price-interactive';
 import type {
   CreditBucket,
   CreditBucketStatus,
   CreditOverviewData
 } from './types';
+import { useCreditNavPopover, type PricingModalMode } from './credit-nav-button';
 
 export interface CreditOverviewTranslations {
   summaryDescription: string;
@@ -31,8 +25,6 @@ export interface CreditOverviewTranslations {
   subscribePay?: string;
   onetimeBuy: string;
 }
-
-type PricingModalMode = 'subscription' | 'onetime';
 
 interface CreditOverviewClientProps {
   data: CreditOverviewData;
@@ -64,6 +56,24 @@ export function CreditOverviewClient({
   expiringSoonThresholdDays = 7,
 }: CreditOverviewClientProps) {
   const { redirectToSignIn } = useClerk();
+  const navPopover = useCreditNavPopover();
+  const closeNavPopover = useCallback(
+    (options?: { defer?: boolean }) => {
+      if (!navPopover) {
+        return;
+      }
+      if (options?.defer) {
+        if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+          window.requestAnimationFrame(() => navPopover.close());
+        } else {
+          setTimeout(() => navPopover.close(), 0);
+        }
+        return;
+      }
+      navPopover.close();
+    },
+    [navPopover],
+  );
   const buckets = useMemo<NormalizedBucket[]>(() => {
     return (data.buckets || []).map((bucket) => {
       const limit = Math.max(bucket.limit, 0);
@@ -96,76 +106,53 @@ export function CreditOverviewClient({
   const hasBuckets = buckets.length > 0;
   const subscription = data.subscription;
   const pricingContext = data.pricingContext;
-  const [pricingModal, setPricingModal] = useState<{
-    open: boolean;
-    mode: PricingModalMode;
-  }>({
-    open: false,
-    mode: 'subscription',
-  });
-  const isOnetimeModal = pricingModal.mode === 'onetime';
-  const pricingContentRef = useRef<HTMLDivElement | null>(null);
-
-  const modalMoneyPriceData = useMemo(() => {
-    if (!pricingContext) {
-      return null;
-    }
-
-    if (!isOnetimeModal) {
-      return pricingContext.moneyPriceData;
-    }
-
-    const hasOnetimeOption = pricingContext.moneyPriceData.billingSwitch.options.some(
-      (option) => option.key === 'onetime',
-    );
-
-    if (!hasOnetimeOption) {
-      return pricingContext.moneyPriceData;
-    }
-
-    return {
-      ...pricingContext.moneyPriceData,
-      billingSwitch: {
-        ...pricingContext.moneyPriceData.billingSwitch,
-        defaultKey: 'onetime',
-      },
-    };
-  }, [pricingContext, isOnetimeModal]);
-
-  useEffect(() => {
-    if (!pricingModal.open) {
-      return;
-    }
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!pricingContentRef.current) {
-        return;
-      }
-
-      const target = event.target as Node | null;
-      if (target && !pricingContentRef.current.contains(target)) {
-        setPricingModal((prev) => ({
-          ...prev,
-          open: false,
-        }));
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-    };
-  }, [pricingModal.open]);
-
-  const openPricingModal = useCallback(
+  const getModalMoneyPriceData = useCallback(
     (mode: PricingModalMode) => {
       if (!pricingContext) {
-        return false;
+        return null;
       }
-      setPricingModal({ open: true, mode });
-      return true;
+
+      if (mode !== 'onetime') {
+        return pricingContext.moneyPriceData;
+      }
+
+      const hasOnetimeOption = pricingContext.moneyPriceData.billingSwitch.options.some(
+        (option) => option.key === 'onetime',
+      );
+
+      if (!hasOnetimeOption) {
+        return pricingContext.moneyPriceData;
+      }
+
+      return {
+        ...pricingContext.moneyPriceData,
+        billingSwitch: {
+          ...pricingContext.moneyPriceData.billingSwitch,
+          defaultKey: 'onetime',
+        },
+      };
     },
     [pricingContext],
+  );
+
+  const requestPricingModal = useCallback(
+    (mode: PricingModalMode) => {
+      if (!pricingContext || !navPopover?.openPricingModal) {
+        return false;
+      }
+      const dataForMode = getModalMoneyPriceData(mode);
+      if (!dataForMode) {
+        return false;
+      }
+
+      navPopover.openPricingModal({
+        mode,
+        modalMoneyPriceData: dataForMode,
+        pricingContext,
+      });
+      return true;
+    },
+    [getModalMoneyPriceData, navPopover, pricingContext],
   );
 
   const handleSubscribeAction = useCallback(() => {
@@ -173,19 +160,24 @@ export function CreditOverviewClient({
       return;
     }
 
-    if (openPricingModal('subscription')) {
+    const opened = requestPricingModal('subscription');
+    if (opened) {
+      closeNavPopover({ defer: true });
       return;
     }
 
+    closeNavPopover();
     if (data.subscribeUrl && data.subscribeUrl !== '#') {
       window.location.href = data.subscribeUrl;
     }
-  }, [data.subscribeUrl, openPricingModal, subscription]);
+  }, [closeNavPopover, data.subscribeUrl, requestPricingModal, subscription]);
 
   const handleManageAction = useCallback(async () => {
     if (!subscription) {
       return;
     }
+
+    closeNavPopover();
 
     if (pricingContext) {
       const handled = await redirectToCustomerPortal({
@@ -202,18 +194,21 @@ export function CreditOverviewClient({
       return;
     }
 
-    openPricingModal('subscription');
-  }, [openPricingModal, pricingContext, redirectToSignIn, subscription]);
+    requestPricingModal('subscription');
+  }, [closeNavPopover, pricingContext, redirectToSignIn, requestPricingModal, subscription]);
 
   const handleOnetimeAction = useCallback(() => {
-    if (openPricingModal('onetime')) {
+    const opened = requestPricingModal('onetime');
+    if (opened) {
+      closeNavPopover({ defer: true });
       return;
     }
 
+    closeNavPopover();
     if (data.checkoutUrl && data.checkoutUrl !== '#') {
       window.location.href = data.checkoutUrl;
     }
-  }, [data.checkoutUrl, openPricingModal]);
+  }, [closeNavPopover, data.checkoutUrl, requestPricingModal]);
 
   return (
     <section
@@ -247,20 +242,7 @@ export function CreditOverviewClient({
               icon={subscription ? <icons.Settings2 /> : <icons.Bell />}
               openInNewTab={false}
               className="w-full"
-              onClick={
-                subscription
-                  ? handleManageAction
-                  : pricingContext
-                    ? handleSubscribeAction
-                    : undefined
-              }
-              href={
-                subscription
-                  ? subscription.manageUrl
-                  : pricingContext
-                    ? undefined
-                    : data.subscribeUrl ?? '#'
-              }
+              onClick={subscription ? handleManageAction : handleSubscribeAction}
             />
           </div>
         </div>
@@ -320,73 +302,12 @@ export function CreditOverviewClient({
         )}
         <GradientButton
           title={translations.onetimeBuy}
-          href={pricingContext ? undefined : data.checkoutUrl}
           icon={<icons.ShoppingCart />}
           align="center"
           className="w-full text-sm sm:text-base"
-          onClick={pricingContext ? handleOnetimeAction : undefined}
+          onClick={handleOnetimeAction}
         />
       </section>
-      {pricingContext ? (
-        <AlertDialog
-          open={pricingModal.open}
-          onOpenChange={(open) =>
-            setPricingModal((prev) => ({
-              ...prev,
-              open,
-            }))
-          }
-        >
-          <AlertDialogContent
-            ref={pricingContentRef}
-            className="mt-8 w-[95vw] max-w-[1200px] overflow-hidden border border-slate-200 bg-white p-0 shadow-[0_32px_90px_rgba(15,23,42,0.25)] ring-1 ring-black/5 dark:border-white/12 dark:bg-[#0f1222] dark:shadow-[0_40px_120px_rgba(0,0,0,0.6)] dark:ring-white/10"
-          >
-            <AlertDialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 px-6 pt-4 pb-1 dark:border-slate-800">
-              <AlertDialogTitle asChild>
-                <div className="flex flex-wrap items-baseline gap-3 text-slate-900 dark:text-white">
-                  <span className="text-2xl font-semibold leading-tight">
-                    {modalMoneyPriceData?.title}
-                  </span>
-                  {modalMoneyPriceData?.subtitle ? (
-                    <span className="text-sm font-medium text-slate-500 dark:text-slate-300">
-                      {modalMoneyPriceData.subtitle}
-                    </span>
-                  ) : null}
-                </div>
-              </AlertDialogTitle>
-              <button
-                type="button"
-                className="rounded-full p-2 text-gray-400 transition hover:bg-gray-400 hover:text-gray-400 dark:text-white/80 dark:hover:bg-white/80 dark:hover:text-white/80"
-                onClick={() =>
-                  setPricingModal((prev) => ({
-                    ...prev,
-                    open: false,
-                  }))
-                }
-              >
-                <icons.X className="h-6 w-6" />
-              </button>
-            </AlertDialogHeader>
-            <div className="max-h-[80vh] overflow-y-auto px-4 pt-2 pb-6">
-              <div className="mx-auto w-full max-w-6xl px-2 sm:px-4 md:px-8">
-                {modalMoneyPriceData ? (
-                  <MoneyPriceInteractive
-                    key={pricingModal.mode}
-                    data={modalMoneyPriceData}
-                    config={pricingContext.moneyPriceConfig}
-                    checkoutApiEndpoint={pricingContext.checkoutApiEndpoint}
-                    customerPortalApiEndpoint={pricingContext.customerPortalApiEndpoint}
-                    enableSubscriptionUpgrade={pricingContext.enableSubscriptionUpgrade}
-                    initialBillingType={isOnetimeModal ? 'onetime' : undefined}
-                    disableAutoDetectBilling={isOnetimeModal}
-                    initUserContext={pricingContext.initUserContext}
-                  />
-                ) : null}
-              </div>
-            </div>
-          </AlertDialogContent>
-        </AlertDialog>
-      ) : null}
     </section>
   );
 }
