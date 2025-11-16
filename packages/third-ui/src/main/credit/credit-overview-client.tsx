@@ -218,29 +218,29 @@ export function CreditOverviewClient({
   return (
     <section
       className={cn(
-        "flex flex-col gap-6 rounded-2xl border border-white bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950",
+        "flex flex-col gap-4 rounded-2xl border border-white bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:gap-6 sm:p-6",
         className
       )}
     >
       {/* Primary Card - Total Credits + Subscription */}
-      <header className="relative rounded-2xl bg-linear-to-bl from-indigo-200/60 via-indigo-400/90 to-purple-200/50 dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 p-4 shadow-inner">
-        <div className="flex flex-col gap-2">
+      <header className="relative rounded-2xl bg-linear-to-bl from-indigo-200/60 via-indigo-400/90 to-purple-200/50 p-4 shadow-inner dark:from-indigo-300/20 dark:via-slate-400 dark:to-slate-500/50 sm:p-6">
+        <div className="flex flex-col gap-2 sm:gap-3">
           <div className="flex items-center justify-start rounded-full ">
-            <icons.Gem aria-hidden className="h-8 w-8 mr-2" />
-            <span>{translations.totalLabel}</span>
+            <icons.Gem aria-hidden className="mr-2 h-6 w-6 sm:h-8 sm:w-8" />
+            <span className="text-sm font-medium sm:text-base">{translations.totalLabel}</span>
           </div>
-          <div className="flex justify-center text-4xl font-semibold leading-tight">
+          <div className="flex justify-center text-3xl font-semibold leading-tight sm:text-4xl">
             {formatNumber(locale, data.totalBalance)}
           </div>
           <div className="flex-1 flex-col gap-1">
-            <p className="text-sm text-gray-700 dark:text-slate-100">
+            <p className="text-xs text-gray-700 dark:text-slate-100 sm:text-sm">
               {translations.subscriptionPeriodLabel}
             </p>
-            <h4 className="text-2xl font-semibold">
+            <h4 className="text-xl font-semibold sm:text-2xl">
               {subscription ? subscription.planName : translations.subscriptionInactive}
             </h4>
           </div>
-          <div className="pt-0">
+          <div className="pt-2 sm:pt-0">
             <GradientButton
               title={subscription ? translations.subscriptionManage : translations.subscribePay}
               align="center"
@@ -264,7 +264,7 @@ export function CreditOverviewClient({
             />
           </div>
         </div>
-        <div className="absolute top-6 -right-[14px]">
+        <div className="absolute right-3 top-3 sm:-right-[14px] sm:top-6">
           <HoverInfo
             label={translations.totalLabel}
             description={translations.summaryDescription}
@@ -273,31 +273,31 @@ export function CreditOverviewClient({
       </header>
 
       {/* Credit Details Section */}
-      <section className="space-y-2 relative rounded-2xl border p-4 shadow-inner">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-500 dark:text-slate-100">
+      <section className="relative space-y-3 rounded-2xl border p-4 shadow-inner sm:space-y-2 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-base font-semibold text-gray-500 dark:text-slate-100 sm:text-lg">
             {translations.bucketsTitle}
           </h3>
         </div>
         {hasBuckets ? (
-          <ul className="flex flex-col gap-3 mb-5">
+          <ul className="mb-4 flex flex-col gap-3 sm:mb-5">
             {buckets.map((bucket) => {
               const balanceDisplay = formatNumber(locale, bucket.balance);
               return (
                 <li
                   key={bucket.kind}
                   data-credit-kind={bucket.kind}
-                  className="rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60"
+                  className="rounded-2xl border border-slate-200/70 bg-white/85 px-3 py-3 text-sm shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60 sm:px-4"
                 >
-                  <div className="grid grid-cols-2 items-center gap-3 text-sm">
+                  <div className="grid grid-cols-[1fr_auto] items-center gap-3 text-xs sm:text-sm">
                     <span className="flex min-w-0 items-center gap-2">
-                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-sm font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100">
+                      <span className="max-w-full truncate rounded-full bg-purple-50 px-2 py-1 text-xs font-semibold text-purple-600 shadow-sm dark:bg-purple-500/20 dark:text-purple-100 sm:text-sm">
                         {bucket.computedLabel}
                       </span>
                     </span>
                     <span className="flex min-w-0 justify-end">
                       <span
-                        className="text-right text-lg font-semibold leading-tight text-gray-500 dark:text-slate-100"
+                        className="text-right text-base font-semibold leading-tight text-gray-500 dark:text-slate-100 sm:text-lg"
                         title={balanceDisplay}
                       >
                         {balanceDisplay}
@@ -305,7 +305,7 @@ export function CreditOverviewClient({
                     </span>
                   </div>
                   <div className="mt-3 flex justify-end gap-2">
-                    <span className="text-xs font-semibold text-gray-500 dark:text-slate-100">
+                    <span className="text-[11px] font-semibold text-gray-500 dark:text-slate-100 sm:text-xs">
                       Expires: {bucket.expiresAt}
                     </span>
                   </div>
@@ -323,7 +323,7 @@ export function CreditOverviewClient({
           href={pricingContext ? undefined : data.checkoutUrl}
           icon={<icons.ShoppingCart />}
           align="center"
-          className="w-full"
+          className="w-full text-sm sm:text-base"
           onClick={pricingContext ? handleOnetimeAction : undefined}
         />
       </section>
