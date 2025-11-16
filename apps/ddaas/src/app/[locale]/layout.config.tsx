@@ -11,8 +11,10 @@ import { i18n } from '@/i18n';
 import { appConfig } from '@/lib/appConfig';
 import { CreditPopover } from '@/components/credit-popover';
 
+type ExtendedLinkItem = LinkItemType & { mobilePinned?: boolean };
+
 // 首页普通菜单
-export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
+export async function homeNavLinks(locale: string): Promise<ExtendedLinkItem[]> {
   const t1 = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {
@@ -26,12 +28,14 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
     {
       type: 'custom',
       secondary: true,
+      mobilePinned: true,
       children: <CreditPopover locale={locale} />,
     },
     {
       type: 'custom',
       // false就先排左边的菜单, true就先排右边的按钮
       secondary: true,
+      mobilePinned: true,
       // NicknameFilter 假设在其内部也使用了 useNickname
       children: <ClerkUser locale={locale} clerkAuthInModal={appConfig.style.clerkAuthInModal} showSignUp={true}/>
     },
@@ -44,7 +48,7 @@ export async function homeNavLinks(locale: string): Promise<LinkItemType[]> {
 }
 
 // 层级特殊菜单
-export async function levelNavLinks(locale: string): Promise<LinkItemType[]> {
+export async function levelNavLinks(locale: string): Promise<ExtendedLinkItem[]> {
   const t1 = await getTranslations({ locale: locale, namespace: 'linkPreview' });
   return [
     {

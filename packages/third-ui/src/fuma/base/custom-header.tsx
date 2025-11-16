@@ -105,6 +105,12 @@ export function CustomHomeHeader({
   const menuItems = finalLinks.filter((item) =>
     ['menu', 'all'].includes(item.on ?? 'all'),
   );
+  const mobilePinnedItems = navItems.filter(
+    (item) => isSecondary(item) && isMobilePinned(item),
+  );
+  const filteredMenuItems = menuItems.filter(
+    (item) => !isMobilePinned(item),
+  );
 
   return (
     <CustomNavbar
@@ -160,6 +166,13 @@ export function CustomHomeHeader({
         </ul>
       </div>
       <ul className="flex flex-row items-center ms-auto -me-1.5 lg:hidden">
+        {mobilePinnedItems.map((item, i) => (
+          <NavbarLinkItem
+            key={`mobile-pinned-${i}`}
+            item={item}
+            className="max-sm:-mr-1"
+          />
+        ))}
         {searchToggle.enabled !== false &&
           (searchToggle.components?.sm ?? (
             <SearchToggle className="p-2" hideIfDisabled />
@@ -179,13 +192,13 @@ export function CustomHomeHeader({
             <icons.ChevronDown className="transition-transform duration-300 group-data-[state=open]:rotate-180" />
           </MenuTrigger>
           <MenuContent className="sm:flex-row sm:items-center sm:justify-end">
-            {menuItems
+            {filteredMenuItems
               .filter((item) => !isSecondary(item))
               .map((item, i) => (
                 <MenuLinkItem key={i} item={item} className="sm:hidden" />
               ))}
             <div className="-ms-1.5 flex flex-row items-center gap-1.5 max-sm:mt-2">
-              {menuItems.filter(isSecondary).map((item, i) => (
+              {filteredMenuItems.filter(isSecondary).map((item, i) => (
                 <MenuLinkItem key={i} item={item} className="-me-1.5" />
               ))}
               <div role="separator" className="flex-1" />
@@ -554,4 +567,8 @@ function isSecondary(item: LinkItemType): boolean {
   if ('secondary' in item && item.secondary != null) return item.secondary;
 
   return item.type === 'icon';
+}
+
+function isMobilePinned(item: LinkItemType): boolean {
+  return Boolean((item as { mobilePinned?: boolean }).mobilePinned);
 }
