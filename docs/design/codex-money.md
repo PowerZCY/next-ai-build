@@ -2,6 +2,11 @@
 
 ## 1. 组件分层总览
 
+### 客户端布局规范
+
+- **Billing Type 切换按钮**：移动端使用 `flex` + `flex-wrap`，外层容器限制在 360px 内并居中，按钮本身通过 `flex-1 basis-1/3` 保持相同宽度，即便文案长短不同也不会影响布局；进入 `md` 断点后容器回到自动宽度，三个按钮依旧共享统一的 pill 背景。
+- **价格卡栅格**：`MoneyPriceInteractive` 的卡片区域采用 `flex-wrap`。移动端每张卡宽度固定为 `90vw`（最多 360px），左右自动留 5% 边距；桌面端通过 `width: clamp(280px, 32vw, 360px)` 并 `flex-shrink-0` 控制卡片宽度，外层 `gap` + `justify-center` 保证自动排成 2 或 3 列。`maxFeaturesCount` 负责对齐卡片高度，底部按钮区域用 `flex-1` 撑开，从而在任何 billingType 切换下，三张卡的宽高都保持一致，视觉上不会跳动。
+
 ```
 money-price/
 ├── money-price.tsx                        # 服务端组件，处理SSR、翻译、静态渲染
@@ -319,4 +324,3 @@ sequenceDiagram
 - 未登录场景仅传递指纹 ID 和 auth 状态，避免同一 `fp_id` 渲染出其它账号的数据。
 - 客户端只负责交互（计费切换、按钮点击、Clerk 弹窗），去掉 fingerprint context 依赖，彻底消除闪烁。
 - `redirectToCustomerPortal` helper 已抽离，点击“管理订阅”时页面与弹窗都会走同一套 Portal 逻辑。
-

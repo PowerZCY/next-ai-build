@@ -435,7 +435,7 @@ export function MoneyPriceInteractive({
       </div>
 
       <div className="w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 xl:gap-8 w-full max-w-6xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-5 md:gap-6 xl:gap-8 w-full max-w-6xl mx-auto">
         {currentPlans.map((plan: any) => {
           const planKey = plan.key as 'F1' | 'P2' | 'U3';
           if (!PLAN_KEYS.includes(planKey)) {
@@ -447,12 +447,14 @@ export function MoneyPriceInteractive({
           const showBillingSubtitle = plan.showBillingSubTitle !== false;
           const hasDiscount = !!pricing.discountPercent && !!pricing.originalAmount;
 
+          // 移动端宽度样式
           return (
             <div
               key={plan.key}
               data-price-plan={planKey}
               className={cn(
-                'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-5 md:p-8 h-full shadow-sm dark:shadow-none w-full',
+                'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-5 md:p-8 h-full shadow-sm dark:shadow-none w-[85vw] max-w-[360px]',
+                'md:w-[clamp(280px,32vw,360px)] md:max-w-[360px] md:shrink-0',
                 'hover:border-2 hover:border-purple-500',
                 'focus-within:border-2 focus-within:border-purple-500'
               )}
