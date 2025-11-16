@@ -88,10 +88,10 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
       : [])
   ];
 
+  const pricingPageBaseUrl = `/${locale}/pricing`;
+
   const data: CreditOverviewData = {
     totalBalance,
-    checkoutUrl: '#',
-    subscribeUrl: '#',
     buckets,
     pricingContext: {
       moneyPriceData,
@@ -101,6 +101,20 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
       enableSubscriptionUpgrade,
       initUserContext,
     },
+    ctaBehaviors: {
+      subscribe: {
+        desktop: { kind: 'modal', mode: 'subscription' },
+        mobile: { kind: 'redirect', url: `${pricingPageBaseUrl}?initialBillingType=subscription` },
+      },
+      manage: {
+        desktop: { kind: 'auth' },
+        mobile: { kind: 'auth' },
+      },
+      onetime: {
+        desktop: { kind: 'modal', mode: 'onetime' },
+        mobile: { kind: 'redirect', url: `${pricingPageBaseUrl}?initialBillingType=onetime` },
+      },
+    },
   };
 
   if (subscription) {
@@ -108,7 +122,6 @@ export async function CreditPopover({ locale }: CreditPopoverProps) {
       planName: subscription.priceName || t('subscription.active'),
       periodStart: viewLocalTime(subscription.subPeriodStart),
       periodEnd: viewLocalTime(subscription.subPeriodEnd),
-      manageUrl: '#',
     };
   }
 

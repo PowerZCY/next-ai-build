@@ -13,6 +13,7 @@ export async function MoneyPrice({
   enabledBillingTypes,
   enableSubscriptionUpgrade = true,
   initUserContext,
+  initialBillingType,
 }: MoneyPriceProps) {
   const data = await buildMoneyPriceData({
     locale,
@@ -37,6 +38,7 @@ export async function MoneyPrice({
         enabledBillingTypes={enabledBillingTypes}
         enableSubscriptionUpgrade={enableSubscriptionUpgrade}
         initUserContext={initUserContext}
+        initialBillingType={initialBillingType}
       />
     </section>
   );

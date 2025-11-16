@@ -22,7 +22,7 @@ import {
 } from 'react';
 import { MoneyPriceInteractive } from '../money-price/money-price-interactive';
 import type { MoneyPriceData } from '../money-price/money-price-types';
-import type { CreditPricingContext } from './types';
+import type { CreditPricingContext, PricingModalMode } from './types';
 
 interface CreditNavButtonProps {
   locale: string;
@@ -30,8 +30,6 @@ interface CreditNavButtonProps {
   totalLabel: string;
   children: React.ReactNode;
 }
-
-export type PricingModalMode = 'subscription' | 'onetime';
 
 export function CreditNavButton({
   locale,

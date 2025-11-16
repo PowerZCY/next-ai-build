@@ -104,6 +104,7 @@ export interface MoneyPriceProps {
   enabledBillingTypes?: string[];
   enableSubscriptionUpgrade?: boolean;
   initUserContext?: InitUserContext;
+  initialBillingType?: string;
 }
 
 // 交互组件属性

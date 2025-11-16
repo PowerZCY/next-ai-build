@@ -1,4 +1,48 @@
-import type { InitUserContext, MoneyPriceConfig, MoneyPriceData } from '../money-price/money-price-types';
+import type {
+  InitUserContext,
+  MoneyPriceConfig,
+  MoneyPriceData,
+} from '../money-price/money-price-types';
+
+export type PricingModalMode = 'subscription' | 'onetime';
+
+export type CreditActionConfig =
+  | CreditModalAction
+  | CreditRedirectAction
+  | CreditAuthAction
+  | CreditCustomAction;
+
+export interface CreditModalAction {
+  kind: 'modal';
+  mode: PricingModalMode;
+}
+
+export interface CreditRedirectAction {
+  kind: 'redirect';
+  url: string;
+}
+
+export interface CreditAuthAction {
+  kind: 'auth';
+  endpoint?: string;
+  returnUrl?: string;
+}
+
+export interface CreditCustomAction {
+  kind: 'custom';
+  handlerKey: string;
+}
+
+export interface DeviceAwareCreditActionConfig {
+  desktop?: CreditActionConfig;
+  mobile?: CreditActionConfig;
+}
+
+export interface CreditCTAConfig {
+  subscribe?: DeviceAwareCreditActionConfig;
+  manage?: DeviceAwareCreditActionConfig;
+  onetime?: DeviceAwareCreditActionConfig;
+}
 
 export type CreditBucketStatus = 'active' | 'expiringSoon' | 'expired';
 
@@ -25,16 +69,14 @@ export interface SubscriptionInfo {
   planName: string;
   periodStart?: string;
   periodEnd?: string;
-  manageUrl: string;
 }
 
 export interface CreditOverviewData {
   totalBalance: number;
   buckets: CreditBucket[];
   subscription?: SubscriptionInfo;
-  checkoutUrl: string;
-  subscribeUrl?: string;
   pricingContext?: CreditPricingContext;
+  ctaBehaviors?: CreditCTAConfig;
 }
 
 export interface CreditPricingContext {

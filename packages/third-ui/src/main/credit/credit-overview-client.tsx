@@ -9,9 +9,14 @@ import { redirectToCustomerPortal } from '../money-price/customer-portal';
 import type {
   CreditBucket,
   CreditBucketStatus,
-  CreditOverviewData
+  CreditOverviewData,
+  CreditActionConfig,
+  CreditAuthAction,
+  PricingModalMode,
 } from './types';
-import { useCreditNavPopover, type PricingModalMode } from './credit-nav-button';
+import { useCreditNavPopover } from './credit-nav-button';
+
+type CreditActionKey = 'subscribe' | 'manage' | 'onetime';
 
 export interface CreditOverviewTranslations {
   summaryDescription: string;
@@ -32,6 +37,7 @@ interface CreditOverviewClientProps {
   translations: CreditOverviewTranslations;
   className?: string;
   expiringSoonThresholdDays?: number;
+  customActionHandlers?: Record<string, () => Promise<void> | void>;
 }
 
 interface NormalizedBucket extends CreditBucket {
@@ -54,9 +60,11 @@ export function CreditOverviewClient({
   translations,
   className,
   expiringSoonThresholdDays = 7,
+  customActionHandlers,
 }: CreditOverviewClientProps) {
   const { redirectToSignIn } = useClerk();
   const navPopover = useCreditNavPopover();
+  const isMobile = navPopover?.isMobile ?? false;
   const closeNavPopover = useCallback(
     (options?: { defer?: boolean }) => {
       if (!navPopover) {
@@ -106,6 +114,7 @@ export function CreditOverviewClient({
   const hasBuckets = buckets.length > 0;
   const subscription = data.subscription;
   const pricingContext = data.pricingContext;
+  const ctaBehaviors = data.ctaBehaviors;
   const getModalMoneyPriceData = useCallback(
     (mode: PricingModalMode) => {
       if (!pricingContext) {
@@ -155,60 +164,175 @@ export function CreditOverviewClient({
     [getModalMoneyPriceData, navPopover, pricingContext],
   );
 
+  const executeAuthAction = useCallback(
+    async (action: CreditAuthAction) => {
+      const endpoint = action.endpoint ?? pricingContext?.customerPortalApiEndpoint;
+      if (!endpoint) {
+        console.warn('[CreditOverview] Auth action requires an endpoint.');
+        return false;
+      }
+
+      return redirectToCustomerPortal({
+        customerPortalApiEndpoint: endpoint,
+        redirectToSignIn,
+        returnUrl: action.returnUrl,
+      });
+    },
+    [pricingContext, redirectToSignIn],
+  );
+
+  const executeConfiguredAction = useCallback(
+    async (
+      action: CreditActionConfig,
+      key: CreditActionKey,
+      device: 'desktop' | 'mobile',
+    ) => {
+      if (device === 'mobile' && action.kind === 'modal') {
+        console.warn(
+          `[CreditOverview] Mobile device cannot run modal action for "${key}". Adjust configuration.`,
+        );
+        return false;
+      }
+
+      switch (action.kind) {
+        case 'modal': {
+          const opened = requestPricingModal(action.mode);
+          if (opened) {
+            closeNavPopover({ defer: true });
+          }
+          return opened;
+        }
+        case 'redirect': {
+          if (!action.url || action.url === '#') {
+            console.warn(`[CreditOverview] Redirect URL missing for action "${key}".`);
+            return false;
+          }
+          closeNavPopover();
+          window.location.href = action.url;
+          return true;
+        }
+        case 'auth': {
+          closeNavPopover();
+          return executeAuthAction(action);
+        }
+        case 'custom': {
+          const handler = customActionHandlers?.[action.handlerKey];
+          if (!handler) {
+            console.warn(
+              `[CreditOverview] Custom action "${action.handlerKey}" missing handler for "${key}".`,
+            );
+            return false;
+          }
+          closeNavPopover();
+          await handler();
+          return true;
+        }
+        default:
+          return false;
+      }
+    },
+    [closeNavPopover, customActionHandlers, executeAuthAction, requestPricingModal],
+  );
+
+  const runConfiguredAction = useCallback(
+    async (key: CreditActionKey, fallback: () => Promise<void> | void) => {
+      const device: 'desktop' | 'mobile' = isMobile ? 'mobile' : 'desktop';
+      const deviceAction = ctaBehaviors?.[key]?.[device];
+
+      if (deviceAction) {
+        const handled = await executeConfiguredAction(deviceAction, key, device);
+        if (handled) {
+          return;
+        }
+        console.warn(
+          `[CreditOverview] Configured action "${key}" for ${device} did not complete successfully. Falling back to default behavior.`,
+        );
+      } else if (ctaBehaviors?.[key]) {
+        console.warn(
+          `[CreditOverview] Missing ${device} configuration for action "${key}". Falling back to default behavior.`,
+        );
+      }
+
+      await Promise.resolve(fallback());
+    },
+    [ctaBehaviors, executeConfiguredAction, isMobile],
+  );
+
+  const fallbackSubscribe = useCallback(async () => {
+    if (!isMobile) {
+      const opened = requestPricingModal('subscription');
+      if (opened) {
+        closeNavPopover({ defer: true });
+        return;
+      }
+    }
+
+    console.warn(
+      `[CreditOverview] Missing subscribe action for ${isMobile ? 'mobile' : 'desktop'} device. Dropdown will simply close.`,
+    );
+    closeNavPopover();
+  }, [closeNavPopover, isMobile, requestPricingModal]);
+
+  const fallbackManage = useCallback(async () => {
+    closeNavPopover();
+
+    const handled = await redirectToCustomerPortal({
+      customerPortalApiEndpoint: pricingContext?.customerPortalApiEndpoint,
+      redirectToSignIn,
+    });
+
+    if (handled) {
+      return;
+    }
+
+    if (!isMobile) {
+      const opened = requestPricingModal('subscription');
+      if (opened) {
+        closeNavPopover({ defer: true });
+      }
+    }
+  }, [
+    closeNavPopover,
+    isMobile,
+    pricingContext,
+    redirectToSignIn,
+    requestPricingModal,
+  ]);
+
+  const fallbackOnetime = useCallback(async () => {
+    if (!isMobile) {
+      const opened = requestPricingModal('onetime');
+      if (opened) {
+        closeNavPopover({ defer: true });
+        return;
+      }
+    }
+
+    console.warn(
+      `[CreditOverview] Missing onetime action for ${isMobile ? 'mobile' : 'desktop'} device. Dropdown will simply close.`,
+    );
+    closeNavPopover();
+  }, [closeNavPopover, isMobile, requestPricingModal]);
+
   const handleSubscribeAction = useCallback(() => {
     if (subscription) {
       return;
     }
 
-    const opened = requestPricingModal('subscription');
-    if (opened) {
-      closeNavPopover({ defer: true });
-      return;
-    }
-
-    closeNavPopover();
-    if (data.subscribeUrl && data.subscribeUrl !== '#') {
-      window.location.href = data.subscribeUrl;
-    }
-  }, [closeNavPopover, data.subscribeUrl, requestPricingModal, subscription]);
+    void runConfiguredAction('subscribe', fallbackSubscribe);
+  }, [fallbackSubscribe, runConfiguredAction, subscription]);
 
   const handleManageAction = useCallback(async () => {
     if (!subscription) {
       return;
     }
 
-    closeNavPopover();
-
-    if (pricingContext) {
-      const handled = await redirectToCustomerPortal({
-        customerPortalApiEndpoint: pricingContext.customerPortalApiEndpoint,
-        redirectToSignIn,
-      });
-      if (handled) {
-        return;
-      }
-    }
-
-    if (subscription.manageUrl && subscription.manageUrl !== '#') {
-      window.location.href = subscription.manageUrl;
-      return;
-    }
-
-    requestPricingModal('subscription');
-  }, [closeNavPopover, pricingContext, redirectToSignIn, requestPricingModal, subscription]);
+    await runConfiguredAction('manage', fallbackManage);
+  }, [fallbackManage, runConfiguredAction, subscription]);
 
   const handleOnetimeAction = useCallback(() => {
-    const opened = requestPricingModal('onetime');
-    if (opened) {
-      closeNavPopover({ defer: true });
-      return;
-    }
-
-    closeNavPopover();
-    if (data.checkoutUrl && data.checkoutUrl !== '#') {
-      window.location.href = data.checkoutUrl;
-    }
-  }, [closeNavPopover, data.checkoutUrl, requestPricingModal]);
+    void runConfiguredAction('onetime', fallbackOnetime);
+  }, [fallbackOnetime, runConfiguredAction]);
 
   return (
     <section

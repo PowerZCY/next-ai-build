@@ -5,11 +5,20 @@ import { getMoneyPriceInitUserContext } from '@/lib/money-price-helper';
 import { FingerprintStatus } from "@third-ui/clerk/fingerprint";
 import { MoneyPrice } from "@third-ui/main/server";
 
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+export default async function Pricing({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams?: Promise<{ initialBillingType?: string }>;
+}) {
   const isDev = process.env.NODE_ENV !== 'production';
   const forceShow = process.env.SHOW_FINGERPRINT_STATUS === 'true'
   const enableSubscriptionUpgrade = process.env.ENABLE_STRIPE_SUBSCRIPTION_UPGRADE !== 'false';
-  const { locale } = await params;
+  const { locale } =  await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const { initialBillingType } = resolvedSearchParams;
+  console.log(initialBillingType);
   const initUserContext = await getMoneyPriceInitUserContext();
   return (
     <>
@@ -24,6 +33,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         enableSubscriptionUpgrade={enableSubscriptionUpgrade}
         initUserContext={initUserContext}
         sectionClassName='mt-12'
+        initialBillingType={initialBillingType}
       />
     </>
   );
