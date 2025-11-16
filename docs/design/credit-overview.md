@@ -38,11 +38,13 @@ credit/                                                       # packages/third-u
 
 1. 用户点击头部积分按钮 → `DropdownMenu` 展开下拉卡片。由于 `modal={false}`，主页面仍能滚动。
 2. 卡片内部按钮：遵循 `ctaBehaviors` 配置，PC 端可独立选择 `modal`、`redirect`、`auth`、`custom` 等动作。
-   - `modal`：调用 `openPricingModal` 打开价格弹窗，并通过 `requestAnimationFrame` 延迟折叠，避免闪烁。
-   - `redirect`：先折叠下拉（解除滚动锁）再跳转至目标 URL。
-   - `auth`：先折叠，再调用配置的 API（默认复用 `redirectToCustomerPortal` + Clerk 鉴权）获取真实跳转地址。
-   - `custom`：折叠后触发业务自定义 handler，常用于唤起其它客户端状态。
+   - `modal`：调用 `openPricingModal` 打开 Money Price 弹窗，并通过 `requestAnimationFrame` 延迟折叠，避免闪烁。
+   - `redirect`：先设置 `window.location.href`，再调用 `closeNavPopover()` 解除滚动锁；对用户而言几乎等同于“跳转前一瞬间自动收起”。
+   - `auth`：点击后按钮进入 `GradientButton` 自带的 loading，保持下拉展开，待 `redirectToCustomerPortal` 成功（包括 302 跳 Portal、401/403 触发 Clerk 登录）后才折叠；若接口失败则保留下拉并提示 warning，便于用户重试或走 fallback。
+   - `custom`：等待业务 handler resolve 后再折叠，确保所有副作用完成。
 3. 弹窗与下拉的生命周期解耦：即使下拉已经折叠，弹窗仍挂载在 `CreditNavButton` 下，直到用户点击关闭或 ESC。
+
+> CTA 按钮统一使用 `GradientButton`，`preventDoubleClick=true` + loading 反馈可以确保异步阶段不会触发第二次点击，同时让用户明确“正在处理”。
 
 ### 移动端
 
@@ -50,9 +52,9 @@ credit/                                                       # packages/third-u
 2. 外部点击或手势（包括滑动页面空白区域）被监听，一旦触发立即折叠下拉并恢复滚动。
 3. 卡片内部按钮行为：
    - 移动端不渲染任何 `modal` 动作；`ctaBehaviors.mobile` 只能配置 `redirect`、`auth` 或 `custom`，否则会在控制台给出告警。
-   - `redirect`：关闭下拉并立即跳转。
-   - `auth`：关闭下拉，调用配置的鉴权接口拿到最终 URL 后再跳转。
-   - `custom`：关闭下拉后交由业务 handler 处理（例如触发 Native Bridge）。
+   - `redirect`：同样先设置 `window.location.href` 再折叠，避免未跳走就先关闭导致的“什么都没发生”错觉。
+   - `auth`：与 PC 一致，保持下拉和 loading 状态，等接口拿到最终 URL 或触发登录操作后再折叠；失败会维持展开状态并继续打印 warning。
+   - `custom`：等待 handler 执行完毕再收起（很多 Native Bridge 操作也需要一些时间）。
 4. 弹窗本身不锁定页面，仍由 Radix `AlertDialog` 控制，关闭时会恢复滚动；其内容同样可滚动，按钮点击只影响弹窗，不会重新展开下拉。
 
 > 通过 Context 将“折叠 + 弹窗”能力上提到 `CreditNavButton`，任何新增按钮只要调用 `navPopover.close()` 或 `navPopover.openPricingModal(...)` 就能遵循一致的交互规范。
@@ -123,7 +125,7 @@ interface CreditCTAConfig {
 
 - **modal**：仅在 PC 端可用，调用 `openPricingModal`。
 - **redirect**：简单跳转，适用于任何端。
-- **auth**：需要先访问配置的 API 获取真实 URL，默认会回退到 `pricingContext.customerPortalApiEndpoint` 配置并携带 Clerk 鉴权。
+- **auth**：需要先访问配置的 API 获取真实 URL，默认会回退到 `pricingContext.customerPortalApiEndpoint` 配置并携带 Clerk 鉴权；执行期间保持下拉展开，待 Promise resolve 后才关闭。
 - **custom**：为未来扩展保留，`CreditOverviewClient` 可通过 `customActionHandlers` prop 注入 handler。
 
 移动端禁止 `modal`，若误配会在控制台给出 warning 并继续执行默认策略。未配置的端仍会使用内置的 fallback：
@@ -162,16 +164,23 @@ flowchart TD
     %% ==================== PC 端（蓝色系） ====================
     B -->|PC 端| PC1[展开下拉卡片<br/>背景仍可滚动<br/>modal=false]:::pc
     PC1 --> PC_Q{点击哪个按钮?}
-    PC_Q -->|订阅 Subscribe| PC_S1[延迟折叠下拉]:::pc --> PC_S2[打开 Money Price 弹窗<br/>默认订阅模式]:::pcModal
-    PC_Q -->|一次性购买 Onetime| PC_O1[延迟折叠下拉]:::pc --> PC_O2[打开 Money Price 弹窗<br/>默认一次性模式]:::pcModal
-    PC_Q -->|管理订阅 Manage| PC_M1[立即折叠下拉]:::pc --> PC_M2[调用 customer-portal API]:::pc --> PC_M3[跳转 Stripe Portal]:::pcJump
+    PC_Q -->|订阅 Subscribe| PC_S1[调用 openPricingModal#mode=subscription]:::pcModal --> PC_S2[rAF 延迟 closeNavPopover<br/>避免闪烁]:::pc
+    PC_Q -->|一次性购买 Onetime| PC_O1[openPricingModal#mode=onetime]:::pcModal --> PC_O2[rAF 延迟 closeNavPopover]:::pc
+    PC_Q -->|管理订阅 Manage（auth）| PC_M0[按钮进入 loading<br/>下拉保持展开]:::pc --> PC_M1[调用 customer-portal API / redirectToCustomerPortal]:::pc
+    PC_M1 -->|返回 sessionUrl| PC_M2[window.location.href = sessionUrl]:::pcJump --> PC_M4[随后执行 closeNavPopover<br/>（可能在跳转开始前完成）]:::pc
+    PC_M1 -->|401/403| PC_M3[Clerk redirectToSignIn#]:::pcJump --> PC_M4
+    PC_M1 -->|失败/未配置| PC_MFAIL[保持下拉展开 + warning<br/>尝试 fallback Money Price 或等待修复]:::warn
+    PC_Q -->|配置为 Redirect/Custom| PC_R1[执行跳转或业务 handler]:::pc --> PC_R2[动作完成后 closeNavPopover]:::pc
     
     %% ==================== 移动端（绿色系） ====================
     B -->|移动端| MOB1[展开下拉 + 锁定 body 滚动<br/>overflow=hidden]:::mobile
     MOB1 --> MOB_Q{点击哪个按钮?}
-    MOB_Q -->|订阅 Subscribe| MOB_S1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_S2[跳转 /pricing?initialBillingType=subscription]:::mobileJump
-    MOB_Q -->|一次性购买 Onetime| MOB_O1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_O2[跳转 /pricing?initialBillingType=onetime]:::mobileJump
-    MOB_Q -->|管理订阅 Manage| MOB_M1[立即关闭下拉<br/>恢复滚动]:::mobile --> MOB_M2[调用 customer-portal API]:::mobile --> MOB_M3[跳转 Stripe Portal]:::mobileJump
+    MOB_Q -->|订阅/一次性（redirect）| MOB_S1[window.location.href = 目标 URL<br/>携带初始 tab 参数]:::mobileJump --> MOB_S2[随后 closeNavPopover + 恢复滚动]:::mobile
+    MOB_Q -->|管理订阅 Manage（auth）| MOB_M0[按钮 loading + 保持展开]:::mobile --> MOB_M1[调用 customer-portal API]:::mobile
+    MOB_M1 -->|返回 sessionUrl| MOB_M2[window.location.href = sessionUrl]:::mobileJump --> MOB_M4[closeNavPopover + 恢复滚动]:::mobile
+    MOB_M1 -->|401/403| MOB_M3[Clerk redirectToSignIn#]:::mobileJump --> MOB_M4
+    MOB_M1 -->|失败/未配置| MOB_MFAIL[保持展开 + warning<br/>提示用户重试或等待配置]:::warn
+    MOB_Q -->|自定义 custom| MOB_C1[业务 handler 执行完成]:::mobile --> MOB_C2[closeNavPopover + 恢复滚动]:::mobile
     
     %% ==================== 关闭方式 ====================
     PC1 -->|外部点击| PC_CLOSE[关闭下拉]:::pc
@@ -181,7 +190,7 @@ flowchart TD
     classDef pc fill:#e6f7ff,stroke:#91d5ff,stroke-width:3px,color:#1c3d5a
     classDef pcModal fill:#d6f4ff,stroke:#40a9ff,stroke-width:4px,stroke-dasharray: 5 5,color:#003a8c
     classDef pcJump fill:#fff2e8,stroke:#ffbb96,stroke-width:3px,color:#872b00
-    
     classDef mobile fill:#f6ffed,stroke:#95de64,stroke-width:3px,color:#135200
     classDef mobileJump fill:#d9f7be,stroke:#52c41a,stroke-width:4px,color:#092b00
+    classDef warn fill:#fffbe6,stroke:#faad14,stroke-width:3px,color:#614700
 ```

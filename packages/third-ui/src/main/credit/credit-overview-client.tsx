@@ -207,13 +207,16 @@ export function CreditOverviewClient({
             console.warn(`[CreditOverview] Redirect URL missing for action "${key}".`);
             return false;
           }
-          closeNavPopover();
           window.location.href = action.url;
+          closeNavPopover();
           return true;
         }
         case 'auth': {
-          closeNavPopover();
-          return executeAuthAction(action);
+          const handled = await executeAuthAction(action);
+          if (handled) {
+            closeNavPopover();
+          }
+          return handled;
         }
         case 'custom': {
           const handler = customActionHandlers?.[action.handlerKey];
@@ -223,8 +226,8 @@ export function CreditOverviewClient({
             );
             return false;
           }
-          closeNavPopover();
           await handler();
+          closeNavPopover();
           return true;
         }
         default:
@@ -274,14 +277,13 @@ export function CreditOverviewClient({
   }, [closeNavPopover, isMobile, requestPricingModal]);
 
   const fallbackManage = useCallback(async () => {
-    closeNavPopover();
-
     const handled = await redirectToCustomerPortal({
       customerPortalApiEndpoint: pricingContext?.customerPortalApiEndpoint,
       redirectToSignIn,
     });
 
     if (handled) {
+      closeNavPopover();
       return;
     }
 
@@ -314,12 +316,12 @@ export function CreditOverviewClient({
     closeNavPopover();
   }, [closeNavPopover, isMobile, requestPricingModal]);
 
-  const handleSubscribeAction = useCallback(() => {
+  const handleSubscribeAction = useCallback(async () => {
     if (subscription) {
       return;
     }
 
-    void runConfiguredAction('subscribe', fallbackSubscribe);
+    await runConfiguredAction('subscribe', fallbackSubscribe);
   }, [fallbackSubscribe, runConfiguredAction, subscription]);
 
   const handleManageAction = useCallback(async () => {
@@ -330,8 +332,8 @@ export function CreditOverviewClient({
     await runConfiguredAction('manage', fallbackManage);
   }, [fallbackManage, runConfiguredAction, subscription]);
 
-  const handleOnetimeAction = useCallback(() => {
-    void runConfiguredAction('onetime', fallbackOnetime);
+  const handleOnetimeAction = useCallback(async () => {
+    await runConfiguredAction('onetime', fallbackOnetime);
   }, [fallbackOnetime, runConfiguredAction]);
 
   return (
