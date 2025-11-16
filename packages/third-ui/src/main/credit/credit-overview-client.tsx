@@ -337,7 +337,7 @@ export function CreditOverviewClient({
   return (
     <section
       className={cn(
-        "flex flex-col gap-4 rounded-2xl border border-white bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:gap-6 sm:p-6",
+        "flex flex-col gap-2 p-2 shadow-inner rounded-xl bg-white dark:bg-slate-900",
         className
       )}
     >
