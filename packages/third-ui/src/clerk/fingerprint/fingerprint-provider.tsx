@@ -163,7 +163,7 @@ export function FingerprintStatus() {
           type="button"
           aria-label="Fingerprint debug panel"
           className={cn(
-            'fixed left-3 top-3 z-10000 inline-flex size-11 items-center justify-center rounded-full',
+            'fixed left-2 top-2 md:left-2 md:top-3 z-10000 inline-flex size-8 md:size-11 items-center justify-center rounded-full',
             'bg-linear-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 dark:from-purple-500 dark:to-pink-600 dark:hover:from-purple-600 dark:hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300',
           )}
         >
@@ -178,10 +178,10 @@ export function FingerprintStatus() {
           <div
             ref={modalRef}
             className={cn(
-              'fixed inset-3 z-9999 mx-auto w-[min(95vw,520px)] max-h-[90vh] overflow-y-auto rounded-2xl border',
+              'fixed inset-3 z-9999 mx-auto w-[min(95vw,520px)] overflow-y-auto rounded-2xl border',
               'border-slate-200/70 bg-white/95 p-4 shadow-2xl backdrop-blur-sm',
               'font-sans text-sm text-slate-700 dark:border-white/12 dark:bg-slate-950/95 dark:text-slate-200',
-              'sm:inset-auto sm:left-3 sm:top-1 sm:right-auto sm:w-[min(520px,95vw)] sm:p-5'
+              'sm:inset-auto md:left-2 sm:top-1 md:right-auto sm:w-[min(520px,95vw)] sm:p-5'
             )}
           >
             <header className="mb-4">
