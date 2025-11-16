@@ -82,7 +82,7 @@ export function XButton(props: xButtonProps) {
   }
 
   // base style class
-  const baseButtonClass = "flex items-center justify-center px-4 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-white text-sm font-semibold transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-700"
+  const baseButtonClass = "flex items-center justify-center gap-2 px-4 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-white text-sm font-semibold transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-700"
   const disabledClass = "opacity-60 cursor-not-allowed"
 
   if (props.type === 'single') {
@@ -95,7 +95,7 @@ export function XButton(props: xButtonProps) {
       <button
         onClick={() => handleButtonClick(button.onClick)}
         disabled={isDisabled}
-        className={`${minWidth} ${baseButtonClass} rounded-full ${isDisabled ? disabledClass : ''} ${className}`}
+        className={`w-full sm:w-auto ${minWidth} ${baseButtonClass} rounded-full ${isDisabled ? disabledClass : ''} ${className}`}
         title={button.text}
       >
         {isLoading ? (
@@ -114,20 +114,19 @@ export function XButton(props: xButtonProps) {
   }
 
   // Split button
-  const { mainButton, menuItems, loadingText, menuWidth = 'w-40', className = '', mainButtonClassName = '', dropdownButtonClassName = '' } = props
+  const { mainButton, menuItems, loadingText, menuWidth = 'w-full sm:w-40', className = '', mainButtonClassName = '', dropdownButtonClassName = '' } = props
   const isMainDisabled = mainButton.disabled || isLoading
   // loadingText prioty：props.loadingText > mainButton.text > 'Loading...'
   const actualLoadingText = loadingText || mainButton.text?.trim() || 'Loading...'
 
   return (
-    <div className={`relative flex bg-neutral-200 dark:bg-neutral-800 rounded-full ${className}`}>
+    <div className={`relative flex flex-col sm:flex-row items-stretch w-full sm:w-auto bg-neutral-200 dark:bg-neutral-800 rounded-2xl sm:rounded-full gap-2 sm:gap-0 ${className}`}>
       {/* left main button */}
       <button
         onClick={() => handleButtonClick(mainButton.onClick)}
         disabled={isMainDisabled}
-        className={`flex-1 ${baseButtonClass} rounded-l-full ${isMainDisabled ? disabledClass : ''} ${mainButtonClassName}`}
+        className={`flex-1 w-full ${baseButtonClass} rounded-full sm:rounded-l-full sm:rounded-r-none ${isMainDisabled ? disabledClass : ''} ${mainButtonClassName}`}
         onMouseDown={e => { if (e.button === 2) e.preventDefault() }}
-        style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
       >
         {isLoading ? (
           <>
@@ -143,20 +142,21 @@ export function XButton(props: xButtonProps) {
       </button>
 
       {/* right dropdown button */}
-      <span
-        className={`flex items-center justify-center w-10 py-2 cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-r-full ${dropdownButtonClassName}`}
+      <button
+        type="button"
+        className={`flex items-center justify-center w-full sm:w-10 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-white cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full sm:rounded-none sm:rounded-r-full sm:border-l sm:border-neutral-300 sm:dark:border-neutral-700 ${dropdownButtonClassName}`}
         onClick={e => { e.stopPropagation(); setMenuOpen(v => !v) }}
-        tabIndex={0}
-        style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+        aria-label="More actions"
+        aria-expanded={menuOpen}
       >
         <icons.ChevronDown className="w-6 h-6" />
-      </span>
+      </button>
 
       {/* dropdown menu */}
       {menuOpen && (
         <div
           ref={menuRef}
-          className={`absolute right-0 top-full ${menuWidth} bg-white dark:bg-neutral-800 text-neutral-800 dark:text-white text-sm rounded-xl shadow-lg z-50 border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-fade-in`}
+          className={`absolute left-0 top-full sm:left-auto sm:right-0 ${menuWidth} bg-white dark:bg-neutral-800 text-neutral-800 dark:text-white text-sm rounded-xl shadow-lg z-50 border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-fade-in`}
         >
           {menuItems.map((item, index) => (
             <button
