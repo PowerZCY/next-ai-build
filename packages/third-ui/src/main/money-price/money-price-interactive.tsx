@@ -392,10 +392,11 @@ export function MoneyPriceInteractive({
     return selectedBillingOption.discountText.replace('{percent}', String(discountPercent));
   }, [selectedBillingOption, providerConfig, billingType]);
 
+  // 配置移动端BillingTypeButton悬浮样式
   return (
     <>
-      <div className="flex justify-center mb-6">
-        <div className="inline-flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full px-2 py-2 sm:px-3 sm:py-3" data-billing-switch>
+      <div className="flex justify-center mb-6 max-md:sticky max-md:top-30 max-md:z-30 max-md:py-2 max-md:bg-transparent">
+        <div className="inline-flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full px-2 py-2 sm:px-3 sm:py-3 max-md:w-full max-md:max-w-[340px] max-md:mx-auto shadow-sm" data-billing-switch>
           {billingOptions.map(option => {
             const isActive = option.key === billingType;
             const buttonClasses = isActive
@@ -406,7 +407,7 @@ export function MoneyPriceInteractive({
             return (
               <div key={option.key} className="relative flex items-center justify-center mx-1">
                 {showBadge && (
-                  <span className="absolute z-99 left-1/2 -translate-x-1/2 -top-3 sm:-top-4 translate-y-[-50%] px-3 py-0.5  text-[0.625rem] sm:text-xs rounded-md bg-yellow-100 text-yellow-800 font-semibold shadow-sm whitespace-nowrap">
+                  <span className="absolute z-10 left-1/2 -translate-x-1/2 -top-3 sm:-top-4 translate-y-[-50%] px-3 py-0.5  text-[0.625rem] sm:text-xs rounded-md bg-yellow-100 text-yellow-800 font-semibold shadow-sm whitespace-nowrap">
                     {discountBadgeText}
                   </span>
                 )}
