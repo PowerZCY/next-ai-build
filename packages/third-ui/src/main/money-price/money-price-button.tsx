@@ -20,7 +20,7 @@ export function MoneyPriceButton({
   if (isInitLoading) {
     return (
       <div
-        className="w-full h-11 mt-auto rounded-full bg-transparent"
+        className="w-full h-11 md:h-12 mt-4 md:mt-auto rounded-full bg-transparent"
         aria-hidden="true"
         data-plan-button-placeholder={planKey}
       />
@@ -260,7 +260,7 @@ export function MoneyPriceButton({
   };
 
   const buttonClassName = cn(
-    'w-full h-11 px-8 mt-auto inline-flex items-center justify-center text-white text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full',
+    'w-full h-11 md:h-12 px-5 md:px-8 mt-4 md:mt-auto inline-flex items-center justify-center text-white text-sm md:text-base font-bold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 rounded-full',
     isDisabledByConfigOnly
       ? 'bg-gray-400 cursor-not-allowed'
       : 'bg-linear-to-r from-purple-400 to-pink-500 dark:from-purple-500 dark:to-pink-600',

@@ -161,12 +161,11 @@ export function MoneyPriceInteractive({
   }, [initialBillingCandidate]);
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [tooltip, setTooltip] = useState<{
-    show: boolean;
-    content: string;
-    x: number;
-    y: number;
-  }>({ show: false, content: '', x: 0, y: 0 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const getUserState = useCallback((): UserState => {
     if (!subscriptionSnapshot || subscriptionSnapshot.status !== 'active') {
@@ -393,50 +392,14 @@ export function MoneyPriceInteractive({
     return selectedBillingOption.discountText.replace('{percent}', String(discountPercent));
   }, [selectedBillingOption, providerConfig, billingType]);
 
-  const handleTooltipShow = useCallback((content: string, event: React.MouseEvent) => {
-    setTooltip({
-      show: true,
-      content,
-      x: event.clientX,
-      y: event.clientY
-    });
-  }, []);
-
-  const handleTooltipMove = useCallback((event: React.MouseEvent) => {
-    setTooltip(prev => prev.show ? { ...prev, x: event.clientX, y: event.clientY } : prev);
-  }, []);
-
-  const handleTooltipHide = useCallback(() => {
-    setTooltip(prev => ({ ...prev, show: false }));
-  }, []);
-
-  const Tooltip = ({ show, content, x, y }: typeof tooltip) => {
-    if (!show) return null;
-    const style: React.CSSProperties = {
-      position: 'fixed',
-      left: Math.max(8, x),
-      top: Math.max(8, y),
-      zIndex: 9999,
-      maxWidth: 200,
-      transform: 'translateY(-50%)',
-      pointerEvents: 'none',
-      whiteSpace: 'pre-line',
-    };
-    return (
-      <div
-        style={style}
-        className="bg-gray-700 dark:bg-gray-200 text-gray-100 dark:text-gray-800 text-xs leading-relaxed px-3 py-2 rounded-lg shadow-lg border border-gray-300 dark:border-gray-600 backdrop-blur-sm"
-      >
-        {content}
-      </div>
-    );
-  };
-
   return (
     <>
-      <div className="flex flex-col items-center">
-        <div className="flex items-center relative mb-3">
-          <div className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1" data-billing-switch>
+      <div className="flex flex-col items-center w-full">
+        <div className="flex items-center relative mb-3 w-full md:w-auto md:justify-center">
+          <div
+            className="flex bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-full p-1 w-full max-w-[360px] md:max-w-none md:w-auto"
+            data-billing-switch
+          >
             {billingOptions.map(option => {
               const isActive = option.key === billingType;
               const buttonClasses = isActive
@@ -447,7 +410,8 @@ export function MoneyPriceInteractive({
                 <button
                   key={option.key}
                   className={cn(
-                    'min-w-[120px] px-6 py-2 font-medium transition text-lg relative',
+                    'flex-1 basis-1/3 text-sm px-3 py-1.5 font-medium transition relative text-center min-w-0',
+                    'md:text-lg md:px-6 md:py-2 md:min-w-[120px] md:flex-none',
                     buttonClasses
                   )}
                   type="button"
@@ -461,16 +425,17 @@ export function MoneyPriceInteractive({
           </div>
         </div>
 
-        <div className="h-8 flex items-center justify-center mb-3" data-discount-info>
+        <div className="min-h-[32px] flex items-center justify-center mb-3 w-full px-4" data-discount-info>
           {discountBadgeText ? (
-            <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
+            <span className="px-2 py-1 text-[11px] md:text-xs rounded bg-yellow-100 text-yellow-800 font-semibold align-middle text-center inline-flex items-center justify-center whitespace-nowrap">
               {discountBadgeText}
             </span>
           ) : null}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+      <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 xl:gap-8 w-full max-w-6xl mx-auto">
         {currentPlans.map((plan: any) => {
           const planKey = plan.key as 'F1' | 'P2' | 'U3';
           if (!PLAN_KEYS.includes(planKey)) {
@@ -487,14 +452,14 @@ export function MoneyPriceInteractive({
               key={plan.key}
               data-price-plan={planKey}
               className={cn(
-                'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-8 h-full shadow-sm dark:shadow-none min-w-[350px]',
+                'flex flex-col bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-300 dark:border-[#7c3aed40] transition p-5 md:p-8 h-full shadow-sm dark:shadow-none w-full',
                 'hover:border-2 hover:border-purple-500',
                 'focus-within:border-2 focus-within:border-purple-500'
               )}
-              style={{ minHeight: maxFeaturesCount * 100 }}
+              style={{ minHeight: maxFeaturesCount * (isTouchDevice ? 86 : 100) }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{plan.title}</span>
+                <span className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">{plan.title}</span>
                 {plan.titleTags && plan.titleTags.map((tag: string, i: number) => (
                   <span key={i} className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 font-semibold align-middle">
                     {tag}
@@ -504,23 +469,23 @@ export function MoneyPriceInteractive({
 
               <div className="flex flex-col items-start w-full" data-price-container={planKey}>
                 <div className="flex items-end gap-2">
-                  <span className="text-4xl font-extrabold text-gray-900 dark:text-gray-100" data-price-value={planKey}>
+                  <span className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-100" data-price-value={planKey}>
                     {pricing.amount === 0 ? 'Free' : `${data.currency}${pricing.amount}`}
                   </span>
                   {pricing.amount > 0 && (
-                    <span className="text-lg text-gray-700 dark:text-gray-300 font-medium mb-1" data-price-unit={planKey}>
+                    <span className="text-base md:text-lg text-gray-700 dark:text-gray-300 font-medium mb-1" data-price-unit={planKey}>
                       {selectedBillingOption?.unit || '/month'}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 min-h-[24px] mt-1">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 min-h-[28px] mt-1">
                   {hasDiscount && (
                     <>
-                      <span className="text-base text-gray-400 line-through" data-price-original={planKey}>
+                      <span className="text-sm md:text-base text-gray-400 line-through" data-price-original={planKey}>
                         {data.currency}{pricing.originalAmount}
                       </span>
                       {selectedBillingOption?.discountText && (
-                        <span className="px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle" data-price-discount={planKey}>
+                        <span className="px-2 py-0.5 text-[11px] md:text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle" data-price-discount={planKey}>
                           {selectedBillingOption.discountText.replace('{percent}', String(pricing.discountPercent))}
                         </span>
                       )}
@@ -528,7 +493,7 @@ export function MoneyPriceInteractive({
                   )}
                   <div
                     className={cn(
-                      'flex items-center gap-2',
+                      'flex items-center gap-2 text-[11px] md:text-xs',
                       !showBillingSubtitle && 'opacity-0 select-none'
                     )}
                     data-price-subtitle={planKey}
@@ -537,12 +502,12 @@ export function MoneyPriceInteractive({
                       // OneTime 模式下的特殊处理：普通文本 + 带样式的产品副标题
                       <>
                         {selectedBillingOption?.subTitle && (
-                          <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                          <span className="text-[11px] md:text-xs text-gray-700 dark:text-gray-300 font-medium">
                             {selectedBillingOption.subTitle}
                           </span>
                         )}
                         {plan.subtitle && (
-                          <span className="px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle">
+                          <span className="px-2 py-0.5 text-[11px] md:text-xs rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 font-semibold align-middle">
                             +{plan.subtitle}
                           </span>
                         )}
@@ -550,7 +515,7 @@ export function MoneyPriceInteractive({
                     ) : (
                       // 其他模式下保持原逻辑
                       showBillingSubtitle && (
-                        <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+                        <span className="text-[11px] md:text-xs text-gray-700 dark:text-gray-300 font-medium">
                           {selectedBillingOption?.subTitle || ''}
                         </span>
                       )
@@ -559,9 +524,9 @@ export function MoneyPriceInteractive({
                 </div>
               </div>
 
-              <ul className="flex-1 mb-6 mt-4">
+              <ul className="flex-1 mb-6 mt-4 text-xs md:text-sm leading-5">
                 {getFeatureRows(plan).map((feature: any, i: number) => (
-                  <li key={i} className="flex items-center gap-2 mb-2 min-h-[28px]" data-feature-item={`${planKey}-${i}`}>
+                  <li key={i} className="flex items-start gap-2 mb-2 min-h-[24px] md:min-h-[28px]" data-feature-item={`${planKey}-${i}`}>
                     {feature ? (
                       <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 mr-1">
                         {feature.icon ? <span>{feature.icon}</span> : <span className="font-bold">✓</span>}
@@ -575,24 +540,12 @@ export function MoneyPriceInteractive({
                       </span>
                     )}
                     {feature ? (
-                      <span className="relative group cursor-pointer text-sm text-gray-800 dark:text-gray-200">
-                        {feature.description}
+                      <div className="flex-1 text-gray-800 dark:text-gray-200">
+                        <span>{feature.description}</span>
                         {feature.tooltip && (
-                          <span
-                            className="ml-1 align-middle inline-flex"
-                            data-tooltip-trigger={`${planKey}-${i}`}
-                            data-tooltip-content={feature.tooltip}
-                            onMouseEnter={(event) => handleTooltipShow(feature.tooltip, event)}
-                            onMouseMove={handleTooltipMove}
-                            onMouseLeave={handleTooltipHide}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </span>
+                          <span className="block text-[11px] text-gray-500 dark:text-gray-400 mt-1">{feature.tooltip}</span>
                         )}
-                      </span>
+                      </div>
                     ) : (
                       <span>&nbsp;</span>
                     )}
@@ -616,9 +569,8 @@ export function MoneyPriceInteractive({
             </div>
           );
         })}
+        </div>
       </div>
-
-      <Tooltip {...tooltip} />
     </>
   );
 }
