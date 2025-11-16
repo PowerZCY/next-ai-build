@@ -73,22 +73,28 @@ body {
 }
 
 /* Gallery swiper polish for mobile */
+/* Swiper轮播图样式撑宽导致溢出出现横向滚动条 */
+.swiper-wrapper { width: 100% !important; }
+.swiper-slide { width: 100% !important; flex-shrink: 0; }
+.gallery-mobile-swiper { overflow: hidden !important; }
+
 .gallery-mobile-swiper {
-  --swiper-theme-color: #ac62fd;
+  --swiper-theme-color: #AC62FD;
 }
 
 .gallery-mobile-swiper .swiper-pagination {
-  bottom: 12px;
+  bottom: 2px;
 }
 
 .gallery-mobile-swiper .swiper-pagination-bullet {
   width: 8px;
   height: 8px;
   margin: 0 0.25rem;
-  background-color: rgba(255, 255, 255, 0.65);
-  opacity: 1;
+  background: rgba(0, 0, 0, 0.6) !important;
+  opacity: 1 !important;
 }
 
 .gallery-mobile-swiper .swiper-pagination-bullet-active {
-  background-color: #ffffff;
+  background: #AC62FD !important;
+  transform: scale(1.5);
 }
