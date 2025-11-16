@@ -131,7 +131,7 @@ export function GradientButton({
   );
 
   return (
-    <div className={`flex flex-col sm:flex-row gap-3 ${getAlignmentClass()}`}>
+    <div className={`flex flex-row gap-3 ${getAlignmentClass()}`}>
       {onClick ? (
         // for click
         <Button

@@ -21,7 +21,7 @@ export async function Hero({ locale }: { locale: string }) {
           title={t('button')}
           href="https://preview.reve.art/"
           align="center"
-          className="w-full"
+          className="md:w-full"
         />
         <div className="flex items-center gap-2 text-sm text-gray-400">
           <icons.Zap className="h-4 w-4" />

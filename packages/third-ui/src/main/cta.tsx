@@ -34,6 +34,7 @@ export async function CTA({
   return (
     <section id="cta" className={cn(responsiveSection, sectionClassName)}>
       <div className="
+        py-3 sm:py-6 md:8
         bg-linear-to-r from-[#f7f8fa] via-[#e0c3fc] to-[#b2fefa]
         dark:bg-linear-to-r dark:from-[#2d0b4e] dark:via-[#6a3fa0] dark:to-[#3a185a]
         rounded-2xl text-center
@@ -42,10 +43,10 @@ export async function CTA({
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           {data.title} <span className="text-purple-400">{data.eyesOn}</span>?
         </h2>
-        <p className="text-xl sm:text-2xl mx-auto mb-8 max-w-3xl">
+        <p className="text-base sm:text-xl mx-auto mb-8 max-w-3xl">
           {data.description1}
           <br />
-          <span className="text-purple-400">{data.description2}</span>
+          <span className="text-purple-400 text-xl sm:text-2xl">{data.description2}</span>
         </p>
         <GradientButton
           title={data.button}
