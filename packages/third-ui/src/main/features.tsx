@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { getGlobalIcon } from '@windrun-huaiin/base-ui/components/server';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { richText } from '@third-ui/main/rich-text-expert';
+import { richText } from './rich-text-expert';
 import { responsiveSection } from './section-layout';
 
 interface FeaturesData {

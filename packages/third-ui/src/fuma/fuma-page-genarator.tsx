@@ -1,7 +1,7 @@
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
 import { ReactNode, ReactElement, cloneElement } from 'react';
-import { TocFooterWrapper } from '@third-ui/fuma/mdx';
-import type { LLMCopyButtonProps, LLMCopyButton } from '@third-ui/fuma/mdx';
+import { TocFooterWrapper } from '@third-ui/fuma/mdx/toc-footer-wrapper';
+import type { LLMCopyButtonProps, LLMCopyButton } from '@third-ui/fuma/mdx/toc-base';
 
 interface FumaPageParams {
   /* 

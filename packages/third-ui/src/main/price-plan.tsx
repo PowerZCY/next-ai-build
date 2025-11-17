@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@windrun-huaiin/lib/utils';
 import { getTranslations } from 'next-intl/server';
-import { PricePlanInteractive } from '@third-ui/main';
+import { PricePlanInteractive } from './price-plan-interactive';
 
 export interface PricePlanProps {
   locale: string

@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { richText } from '@third-ui/main/rich-text-expert';
-import { FAQInteractive } from '@third-ui/main';
+import { richText } from './rich-text-expert';
+import { FAQInteractive } from './faq-interactive';
 import { responsiveSection } from './section-layout';
 
 interface FAQData {

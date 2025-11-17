@@ -10,8 +10,6 @@
     "baseUrl": "./src",
     "paths": {
       "@third-ui/*": ["./*"],
-      "@base-ui/*": ["../../base-ui/src/*"],
-      "@lib/*": ["../../lib/src/*"]
     }
   },
   "include": [

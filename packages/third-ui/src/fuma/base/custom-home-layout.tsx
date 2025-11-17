@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
-import { FumaBannerSuit } from '@third-ui/fuma/server';
-import { Footer } from '@third-ui/main/server';
-import { GoToTop } from '@third-ui/main';
+import { FumaBannerSuit } from '@third-ui/fuma/fuma-banner-suit';
+import { Footer } from '@third-ui/main/footer';
+import { GoToTop } from '@third-ui/main/go-to-top';
 import { NavbarCSSVars, CustomHomeHeader } from './custom-header';
 
 // - bannerHeight/headerHeight 换成你项目期望的 rem 值即可（如果没有 Banner 就把 bannerHeight 设成 0）。
