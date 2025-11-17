@@ -1,5 +1,37 @@
 # @windrun-huaiin/third-ui
 
+## 10.0.0
+
+### Major Changes
+
+- refactor(upgrade): Fumadocs dependencies upgrade to 16.0.9
+
+  ### Also make patchs
+
+  - `patches/fumadocs-core@16.0.9.patch`, **toc.ts** for TOC componnet config null issue fixed
+  - `patches/fumadocs-ui@16.0.9.patch`, **toc-clerk.ts** for clerk's style of TOC, just custom css
+
+  ### Key Version
+
+  - nextjs `16.0.0`
+  - next-intl `^4.4.0`
+  - react `19.2.0`
+  - rollup `4.46.2`
+  - turbo `^2.6.0`
+  - typescript `^5.8.3`
+  - zod `^4.1.12`
+  - fumadocs-core `16.0.9`
+  - fumadocs-docgen `3.0.4`
+  - fumadocs-mdx `13.0.6`
+  - fumadocs-typescript `4.0.13`
+  - fumadocs-ui `16.0.9`
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@10.0.0
+  - @windrun-huaiin/lib@10.0.0
+
 ## 7.6.1
 
 ### Patch Changes
