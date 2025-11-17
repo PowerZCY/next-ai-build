@@ -408,7 +408,7 @@ export function CreditOverviewClient({
         </div>
         {hasBuckets ? (
           bucketExpanded ? (
-            <ul className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200/70 bg-white/70 p-3 sm:p-4">
+            <ul className="flex flex-col gap-2">
               {buckets.map((bucket) => {
                 const balanceDisplay = formatNumber(locale, bucket.balance);
                 return (
