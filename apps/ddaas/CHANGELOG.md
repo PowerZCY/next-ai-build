@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 10.1.0
+
+### Minor Changes
+
+- fix(package): build and webpack, DO NOT USE package name IMPORT from the same project!
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@10.1.0
+  - @windrun-huaiin/third-ui@10.1.0
+  - @windrun-huaiin/lib@10.1.0
+  - @windrun-huaiin/shared-assets@10.1.0
+
 ## 10.0.0
 
 ### Major Changes

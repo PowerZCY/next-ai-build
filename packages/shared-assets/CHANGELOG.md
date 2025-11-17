@@ -1,5 +1,11 @@
 # @windrun-huaiin/shared-assets
 
+## 10.1.0
+
+### Minor Changes
+
+- fix(package): build and webpack, DO NOT USE package name IMPORT from the same project!
+
 ## 10.0.0
 
 ### Major Changes
