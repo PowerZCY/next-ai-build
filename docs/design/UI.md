@@ -11,6 +11,7 @@
 
 ## 2. 布局与间距
 - **卡片栅格**：三列时保持每卡最小宽度 350px，左右留白通过 `max-w-6xl` 容器 + `px-4/px-8` 控制；移动端自动折行为单列。
+- **积分下拉容器**：`CreditNavButton` 的 `DropdownMenuContent` 采用 `w-[90vw] max-w-[410px]`（桌面 `sm:max-w-[95vw]`）+ `max-h-[80~85vh] overflow-y-auto`，始终在卡片内部产生滚动条，避免驱动背景页面滚动或溢出视口。
 - **模态宽度**：弹窗 `w-[95vw]`、`max-w-[1200px]`，内层内容容器限定 `max-w-6xl`，避免卡片被拉扁。
 - **内边距与分隔**：卡片内部使用 24px 级别间距，标题/副标题之间 12px，列表条目 8–12px，保留呼吸感。
 - **响应式分段**：所有全页板块应落入统一的 `max-w-6xl` 容器并搭配 `"px-4 py-10 sm:px-6 md:px-8 lg:px-10"` 级别的横向留白，移动端默认 `max-w-full` 自动塞满可用宽度；强调型内容（如 `CTA`、`FAQ`）可选用稍微加宽的 `wideResponsiveSection` 变体，但仍需保留四周间距。
@@ -25,6 +26,7 @@
 - **Tag & 徽标**：圆角胶囊形态，填充色与文字保持 4.5:1 对比度；折扣类 Tag 支持模板文案，如 `Save {percent}`。
 - **Iconography**：首选 `globalLucideIcons`；若需强调信息，可将图标置于浅色圆片背景中并保持 `h-4 w-4`。
 - **进度/状态**：Credit Overview 列表中状态行提供简单标签与明确到期提示，字体 12px 并使用语义色。
+- **积分触发按钮**：`CreditNavButton` 是圆角胶囊 + 宝石图标组合，亮色下白底+紫渐变 hover，暗色下深色胶囊；hover/active 时需维持柔光阴影并保证 `aria-label` 包含积分数值。
 
 ## 5. 交互细节
 - **计费切换**：Money Price 使用 pill 样式按钮组；激活态应用渐变背景，非激活态保持幽灵按钮风格。
@@ -33,12 +35,15 @@
 - **门户跳转**：统一通过 `redirectToCustomerPortal` helper 处理 Stripe Portal 逻辑（含登录 fallback），避免各处重复实现。
 - **调试面板**：FingerptintStatus 等内部面板也需遵循移动端，限定 `max-h-[90vh]`、`w-[min(95vw,520px)]`，后顶层加固遮罩并在右上角提供关闭按钮，便于小屏操作。
 - **菜单折叠**：当移动端导航下拉展开时，点击积分类卡片或按钮应该主动折叠主菜单以避免遮挡；可通过监听 `DropdownMenu` 的 open 状态并触发导航 Toggle 关闭。
+- **积分下拉交互**：桌面环境 `DropdownMenu` 设置 `modal=false`，动作完成后再折叠以避免闪烁；移动端展开时锁定 `body/html` 的滚动并监听外部点击/手势关闭。`ctaBehaviors.mobile` 禁用 `modal`，所有 CTA 一律走 `GradientButton`，待请求 resolve 或跳转发起后才调用 `closeNavPopover`，确保 loading 状态与滚动锁同步释放。
+- **积分明细折叠策略**：`CreditOverviewClient` 默认在桌面展开积分桶列表、移动端收起，并以“展开明细”占位按钮保留列表高度；用户一旦手动切换，则通过内部 ref 记住状态，避免因 breakpoint 或重渲染导致闪烁。
 
 ## 6. 复用实践提示
 - **数据构建**：服务端统一调用 `buildMoneyPriceData({ locale, currency, enabledBillingTypes? })`，在不同场景按需覆写 `billingSwitch.defaultKey` 即可；勿就地硬编码文案。
 - **样式扩展**：新组件优先沿用以上间距/渐变体系；若需新颜色，确保在两种主题下都提供对比度示例。
 - **文案与国际化**：所有文本遵循 `moneyPrice` / `credit` 命名空间的结构，方便复用现有翻译。
 - **可访问性**：交互元素需具备 `focus-visible` 样式、语义 aria 属性；暗色背景下保证文本对比度≥ 4.5:1。
+- **CTA 策略**：复用 `ctaBehaviors` 配置矩阵分别定义 `subscribe/manage/onetime` 在桌面与移动端的动作，桌面可使用 `modal` + `requestAnimationFrame` 延迟折叠方案，移动端需提供 `redirect`/`auth`/`custom` 并准备 fallback；若某端缺失配置，要在控制台给出警告并回退到默认订阅弹窗/门户逻辑。
 
 > **提示词示例（可直接贴给设计或生成模型）**  
 > “设计一个符合 Next AI Build 品牌的多主题 UI 卡片：大面积使用白色或深蓝背景，主行动按钮采用紫到粉的线性渐变，卡片内保持 24px 内边距，标题 32px 粗体、副标题 16px 次级颜色。请确保暗色模式下仍能看到清晰的卡片轮廓（浅色描边 + 漫反射阴影），并提供订阅/一次性切换的 pill 状态栏。”  

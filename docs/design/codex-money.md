@@ -1,11 +1,11 @@
 # Money Price 价格卡片：设计与实现文档
 
-## 1. 组件分层总览
+## 0. 客户端布局规范
 
-### 客户端布局规范
-
-- **Billing Type 切换按钮**：移动端使用 `flex` + `flex-wrap`，外层容器限制在 360px 内并居中，按钮本身通过 `flex-1 basis-1/3` 保持相同宽度，即便文案长短不同也不会影响布局；进入 `md` 断点后容器回到自动宽度，三个按钮依旧共享统一的 pill 背景。
+- **Billing Type 切换按钮**：`data-billing-switch` 容器在移动端整块 `sticky` 到弹窗顶部（`max-md:sticky top-30 z-30`），保证滚动长卡片时切换器始终可见；容器本身是 `inline-flex` 的圆角胶囊，移动端 `w-full max-w-[340px]` 并自动居中，桌面端宽度由内容决定但同样保留 `px-2/py-2` 的内边距和浅色描边；按钮采用固定的 `min-w-[100px]`（桌面 `120px`）和 `px-2 sm:px-4 py-2`，激活态切换到紫粉渐变并附带一个 `absolute` 的折扣 Badge（位于按钮上方居中），未激活态保持透明 pill，使得三种计费类型在不同语言长度下也能居中排布且视觉状态清晰。
 - **价格卡栅格**：`MoneyPriceInteractive` 的卡片区域采用 `flex-wrap`。移动端每张卡宽度固定为 `90vw`（最多 360px），左右自动留 5% 边距；桌面端通过 `width: clamp(280px, 32vw, 360px)` 并 `flex-shrink-0` 控制卡片宽度，外层 `gap` + `justify-center` 保证自动排成 2 或 3 列。`maxFeaturesCount` 负责对齐卡片高度，底部按钮区域用 `flex-1` 撑开，从而在任何 billingType 切换下，三张卡的宽高都保持一致，视觉上不会跳动。
+
+## 1. 组件分层总览
 
 ```
 money-price/
