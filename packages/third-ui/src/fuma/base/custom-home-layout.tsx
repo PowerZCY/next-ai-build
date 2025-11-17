@@ -3,7 +3,13 @@ import { HomeLayout, type HomeLayoutProps } from 'fumadocs-ui/layouts/home';
 import { FumaBannerSuit } from '@third-ui/fuma/fuma-banner-suit';
 import { Footer } from '@third-ui/main/footer';
 import { GoToTop } from '@third-ui/main/go-to-top';
-import { NavbarCSSVars, CustomHomeHeader } from './custom-header';
+import {
+  NavbarCSSVars,
+  CustomHomeHeader,
+  type DesktopAction,
+  type MobileBarAction,
+  type MobileMenuAction,
+} from './custom-header';
 
 // - bannerHeight/headerHeight 换成你项目期望的 rem 值即可（如果没有 Banner 就把 bannerHeight 设成 0）。
 // - layoutStyle 同时把变量传给 HomeLayout 的 main 元素，这样内容整体会往下错开，不需要 has-banner/no-banner class。
@@ -73,7 +79,17 @@ export interface CustomHomeLayoutProps {
    * Additional styles merged on top of the computed layout style.
    */
   style?: CSSProperties;
+  /**
+   * Customize the order of header action items.
+   */
+  actionOrders?: HeaderActionOrders;
   children?: ReactNode;
+}
+
+export interface HeaderActionOrders {
+  desktop?: DesktopAction[];
+  mobileBar?: MobileBarAction[];
+  mobileMenu?: MobileMenuAction[];
 }
 
 export function CustomHomeLayout({
@@ -92,6 +108,7 @@ export function CustomHomeLayout({
   showGoToTop = true,
   style,
   floatingNav = false,
+  actionOrders,
 }: CustomHomeLayoutProps) {
   const resolvedBannerHeight = bannerHeight ?? (showBanner ? 3 : 0.5);
   const resolvedPaddingTop =
@@ -116,6 +133,9 @@ export function CustomHomeLayout({
       headerHeight={headerHeight}
       navbarClassName={navbarClassName}
       floating={floatingNav}
+      desktopActionsOrder={actionOrders?.desktop}
+      mobileBarActionsOrder={actionOrders?.mobileBar}
+      mobileMenuActionsOrder={actionOrders?.mobileMenu}
     />
   );
 

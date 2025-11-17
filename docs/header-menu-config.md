@@ -58,6 +58,24 @@ on 字段可以写在任何 LinkItemType 上（顶层或子项都可以），用
   记得 mobilePinned / secondary 等属性只影响“主菜单栏 vs. 功能区”的布局，不会改变 on 对应的区域筛选，两者可以配合使用。
 ```
 
+## 行为顺序自定义
+- `<CustomHomeLayout>` 支持 `actionOrders` 属性，可分别控制三个区域：
+  - `desktop`: `('search' | 'theme' | 'i18n' | 'secondary')[]`，桌面右侧工具条。
+  - `mobileBar`: `('pinned' | 'search' | 'menu')[]`，移动端顶部工具条。
+  - `mobileMenu`: `('secondary' | 'separator' | 'i18n' | 'theme')[]`，移动抽屉中的功能顺序。
+- 示例：
+  ```tsx
+  <CustomHomeLayout
+    actionOrders={{
+      desktop: ['search', 'i18n', 'theme', 'secondary'],
+      mobileBar: ['pinned', 'menu', 'search'],
+      mobileMenu: ['secondary', 'i18n', 'separator', 'theme'],
+    }}
+    {...otherProps}
+  />
+  ```
+- 不配置则沿用默认顺序（与当前 UI 一致）。
+
 ## 其它提示
 - `on: 'nav' | 'menu' | 'all'` 可强制指定某个链接只在桌面导航或移动菜单中展示，不写则等同 `'all'`。  
 - `type: 'icon'`、`type: 'button'` 会自动继承 Fumadocs 提供的样式，也会默认算 secondary。需要它们回到左侧时手动设置 `secondary: false`。  

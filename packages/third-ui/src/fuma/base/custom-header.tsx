@@ -4,6 +4,7 @@ import {
   type ComponentProps,
   type CSSProperties,
   Fragment,
+  type ReactNode,
   useMemo,
   useState,
 } from 'react';
@@ -79,7 +80,41 @@ export interface CustomHomeHeaderProps extends HomeLayoutProps {
    * @defaultValue true
    */
   floating?: boolean;
+  /**
+   * Control order of action items on desktop.
+   */
+  desktopActionsOrder?: DesktopAction[];
+  /**
+   * Control order of quick actions on the mobile bar.
+   */
+  mobileBarActionsOrder?: MobileBarAction[];
+  /**
+   * Control order of utilities inside the mobile dropdown.
+   */
+  mobileMenuActionsOrder?: MobileMenuAction[];
 }
+
+export type DesktopAction = 'search' | 'theme' | 'i18n' | 'secondary';
+export type MobileBarAction = 'pinned' | 'search' | 'menu';
+export type MobileMenuAction = 'secondary' | 'separator' | 'i18n' | 'theme';
+
+const DEFAULT_DESKTOP_ACTIONS: DesktopAction[] = [
+  'search',
+  'theme',
+  'i18n',
+  'secondary',
+];
+const DEFAULT_MOBILE_BAR_ACTIONS: MobileBarAction[] = [
+  'pinned',
+  'search',
+  'menu',
+];
+const DEFAULT_MOBILE_MENU_ACTIONS: MobileMenuAction[] = [
+  'secondary',
+  'separator',
+  'i18n',
+  'theme',
+];
 
 export function CustomHomeHeader({
   nav = {},
@@ -93,6 +128,9 @@ export function CustomHomeHeader({
   maxContentWidth = 1400,
   navbarClassName,
   floating = false,
+  desktopActionsOrder = DEFAULT_DESKTOP_ACTIONS,
+  mobileBarActionsOrder = DEFAULT_MOBILE_BAR_ACTIONS,
+  mobileMenuActionsOrder = DEFAULT_MOBILE_MENU_ACTIONS,
 }: CustomHomeHeaderProps) {
   const finalLinks = useMemo(
     () => getLinks(links, githubUrl),
@@ -108,9 +146,139 @@ export function CustomHomeHeader({
   const mobilePinnedItems = navItems.filter(
     (item) => isSecondary(item) && isMobilePinned(item),
   );
-  const filteredMenuItems = menuItems.filter(
-    (item) => !isMobilePinned(item),
+  const filteredMenuItems = menuItems.filter((item) => !isMobilePinned(item));
+  const primaryMenuItems = filteredMenuItems.filter((item) => !isSecondary(item));
+  const secondaryMenuItems = filteredMenuItems.filter(isSecondary);
+  const desktopSecondaryItems = navItems.filter(isSecondary);
+
+  const desktopActionNodes: Record<DesktopAction, ReactNode> = {
+    search:
+      searchToggle.enabled !== false
+        ? searchToggle.components?.lg ?? (
+            <LargeSearchToggle
+              className="w-full rounded-full ps-2.5 max-w-[240px]"
+              hideIfDisabled
+            />
+          )
+        : null,
+    theme:
+      themeSwitch.enabled !== false
+        ? themeSwitch.component ?? <ThemeToggle mode={themeSwitch?.mode} />
+        : null,
+    i18n: i18n ? (
+      <CompactLanguageToggle>
+        <icons.Languages className="size-5" />
+      </CompactLanguageToggle>
+    ) : null,
+    secondary: desktopSecondaryItems.length ? (
+      <ul className="flex flex-row gap-2 items-center empty:hidden">
+        {desktopSecondaryItems.map((item, i) => (
+          <NavbarLinkItem
+            key={i}
+            item={item}
+            className={cn(
+              item.type === 'icon' && [
+                '-mx-1',
+                i === 0 && 'ms-0',
+                i === desktopSecondaryItems.length - 1 && 'me-0',
+              ],
+            )}
+          />
+        ))}
+      </ul>
+    ) : null,
+  };
+
+  const mobileMenuActionNodes: Record<MobileMenuAction, ReactNode> = {
+    secondary: secondaryMenuItems.length ? (
+      <>
+        {secondaryMenuItems.map((item, i) => (
+          <MenuLinkItem key={i} item={item} className="-me-1.5" />
+        ))}
+      </>
+    ) : null,
+    separator: <div role="separator" className="flex-1" />,
+    i18n: i18n ? (
+      <CompactLanguageToggle>
+        <icons.Languages className="size-5" />
+        <LanguageToggleText />
+        <icons.ChevronDown className="size-3 text-fd-muted-foreground" />
+      </CompactLanguageToggle>
+    ) : null,
+    theme:
+      themeSwitch.enabled !== false
+        ? themeSwitch.component ?? <ThemeToggle mode={themeSwitch?.mode} />
+        : null,
+  };
+  const shouldRenderMobileUtilities = mobileMenuActionsOrder.some(
+    (action) => action !== 'separator' && Boolean(mobileMenuActionNodes[action]),
   );
+  const renderMobileMenuAction = (action: MobileMenuAction) => {
+    if (action === 'separator' && !shouldRenderMobileUtilities) return null;
+    return mobileMenuActionNodes[action];
+  };
+
+  const menuNode = (
+    <Menu>
+      <MenuTrigger
+        aria-label="Toggle Menu"
+        className={cn(
+          buttonVariants({
+            size: 'icon',
+            color: 'ghost',
+            className: 'group [&_svg]:size-5.5',
+          }),
+        )}
+        enableHover={nav.enableHoverToOpen}
+      >
+        <icons.ChevronDown className="transition-transform duration-300 group-data-[state=open]:rotate-180" />
+      </MenuTrigger>
+      <MenuContent className="sm:flex-row sm:items-center sm:justify-end">
+        {primaryMenuItems.map((item, i) => (
+          <MenuLinkItem key={i} item={item} className="sm:hidden" />
+        ))}
+        {shouldRenderMobileUtilities ? (
+          <div className="-ms-1.5 flex flex-row items-center gap-1.5 max-sm:mt-2">
+            {mobileMenuActionsOrder.map((action) => {
+              const node = renderMobileMenuAction(action);
+              if (!node) return null;
+              return (
+                <Fragment key={`mobile-menu-${action}`}>
+                  {node}
+                </Fragment>
+              );
+            })}
+          </div>
+        ) : null}
+      </MenuContent>
+    </Menu>
+  );
+
+  const mobilePinnedNode =
+    mobilePinnedItems.length > 0 ? (
+      <>
+        {mobilePinnedItems.map((item, i) => (
+          <NavbarLinkItem
+            key={`mobile-pinned-${i}`}
+            item={item}
+            className="max-sm:-mr-1"
+          />
+        ))}
+      </>
+    ) : null;
+  const mobileSearchNode =
+    searchToggle.enabled !== false
+      ? searchToggle.components?.sm ?? (
+          <SearchToggle className="p-2" hideIfDisabled />
+        )
+      : null;
+  const mobileBarNodes: Record<MobileBarAction, ReactNode> = {
+    pinned: mobilePinnedNode,
+    search: mobileSearchNode,
+    menu: menuNode,
+  };
+  const getMobileBarNode = (action: MobileBarAction) =>
+    mobileBarNodes[action] ?? null;
 
   return (
     <CustomNavbar
@@ -135,87 +303,23 @@ export function CustomHomeHeader({
           ))}
       </ul>
       <div className="flex flex-row items-center justify-end gap-1.5 flex-1 max-lg:hidden">
-        {searchToggle.enabled !== false &&
-          (searchToggle.components?.lg ?? (
-            <LargeSearchToggle
-              className="w-full rounded-full ps-2.5 max-w-[240px]"
-              hideIfDisabled
-            />
-          ))}
-        {themeSwitch.enabled !== false &&
-          (themeSwitch.component ?? <ThemeToggle mode={themeSwitch?.mode} />)}
-        {i18n && (
-          <CompactLanguageToggle>
-            <icons.Languages className="size-5" />
-          </CompactLanguageToggle>
-        )}
-        <ul className="flex flex-row gap-2 items-center empty:hidden">
-          {navItems.filter(isSecondary).map((item, i) => (
-            <NavbarLinkItem
-              key={i}
-              item={item}
-              className={cn(
-                item.type === 'icon' && [
-                  '-mx-1',
-                  i === 0 && 'ms-0',
-                  i === navItems.length - 1 && 'me-0',
-                ],
-              )}
-            />
-          ))}
-        </ul>
+        {desktopActionsOrder.map((action) => {
+          const node = desktopActionNodes[action];
+          if (!node) return null;
+          return (
+            <Fragment key={`desktop-${action}`}>
+              {node}
+            </Fragment>
+          );
+        })}
       </div>
       <ul className="flex flex-row items-center ms-auto -me-1.5 lg:hidden">
-        {mobilePinnedItems.map((item, i) => (
-          <NavbarLinkItem
-            key={`mobile-pinned-${i}`}
-            item={item}
-            className="max-sm:-mr-1"
-          />
-        ))}
-        {searchToggle.enabled !== false &&
-          (searchToggle.components?.sm ?? (
-            <SearchToggle className="p-2" hideIfDisabled />
-          ))}
-        <Menu>
-          <MenuTrigger
-            aria-label="Toggle Menu"
-            className={cn(
-              buttonVariants({
-                size: 'icon',
-                color: 'ghost',
-                className: 'group [&_svg]:size-5.5',
-              }),
-            )}
-            enableHover={nav.enableHoverToOpen}
-          >
-            <icons.ChevronDown className="transition-transform duration-300 group-data-[state=open]:rotate-180" />
-          </MenuTrigger>
-          <MenuContent className="sm:flex-row sm:items-center sm:justify-end">
-            {filteredMenuItems
-              .filter((item) => !isSecondary(item))
-              .map((item, i) => (
-                <MenuLinkItem key={i} item={item} className="sm:hidden" />
-              ))}
-            <div className="-ms-1.5 flex flex-row items-center gap-1.5 max-sm:mt-2">
-              {filteredMenuItems.filter(isSecondary).map((item, i) => (
-                <MenuLinkItem key={i} item={item} className="-me-1.5" />
-              ))}
-              <div role="separator" className="flex-1" />
-              {i18n ? (
-                <CompactLanguageToggle>
-                  <icons.Languages className="size-5" />
-                  <LanguageToggleText />
-                  <icons.ChevronDown className="size-3 text-fd-muted-foreground" />
-                </CompactLanguageToggle>
-              ) : null}
-              {themeSwitch.enabled !== false &&
-                (themeSwitch.component ?? (
-                  <ThemeToggle mode={themeSwitch?.mode} />
-                ))}
-            </div>
-          </MenuContent>
-        </Menu>
+        {mobileBarActionsOrder.map((action) => {
+          const node = getMobileBarNode(action);
+          return node ? (
+            <Fragment key={`mobile-bar-${action}`}>{node}</Fragment>
+          ) : null;
+        })}
       </ul>
     </CustomNavbar>
   );
