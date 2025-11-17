@@ -35,15 +35,10 @@ export async function homeNavLinks(locale: string): Promise<ExtendedLinkItem[]> 
       type: 'custom',
       // false就先排左边的菜单, true就先排右边的按钮
       secondary: true,
+      // true代表在移动端也会出现在主菜单栏上，不会被折叠
       mobilePinned: true,
-      // NicknameFilter 假设在其内部也使用了 useNickname
       children: <ClerkUser locale={locale} clerkAuthInModal={appConfig.style.clerkAuthInModal} showSignUp={true}/>
     },
-    // {
-    //   type: 'custom',
-    //   secondary: true,
-    //   children: <ClerkOrganization locale={locale} />
-    // }
   ];
 }
 
