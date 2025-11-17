@@ -48,12 +48,13 @@ credit/                                                       # packages/third-u
    - `auth`：点击后按钮进入 `GradientButton` 自带的 loading，保持下拉展开，待 `redirectToCustomerPortal` 成功（包括 302 跳 Portal、401/403 触发 Clerk 登录）后才折叠；若接口失败则保留下拉并提示 warning，便于用户重试或走 fallback。
    - `custom`：等待业务 handler resolve 后再折叠，确保所有副作用完成。
 3. 弹窗与下拉的生命周期解耦：即使下拉已经折叠，弹窗仍挂载在 `CreditNavButton` 下，直到用户点击关闭或 ESC。
+4. 通过`w-[90vw] max-w-[90vw] max-h-[80vh] overflow-y-auto overflow-x-hidden sm:w-[410px] sm:max-h-[90vh] sm:max-w-[95vw]`来控制积分下拉框的宽度、高度以及竖直滚动条
 
 > CTA 按钮统一使用 `GradientButton`，`preventDoubleClick=true` + loading 反馈可以确保异步阶段不会触发第二次点击，同时让用户明确“正在处理”。
 
 ### 移动端
 
-1. 点击积分按钮展开下拉时，`credit-nav-button` 会将 `body` 与 `html` 的 `overflow` 改为 `hidden`，禁止背景页面滑动。
+1. 点击积分按钮展开下拉时，`credit-nav-button` 会将 `body` 与 `html` 的 `overflow` 改为 `hidden`，禁止背景页面滑动，但通过`max-h-[80vh] overflow-y-auto`在其内部会有竖直滚动条。
 2. 外部点击或手势（包括滑动页面空白区域）被监听，一旦触发立即折叠下拉并恢复滚动。
 3. 卡片内部按钮行为：
    - 移动端不渲染任何 `modal` 动作；`ctaBehaviors.mobile` 只能配置 `redirect`、`auth` 或 `custom`，否则会在控制台给出告警。

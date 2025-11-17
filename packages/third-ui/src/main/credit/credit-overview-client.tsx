@@ -4,7 +4,7 @@ import { useClerk } from '@clerk/nextjs';
 import { GradientButton } from '@third-ui/fuma/mdx/gradient-button';
 import { globalLucideIcons as icons } from '@windrun-huaiin/base-ui/components/server';
 import { cn } from '@windrun-huaiin/lib/utils';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { redirectToCustomerPortal } from '../money-price/customer-portal';
 import type {
   CreditBucket,
@@ -69,6 +69,7 @@ export function CreditOverviewClient({
   const navPopover = useCreditNavPopover();
   const isMobile = navPopover?.isMobile ?? false;
   const [bucketExpanded, setBucketExpanded] = useState(false);
+  const userToggledRef = useRef(false);
   const closeNavPopover = useCallback(
     (options?: { defer?: boolean }) => {
       if (!navPopover) {
@@ -340,6 +341,23 @@ export function CreditOverviewClient({
     await runConfiguredAction('onetime', fallbackOnetime);
   }, [fallbackOnetime, runConfiguredAction]);
 
+  useLayoutEffect(() => {
+    if (userToggledRef.current) {
+      return;
+    }
+    setBucketExpanded(!isMobile);
+  }, [isMobile]);
+
+  const toggleBucketExpanded = useCallback(() => {
+    userToggledRef.current = true;
+    setBucketExpanded((prev) => !prev);
+  }, []);
+
+  const expandBuckets = useCallback(() => {
+    userToggledRef.current = true;
+    setBucketExpanded(true);
+  }, []);
+
   return (
     <section
       className={cn(
@@ -395,7 +413,7 @@ export function CreditOverviewClient({
               type="button"
               aria-expanded={bucketExpanded}
               aria-label={bucketExpanded ? translations.hiddenDetail : translations.expandDetail}
-              onClick={() => setBucketExpanded((prev) => !prev)}
+              onClick={toggleBucketExpanded}
               className="flex h-7 w-7 items-center justify-center rounded-full border border-transparent bg-white text-purple-600 shadow-[0_6px_20px_rgba(99,102,241,0.25)] transition-colors hover:text-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:bg-[#1b1541] dark:text-purple-100 dark:hover:text-purple-50 dark:shadow-[0_6px_22px_rgba(112,86,255,0.35)]"
             >
               {bucketExpanded ? (
@@ -444,7 +462,7 @@ export function CreditOverviewClient({
           ) : (
             <button
               type="button"
-              onClick={() => setBucketExpanded(true)}
+              onClick={expandBuckets}
               
               className="w-full rounded-2xl border border-slate-200/70 bg-white/85 p-6 sm:px-4 text-sm shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/60 hover:text-purple-500"
             >

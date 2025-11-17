@@ -204,7 +204,7 @@ export function CreditNavButton({
           className="z-50 border-0 bg-transparent p-0 shadow-none mx-4 sm:mx-2 md:mx-1"
         >
           <div
-            className="w-[90vw] max-w-[90vw] overflow-y-auto overflow-x-hidden rounded-3xl bg-transparent sm:w-[410px] sm:max-w-[95vw]"
+            className="w-[90vw] max-w-[90vw] max-h-[80vh] overflow-y-auto overflow-x-hidden rounded-3xl bg-transparent sm:w-[410px] sm:max-h-[90vh] sm:max-w-[95vw]"
             ref={contentRef}
           >
             {children}
