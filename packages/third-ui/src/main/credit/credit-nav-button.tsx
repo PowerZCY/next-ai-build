@@ -181,7 +181,7 @@ export function CreditNavButton({
             type="button"
             aria-label={`${formattedBalance} ${totalLabel}`}
             className={cn(
-              'group ml-1 mr-0 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white pl-2 pr-4 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
+              'group mx-2  sm:mx-1 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white pl-2 pr-4 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
               'hover:border-transparent hover:bg-linear-to-r hover:from-purple-500/90 hover:to-pink-500/90 hover:text-white hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 dark:hover:from-purple-500 dark:hover:to-pink-500',
             )}
             ref={triggerRef}

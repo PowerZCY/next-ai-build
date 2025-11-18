@@ -94,9 +94,19 @@ export interface CustomHomeHeaderProps extends HomeLayoutProps {
   mobileMenuActionsOrder?: MobileMenuAction[];
 }
 
-export type DesktopAction = 'search' | 'theme' | 'i18n' | 'secondary';
+export type DesktopAction =
+  | 'search'
+  | 'theme'
+  | 'i18n'
+  | 'secondary'
+  | 'github';
 export type MobileBarAction = 'pinned' | 'search' | 'menu';
-export type MobileMenuAction = 'secondary' | 'separator' | 'i18n' | 'theme';
+export type MobileMenuAction =
+  | 'secondary'
+  | 'github'
+  | 'separator'
+  | 'i18n'
+  | 'theme';
 
 const DEFAULT_DESKTOP_ACTIONS: DesktopAction[] = [
   'search',
@@ -150,6 +160,14 @@ export function CustomHomeHeader({
   const primaryMenuItems = filteredMenuItems.filter((item) => !isSecondary(item));
   const secondaryMenuItems = filteredMenuItems.filter(isSecondary);
   const desktopSecondaryItems = navItems.filter(isSecondary);
+  const desktopActionsIncludeGithub = desktopActionsOrder.includes('github');
+  const githubDesktopItem = desktopActionsIncludeGithub
+    ? desktopSecondaryItems.find((item) => isGithubItem(item, githubUrl))
+    : undefined;
+  const desktopSecondaryDisplayItems =
+    desktopActionsIncludeGithub && githubDesktopItem
+      ? desktopSecondaryItems.filter((item) => !isGithubItem(item, githubUrl))
+      : desktopSecondaryItems;
 
   const desktopActionNodes: Record<DesktopAction, ReactNode> = {
     search:
@@ -170,9 +188,9 @@ export function CustomHomeHeader({
         <icons.Languages className="size-5" />
       </CompactLanguageToggle>
     ) : null,
-    secondary: desktopSecondaryItems.length ? (
+    secondary: desktopSecondaryDisplayItems.length ? (
       <ul className="flex flex-row gap-2 items-center empty:hidden">
-        {desktopSecondaryItems.map((item, i) => (
+        {desktopSecondaryDisplayItems.map((item, i) => (
           <NavbarLinkItem
             key={i}
             item={item}
@@ -180,22 +198,41 @@ export function CustomHomeHeader({
               item.type === 'icon' && [
                 '-mx-1',
                 i === 0 && 'ms-0',
-                i === desktopSecondaryItems.length - 1 && 'me-0',
+                i === desktopSecondaryDisplayItems.length - 1 && 'me-0',
               ],
             )}
           />
         ))}
       </ul>
     ) : null,
+    github: githubDesktopItem ? (
+      <NavbarLinkItem
+        item={githubDesktopItem}
+        className={cn(githubDesktopItem.type === 'icon' && '-mx-1')}
+      />
+    ) : null,
   };
 
+  const mobileMenuActionsIncludeGithub =
+    mobileMenuActionsOrder.includes('github');
+  const githubMobileMenuItem = mobileMenuActionsIncludeGithub
+    ? secondaryMenuItems.find((item) => isGithubItem(item, githubUrl))
+    : undefined;
+  const secondaryMenuDisplayItems =
+    mobileMenuActionsIncludeGithub && githubMobileMenuItem
+      ? secondaryMenuItems.filter((item) => !isGithubItem(item, githubUrl))
+      : secondaryMenuItems;
+
   const mobileMenuActionNodes: Record<MobileMenuAction, ReactNode> = {
-    secondary: secondaryMenuItems.length ? (
+    secondary: secondaryMenuDisplayItems.length ? (
       <>
-        {secondaryMenuItems.map((item, i) => (
+        {secondaryMenuDisplayItems.map((item, i) => (
           <MenuLinkItem key={i} item={item} className="-me-1.5" />
         ))}
       </>
+    ) : null,
+    github: githubMobileMenuItem ? (
+      <MenuLinkItem item={githubMobileMenuItem} className="-me-1.5" />
     ) : null,
     separator: <div role="separator" className="flex-1" />,
     i18n: i18n ? (
@@ -629,7 +666,7 @@ function CompactLanguageToggle({
         className={cn(
           buttonVariants({
             color: 'ghost',
-            className: 'gap-1.5 py-1.5 pl-2 pr-0.5',
+            className: 'gap-1.5 py-1.5 px-1',
           }),
           props.className,
         )}
@@ -664,6 +701,12 @@ function CompactLanguageToggle({
         ))}
       </PopoverContent>
     </Popover>
+  );
+}
+
+function isGithubItem(item: LinkItemType, githubUrl?: string): boolean {
+  return Boolean(
+    githubUrl && item.type === 'icon' && item.url === githubUrl,
   );
 }
 

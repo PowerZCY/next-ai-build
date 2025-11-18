@@ -60,21 +60,28 @@ on 字段可以写在任何 LinkItemType 上（顶层或子项都可以），用
 
 ## 行为顺序自定义
 - `<CustomHomeLayout>` 支持 `actionOrders` 属性，可分别控制三个区域：
-  - `desktop`: `('search' | 'theme' | 'i18n' | 'secondary')[]`，桌面右侧工具条。
+  - `desktop`: `('search' | 'theme' | 'i18n' | 'secondary' | 'github')[]`，桌面右侧工具条。`github` 仅在配置了 `githubUrl` 时生效，并可让 GitHub 图标脱离 secondary 队列单独排序。
   - `mobileBar`: `('pinned' | 'search' | 'menu')[]`，移动端顶部工具条。
-  - `mobileMenu`: `('secondary' | 'separator' | 'i18n' | 'theme')[]`，移动抽屉中的功能顺序。
-- 示例：
+  - `mobileMenu`: `('secondary' | 'github' | 'separator' | 'i18n' | 'theme')[]`，移动抽屉中的功能顺序。
+- 示例
   ```tsx
   <CustomHomeLayout
     actionOrders={{
-      desktop: ['search', 'i18n', 'theme', 'secondary'],
-      mobileBar: ['pinned', 'menu', 'search'],
-      mobileMenu: ['secondary', 'i18n', 'separator', 'theme'],
+      desktop: ['search', 'theme', 'github', 'i18n', 'secondary'],
+      mobileBar: ['search', 'pinned', 'menu'],
+      mobileMenu: ['theme', 'i18n', 'separator', 'secondary', 'github'],
     }}
     {...otherProps}
   />
   ```
+- 不把 `github` 写进数组时它会继续随 secondary 一起渲染，保持原有表现。
 - 不配置则沿用默认顺序（与当前 UI 一致）。
+- 推荐
+  - 桌面端： 网站LOGO-标题-一级菜单项 | 空白分割 | 搜索框-主题切换-Github图标-语言切换-自定义菜单按钮
+  - 移动端：
+    - 网站LOGO-标题 | 空白分割 | 搜索框-自定义菜单按钮Pinned-菜单下拉按钮
+    - 一级子菜单及子菜单项
+    - 主题切换-语言切换 | 空白分割 | 自定义菜单按钮非Pinned-Github图标 
 
 ## 其它提示
 - `on: 'nav' | 'menu' | 'all'` 可强制指定某个链接只在桌面导航或移动菜单中展示，不写则等同 `'all'`。  

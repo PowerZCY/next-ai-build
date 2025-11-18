@@ -134,6 +134,6 @@ export async function baseOptions(locale: string): Promise<BaseLayoutProps> {
     // 导航Header, 语言切换
     i18n,
     // 导航Header, Github链接
-    // githubUrl: appConfig.github,
+    githubUrl: appConfig.github,
   };
 }
