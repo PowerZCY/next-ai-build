@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 10.1.2
+
+### Patch Changes
+
+- feat(header): now you can custom menu view order by config `actionOrders` params
+- Updated dependencies
+  - @windrun-huaiin/base-ui@10.1.0
+  - @windrun-huaiin/lib@10.1.0
+
 ## 10.1.1
 
 ### Patch Changes
