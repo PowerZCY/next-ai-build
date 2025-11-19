@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["nextai", "public"]
 }
 
 model User {
@@ -25,6 +26,8 @@ model User {
 
   @@index([fingerprintId], map: "idx_users_fingerprint_id")
   @@map("users")
+
+  @@schema("nextai")
 }
 
 model Subscription {
@@ -46,6 +49,8 @@ model Subscription {
   @@index([paySubscriptionId], map: "idx_subscriptions_pay_subscription_id")
   @@index([orderId], map: "idx_subscriptions_order_id")
   @@map("subscriptions")
+
+  @@schema("nextai")
 }
 
 model Credit {
@@ -76,6 +81,8 @@ model Credit {
 
   @@index([userId], map: "idx_credits_user_id")
   @@map("credits")
+
+  @@schema("nextai")
 }
 
 model Transaction {
@@ -118,6 +125,8 @@ model Transaction {
   @@index([paySubscriptionId], map: "idx_transactions_pay_subscription_id")
   @@index([userId], map: "idx_transactions_user_id")
   @@map("transactions")
+
+  @@schema("nextai")
 }
 
 model CreditAuditLog {
@@ -136,6 +145,8 @@ model CreditAuditLog {
   @@index([operationType], map: "idx_credit_audit_log_operation_type")
   @@index([userId], map: "idx_credit_audit_log_user_id")
   @@map("credit_audit_log")
+
+  @@schema("nextai")
 }
 
 model UserBackup {
@@ -157,6 +168,8 @@ model UserBackup {
   @@index([fingerprintId], map: "idx_user_backup_fingerprint_id")
   @@index([originalUserId], map: "idx_user_backup_original_user_id")
   @@map("user_backup")
+
+   @@schema("nextai")
 }
 
 model Apilog {
@@ -169,4 +182,6 @@ model Apilog {
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("apilog")
+
+  @@schema("nextai")
 }
