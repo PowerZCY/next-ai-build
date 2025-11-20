@@ -1,8 +1,10 @@
-import { Montserrat } from "next/font/google";
+import localFont from 'next/font/local';
 
-export const montserrat = Montserrat({
-  weight: ['400'],
-  subsets: ['latin'],
+// 固定使用本地字体，不再依赖环境变量/远程 Google。
+export const montserrat = localFont({
+  src: [
+    { path: '../../public/asserts/Montserrat-Regular.otf', weight: '400', style: 'normal' },
+  ],
   display: 'swap',
-  fallback: ['system-ui', 'Arial', 'sans-serif']
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
 });

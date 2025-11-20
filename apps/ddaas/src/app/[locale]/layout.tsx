@@ -5,16 +5,10 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import { ClerkProviderClient } from '@third-ui/clerk';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
-import { Montserrat } from "next/font/google";
+import { montserrat } from "@/lib/fonts";
+import { cn } from '@windrun-huaiin/lib/utils';
 import './globals.css';
 import React from 'react';
-
-export const montserrat = Montserrat({
-  weight: ['400'],
-  subsets: ['latin'],
-  display: 'swap',
-  fallback: ['system-ui', 'Arial', 'sans-serif']
-});
 
 export const dynamic = 'force-dynamic'
 
@@ -73,7 +67,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <NextIntlClientProvider messages={messages}>
-        <body>
+        <body className={cn(montserrat.className)}>
           <NProgressBar />
           <ClerkProviderClient locale={locale}>
             <RootProvider
