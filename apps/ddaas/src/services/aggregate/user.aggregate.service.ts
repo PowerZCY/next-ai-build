@@ -9,11 +9,13 @@ export class UserAggregateService {
 
   async initAnonymousUser(
     fingerprintId: string,
+    options?: { sourceRef?: string; }
   ): Promise<{ newUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const newUser = await userService.createUser(
         {
           fingerprintId,
+          sourceRef: options?.sourceRef,
           status: UserStatus.ANONYMOUS,
         },
         tx
@@ -54,7 +56,8 @@ export class UserAggregateService {
     clerkUserId: string,
     email?: string,
     fingerprintId?: string,
-    userName?: string
+    userName?: string,
+    sourceRef?: string,
   ): Promise<{ newUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const newUser = await userService.createUser(
@@ -63,6 +66,7 @@ export class UserAggregateService {
           email,
           fingerprintId,
           userName,
+          sourceRef,
           status: UserStatus.REGISTERED,
         },
         tx

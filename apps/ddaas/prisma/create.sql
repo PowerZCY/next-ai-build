@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS nextai.users (
     user_name             VARCHAR(255),
     created_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMPTZ    DEFAULT CURRENT_TIMESTAMP,
+    source_ref      TEXT,
     CONSTRAINT users_user_id_key UNIQUE (user_id),
     CONSTRAINT users_status_check CHECK (status::text = ANY (ARRAY['anonymous'::character varying, 'registered'::character varying, 'frozen'::character varying, 'deleted'::character varying]::text[]))
 );

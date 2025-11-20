@@ -19,6 +19,7 @@ model User {
   userName String?        @map("user_name") @db.VarChar(255)
   createdAt     DateTime?      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime?      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  sourceRef     String?        @map("source_ref") @db.Text
   creditAuditLogs   CreditAuditLog[]
   credit       Credit?
   subscription  Subscription?

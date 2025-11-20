@@ -10,6 +10,7 @@ export class UserService {
   // Create user
   async createUser(data: {
     fingerprintId?: string;
+    sourceRef?: string;
     clerkUserId?: string;
     stripeCusId?: string;
     email?: string;
@@ -21,6 +22,7 @@ export class UserService {
     return await client.user.create({
       data: {
         fingerprintId: data.fingerprintId,
+        sourceRef: data.sourceRef,
         clerkUserId: data.clerkUserId,
         stripeCusId: data.stripeCusId,
         email: data.email,

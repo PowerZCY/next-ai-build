@@ -68,6 +68,39 @@ function createErrorResponse(message: string, status = 400): NextResponse {
   return NextResponse.json(errorResponse, { status });
 }
 
+const SOURCE_REF_MAX_LENGTH = 2048;
+
+function normalizeSourceRef(ref: string | null): string | null {
+  if (!ref) {
+    return null;
+  }
+
+  const trimmed = ref.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.length > SOURCE_REF_MAX_LENGTH
+    ? trimmed.slice(0, SOURCE_REF_MAX_LENGTH)
+    : trimmed;
+}
+
+// 提取用户首次访问来源
+function extractSourceRef(request: NextRequest): string | null {
+  const headerRef = request.headers.get('referer') || request.headers.get('referrer');
+  const customRef = request.headers.get('x-source-ref');
+  const queryRef = request.nextUrl.searchParams.get('ref');
+
+  const candidates = [headerRef, customRef, queryRef];
+  for (const candidate of candidates) {
+    const normalized = normalizeSourceRef(candidate);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return null;
+}
 
 /**
  * 根据fingerprint_id查询用户并返回响应数据
@@ -144,8 +177,10 @@ async function handleFingerprintRequest(request: NextRequest, options: { createI
       return createErrorResponse('User not found', 404);
     }
 
+    const sourceRef = extractSourceRef(request);
+
     // 创建新的匿名用户
-    const { newUser, credit } = await userAggregateService.initAnonymousUser(fingerprintId);
+    const { newUser, credit } = await userAggregateService.initAnonymousUser(fingerprintId, { sourceRef: sourceRef??  undefined});
 
     console.log(`Created new anonymous user ${newUser.userId} with fingerprint ${fingerprintId}`);
 
