@@ -12,6 +12,7 @@ import type {
   XSubscription,
   XUser
 } from './types';
+import { FINGERPRINT_SOURCE_REFER } from './fingerprint-shared'
 
 /**
  * Hook for managing fingerprint ID and anonymous user data
@@ -77,6 +78,7 @@ export function useFingerprint(config: FingerprintConfig): UseFingerprintResult 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          [FINGERPRINT_SOURCE_REFER]: document.referrer || '',
           ...fingerprintHeaders,
         },
         body: JSON.stringify({ fingerprintId }),

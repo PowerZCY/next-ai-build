@@ -7,6 +7,7 @@
 export const FINGERPRINT_STORAGE_KEY = '__x_fingerprint_id';
 export const FINGERPRINT_HEADER_NAME = 'x-fingerprint-id-v8';
 export const FINGERPRINT_COOKIE_NAME = '__x_fingerprint_id';
+export const FINGERPRINT_SOURCE_REFER = 'x-source-ref';
 
 /**
  * 验证fingerprint ID格式

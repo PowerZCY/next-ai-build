@@ -1,5 +1,14 @@
 # @windrun-huaiin/third-ui
 
+## 10.1.3
+
+### Patch Changes
+
+- feat(source): parse user source from http for better analysis
+- Updated dependencies
+  - @windrun-huaiin/base-ui@10.1.0
+  - @windrun-huaiin/lib@10.1.0
+
 ## 10.1.2
 
 ### Patch Changes

@@ -5,7 +5,7 @@
  */
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { FINGERPRINT_STORAGE_KEY, FINGERPRINT_COOKIE_NAME, isValidFingerprintId } from './fingerprint-shared';
+import { FINGERPRINT_COOKIE_NAME, FINGERPRINT_HEADER_NAME, FINGERPRINT_SOURCE_REFER, FINGERPRINT_STORAGE_KEY, isValidFingerprintId } from './fingerprint-shared';
 
 /**
  * 检查浏览器存储（localStorage 和 cookie）中的指纹 ID
@@ -128,7 +128,7 @@ export async function getOrGenerateFingerprintId(): Promise<string> {
 export async function createFingerprintHeaders(): Promise<Record<string, string>> {
   const fingerprintId = await getOrGenerateFingerprintId();
   return {
-    FINGERPRINT_HEADER_NAME: fingerprintId,
+    [FINGERPRINT_HEADER_NAME]: fingerprintId,
   };
 }
 
@@ -147,6 +147,7 @@ export function createFingerprintFetch() {
     const fingerprintHeaders = await createFingerprintHeaders();
     const headers = {
       ...fingerprintHeaders,
+      [FINGERPRINT_SOURCE_REFER]: document.referrer || '',
       ...(init?.headers || {}),
     };
 
