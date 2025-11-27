@@ -26,7 +26,7 @@
     "third:build": "turbo build --filter=@windrun-huaiin/third-ui build",
     "cli:build": "turbo build --filter=@windrun-huaiin/dev-scripts build",
     "source:build": "turbo build --filter=@windrun-huaiin/shared-assets build",
-    "diaomao:build": "turbo build --filter=@windrun-huaiin/diaomao build"
+    "core:build": "turbo build --filter=@windrun-huaiin/backend-core build"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

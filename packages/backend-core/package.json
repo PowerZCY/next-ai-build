@@ -1,0 +1,102 @@
+{
+  "name": "@windrun-huaiin/backend-core",
+  "version": "10.0.0",
+  "description": "Shared backend primitives: Prisma schema/client, database services, routing helpers",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "backend-core": "./dist/cli/index.cjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./prisma": {
+      "types": "./dist/prisma/index.d.ts",
+      "import": "./dist/prisma/index.mjs",
+      "require": "./dist/prisma/index.cjs"
+    },
+    "./prisma/client": {
+      "types": "./dist/prisma/client.d.ts",
+      "import": "./dist/prisma/client.mjs",
+      "require": "./dist/prisma/client.cjs"
+    },
+    "./database": {
+      "types": "./dist/services/database/index.d.ts",
+      "import": "./dist/services/database/index.mjs",
+      "require": "./dist/services/database/index.cjs"
+    },
+    "./aggregate": {
+      "types": "./dist/services/aggregate/index.d.ts",
+      "import": "./dist/services/aggregate/index.mjs",
+      "require": "./dist/services/aggregate/index.cjs"
+    },
+    "./context": {
+      "types": "./dist/services/context/index.d.ts",
+      "import": "./dist/services/context/index.mjs",
+      "require": "./dist/services/context/index.cjs"
+    },
+    "./stripe": {
+      "types": "./dist/services/stripe/index.d.ts",
+      "import": "./dist/services/stripe/index.mjs",
+      "require": "./dist/services/stripe/index.cjs"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.mjs",
+      "require": "./dist/lib/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "prisma",
+    "migrations",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "build:prod": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "catalog:",
+    "@prisma/client": "catalog:",
+    "@windrun-huaiin/lib": "workspace:^",
+    "@windrun-huaiin/third-ui": "workspace:^",
+    "next": "catalog:",
+    "prisma": "catalog:",
+    "stripe": "catalog:",
+    "svix": "catalog:",
+    "zod": "catalog:",
+    "commander": "catalog:"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
+    "rollup": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@clerk/nextjs": "catalog:",
+    "@prisma/client": "catalog:",
+    "next": "catalog:",
+    "prisma": "catalog:",
+    "stripe": "catalog:",
+    "svix": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
