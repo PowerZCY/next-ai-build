@@ -10,7 +10,7 @@ export class UserService {
   // Create user
   async createUser(data: {
     fingerprintId?: string;
-    sourceRef?: string;
+    sourceRef?: Prisma.InputJsonValue;
     clerkUserId?: string;
     stripeCusId?: string;
     email?: string;

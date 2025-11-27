@@ -9,7 +9,7 @@ export class UserAggregateService {
 
   async initAnonymousUser(
     fingerprintId: string,
-    options?: { sourceRef?: string; }
+    options?: { sourceRef?: Prisma.InputJsonValue; }
   ): Promise<{ newUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const newUser = await userService.createUser(
@@ -57,7 +57,7 @@ export class UserAggregateService {
     email?: string,
     fingerprintId?: string,
     userName?: string,
-    sourceRef?: string,
+    sourceRef?: Prisma.InputJsonValue,
   ): Promise<{ newUser: User; credit: Credit; }> {
     return runInTransaction(async (tx) => {
       const newUser = await userService.createUser(
