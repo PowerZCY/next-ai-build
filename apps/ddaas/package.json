@@ -13,7 +13,14 @@
     "check-translations": "dev-scripts check-translations -v",
     "clean-translations": "dev-scripts clean-translations -v",
     "remove-translations": "dev-scripts clean-translations --remove -v",
-    "whoareyou": "dev-scripts generate-nextjs-architecture -v"
+    "core-list-route": "dev-scripts backend-core routes:list",
+    "core-sync-route": "dev-scripts backend-core routes:sync",
+    "core-sync-schema": "dev-scripts backend-core prisma:sync",
+    "core-sync-sql": "dev-scripts backend-core migrations:sync",
+    "whoareyou": "dev-scripts generate-nextjs-architecture -v",
+    "windrun": "pnpm remove @windrun-huaiin/base-ui @windrun-huaiin/lib @windrun-huaiin/third-ui @windrun-huaiin/backend-core @windrun-huaiin/dev-scripts  && pnpm add @windrun-huaiin/base-ui@latest @windrun-huaiin/lib@latest @windrun-huaiin/third-ui@latest @windrun-huaiin/backend-core@latest && pnpm add -D @windrun-huaiin/dev-scripts@latest",
+    "windrun3": "pnpm remove @windrun-huaiin/third-ui && pnpm add @windrun-huaiin/third-ui@latest",
+    "windrunC": "pnpm remove @windrun-huaiin/backend-core && pnpm add @windrun-huaiin/backend-core@latest"
   },
   "dependencies": {
     "@clerk/localizations": "catalog:",
