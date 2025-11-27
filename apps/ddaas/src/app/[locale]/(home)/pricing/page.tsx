@@ -1,6 +1,6 @@
 
 import { appConfig } from '@/lib/appConfig';
-import { moneyPriceConfig } from '@/lib/money-price-config';
+import { moneyPriceConfig } from '@windrun-huaiin/backend-core/lib';
 import { getMoneyPriceInitUserContext } from '@/lib/money-price-helper';
 import { FingerprintStatus } from "@third-ui/clerk/fingerprint";
 import { MoneyPrice } from "@third-ui/main/server";

@@ -7,6 +7,7 @@
 - ✅ **翻译检查**: 检查翻译文件的完整性和一致性
 - 🧹 **翻译清理**: 自动清理未使用的翻译键
 - 📝 **博客索引生成**: 自动生成博客索引和月度统计
+- 🧭 **Backend Core 集成**: 生成 Next.js 路由壳、合并 Prisma 模型、同步SQL
 - ⚙️ **配置驱动**: 支持多种配置方式，适配不同项目结构
 - 🔧 **CLI工具**: 统一的命令行接口，易于集成到构建流程
 
@@ -232,6 +233,21 @@ Options:
 ...
 ✅ 共清理 3 个目录或文件。
 ```
+
+### backend-core
+
+为 `@windrun-huaiin/backend-core` 提供路由壳生成与 Prisma 模型合并（需先安装 backend-core，可在 workspace/项目内被 resolve）。
+
+```bash
+dev-scripts backend-core routes:list
+dev-scripts backend-core routes:sync --app-dir src/app --force
+dev-scripts backend-core prisma:sync --schema prisma/schema.prisma
+dev-scripts backend-core migrations:sync --dest prisma --force
+```
+
+- `routes:sync`：在 `app/api` 下生成代理文件，默认 app 目录为 `src/app`，默认跳过已存在文件，`--force` 强制覆盖。
+- `prisma:sync`：把包内模型追加到宿主 schema（默认 `prisma/schema.prisma`），并用宿主 datasource 的 schema 名替换 `@@schema("nextai")`。
+- `migrations:sync`：将包内 `migrations/*.sql` 复制到指定目录（默认 `prisma/`，默认跳过已存在，`--force` 可覆盖）。
 
 ## 支持的翻译模式
 

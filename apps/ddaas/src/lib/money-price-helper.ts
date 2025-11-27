@@ -8,7 +8,7 @@ import {
   applyUserMockContext,
   buildInitUserContextFromEntities,
   fetchUserContextByClerkUserId,
-} from '@/context/user-context-service';
+} from '@windrun-huaiin/backend-core/context';
 
 async function readFingerprintIdFromRequest(): Promise<string | null> {
   const cookieStore = await cookies();

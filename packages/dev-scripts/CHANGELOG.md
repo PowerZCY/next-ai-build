@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 10.2.0
+
+### Minor Changes
+
+- feat(backend): core service logic sink into common package
+
 ## 10.1.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/ddaas-website",
-  "version": "10.1.1",
+  "version": "10.2.0",
   "private": true,
   "scripts": {
     "dev": "prisma generate && next dev",
@@ -74,6 +74,7 @@
     "@types/react-medium-image-zoom": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "@windrun-huaiin/dev-scripts": "workspace:*",
+    "@windrun-huaiin/backend-core": "workspace:*",
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
     "eslint-plugin-unused-imports": "catalog:",

@@ -1,5 +1,19 @@
 # @windrun-huaiin/ddaas-website
 
+## 10.2.0
+
+### Minor Changes
+
+- feat(backend): core service logic sink into common package
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/base-ui@10.1.0
+  - @windrun-huaiin/third-ui@10.1.3
+  - @windrun-huaiin/lib@10.1.0
+  - @windrun-huaiin/shared-assets@10.1.0
+
 ## 10.1.1
 
 ### Patch Changes

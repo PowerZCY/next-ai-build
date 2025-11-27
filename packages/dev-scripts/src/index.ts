@@ -2,6 +2,13 @@
 export { checkTranslations } from '@dev-scripts/commands/check-translations'
 export { cleanTranslations } from '@dev-scripts/commands/clean-translations'
 export { generateBlogIndex } from '@dev-scripts/commands/generate-blog-index'
+export {
+  registerBackendCoreCommands,
+  syncBackendCoreRoutes,
+  listBackendCoreRoutes,
+  syncBackendCorePrisma,
+  syncBackendCoreMigrations
+} from '@dev-scripts/commands/backend-core'
 
 // config
 export { loadConfig, validateConfig } from '@dev-scripts/config'

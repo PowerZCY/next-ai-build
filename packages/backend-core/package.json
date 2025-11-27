@@ -1,54 +1,76 @@
 {
   "name": "@windrun-huaiin/backend-core",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Shared backend primitives: Prisma schema/client, database services, routing helpers",
   "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "backend-core": "./dist/cli/index.cjs"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
     },
     "./prisma": {
       "types": "./dist/prisma/index.d.ts",
       "import": "./dist/prisma/index.mjs",
-      "require": "./dist/prisma/index.cjs"
+      "require": "./dist/prisma/index.js"
     },
     "./prisma/client": {
       "types": "./dist/prisma/client.d.ts",
       "import": "./dist/prisma/client.mjs",
-      "require": "./dist/prisma/client.cjs"
+      "require": "./dist/prisma/client.js"
     },
     "./database": {
       "types": "./dist/services/database/index.d.ts",
       "import": "./dist/services/database/index.mjs",
-      "require": "./dist/services/database/index.cjs"
+      "require": "./dist/services/database/index.js"
     },
     "./aggregate": {
       "types": "./dist/services/aggregate/index.d.ts",
       "import": "./dist/services/aggregate/index.mjs",
-      "require": "./dist/services/aggregate/index.cjs"
+      "require": "./dist/services/aggregate/index.js"
     },
     "./context": {
       "types": "./dist/services/context/index.d.ts",
       "import": "./dist/services/context/index.mjs",
-      "require": "./dist/services/context/index.cjs"
+      "require": "./dist/services/context/index.js"
     },
     "./stripe": {
       "types": "./dist/services/stripe/index.d.ts",
       "import": "./dist/services/stripe/index.mjs",
-      "require": "./dist/services/stripe/index.cjs"
+      "require": "./dist/services/stripe/index.js"
     },
     "./lib": {
       "types": "./dist/lib/index.d.ts",
       "import": "./dist/lib/index.mjs",
-      "require": "./dist/lib/index.cjs"
+      "require": "./dist/lib/index.js"
+    },
+    "./app/api/webhook/stripe/route": {
+      "types": "./dist/app/api/webhook/stripe/route.d.ts",
+      "import": "./dist/app/api/webhook/stripe/route.mjs",
+      "require": "./dist/app/api/webhook/stripe/route.js"
+    },
+    "./app/api/webhook/clerk/user/route": {
+      "types": "./dist/app/api/webhook/clerk/user/route.d.ts",
+      "import": "./dist/app/api/webhook/clerk/user/route.mjs",
+      "require": "./dist/app/api/webhook/clerk/user/route.js"
+    },
+    "./app/api/user/anonymous/init/route": {
+      "types": "./dist/app/api/user/anonymous/init/route.d.ts",
+      "import": "./dist/app/api/user/anonymous/init/route.mjs",
+      "require": "./dist/app/api/user/anonymous/init/route.js"
+    },
+    "./app/api/stripe/checkout/route": {
+      "types": "./dist/app/api/stripe/checkout/route.d.ts",
+      "import": "./dist/app/api/stripe/checkout/route.mjs",
+      "require": "./dist/app/api/stripe/checkout/route.js"
+    },
+    "./app/api/stripe/customer-portal/route": {
+      "types": "./dist/app/api/stripe/customer-portal/route.d.ts",
+      "import": "./dist/app/api/stripe/customer-portal/route.mjs",
+      "require": "./dist/app/api/stripe/customer-portal/route.js"
     },
     "./package.json": "./package.json"
   },
@@ -77,8 +99,7 @@
     "prisma": "catalog:",
     "stripe": "catalog:",
     "svix": "catalog:",
-    "zod": "catalog:",
-    "commander": "catalog:"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "catalog:",

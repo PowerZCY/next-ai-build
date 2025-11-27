@@ -18,6 +18,7 @@ const baseConfig = {
     'fs',
     'path',
     'child_process',
+    'module',
     'url',
     'typescript',
     /^node:/

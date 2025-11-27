@@ -30,15 +30,6 @@
       "@/.source": [
         ".source"
       ],
-      "@/db/*": [
-        "./src/services/database/*"
-      ],
-      "@/agg/*": [
-        "./src/services/aggregate/*"
-      ],
-      "@/context/*": [
-        "./src/services/context/*"
-      ],
       "@third-ui/*": [
         "../../packages/third-ui/src/*"
       ],

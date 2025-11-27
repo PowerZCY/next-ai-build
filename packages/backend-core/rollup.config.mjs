@@ -8,7 +8,6 @@ import { preserveDirectives } from 'rollup-plugin-preserve-directives';
 // Align build entry points with package.json exports to produce per-module outputs
 const entries = [
   'src/index.ts',
-  'src/cli/index.ts',
   'src/prisma/index.ts',
   'src/prisma/client.ts',
   'src/services/database/index.ts',
@@ -16,6 +15,11 @@ const entries = [
   'src/services/context/index.ts',
   'src/services/stripe/index.ts',
   'src/lib/index.ts',
+  'src/app/api/webhook/stripe/route.ts',
+  'src/app/api/webhook/clerk/user/route.ts',
+  'src/app/api/user/anonymous/init/route.ts',
+  'src/app/api/stripe/checkout/route.ts',
+  'src/app/api/stripe/customer-portal/route.ts',
 ];
 
 const createConfig = (format) => ({
@@ -27,8 +31,7 @@ const createConfig = (format) => ({
     'stripe',
     'svix',
     /^@windrun-huaiin\//,
-    /^@prisma\/client/,
-    'commander',
+    /^@prisma\/client/
   ],
   plugins: [
     peerDepsExternal(),
@@ -55,7 +58,6 @@ const createConfig = (format) => ({
     entryFileNames: format === 'es' ? '[name].mjs' : '[name].js',
     chunkFileNames: format === 'es' ? '[name]-[hash].mjs' : '[name]-[hash].js',
     exports: 'auto',
-    banner: (chunk) => (chunk.facadeModuleId?.endsWith('cli/index.ts') ? '#!/usr/bin/env node' : undefined),
   },
 });
 
