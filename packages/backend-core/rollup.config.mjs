@@ -30,6 +30,7 @@ const createConfig = (format) => ({
     /^@clerk\//,
     'stripe',
     'svix',
+    'zod',
     /^@windrun-huaiin\//,
     /^@prisma\/client/
   ],

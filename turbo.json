@@ -54,6 +54,20 @@
       "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
+    "@windrun-huaiin/backend-core#build": {
+      "dependsOn": [
+        "@windrun-huaiin/lib#build",
+        "@windrun-huaiin/base-ui#build",
+        "@windrun-huaiin/third-ui#build"
+      ],
+      "outputs": ["dist/**"],
+      "env": [
+        "NODE_ENV",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
+    },
     "@windrun-huaiin/base-ui#build": {
       "dependsOn": ["@windrun-huaiin/lib#build"],
       "outputs": ["dist/**"],
@@ -76,6 +90,20 @@
     "@windrun-huaiin/lib#build:prod": {
       "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
+    },
+    "@windrun-huaiin/backend-core#build:prod": {
+      "dependsOn": [
+        "@windrun-huaiin/lib#build:prod",
+        "@windrun-huaiin/base-ui#build:prod",
+        "@windrun-huaiin/third-ui#build:prod"
+      ],
+      "outputs": ["dist/**"],
+      "env": [
+        "NODE_ENV",
+        "CLERK_SECRET_KEY",
+        "CLERK_DEBUG",
+        "NEXT_PUBLIC_CLERK_*"
+      ]
     },
     "@windrun-huaiin/base-ui#build:prod": {
       "dependsOn": ["@windrun-huaiin/lib#build:prod"],
