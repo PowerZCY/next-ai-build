@@ -1,6 +1,6 @@
 import { baseOptions, homeNavLinks, levelNavLinks } from '@/app/[locale]/layout.config';
 import { showBanner } from '@/lib/appConfig';
-import { fingerprintConfig } from '@/lib/fingerprint-config';
+import { fingerprintConfig } from '@windrun-huaiin/backend-core/lib';
 import { FingerprintProvider } from '@third-ui/clerk/fingerprint';
 import { CustomHomeLayout } from '@third-ui/fuma/base';
 import type { HomeLayoutProps } from 'fumadocs-ui/layouts/home';

@@ -1,4 +1,4 @@
-import { FingerprintConfig } from '@third-ui/clerk/fingerprint';
+import { FingerprintConfig } from '@windrun-huaiin/third-ui/fingerprint';
 
 export const fingerprintConfig: FingerprintConfig = {
   apiEndpoint: '/api/user/anonymous/init',

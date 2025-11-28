@@ -2,13 +2,13 @@ import { auth } from '@clerk/nextjs/server';
 import { cookies, headers } from 'next/headers';
 import {
   extractFingerprintFromNextStores,
-} from '@third-ui/clerk/fingerprint/server';
-import type { InitUserContext } from '@third-ui/main/server';
+} from '@windrun-huaiin/third-ui/fingerprint/server';
+import type { InitUserContext } from '@windrun-huaiin/third-ui/main/server';
 import {
   applyUserMockContext,
   buildInitUserContextFromEntities,
   fetchUserContextByClerkUserId,
-} from '@windrun-huaiin/backend-core/context';
+} from '../services/context';
 
 async function readFingerprintIdFromRequest(): Promise<string | null> {
   const cookieStore = await cookies();
