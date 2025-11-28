@@ -1,5 +1,16 @@
 # @windrun-huaiin/ddaas-website
 
+## 11.0.1
+
+### Patch Changes
+
+- fix(migrations): update migration commands to support schema name and remove obsolete SQL files
+- Updated dependencies
+  - @windrun-huaiin/base-ui@11.0.0
+  - @windrun-huaiin/third-ui@11.0.0
+  - @windrun-huaiin/lib@11.0.0
+  - @windrun-huaiin/shared-assets@11.0.0
+
 ## 11.0.0
 
 ### Major Changes

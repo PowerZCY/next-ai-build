@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin/ddaas-website",
-  "version": "11.0.0",
+  "version": "11.0.1",
   "private": true,
   "scripts": {
     "dev": "prisma generate && next dev",
@@ -16,7 +16,7 @@
     "core-list-route": "dev-scripts backend-core routes:list",
     "core-sync-route": "dev-scripts backend-core routes:sync",
     "core-sync-schema": "dev-scripts backend-core prisma:sync",
-    "core-sync-sql": "dev-scripts backend-core migrations:sync",
+    "core-sync-sql": "dev-scripts backend-core migrations:sync --schema nextai",
     "whoareyou": "dev-scripts generate-nextjs-architecture -v",
     "windrun": "pnpm remove @windrun-huaiin/base-ui @windrun-huaiin/lib @windrun-huaiin/third-ui @windrun-huaiin/backend-core @windrun-huaiin/dev-scripts  && pnpm add @windrun-huaiin/base-ui@latest @windrun-huaiin/lib@latest @windrun-huaiin/third-ui@latest @windrun-huaiin/backend-core@latest && pnpm add -D @windrun-huaiin/dev-scripts@latest",
     "windrun3": "pnpm remove @windrun-huaiin/third-ui && pnpm add @windrun-huaiin/third-ui@latest",

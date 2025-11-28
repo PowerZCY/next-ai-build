@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 11.0.1
+
+### Patch Changes
+
+- fix(migrations): update migration commands to support schema name and remove obsolete SQL files
+
 ## 11.0.0
 
 ### Major Changes

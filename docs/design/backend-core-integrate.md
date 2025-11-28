@@ -22,9 +22,8 @@ CLI 功能原先在 `@windrun-huaiin/backend-core` 包内，现统一由 `@windr
 5. Prisma/schema（提供追加命令）：  
    - `pnpm dev-scripts backend-core prisma:sync --schema prisma/schema.prisma` 将包内 models 追加到宿主 schema（保留宿主 datasource/generator，标记 `// === backend-core models ===`）。  
    - 命令会把包内 `@@schema("nextai")` 替换为宿主 datasource 的 schema 名（若能解析到）。  
-   - `pnpm dev-scripts backend-core migrations:sync --dest prisma` 将包内 `migrations/*.sql` 复制到指定目录（默认跳过已存在，`--force` 可覆盖），然后 `npx prisma generate`。
-6. 同步SQL： `pnpm dev-scripts backend-core migrations:sync --dest prisma --force`
-7. 升级：升级包 → 跑 `dev-scripts backend-core routes:sync` 同步新增路由 → 手动比对/合并 schema + 执行迁移 → `npx prisma generate`。
+   - `pnpm dev-scripts backend-core migrations:sync --schema nextai --dest prisma` 将包内 `migrations/*.sql` 复制到指定目录（默认跳过已存在，`--force` 可覆盖），然后 `npx prisma generate`。
+6. 升级：升级包 → 跑 `dev-scripts backend-core routes:sync` 同步新增路由 → 手动比对/合并 schema + 执行迁移 → `npx prisma generate`。
 
 ### 环境变量
 ```conf

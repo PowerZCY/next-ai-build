@@ -113,11 +113,12 @@ export function registerBackendCoreCommands(program: Command) {
     .command('migrations:sync')
     .description('Copy backend-core SQL migrations into the host directory')
     .option('--dest <dir>', 'Target migrations directory', 'prisma')
+    .option('--schema <name>', 'Database schema name (replaces "nextai" in SQL files)', 'nextai')
     .option('--force', 'Overwrite existing files', false)
     .action(async (opts) => {
       const cwd = process.cwd()
       try {
-        const results = await syncBackendCoreMigrations(opts.dest, opts.force, cwd)
+        const results = await syncBackendCoreMigrations(opts.dest, opts.schema, opts.force, cwd)
         console.log('Migrations sync results:')
         for (const r of results) {
           console.log(`- ${r.status} :: ${r.file}`)
@@ -214,6 +215,7 @@ export async function syncBackendCorePrisma(
 
 export async function syncBackendCoreMigrations(
   destDirInput: string,
+  schemaName: string = 'nextai',
   force: boolean = false,
   cwd: string = process.cwd()
 ): Promise<RouteSyncResult[]> {
@@ -239,7 +241,12 @@ export async function syncBackendCoreMigrations(
       results.push({ file: to, status: 'skip (exists)' })
       continue
     }
-    await fs.copyFile(from, to)
+
+    // Read SQL content and replace schema name
+    const sqlContent = await fs.readFile(from, 'utf8')
+    const updatedContent = sqlContent.replace(/nextai\./g, `${schemaName}.`)
+
+    await fs.writeFile(to, updatedContent, 'utf8')
     results.push({ file: to, status: exists ? 'overwritten' : 'copied' })
   }
 
