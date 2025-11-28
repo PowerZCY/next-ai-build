@@ -1,5 +1,11 @@
 # @windrun-huaiin/dev-scripts
 
+## 11.0.2
+
+### Patch Changes
+
+- fix(migrations): sql sync cli commander issue fixed
+
 ## 11.0.1
 
 ### Patch Changes

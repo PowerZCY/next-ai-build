@@ -244,7 +244,15 @@ export async function syncBackendCoreMigrations(
 
     // Read SQL content and replace schema name
     const sqlContent = await fs.readFile(from, 'utf8')
-    const updatedContent = sqlContent.replace(/nextai\./g, `${schemaName}.`)
+    // Diff handle init-schema.sql file
+    let updatedContent: string
+    if (file.name === 'init-schema.sql') {
+      // Just use 'schemaName' to replace 'nextai'
+      updatedContent = sqlContent.replace(/\bnextai\b/g, schemaName)
+    } else {
+      // Others use 'schemaName.' to replace 'nextai.'
+      updatedContent = sqlContent.replace(/nextai\./g, `${schemaName}.`)
+    }
 
     await fs.writeFile(to, updatedContent, 'utf8')
     results.push({ file: to, status: exists ? 'overwritten' : 'copied' })
