@@ -1,5 +1,12 @@
 # @windrun-huaiin/dev-scripts
 
+## 11.0.0
+
+### Major Changes
+
+- fix(backend): core service logic sink into common package
+  - path use alias for simple
+
 ## 10.2.0
 
 ### Minor Changes

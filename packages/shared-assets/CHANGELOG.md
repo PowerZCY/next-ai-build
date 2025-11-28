@@ -1,5 +1,12 @@
 # @windrun-huaiin/shared-assets
 
+## 11.0.0
+
+### Major Changes
+
+- fix(backend): core service logic sink into common package
+  - path use alias for simple
+
 ## 10.1.0
 
 ### Minor Changes

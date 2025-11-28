@@ -4,9 +4,9 @@
   return this.toString();
 };
 
-import { userAggregateService } from '../../../../../services/aggregate/index';
-import { UserStatus } from '../../../../../services//database/constants';
-import { Apilogger, userService } from '../../../../../services//database/index';
+import { userAggregateService } from '@/aggregate/user.aggregate.service';
+import { UserStatus } from '@/db/constants';
+import { Apilogger, userService } from '@/db/index';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
@@ -246,4 +246,3 @@ async function handleUserDeleted(event: ClerkWebhookEvent) {
     throw error;
   }
 }
-

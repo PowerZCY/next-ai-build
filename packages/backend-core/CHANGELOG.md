@@ -1,5 +1,18 @@
 # @windrun-huaiin/backend-core
 
+## 11.0.0
+
+### Major Changes
+
+- fix(backend): core service logic sink into common package
+  - path use alias for simple
+
+### Patch Changes
+
+- Updated dependencies
+  - @windrun-huaiin/third-ui@11.0.0
+  - @windrun-huaiin/lib@11.0.0
+
 ## 10.0.1
 
 ### Patch Changes

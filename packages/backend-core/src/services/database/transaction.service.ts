@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Prisma } from './prisma-model-type';
-import type { Transaction } from './prisma-model-type';
-import { OrderStatus, TransactionType, PaySupplier, PaymentStatus } from './constants';
-import { checkAndFallbackWithNonTCClient } from '../../prisma/index';
+import { Prisma } from '@/db/prisma-model-type';
+import type { Transaction } from '@/db/prisma-model-type';
+import { OrderStatus, TransactionType, PaySupplier, PaymentStatus } from '@/db/constants';
+import { checkAndFallbackWithNonTCClient } from '@/prisma/index';
 
 export class TransactionService {
 

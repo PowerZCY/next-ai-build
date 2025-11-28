@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from './prisma-model-type';
-import type { User } from './prisma-model-type';
-import { UserStatus } from './constants';
-import { checkAndFallbackWithNonTCClient } from '../../prisma/index';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { User } from '@/db/prisma-model-type';
+import { UserStatus } from '@/db/constants';
+import { checkAndFallbackWithNonTCClient } from '@/prisma/index';
 
 export class UserService {
 

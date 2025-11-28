@@ -1,6 +1,6 @@
 {
   "name": "@windrun-huaiin",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "private": true,
   "packageManager": "pnpm@10.23.0",
   "scripts": {

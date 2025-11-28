@@ -9,6 +9,14 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
     "paths": {
+      "@/*": ["./*"],
+      "@/db": ["./services/database"],
+      "@/db/*": ["./services/database/*"],
+      "@/aggregate/*": ["./services/aggregate/*"],
+      "@/context/*": ["./services/context/*"],
+      "@/stripe/*": ["./services/stripe/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/prisma/*": ["./prisma/*"],
       "@backend-core/*": ["./*"]
     }
   },

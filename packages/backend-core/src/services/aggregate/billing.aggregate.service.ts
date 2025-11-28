@@ -9,9 +9,9 @@ import {
   SubscriptionStatus,
   transactionService,
   TransactionType,
-} from '../database/index';
-import type { Subscription, Transaction } from '../database/prisma-model-type';
-import { runInTransaction } from '../../prisma/prisma-transaction-util';
+} from '@/db/index';
+import type { Subscription, Transaction } from '@/db/prisma-model-type';
+import { runInTransaction } from '@/prisma/prisma-transaction-util';
 
 type NullableString = string | null | undefined;
 

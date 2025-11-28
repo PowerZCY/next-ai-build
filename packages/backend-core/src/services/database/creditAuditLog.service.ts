@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Prisma } from './prisma-model-type';
-import type { CreditAuditLog } from './prisma-model-type';
-import { CreditType, OperationType } from './constants';
-import { checkAndFallbackWithNonTCClient } from '../../prisma/index';
+import { Prisma } from '@/db/prisma-model-type';
+import type { CreditAuditLog } from '@/db/prisma-model-type';
+import { CreditType, OperationType } from '@/db/constants';
+import { checkAndFallbackWithNonTCClient } from '@/prisma/index';
 
 export class CreditAuditLogService {
 

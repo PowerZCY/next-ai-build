@@ -5,7 +5,7 @@
   return this.toString();
 };
 
-import { userAggregateService } from '../../../../../services/aggregate/index';
+import { userAggregateService } from '@/aggregate/user.aggregate.service';
 import { XCredit, XSubscription, XUser } from '@windrun-huaiin/third-ui/fingerprint';
 import { extractFingerprintFromNextRequest } from '@windrun-huaiin/third-ui/fingerprint/server';
 import { auth } from '@clerk/nextjs/server';
@@ -18,8 +18,8 @@ import {
   mapSubscriptionToXSubscription,
   mapUserToXUser,
   type UserContextEntities,
-} from '../../../../../services/context/user-context-service';
-import type { Prisma } from '../../../../../services/database/prisma-model-type';
+} from '@/context/user-context-service';
+import type { Prisma } from '@/db/prisma-model-type';
 
 
 // ==================== 类型定义 ====================

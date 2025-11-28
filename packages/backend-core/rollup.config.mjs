@@ -1,9 +1,15 @@
+import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'rollup';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import { preserveDirectives } from 'rollup-plugin-preserve-directives';
+
+const rootDir = fileURLToPath(new URL('.', import.meta.url));
+const resolveFromRoot = (...segments) => path.resolve(rootDir, ...segments);
 
 // Align build entry points with package.json exports to produce per-module outputs
 const entries = [
@@ -35,6 +41,17 @@ const createConfig = (format) => ({
     /^@prisma\/client/
   ],
   plugins: [
+    alias({
+      entries: [
+        { find: '@/db', replacement: resolveFromRoot('src/services/database') },
+        { find: '@/aggregate', replacement: resolveFromRoot('src/services/aggregate') },
+        { find: '@/context', replacement: resolveFromRoot('src/services/context') },
+        { find: '@/stripe', replacement: resolveFromRoot('src/services/stripe') },
+        { find: '@/lib', replacement: resolveFromRoot('src/lib') },
+        { find: '@/prisma', replacement: resolveFromRoot('src/prisma') },
+        { find: '@/', replacement: resolveFromRoot('src') },
+      ],
+    }),
     peerDepsExternal(),
     resolve({
       extensions: ['.ts', '.tsx', '.js', '.jsx'],

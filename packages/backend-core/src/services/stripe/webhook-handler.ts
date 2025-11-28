@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { billingAggregateService } from '../aggregate/index';
+import { billingAggregateService } from '@/aggregate/billing.aggregate.service';
 import {
   Apilogger,
   BillingReason,
@@ -9,11 +9,11 @@ import {
   subscriptionService,
   transactionService,
   TransactionType
-} from '../database/index';
-import { Transaction } from '../database/prisma-model-type';
-import { oneTimeExpiredDays } from '../../lib/credit-init';
-import { getCreditsFromPriceId } from '../../lib/money-price-config';
-import { fetchPaymentId, stripe } from '../../lib/stripe-config';
+} from '@/db/index';
+import { Transaction } from '@/db/prisma-model-type';
+import { oneTimeExpiredDays } from '@/lib/credit-init';
+import { getCreditsFromPriceId } from '@/lib/money-price-config';
+import { fetchPaymentId, stripe } from '@/lib/stripe-config';
 import Stripe from 'stripe';
 import { viewLocalTime } from '@windrun-huaiin/lib/utils';
 

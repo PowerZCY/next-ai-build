@@ -1,6 +1,6 @@
-import { SubscriptionStatus } from './constants';
-import { checkAndFallbackWithNonTCClient } from '../../prisma/index';
-import type { Prisma, Subscription } from './prisma-model-type';
+import { SubscriptionStatus } from '@/db/constants';
+import { checkAndFallbackWithNonTCClient } from '@/prisma/index';
+import type { Prisma, Subscription } from '@/db/prisma-model-type';
 
 export class SubscriptionService {
 

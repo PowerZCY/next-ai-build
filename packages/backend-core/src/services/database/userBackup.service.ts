@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Prisma } from './prisma-model-type';
-import type { UserBackup } from './prisma-model-type';
-import { checkAndFallbackWithNonTCClient } from '../../prisma/index';
+import type { Prisma } from '@/db/prisma-model-type';
+import type { UserBackup } from '@/db/prisma-model-type';
+import { checkAndFallbackWithNonTCClient } from '@/prisma/index';
 
 export class UserBackupService {
 

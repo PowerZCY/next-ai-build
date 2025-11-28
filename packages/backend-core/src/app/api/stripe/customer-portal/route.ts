@@ -3,9 +3,9 @@ import { z } from 'zod';
 import {
   createCustomerPortalSession,
   createOrGetCustomer,
-} from '../../../../lib/stripe-config';
-import { ApiAuthUtils } from '../../../../lib/auth-utils';
-import { subscriptionService } from '../../../../services/database/index';
+} from '@/lib/stripe-config';
+import { ApiAuthUtils } from '@/lib/auth-utils';
+import { subscriptionService } from '@/db/index';
 
 const createCustomerPortalSchema = z
   .object({
